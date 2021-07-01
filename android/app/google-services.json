@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "127632890370",
+    "project_id": "hint-72d23",
+    "storage_bucket": "hint-72d23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127632890370:android:8fabd324794bf8b66d251b",
+        "android_client_info": {
+          "package_name": "com.noxiousbuff.hint"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "127632890370-cuc5slitsa3tq0c77ajiqv7m040hd7eo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.noxiousbuff.hint",
+            "certificate_hash": "7f73eff9d60de4d7378321ccb26553c16b4c3ecf"
+          }
+        },
+        {
+          "client_id": "127632890370-g9kv1v51os4gp1m52rinqp1vf4dqelo0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7IqSo_bmuimQ37PC-BeO-RsRnAtxgci0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "127632890370-g9kv1v51os4gp1m52rinqp1vf4dqelo0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
