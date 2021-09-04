@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/helper/hive_helper.dart';
-import 'package:hint/helper/path_helper.dart';
-import 'package:hint/utilities/hint_video.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/api/path.dart';
+import 'package:hint/ui/components/convo/hint_video.dart';
 
 class SamplePrototype extends StatefulWidget {
   const SamplePrototype({Key? key}) : super(key: key);
