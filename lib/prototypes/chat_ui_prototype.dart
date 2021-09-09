@@ -95,7 +95,7 @@ class _ChatUiPrototypeState extends State<ChatUiPrototype> {
                     SizedBox(width: 5.0),
                     CircleAvatar(radius: 18, backgroundColor: Colors.white, child: Icon(Icons.attach_file_outlined),),
                     SizedBox(width: 5.0),
-                    CircleAvatar(radius: 18, backgroundColor: Colors.white, child: Icon(Icons.mic_external_on_outlined),),
+                    CircleAvatar(radius: 18, backgroundColor: Colors.white, child: Icon(Icons.ac_unit),),
                     SizedBox(width: 16.0),
                   ],
                 ),
