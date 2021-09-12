@@ -29,9 +29,9 @@ class BasicDialogContent extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       verticalSpaceSmall,
-      Text('Something'),
+      const Text('Something'),
       verticalSpaceSmall,
-      Text('Something'),
+      const Text('Something'),
       verticalSpaceMedium,
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -39,7 +39,7 @@ class BasicDialogContent extends StatelessWidget {
           
           TextButton(
             onPressed: () {},
-            child:Text('Something'),
+            child:const Text('Something'),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/register/username/username_register_view.dart';
 import 'package:stacked/stacked.dart';
@@ -18,7 +19,7 @@ class PasswordRegisterView extends StatelessWidget {
     return ViewModelBuilder<PasswordRegisterViewModel>.reactive(
       onModelReady: (model) => model.updateUserEmail(email),
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
+        value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
           // ignore: todo
           //TODO: Apply for dark theme
@@ -32,7 +33,7 @@ class PasswordRegisterView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Divider(
+                const Divider(
                   color: Color(0x4D000000),
                   thickness: 1.0,
                   height: 0.0,
@@ -42,14 +43,14 @@ class PasswordRegisterView extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   child: Row(
                     children: [
-                      Container(
-                        child: Icon(CupertinoIcons.check_mark_circled_solid),
+                      SizedBox(
+                        child: const Icon(CupertinoIcons.check_mark_circled_solid),
                         width: screenWidthPercentage(context, percentage: 0.1),
                       ),
-                      Container(
+                      SizedBox(
                           width:
                               screenWidthPercentage(context, percentage: 0.8),
-                          child: Text(
+                          child: const Text(
                               'By Clicking Create Account to agree to our Privacy Policy and Terms and Conditions.'))
                     ],
                   ),
@@ -68,7 +69,7 @@ class PasswordRegisterView extends StatelessWidget {
                 children: [
                   // verticalSpaceLarge,
                   // verticalSpaceLarge,
-                  Icon(
+                  const Icon(
                     CupertinoIcons.padlock,
                     size: 70.0,
                   ),
@@ -134,7 +135,7 @@ class PasswordRegisterView extends StatelessWidget {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
+                        borderSide: const BorderSide(
                           color: CupertinoColors.lightBackgroundGray,
                         ),
                       ),
@@ -153,7 +154,7 @@ class PasswordRegisterView extends StatelessWidget {
                         ),
                         child: CupertinoButton(
                           child: model.isBusy
-                              ? SizedBox(
+                              ? const SizedBox(
                                   height: 17,
                                   width: 17,
                                   child: CircularProgressIndicator(
@@ -162,7 +163,7 @@ class PasswordRegisterView extends StatelessWidget {
                                         Colors.white),
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   'Create Account',
                                   style: TextStyle(color: Colors.white),
                                 ),
@@ -176,7 +177,7 @@ class PasswordRegisterView extends StatelessWidget {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                UsernameRegisterView()));
+                                                const UsernameRegisterView()));
                                   }
                                 },
                         ),
@@ -190,12 +191,12 @@ class PasswordRegisterView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: CupertinoButton(
-                          child: Text(
+                          child: const Text(
                             'Change Email',
                             style: TextStyle(color: Colors.black),
                           ),
                           onPressed: () {
-                            print(model.passwordTech.text);
+                            getLogger('Password Register View').wtf(model.passwordTech.text);
                             Navigator.pop(context);
                           },
                         ),

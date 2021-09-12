@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MainView extends StatefulWidget {
+  const MainView({Key? key}) : super(key: key);
+
   @override
   _MainViewState createState() => _MainViewState();
 }
@@ -99,15 +101,15 @@ class _MainViewState extends State<MainView> {
           //     ],
           //   ),
           // ),
-          SizedBox(height: 12.0),
+          const SizedBox(height: 12.0),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Container(
               decoration: BoxDecoration(
                 color: CupertinoColors.white,
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
-                  color: Color(0x4D000000),
+                  color: const Color(0x4D000000),
                   width: 0.5, // One physical pixel.
                   style: BorderStyle.solid,
                 ),
@@ -115,7 +117,7 @@ class _MainViewState extends State<MainView> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       radius: 28.0,
                       backgroundImage: AssetImage('images/img1.jpg'),
                     ),
@@ -129,12 +131,12 @@ class _MainViewState extends State<MainView> {
                             letterSpacing: -0.5),
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: const Text(
                       'SlidableDrawerDelegate',
                     ),
                   ),
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       radius: 28.0,
                       backgroundImage: AssetImage('images/img1.jpg'),
                     ),
@@ -148,12 +150,12 @@ class _MainViewState extends State<MainView> {
                             letterSpacing: -0.5),
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: const Text(
                       'SlidableDrawerDelegate',
                     ),
                   ),
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       radius: 28.0,
                       backgroundImage: AssetImage('images/img1.jpg'),
                     ),
@@ -167,12 +169,12 @@ class _MainViewState extends State<MainView> {
                             letterSpacing: -0.5),
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: const Text(
                       'SlidableDrawerDelegate',
                     ),
                   ),
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       radius: 28.0,
                       backgroundImage: AssetImage('images/img1.jpg'),
                     ),
@@ -186,7 +188,7 @@ class _MainViewState extends State<MainView> {
                             letterSpacing: -0.5),
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: const Text(
                       'SlidableDrawerDelegate',
                     ),
                   ),
@@ -207,45 +209,40 @@ Row activityItem(
     children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
-        child: InkWell(
-          onTap: () {
-            print(MediaQuery.of(context).size.width);
-          },
-          child: Container(
-            height: MediaQuery.of(context).size.width,
-            width: MediaQuery.of(context).size.width * 0.75,
-            padding: EdgeInsets.only(top: 8.0),
-            decoration: BoxDecoration(
-              color: CupertinoColors.white,
-              borderRadius: BorderRadius.circular(20.0),
-              border: Border.all(
-                color: Color(0x4D000000),
-                width: 0.5, // One physical pixel.
-                style: BorderStyle.solid,
+        child: Container(
+          height: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width * 0.75,
+          padding: const EdgeInsets.only(top: 8.0),
+          decoration: BoxDecoration(
+            color: CupertinoColors.white,
+            borderRadius: BorderRadius.circular(20.0),
+            border: Border.all(
+              color: const Color(0x4D000000),
+              width: 0.5, // One physical pixel.
+              style: BorderStyle.solid,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Image(
+                height: MediaQuery.of(context).size.width * 0.6,
+                width: MediaQuery.of(context).size.width * 0.6,
+                image: AssetImage(activityLocationName),
+                fit: BoxFit.cover,
               ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Image(
-                  height: MediaQuery.of(context).size.width * 0.6,
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  image: AssetImage(activityLocationName),
-                  fit: BoxFit.cover,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Let\'s'),
-                    SizedBox(width: 4.0),
-                    Chip(
-                      label: Text(activityName),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Let\'s'),
+                  const SizedBox(width: 4.0),
+                  Chip(
+                    label: Text(activityName),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

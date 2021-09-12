@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SearchView extends StatefulWidget {
+  const SearchView({Key? key}) : super(key: key);
+
   @override
   _SearchViewState createState() => _SearchViewState();
 }
@@ -20,7 +22,7 @@ class _SearchViewState extends State<SearchView> {
                   const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 8.0),
               child: CupertinoTextField.borderless(
                 controller: searchTech,
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 placeholder: 'Search for someone',
                 decoration: BoxDecoration(
                     color: CupertinoColors.lightBackgroundGray,
@@ -36,7 +38,7 @@ class _SearchViewState extends State<SearchView> {
                 searchTech.clear();
               });
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           )
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/components/media/message/reply_message.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,7 @@ class ReplyKeyboardMedia extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                IconButton(onPressed: null, icon: Icon(Icons.ios_share)),
+                const IconButton(onPressed: null, icon: Icon(Icons.ios_share)),
                 Expanded(
                   child: Container(
                     child: Text(
@@ -38,7 +39,7 @@ class ReplyKeyboardMedia extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.9,
                         minWidth: MediaQuery.of(context).size.width * 0.1),
@@ -46,14 +47,14 @@ class ReplyKeyboardMedia extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    print('IconButton is pressed');
+                    getLogger('Reply Keyboard Media').wtf('IconButton is pressed');
                     replyProvider.emptyReplyFields();
                   },
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                 ),
               ],
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }

@@ -1,26 +1,24 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/routes/shared_axis_route.dart';
-import 'package:hint/ui/components/media/image/full_image.dart';
 import 'package:hint/ui/components/convo/hint_image.dart';
 
 class ImageMedia extends StatefulWidget {
-  final messageUid;
+  final String messageUid;
   final String? mediaUrl;
   final String? messageText;
   final Timestamp? timestamp;
   final bool? isMe;
 
-  ImageMedia({
+  const ImageMedia({
+    Key? key,
     required this.mediaUrl,
     required this.messageText,
     required this.messageUid,
     this.timestamp,
     this.isMe,
-  });
+  }) : super(key: key) ;
 
   @override
   _ImageMediaState createState() => _ImageMediaState();
@@ -58,16 +56,16 @@ class _ImageMediaState extends State<ImageMedia> {
                   hiveBoxName: HiveHelper.hiveBoxImages,
                   folderPath: 'Hint Images',
                   onTap: () {
-                    final route = SharedAxisPageRoute(
-                      page: FullImage(
-                        photoUrl: widget.mediaUrl,
-                        messageText: widget.messageText,
-                        messageUid: widget.messageUid,
-                        hiveBoxName: HiveHelper.hiveBoxImages,
-                      ),
-                      transitionType: SharedAxisTransitionType.scaled,
-                    );
-                    Navigator.of(context).push(route);
+                    // final route = SharedAxisPageRoute(
+                    //   page: FullImage(
+                    //     photoUrl: widget.mediaUrl,
+                    //     messageText: widget.messageText,
+                    //     messageUid: widget.messageUid,
+                    //     hiveBoxName: HiveHelper.hiveBoxImages,
+                    //   ),
+                    //   transitionType: SharedAxisTransitionType.scaled,
+                    // );
+                    // Navigator.of(context).push(route);
                   },
                 ),
               ),

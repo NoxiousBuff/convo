@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 
 class PhotoRegisterView extends StatelessWidget {
+  const PhotoRegisterView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        brightness: Brightness.light,
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
@@ -16,12 +19,12 @@ class PhotoRegisterView extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       body: ListView(
         children: [
-          SizedBox(height: 50.0),
-          Icon(
+          const SizedBox(height: 50.0),
+          const Icon(
             CupertinoIcons.camera,
             size: 70.0,
           ),
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -34,7 +37,7 @@ class PhotoRegisterView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -47,14 +50,14 @@ class PhotoRegisterView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
                 color: Colors.blue.shade700,
                 borderRadius: BorderRadius.circular(4.0)),
             child: CupertinoButton(
-              child: Text(
+              child: const Text(
                 'Add A Photo',
                 style: TextStyle(color: Colors.white),
               ),
@@ -62,20 +65,20 @@ class PhotoRegisterView extends StatelessWidget {
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
-                        builder: (context) => PhotoRegisterView()));
+                        builder: (context) => const PhotoRegisterView()));
               },
             ),
           ),
           CupertinoButton(
-            child: Text(
+            child: const Text(
               'Skip',
             ),
             onPressed: () {
               Navigator.push(context,
-                  CupertinoPageRoute(builder: (context) => HomeView()));
+                  CupertinoPageRoute(builder: (context) => const HomeView()));
             },
           ),
-          SizedBox(height: 100.0),
+            const SizedBox(height: 100.0),
         ],
       ),
     );

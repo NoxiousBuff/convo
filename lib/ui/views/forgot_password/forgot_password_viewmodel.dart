@@ -5,10 +5,10 @@ import 'package:stacked/stacked.dart';
 class ForgotPasswordViewModel extends BaseViewModel {
   bool emailEmpty = true;
 
-  TextEditingController _emailTech = TextEditingController();
+  final TextEditingController _emailTech = TextEditingController();
   TextEditingController get emailTech => _emailTech;
 
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
 
   void updateEmailEmpty() {
     emailEmpty = emailTech.text.isEmpty;

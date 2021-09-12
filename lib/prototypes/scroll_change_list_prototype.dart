@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ScrollLimitReached extends StatefulWidget {
+  const ScrollLimitReached({Key? key}) : super(key: key);
+
   @override
   _ScrollLimitReachedState createState() => _ScrollLimitReachedState();
 }
@@ -72,7 +74,7 @@ class _ScrollLimitReachedState extends State<ScrollLimitReached> {
     return Scaffold(
       appBar: AppBar(
         elevation: message == "reach the top" ? 8.0 : 0.0,
-        title: Text("Scroll Limit reached"),
+        title: const Text("Scroll Limit reached"),
       ),
       body: Column(
         children: <Widget>[

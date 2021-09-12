@@ -47,23 +47,23 @@ class _ChatViewState extends State<ChatView> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         if (snapshot.hasError) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.0)),
-            title: Text(
+            title: const Text(
               'Something Bad Happened',
               textAlign: TextAlign.center,
             ),
-            content: Text(
+            content: const Text(
               'Please try again later.',
               textAlign: TextAlign.center,
             ),
             actions: [
               CupertinoButton(
-                child: Text('Ok'),
+                child: const Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -79,9 +79,9 @@ class _ChatViewState extends State<ChatView> {
                 child: ListView.builder(
                   reverse: true,
                   padding:
-                      EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+                      const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
                   controller: scrollController,
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     return MessageBubble(
@@ -93,12 +93,10 @@ class _ChatViewState extends State<ChatView> {
                   },
                 ),
               )
-            : Center(
-                child: Container(
-                  child: Text(
-                    'Nothing Is Here',
-                    style: TextStyle(color: Colors.white54),
-                  ),
+            : const Center(
+                child: Text(
+                  'Nothing Is Here',
+                  style: TextStyle(color: Colors.white54),
                 ),
               );
       },
@@ -118,20 +116,20 @@ class _ChatViewState extends State<ChatView> {
       onTap: () {
         MediaQuery.of(context).viewInsets.bottom == 0
             ? focusNode.unfocus()
-            : Text('');
+            : const Text('');
       },
       dragStartBehavior: DragStartBehavior.start,
       onVerticalDragStart: (drag) {
         MediaQuery.of(context).viewInsets.bottom == 0
             ? focusNode.unfocus()
-            : Text('');
+            : const Text('');
       },
       child: Scaffold(
         // backgroundColor: Color.fromRGBO(28, 28, 30, 1),
         // backgroundColor: Color(0xFF121212),
         backgroundColor: CupertinoColors.white,
         appBar: AppBar(
-          brightness: Brightness.light,
+          systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
           elevation: 0.0,
           //I could also use Cupertino Back Button
           leading: IconButton(
@@ -139,7 +137,7 @@ class _ChatViewState extends State<ChatView> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
             ),
           ),
@@ -151,7 +149,7 @@ class _ChatViewState extends State<ChatView> {
                 backgroundImage: CachedNetworkImageProvider(
                     widget.receiverPhotoUrl ?? 'images/img2.jpg'),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
                 widget.receiverUserName ?? 'Samantha',
                 style: GoogleFonts.openSans(

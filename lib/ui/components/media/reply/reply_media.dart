@@ -20,7 +20,7 @@ class ReplyMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     return isReply ?? false
         ? Container(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(20),
@@ -37,6 +37,6 @@ class ReplyMedia extends StatelessWidget {
               ],
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }

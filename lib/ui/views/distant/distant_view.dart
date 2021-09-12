@@ -2,24 +2,26 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DistantView extends StatelessWidget {
+  const DistantView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CupertinoColors.extraLightBackgroundGray,
       body: ListView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         children: [
           CustomScrollView(
             shrinkWrap: true,
             slivers: [
               CupertinoSliverNavigationBar(
                 backgroundColor: CupertinoColors.extraLightBackgroundGray,
-                largeTitle: Text('Messages'),
+                largeTitle: const Text('Messages'),
                 border: Border.all(width: 0.0, color: Colors.transparent),
               ),
             ],
           ),
-          SizedBox(height: 24.0),
+          const SizedBox(height: 24.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Container(
@@ -32,10 +34,10 @@ class DistantView extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {},
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(20.0),
                         topRight: Radius.circular(20.0)),
-                    child: ListTile(
+                    child: const ListTile(
                       title: Text('Messages'),
                       leading: Icon(CupertinoIcons.chat_bubble),
                       trailing: Icon(
@@ -45,10 +47,10 @@ class DistantView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(height: 0.0),
+                  const Divider(height: 0.0),
                   InkWell(
                     onTap: () {},
-                    child: ListTile(
+                    child: const ListTile(
                       title: Text('Groups'),
                       leading: Icon(CupertinoIcons.person_2),
                       trailing: Icon(
@@ -58,10 +60,10 @@ class DistantView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(height: 0.0),
+                  const Divider(height: 0.0),
                   InkWell(
                     onTap: () {},
-                    child: ListTile(
+                    child: const ListTile(
                       title: Text('Contacts'),
                       leading: Icon(CupertinoIcons.doc),
                       trailing: Icon(
@@ -71,13 +73,13 @@ class DistantView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(height: 0.0),
+                  const Divider(height: 0.0),
                   InkWell(
                     onTap: () {},
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0)),
-                    child: ListTile(
+                    child: const ListTile(
                       title: Text('Calls'),
                       leading: Icon(CupertinoIcons.phone),
                       trailing: Icon(

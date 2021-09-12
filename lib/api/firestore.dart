@@ -5,7 +5,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreApi {
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 

@@ -57,7 +57,7 @@ class StorageApi {
       // Get raw data.
       Uint8List? downloadedData = await ref.getData();
       // prints -> Hello World!
-      print(utf8.decode(downloadedData!));
+      getLogger('StorageApi').wtf(utf8.decode(downloadedData!));
     } on firebase_core.FirebaseException catch (e) {
       if (e.code == 'canceled') {
         log.e('The process has been cancelled.');

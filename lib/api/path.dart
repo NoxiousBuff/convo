@@ -48,7 +48,7 @@ class PathHelper {
               break;
             }
           }
-          String backPath = '/Hint' + '/$folderPath';
+          String backPath = '/Hint' '/$folderPath';
           log.wtf('Back Path of the Folder : $backPath');
           newPath = newPath + backPath;
           directory = Directory(newPath);
@@ -93,7 +93,7 @@ class PathHelper {
               break;
             }
           }
-          String backPath = '/Hint' + '/$folderPath';
+          String backPath = '/Hint' '/$folderPath';
           //todo: remove
           log.wtf('Back Path of the Folder : $backPath');
           newPath = newPath + backPath;

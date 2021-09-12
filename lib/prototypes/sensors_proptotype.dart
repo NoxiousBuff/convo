@@ -5,7 +5,7 @@ import 'package:hint/prototypes/snake.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 class SensorPrototype extends StatefulWidget {
-  SensorPrototype({Key? key, this.title}) : super(key: key);
+  const SensorPrototype({Key? key, this.title}) : super(key: key);
 
   final String? title;
 

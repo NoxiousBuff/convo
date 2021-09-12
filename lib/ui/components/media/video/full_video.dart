@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:video_player/video_player.dart';
 
 class FullVideo extends StatefulWidget {
@@ -11,29 +12,24 @@ class FullVideo extends StatefulWidget {
   final Timestamp? timestamp;
   final bool? isMe;
 
-  FullVideo(
-      {required this.mediaUrl,
+  const FullVideo(
+      {Key? key,
+      required this.mediaUrl,
       required this.messageText,
       this.timestamp,
-      this.isMe});
+      this.isMe})
+      : super(key: key);
   @override
   _FullVideoState createState() => _FullVideoState(
-        mediaUrl: this.mediaUrl,
-        messageText: this.messageText,
-        timestamp: this.timestamp,
-        isMe: this.isMe,
+        
       );
 }
 
 class _FullVideoState extends State<FullVideo> {
   late VideoPlayerController _playerController;
   Future<void>? _initialiseVideoPlayer;
-  final String? mediaUrl;
-  final String? messageText;
-  final Timestamp? timestamp;
-  final bool? isMe;
   double _opacity = 1.0;
-  Duration fadeDuration = Duration(milliseconds: 300);
+  Duration fadeDuration = const Duration(milliseconds: 300);
 
   String durationFormat(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, "0");
@@ -41,22 +37,15 @@ class _FullVideoState extends State<FullVideo> {
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
-
-  _FullVideoState(
-      {required this.mediaUrl,
-      required this.messageText,
-      this.timestamp,
-      this.isMe});
-
   @override
   void initState() {
     super.initState();
-    _playerController = VideoPlayerController.network(mediaUrl!);
+    _playerController = VideoPlayerController.network(widget.mediaUrl!);
     _initialiseVideoPlayer = _playerController.initialize();
     _playerController.setLooping(true);
     _playerController.setVolume(_playerController.value.volume);
     _playerController.play();
-    print(_playerController.value.volume);
+    getLogger('Full Video').wtf(_playerController.value.volume);
   }
 
   @override
@@ -74,7 +63,7 @@ class _FullVideoState extends State<FullVideo> {
         });
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(systemNavigationBarColor: Colors.black),
+        value: const SystemUiOverlayStyle(systemNavigationBarColor: Colors.black),
         child: Scaffold(
           backgroundColor: Colors.black54,
           appBar: AppBar(
@@ -85,7 +74,7 @@ class _FullVideoState extends State<FullVideo> {
                 duration: fadeDuration,
                 opacity: _opacity,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -93,7 +82,8 @@ class _FullVideoState extends State<FullVideo> {
               ),
             ),
             backgroundColor: Colors.transparent,
-            brightness: Brightness.dark,
+            systemOverlayStyle:
+                const SystemUiOverlayStyle(statusBarBrightness: Brightness.dark),
             elevation: 0.0,
             flexibleSpace: AnimatedOpacity(
               duration: fadeDuration,
@@ -123,11 +113,11 @@ class _FullVideoState extends State<FullVideo> {
                   duration: fadeDuration,
                   opacity: _opacity,
                   child: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.star_border_outlined,
                     ),
                     onPressed: () {
-                      print('star is tapped');
+                      getLogger('Hint Video').wtf('star is tapped');
                     },
                   ),
                 ),
@@ -138,7 +128,7 @@ class _FullVideoState extends State<FullVideo> {
                   duration: fadeDuration,
                   opacity: _opacity,
                   child: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.ios_share,
                     ),
                     onPressed: () {},
@@ -163,20 +153,20 @@ class _FullVideoState extends State<FullVideo> {
                             child: VideoPlayer(_playerController),
                           );
                         }
-                        return CupertinoActivityIndicator();
+                        return const CupertinoActivityIndicator();
                       },
                     ),
                     Text(
                       durationFormat(_playerController.value.duration),
                       style:
-                          TextStyle(color: CupertinoColors.white, fontSize: 50),
+                          const TextStyle(color: CupertinoColors.white, fontSize: 50),
                     ),
                     ValueListenableBuilder(
                       valueListenable: _playerController,
                       builder: (context, value, child) {
                         return Text(
                           durationFormat(_playerController.value.position),
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: CupertinoColors.white, fontSize: 50),
                         );
                       },
@@ -221,7 +211,7 @@ class _FullVideoState extends State<FullVideo> {
                         _playerController,
                         allowScrubbing: true,
                         padding:
-                            EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                            const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
                       ),
                     ),
                   ),

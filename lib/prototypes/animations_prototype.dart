@@ -86,12 +86,12 @@ class _OpenContainerTransformDemoState
                       _transitionType == ContainerTransitionType.fade,
                       _transitionType == ContainerTransitionType.fadeThrough,
                     ],
-                    children: [
+                    children: const [
                       Text(
                         'I removed the text',
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 10,
                         ),
                         child: Text(
@@ -125,7 +125,7 @@ class _OpenContainerTransformDemoState
               automaticallyImplyLeading: false,
               title: Column(
                 children: [
-                  Text(
+                  const Text(
                     'I removed the text',
                   ),
                   Text(
@@ -264,7 +264,7 @@ class _OpenContainerTransformDemoState
                         title: Text(
                           'I removed the text ${index + 1}',
                         ),
-                        subtitle: Text(
+                        subtitle: const Text(
                           'I removed the text',
                         ),
                       );
@@ -348,7 +348,7 @@ class _DetailsCard extends StatelessWidget {
               ),
             ),
           ),
-          ListTile(
+          const ListTile(
             title: Text('I removed the text'),
             subtitle: Text(
               'I removed the text',
@@ -523,7 +523,7 @@ class _DetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'I removed the text',
         ),
       ),

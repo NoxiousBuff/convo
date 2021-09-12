@@ -19,7 +19,7 @@ class VerticalEnterRoute extends PageRouteBuilder {
             return Stack(
               children: <Widget>[
                 SlideTransition(
-                  position: new Tween<Offset>(
+                  position: Tween<Offset>(
                     begin: const Offset(0.0, 1.0),
                     end: Offset.zero,
                   ).animate(animation),

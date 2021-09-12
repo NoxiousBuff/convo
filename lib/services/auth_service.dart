@@ -4,13 +4,13 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 
 class AuthService {
-  static FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
   final log = getLogger('AuthService');
 
-  FirestoreApi _firestoreApi = FirestoreApi();
+  final FirestoreApi _firestoreApi = FirestoreApi();
 
   signUp(
       {required String email,
@@ -28,7 +28,7 @@ class AuthService {
 
       log.i('User has been created in the firebase authentication.');
       await userCredential.user!.updatePhotoURL(kDefaultPhotoUrl).
-          catchError((e) => print(e));
+          catchError((e) => getLogger('AuthService').e(e));
       await _firestoreApi.createUserInFirebase(
           user: userCredential.user!, onError: randomError).then((value) => onComplete);
       await userCredential.user!.sendEmailVerification();
@@ -47,7 +47,7 @@ class AuthService {
         if (randomError != null) randomError();
       }
     } catch (e) {
-      print(e);
+      getLogger('AuthService').e(e);
     }
   }
 

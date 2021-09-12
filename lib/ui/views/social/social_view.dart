@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SocialView extends StatefulWidget {
+  const SocialView({Key? key}) : super(key: key);
+
   @override
   _SocialViewState createState() => _SocialViewState();
 }
@@ -14,7 +16,7 @@ class _SocialViewState extends State<SocialView> {
 
   @override
   void initState() {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         statusBarColor: Colors.white, systemNavigationBarColor: Colors.black));
     super.initState();
   }
@@ -26,7 +28,7 @@ class _SocialViewState extends State<SocialView> {
       extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        brightness: Brightness.dark,
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
         toolbarHeight: 45.0,
         elevation: 0.0,
         centerTitle: true,
@@ -47,10 +49,10 @@ class _SocialViewState extends State<SocialView> {
           style:
               GoogleFonts.poppins(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
-        leading: Icon(CupertinoIcons.chat_bubble),
+        leading: const Icon(CupertinoIcons.chat_bubble),
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               CupertinoIcons.camera,
             ),
             onPressed: () {},
@@ -58,7 +60,7 @@ class _SocialViewState extends State<SocialView> {
         ],
       ),
       body: PageView.builder(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         controller: controller,
         scrollDirection: Axis.vertical,
         itemCount: 11,
@@ -87,27 +89,27 @@ class _SocialViewState extends State<SocialView> {
                           children: [
                             Text(
                               '@username$i',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(
+                            const Text(
                               'Some Text is written here....',
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 20.0),
                             ),
-                            Text(
+                            const Text(
                               'Something here too',
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 20.0),
                             ),
-                            Text(
+                            const Text(
                               'Maybe "#" hashtages down here',
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 20.0),
                             ),
-                            Text(
+                            const Text(
                               'You can choose whatever goes here',
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 20.0),
@@ -125,9 +127,9 @@ class _SocialViewState extends State<SocialView> {
                           padding: const EdgeInsets.all(8.0),
                           child: ExpansionTile(
                             initiallyExpanded: true,
-                            trailing: Text(''),
-                            title: Padding(
-                              padding: const EdgeInsets.only(left: 2.0),
+                            trailing: const Text(''),
+                            title: const Padding(
+                              padding: EdgeInsets.only(left: 2.0),
                               child: Icon(
                                 Icons.aspect_ratio_rounded,
                                 size: 30.0,
@@ -158,32 +160,32 @@ class _SocialViewState extends State<SocialView> {
                                           ),
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                      const Padding(
+                                        padding: EdgeInsets.all(16.0),
                                         child: Icon(
                                           Icons.favorite,
                                           size: 35.0,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                      const Padding(
+                                        padding: EdgeInsets.all(16.0),
                                         child: Icon(
                                           Icons.mode_comment,
                                           size: 35.0,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                      const Padding(
+                                        padding: EdgeInsets.all(16.0),
                                         child: Icon(
                                           Icons.ios_share,
                                           size: 35.0,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                      const Padding(
+                                        padding: EdgeInsets.all(16.0),
                                         child: Icon(
                                           Icons.bookmark,
                                           size: 35.0,

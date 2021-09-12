@@ -17,9 +17,9 @@ class TextMedia extends StatelessWidget {
         ? Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
-              color: isMe ? Color(0x14350bdf) : CupertinoColors.systemGrey6,
+              color: isMe ? const Color(0x14350bdf) : CupertinoColors.systemGrey6,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.85,
                 minWidth: MediaQuery.of(context).size.width * 0.1),
@@ -31,6 +31,6 @@ class TextMedia extends StatelessWidget {
               ),
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }

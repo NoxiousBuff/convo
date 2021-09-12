@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
+import 'package:hint/app/app_logger.dart';
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:video_player/video_player.dart';
@@ -76,18 +77,18 @@ class _HintVideoState extends State<HintVideo> {
         setState(() {
           isDeleted = false;
         });
-        print('Path of the value given does exist');
+        getLogger('Hint Video').wtf('Path of the value given does exist');
       } else {
         setState(() {
           isDeleted = true;
         });
-        print(
+        getLogger('Hint Video').wtf(
             'Path of the value does not exist.\n Here is the function starts.');
         generalWorker();
-        print('Here functions ends');
+        getLogger('Hint Video').wtf('Here functions ends');
       }
     } else {
-      print('This is the middle else that is been printed.');
+      getLogger('Hint Video').wtf('This is the middle else that is been printed.');
       setState(() {
         isDeleted = false;
       });
@@ -104,7 +105,7 @@ class _HintVideoState extends State<HintVideo> {
                   onPressed: () {
                     generalWorker();
                   },
-                  child: Text('Download Again'),
+                  child: const Text('Download Again'),
                 ),
               )
             : Column(
@@ -118,10 +119,10 @@ class _HintVideoState extends State<HintVideo> {
                           child: VideoPlayer(_playerController),
                         );
                       }
-                      return CupertinoActivityIndicator();
+                      return const CupertinoActivityIndicator();
                     },
                   ),
-                  Text(' This is from Hive')
+                  const Text(' This is from Hive')
                 ],
               )
         : Column(
@@ -135,10 +136,10 @@ class _HintVideoState extends State<HintVideo> {
                       child: VideoPlayer(_playerController),
                     );
                   }
-                  return CupertinoActivityIndicator();
+                  return const CupertinoActivityIndicator();
                 },
               ),
-              Text(' This is from Network.')
+              const Text(' This is from Network.')
             ],
           );
   }

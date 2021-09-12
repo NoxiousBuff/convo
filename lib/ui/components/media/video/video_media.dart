@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/components/media/video/full_video.dart';
 import 'package:video_player/video_player.dart';
 
@@ -12,13 +13,13 @@ class VideoMedia extends StatefulWidget {
   final Timestamp? timestamp;
   final bool isMe;
 
-  VideoMedia({
+  const VideoMedia({Key? key, 
     required this.mediaUrl,
     required this.messageText,
     required this.timestamp,
     required this.isMe,
     required this.messageUid,
-  });
+  }) : super(key: key);
 
   @override
   _VideoMediaState createState() => _VideoMediaState();
@@ -95,7 +96,7 @@ class _VideoMediaState extends State<VideoMedia> {
                           aspectRatio: _playerController.value.aspectRatio,
                           child: VideoPlayer(_playerController),
                         ),
-                        Positioned.fill(
+                        const Positioned.fill(
                           child: Align(
                             alignment: Alignment.center,
                             child: CircleAvatar(
@@ -117,13 +118,13 @@ class _VideoMediaState extends State<VideoMedia> {
                                 color: Colors.black54,
                               ),
                               padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                              margin: EdgeInsets.all(10),
+                              margin: const EdgeInsets.all(10),
                               child: ValueListenableBuilder(
                                 valueListenable: _playerController,
                                 builder: (context, value, child) => Text(
                                   durationFormat(
                                       _playerController.value.duration),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: CupertinoColors.white,
                                       shadows: []),
                                 ),
@@ -133,15 +134,15 @@ class _VideoMediaState extends State<VideoMedia> {
                         ),
                         TextButton(
                           onPressed: () {
-                            print(snapshot.hasData.toString());
+                            getLogger('Video Media').wtf(snapshot.hasData.toString());
                           },
-                          child: Text('Check'),
+                          child: const Text('Check'),
                         )
                       ],
                     );
                   }
 
-                  return Center(child: CupertinoActivityIndicator());
+                  return const Center(child: CupertinoActivityIndicator());
                 },
               ),
             ),

@@ -10,7 +10,7 @@ class LoginViewModel extends BaseViewModel {
   TextEditingController emailTech = TextEditingController();
   TextEditingController passwordTech = TextEditingController();
 
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
 
   void updateEmailEmpty() {
     emailEmpty = emailTech.text.isEmpty;

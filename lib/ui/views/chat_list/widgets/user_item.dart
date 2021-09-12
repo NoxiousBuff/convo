@@ -11,84 +11,82 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class UserItem extends StatelessWidget {
   final FireUser? fireUser;
   final ChatService chatMethods = ChatService();
-  UserItem({this.fireUser});
+  UserItem({Key? key, this.fireUser}) : super(key: key);
 
   final Color randomColor = Color.fromARGB(Random().nextInt(256),
       Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
 
   buildChatListItemPopup({required FireUser fireUser}) {
     return Material(
-      child: Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: ClipOval(
-                    child: Container(
-                      height: 120.0,
-                      width: 120.0,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        image: DecorationImage(
-                          image: CachedNetworkImageProvider(fireUser.photoUrl!),
-                          fit: BoxFit.cover,
-                        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: ClipOval(
+                  child: Container(
+                    height: 120.0,
+                    width: 120.0,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      image: DecorationImage(
+                        image: CachedNetworkImageProvider(fireUser.photoUrl!),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            Row(
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                fireUser.username,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  fireUser.username,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+                  fireUser.email,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.normal, fontSize: 18.0),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    fireUser.email,
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal, fontSize: 18.0),
-                  ),
-                ],
+          ),
+          const Divider(color: Color(0x4D000000), thickness: 0.5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(CupertinoIcons.chat_bubble),
               ),
-            ),
-            Divider(color: Color(0x4D000000), thickness: 0.5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(CupertinoIcons.chat_bubble),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(CupertinoIcons.phone),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(CupertinoIcons.video_camera),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.0)
-          ],
-        ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(CupertinoIcons.phone),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(CupertinoIcons.video_camera),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0)
+        ],
       ),
     );
   }
@@ -105,7 +103,7 @@ class UserItem extends StatelessWidget {
           randomColor,
         );
       },
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           bottomLeft: Radius.circular(20),
@@ -136,7 +134,7 @@ class UserItem extends StatelessWidget {
             width: 56.0,
             child: Text(
               fireUser!.username[0],
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 32,
                 fontWeight: FontWeight.w600,

@@ -16,10 +16,10 @@ class ForgotPasswordView extends StatelessWidget {
         resizeToAvoidBottomInset: true,
         body: Center(
           child: ListView(
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             shrinkWrap: true,
             children: [
-              Icon(
+              const Icon(
                 CupertinoIcons.envelope,
                 size: 70.0,
               ),
@@ -67,7 +67,7 @@ class ForgotPasswordView extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: CupertinoColors.lightBackgroundGray,
                     ),
                   ),
@@ -84,7 +84,7 @@ class ForgotPasswordView extends StatelessWidget {
                 ),
                 child: CupertinoButton(
                   child: model.isBusy
-                      ? SizedBox(
+                      ? const SizedBox(
                           height: 17,
                           width: 17,
                           child: CircularProgressIndicator(
@@ -93,7 +93,7 @@ class ForgotPasswordView extends StatelessWidget {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : Text(
+                      : const Text(
                           'Change Password',
                           style: TextStyle(color: Colors.white),
                         ),

@@ -16,7 +16,7 @@ class UsernameRegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<UsernameRegisterViewModel>.reactive(
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-       value: SystemUiOverlayStyle(
+       value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
           // ignore: todo
           //TODO: Apply for dark theme
@@ -32,7 +32,7 @@ class UsernameRegisterView extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  Icon(
+                  const Icon(
                     CupertinoIcons.at,
                     size: 70.0,
                   ),
@@ -89,7 +89,7 @@ class UsernameRegisterView extends StatelessWidget {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
+                        borderSide: const BorderSide(
                           color: CupertinoColors.lightBackgroundGray,
                         ),
                       ),
@@ -105,7 +105,7 @@ class UsernameRegisterView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child: Text(
+                      child:const  Text(
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),

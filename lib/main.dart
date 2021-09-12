@@ -19,10 +19,12 @@ Future<void> main() async {
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
   HiveHelper().initialiseHive();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -32,7 +34,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   }
 
   @override
@@ -46,7 +48,7 @@ class _MyAppState extends State<MyApp> {
         title: 'Flutter Demo',
         home: FirebaseAuth.instance.currentUser != null
             ? ChatListView()
-            : EmailRegisterView(),
+            : const EmailRegisterView(),
       ),
     );
   }

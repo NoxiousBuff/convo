@@ -5,10 +5,10 @@ import 'package:stacked/stacked.dart';
 
 class UsernameRegisterViewModel extends BaseViewModel {
   final usernameFormKey = GlobalKey<FormState>();
-  static AuthService _authService = AuthService();
+  static final AuthService _authService = AuthService();
   static final FirestoreApi _firestoreApi = FirestoreApi();
 
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   TextEditingController get usernameTech => _controller;
 
   bool usernameEmpty = true;

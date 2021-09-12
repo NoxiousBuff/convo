@@ -5,6 +5,8 @@ import 'package:hint/ui/views/social/social_view.dart';
 import '../main/main_view.dart';
 
 class HomeView extends StatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -19,7 +21,7 @@ class _HomeViewState extends State<HomeView> {
           activeColor: CupertinoColors.black,
           iconSize: 25.0,
           backgroundColor: Colors.white,
-          items: [
+          items: const  [
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.scribble),
             ),
@@ -34,11 +36,11 @@ class _HomeViewState extends State<HomeView> {
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              return MainView();
+              return const MainView();
             case 1:
               return ChatListView();
             case 2:
-              return SocialView();
+              return const SocialView();
             default:
               return ChatListView();
           }

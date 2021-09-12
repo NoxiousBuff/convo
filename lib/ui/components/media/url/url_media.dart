@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' show PreviewData;
 
@@ -22,7 +23,7 @@ class _PreviewLinkState extends State<PreviewLink> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        brightness: Brightness.dark,
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.dark),
         title: const Text('Example'),
       ),
       body: ListView.builder(

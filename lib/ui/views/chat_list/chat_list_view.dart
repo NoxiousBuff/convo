@@ -12,25 +12,21 @@ import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
-class ChatListView extends StatefulWidget {
-  @override
-  _ChatListViewState createState() => _ChatListViewState();
-}
-
-class _ChatListViewState extends State<ChatListView> {
-  bool scrollIsOnTop = true;
-  ScrollController? scrollController;
-  AuthService authMethods = AuthService();
+class ChatListView extends StatelessWidget {
+  final ScrollController? scrollController = ScrollController();
+  final AuthService authMethods = AuthService();
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
-  Future<QuerySnapshot>? usersContactFuture;
+  late final Future<QuerySnapshot>? usersContactFuture;
   final ChatService chatMethods = ChatService();
 
-  Widget buildPinnedView() {
+  ChatListView({Key? key}) : super(key: key);
+
+  Widget buildPinnedView(BuildContext context) {
     final deviceOrientation = MediaQuery.of(context).orientation;
     return GridView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         shrinkWrap: true,
         itemCount: 9,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -53,7 +49,7 @@ class _ChatListViewState extends State<ChatListView> {
                   alignment: Alignment.center,
                   height: 108.0,
                   width: 108.0,
-                  child: Text(letters[Random().nextInt(26)], style: TextStyle(
+                  child: Text(letters[Random().nextInt(26)], style: const TextStyle(
                 color: Colors.black,
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -75,14 +71,14 @@ class _ChatListViewState extends State<ChatListView> {
   Widget buildStoriesView() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Container(
+      child: SizedBox(
         height: 128.0,
         width: double.infinity,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -90,7 +86,7 @@ class _ChatListViewState extends State<ChatListView> {
                 child: Container(
                   height: 108.0,
                   width: 108.0,
-                  child: Icon(CupertinoIcons.add),
+                  child: const Icon(CupertinoIcons.add),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     border: Border.all(),
@@ -102,7 +98,7 @@ class _ChatListViewState extends State<ChatListView> {
             ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 itemCount: 20,
                 itemBuilder: (context, i) {
                   return Padding(
@@ -132,24 +128,24 @@ class _ChatListViewState extends State<ChatListView> {
       future: usersCollection.get(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         if (snapshot.hasError) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.0)),
-            title: Text(
+            title: const Text(
               'Something Bad Happened',
               textAlign: TextAlign.center,
             ),
-            content: Text(
+            content: const Text(
               'Please try again later.',
               textAlign: TextAlign.center,
             ),
             actions: [
               CupertinoButton(
-                child: Text('Ok'),
+                child: const Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -159,34 +155,24 @@ class _ChatListViewState extends State<ChatListView> {
         }
 
         List<UserItem> userResults = [];
-        snapshot.data!.docs.forEach(
-          (document) {
+        for (var document in snapshot.data!.docs) {
             FireUser fireUser = FireUser.fromFirestore(document);
             UserItem userResult = UserItem(fireUser: fireUser);
             userResults.add(userResult);
-          },
-        );
+          }
 
         return userResults.isNotEmpty
             ? ListView(
                 padding: const EdgeInsets.only(left: 5),
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
                 children: userResults,
               )
-            : Center(
-                child: Container(
-                  child: Text('Nothing Is Here'),
-                ),
+            : const Center(
+                child: Text('Nothing Is Here'),
               );
       },
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    scrollController = ScrollController();
   }
 
   @override
@@ -197,7 +183,7 @@ class _ChatListViewState extends State<ChatListView> {
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         appBar: CupertinoNavigationBar(
-          border: Border(
+          border: const Border(
             bottom: BorderSide(
               color: Colors.transparent,
               width: 1.0, // One physical pixel.
@@ -213,11 +199,11 @@ class _ChatListViewState extends State<ChatListView> {
           leading: InkWell(
             onTap: () {
               Navigator.of(context, rootNavigator: false).push(
-                  CupertinoPageRoute(builder: (context) => DistantView()));
+                  CupertinoPageRoute(builder: (context) => const DistantView()));
             },
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: const [
                 Icon(CupertinoIcons.back, color: CupertinoColors.activeBlue),
                 Text(
                   'All',
@@ -230,7 +216,7 @@ class _ChatListViewState extends State<ChatListView> {
             onPressed: () {
               authMethods.signOut(context, onSignOut: () {} );
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_forward_ios,
               color: Colors.blue,
               size: 24.0,
@@ -238,14 +224,13 @@ class _ChatListViewState extends State<ChatListView> {
           ),
         ),
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
+          value: const SystemUiOverlayStyle(
             systemNavigationBarColor: CupertinoColors.systemGroupedBackground,
           ),
           child: CupertinoScrollbar(
-            radius: Radius.circular(20.0),
+            radius: const Radius.circular(20.0),
             child: ListView(
-              physics: BouncingScrollPhysics(),
-              controller: scrollController,
+              physics: const BouncingScrollPhysics(),
               children: [
                 // SingleChildScrollView(
                 //   scrollDirection: Axis.horizontal,
@@ -288,8 +273,8 @@ class _ChatListViewState extends State<ChatListView> {
                 //     ],
                 //   ),
                 // ),
-                buildPinnedView(),
-                SizedBox(height: 10),
+                buildPinnedView(context),
+                const SizedBox(height: 10),
                 buildUserContact(),
               ],
             ),

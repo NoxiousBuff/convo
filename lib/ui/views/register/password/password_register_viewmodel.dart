@@ -10,7 +10,7 @@ class PasswordRegisterViewModel extends BaseViewModel {
   late String _email;
   String get email => _email;
   bool isPasswordShown = false;
-  static AuthService _authService = AuthService();
+  static final AuthService _authService = AuthService();
 
   void updateUserEmail(String email) {
     _email = email;

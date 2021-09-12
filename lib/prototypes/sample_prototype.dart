@@ -27,24 +27,22 @@ class _SamplePrototypeState extends State<SamplePrototype> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
+      appBar: const CupertinoNavigationBar(
         middle: Text('Sample Prototype'),
       ),
       body: Center(
-        child: Container(
-          child: ListView(
-            physics: BouncingScrollPhysics(),
-            padding: EdgeInsets.symmetric(vertical: 50),
-            children: [
-              SizedBox(height: 20),
-              HintVideo(
-                mediaUrl: mediaUrl,
-                uuid: '1',
-                hiveBoxName: HiveHelper.hiveBoxVideo,
-                folderPath: 'Hint Videos',
-              )
-            ],
-          ),
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(vertical: 50),
+          children: [
+            const SizedBox(height: 20),
+            HintVideo(
+              mediaUrl: mediaUrl,
+              uuid: '1',
+              hiveBoxName: HiveHelper.hiveBoxVideo,
+              folderPath: 'Hint Videos',
+            )
+          ],
         ),
       ),
     );

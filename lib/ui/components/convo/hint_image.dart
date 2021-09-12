@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
+import 'package:hint/app/app_logger.dart';
 import 'dart:io';
 import 'package:hive/hive.dart';
 
@@ -61,18 +62,18 @@ class _HintImageState extends State<HintImage> {
         setState(() {
           isDeleted = false;
         });
-        print('Path of the value given does exist');
+        getLogger('Hint Image').wtf('Path of the value given does exist');
       } else {
         setState(() {
           isDeleted = true;
         });
-        print(
+        getLogger('Hint Image').wtf(
             'Path of the value does not exist.\n Here is the function starts.');
         generalWorker();
-        print('Here functions ends');
+        getLogger('Hint Image').wtf('Here functions ends');
       }
     } else {
-      print('This is the middle else that is been printed.');
+      getLogger('Hint Image').wtf('This is the middle else that is been printed.');
       setState(() {
         isDeleted = false;
       });
@@ -89,8 +90,8 @@ class _HintImageState extends State<HintImage> {
                   generalWorker();
                   setState(() {});
                 },
-                child: Center(
-                  child: Container(
+                child: const Center(
+                  child: SizedBox(
                     child: Text('You have deleted this image'),
                     height: 100,
                     width: 100,
@@ -112,16 +113,16 @@ class _HintImageState extends State<HintImage> {
                 CachedNetworkImage(
                   placeholder: (context, string) {
                     if (string.isEmpty) {
-                      Text('Error Occurred');
+                      const Text('Error Occurred');
                     }
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(),
                     );
                   },
                   fit: BoxFit.fitWidth,
                   imageUrl: widget.mediaUrl,
                 ),
-                Text('This is from Cached Network Image'),
+                const Text('This is from Cached Network Image'),
               ],
             ),
           );

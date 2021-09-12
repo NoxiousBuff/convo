@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/forgot_password/forgot_password_view.dart';
@@ -22,7 +23,7 @@ class LoginView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Divider(
+              const Divider(
                 color: Color(0x4D000000),
                 thickness: 1.0,
                 height: 0.0,
@@ -32,7 +33,7 @@ class LoginView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Don\'t Have An Account.',
                     ),
                     CupertinoButton(
@@ -55,10 +56,10 @@ class LoginView extends StatelessWidget {
         ),
         body: Center(
           child: ListView(
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             shrinkWrap: true,
             children: [
-              Icon(
+              const Icon(
                 CupertinoIcons.hand_thumbsup,
                 size: 70.0,
               ),
@@ -106,7 +107,7 @@ class LoginView extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: CupertinoColors.lightBackgroundGray,
                     ),
                   ),
@@ -139,7 +140,7 @@ class LoginView extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: CupertinoColors.lightBackgroundGray,
                     ),
                   ),
@@ -156,7 +157,7 @@ class LoginView extends StatelessWidget {
                 ),
                 child: CupertinoButton(
                   child: model.isBusy
-                      ? SizedBox(
+                      ? const SizedBox(
                           height: 17,
                           width: 17,
                           child: CircularProgressIndicator(
@@ -165,7 +166,7 @@ class LoginView extends StatelessWidget {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : Text(
+                      : const Text(
                           'LogIn',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -193,16 +194,16 @@ class LoginView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: CupertinoButton(
-                  child: Text(
+                  child: const Text(
                     'Forgot Password ?',
                     style: TextStyle(color: Colors.black),
                   ),
                   onPressed: () {
-                    print(model.passwordTech.text);
+                    getLogger('Login View').wtf(model.passwordTech.text);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ForgotPasswordView(),
+                        builder: (context) => const ForgotPasswordView(),
                       ),
                     );
                   },

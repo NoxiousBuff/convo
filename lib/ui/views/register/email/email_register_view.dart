@@ -17,7 +17,7 @@ class EmailRegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<EmailRegisterViewModel>.reactive(
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
+        value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
           // ignore: todo
           //TODO: Apply for dark theme
@@ -32,7 +32,7 @@ class EmailRegisterView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Divider(
+                const Divider(
                   color: Color(0x4D000000),
                   thickness: 1.0,
                   height: 0.0,
@@ -42,7 +42,7 @@ class EmailRegisterView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                     const  Text(
                         'Already Have An Account.',
                       ),
                       CupertinoButton(
@@ -50,7 +50,7 @@ class EmailRegisterView extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginView()));
+                                  builder: (context) => const LoginView()));
                         },
                         padding: EdgeInsets.zero,
                         child: Text(
@@ -71,10 +71,10 @@ class EmailRegisterView extends StatelessWidget {
             key: model.emailFormKey,
             child: Center(
               child: ListView(
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
                 children: [
-                  Icon(
+                  const Icon(
                     CupertinoIcons.person,
                     size: 70.0,
                   ),
@@ -133,7 +133,7 @@ class EmailRegisterView extends StatelessWidget {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
+                        borderSide: const BorderSide(
                           color: CupertinoColors.lightBackgroundGray,
                         ),
                       ),
@@ -149,7 +149,7 @@ class EmailRegisterView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child: Text(
+                      child: const Text(
                         'Fill Password',
                         style: TextStyle(color: Colors.white),
                       ),

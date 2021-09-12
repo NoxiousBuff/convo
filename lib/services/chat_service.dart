@@ -11,7 +11,7 @@ class ChatService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
-  static CollectionReference _conversationCollection =
+  static final CollectionReference _conversationCollection =
       _firestore.collection('Conversation');
 
   startConversation(BuildContext context, String receiverUid,
@@ -44,9 +44,9 @@ class ChatService {
 
   getConversationId(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return '$b\_$a';
+      return '$b/_$a';
     } else {
-      return '$a\_$b';
+      return '$a/_$b';
     }
   }
 
@@ -90,7 +90,7 @@ class ChatService {
     String? replyUid,
   }) {
     String conversationId = getConversationId(receiverUid, liveUserUid);
-    String randomKey = Uuid().v1();
+    String randomKey = const Uuid().v1();
     _conversationCollection.doc(conversationId).collection('Chat').add({
       'isReply': isReply,
       'link': link,

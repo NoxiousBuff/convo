@@ -31,7 +31,7 @@ class BottomTextFieldButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(3.0),
       child: AnimatedOpacity(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         opacity: isKeyboardVisible ? 1.0 : 0.0,
         child: InkWell(
           borderRadius: BorderRadius.circular(8.0),

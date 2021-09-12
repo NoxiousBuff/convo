@@ -12,7 +12,7 @@ class HintTextField extends StatefulWidget {
   final FocusNode focusNode;
   final String? receiverUid;
   final Color? randomColor;
-  HintTextField({
+  const HintTextField({
     Key? key,
     required this.focusNode,
     required this.receiverUid,
@@ -68,7 +68,7 @@ class _HintTextFieldState extends State<HintTextField> {
       child: Container(
         height: 20,
         width: bottomWidth,
-        child: Text(''),
+        child: const Text(''),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
             color: widget.randomColor!.withAlpha(50),
@@ -101,11 +101,11 @@ class _HintTextFieldState extends State<HintTextField> {
       child: ClipRect(
         child: Container(
           padding:
-              EdgeInsets.only(top: 0.0, bottom: 0.0, left: 4.0, right: 2.0),
+              const EdgeInsets.only(top: 0.0, bottom: 0.0, left: 4.0, right: 2.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Divider(height: 0.0),
+              const Divider(height: 0.0),
               ReplyKeyboardMedia(
                 replyType: replyProvider.replyType,
                 replyMsg: replyProvider.replyMsg,
@@ -171,20 +171,20 @@ class _HintTextFieldState extends State<HintTextField> {
               //     ),
               //   ),
               // ),
-              Container(
+              SizedBox(
                 height: 40,
                 child: CupertinoTextField(
                   focusNode: widget.focusNode,
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                   controller: messageTech,
                   placeholder: 'Text Message',
-                  placeholderStyle: TextStyle(color: Colors.black38),
+                  placeholderStyle: const TextStyle(color: Colors.black38),
                   padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
                   minLines: 1,
                   maxLines: 6,
                   onChanged: (val) {
-                    (val.length > 0 && val.trim() != "")
+                    (val.isNotEmpty && val.trim() != "")
                         ? setWritingTo(true)
                         : setWritingTo(false);
                   },
@@ -197,7 +197,7 @@ class _HintTextFieldState extends State<HintTextField> {
                           style: TextStyle(
                             color: !isWriting
                                 ? Colors.black38
-                                : Color.fromRGBO(10, 132, 255, 1),
+                                : const Color.fromRGBO(10, 132, 255, 1),
                           ),
                         ),
                         onPressed: !isWriting
@@ -230,13 +230,13 @@ class _HintTextFieldState extends State<HintTextField> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Container(
                       height: 30,
                       alignment: Alignment.topCenter,
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         scrollDirection: Axis.horizontal,
                         itemCount: 10,
                         itemBuilder: (context, index) {
@@ -357,7 +357,7 @@ class _HintTextFieldState extends State<HintTextField> {
                       //   ],
                       // ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -377,7 +377,7 @@ class _HintTextFieldState extends State<HintTextField> {
                   }
                 },
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   height: optionActive ? optionCurrentHeight : 0,
                 ),
               )

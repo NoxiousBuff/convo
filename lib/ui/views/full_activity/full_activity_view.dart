@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FullActivityView extends StatefulWidget {
+  const FullActivityView({Key? key}) : super(key: key);
+
   @override
   _FullActivityViewState createState() => _FullActivityViewState();
 }
 
 class _FullActivityViewState extends State<FullActivityView> {
-  List<String> _activityLocationName = [
+  final List<String> _activityLocationName = [
     'activities/anything.gif',
     'activities/clean.gif',
     'activities/code.gif',
@@ -30,7 +32,7 @@ class _FullActivityViewState extends State<FullActivityView> {
     'activities/travel.gif',
   ];
 
-  List<String> _activityName = [
+  final List<String> _activityName = [
     'Do Anything',
     'Clean',
     'Code',
@@ -79,12 +81,12 @@ Row activityItemVertical(
           child: Container(
             height: MediaQuery.of(context).size.width * 0.9,
             width: MediaQuery.of(context).size.width * 0.9,
-            padding: EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 8.0),
             decoration: BoxDecoration(
               color: CupertinoColors.white,
               borderRadius: BorderRadius.circular(0.0),
               border: Border.all(
-                color: Color(0x4D000000),
+                color: const Color(0x4D000000),
                 width: 0.5, // One physical pixel.
                 style: BorderStyle.solid,
               ),
@@ -102,8 +104,8 @@ Row activityItemVertical(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Let\'s'),
-                    SizedBox(width: 4.0),
+                    const Text('Let\'s'),
+                    const SizedBox(width: 4.0),
                     Chip(
                       label: Text(activityName),
                     ),

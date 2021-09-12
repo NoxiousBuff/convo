@@ -41,7 +41,7 @@ class MessageBubble extends StatelessWidget {
       // break;
       default:
         {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         }
       // break;
     }
@@ -60,8 +60,8 @@ class MessageBubble extends StatelessWidget {
               isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             messageData.isReply
-                ? SizedBox(height: 10)
-                : SizedBox(height: 0.5),
+                ? const SizedBox(height: 10)
+                : const SizedBox(height: 0.5),
             ReplyMedia(
                 replyType: messageData.replyType,
                 replyMsg: messageData.replyMsg,
@@ -69,12 +69,12 @@ class MessageBubble extends StatelessWidget {
                 isReply: messageData.isReply,
                 replyUid: messageData.replyUid),
             mediaContent(messageData.type, isMe),
-            SizedBox(height: 0.5),
+            const SizedBox(height: 0.5),
             TextMedia(
               messageText: messageData.messageText,
               isMe: isMe,
             ),
-            SizedBox(height: 0.5),
+            const SizedBox(height: 0.5),
           ],
         ),
       ],
