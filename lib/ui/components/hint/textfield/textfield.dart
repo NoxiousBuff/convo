@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/components/media/message/reply_message.dart';
 import 'package:hint/ui/components/media/reply/reply_keyboard_media.dart';
 import 'package:logger/logger.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:provider/provider.dart';
 
 class HintTextField extends StatefulWidget {
   final FocusNode focusNode;
@@ -79,7 +79,6 @@ class _HintTextFieldState extends State<HintTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final replyProvider = Provider.of<ReplyProvider>(context);
     double bottomWidth = (MediaQuery.of(context).size.width - 72.0) / 8;
 
     return GestureDetector(
@@ -100,19 +99,26 @@ class _HintTextFieldState extends State<HintTextField> {
       },
       child: ClipRect(
         child: Container(
-          padding:
-              const EdgeInsets.only(top: 0.0, bottom: 0.0, left: 4.0, right: 2.0),
+          padding: const EdgeInsets.only(
+              top: 0.0, bottom: 0.0, left: 4.0, right: 2.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Divider(height: 0.0),
-              ReplyKeyboardMedia(
-                replyType: replyProvider.replyType,
-                replyMsg: replyProvider.replyMsg,
-                replyMsgId: replyProvider.replyMsgId,
-                isReply: replyProvider.isReply,
-                replyUid: replyProvider.replyUid,
-                replyMediaUrl: replyProvider.replyMediaUrl,
+              Consumer(
+                builder: (BuildContext context,
+                    T Function<T>(ProviderBase<Object?, T>) watch,
+                    Widget? child) {
+                  final replyProvider = watch(replyPod);
+                  return ReplyKeyboardMedia(
+                    replyType: replyProvider.replyType,
+                    replyMsg: replyProvider.replyMsg,
+                    replyMsgId: replyProvider.replyMsgId,
+                    isReply: replyProvider.isReply,
+                    replyUid: replyProvider.replyUid,
+                    replyMediaUrl: replyProvider.replyMediaUrl,
+                  );
+                },
               ),
               // Padding(
               //   padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
@@ -179,8 +185,8 @@ class _HintTextFieldState extends State<HintTextField> {
                   controller: messageTech,
                   placeholder: 'Text Message',
                   placeholderStyle: const TextStyle(color: Colors.black38),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 0.0),
                   minLines: 1,
                   maxLines: 6,
                   onChanged: (val) {
@@ -203,19 +209,29 @@ class _HintTextFieldState extends State<HintTextField> {
                         onPressed: !isWriting
                             ? null
                             : () async {
-                                await chatMethods.addMessage(
+                                await chatMethods.addNewMessage(
                                   receiverUid: widget.receiverUid!,
                                   type: 'text',
                                   messageText: messageTech.text,
-                                  isReply: replyProvider.isReply,
-                                  replyMediaUrl: replyProvider.replyMediaUrl,
-                                  replyMsgId: replyProvider.replyMsgId,
-                                  replyMsg: replyProvider.replyMsg,
-                                  replyType: replyProvider.replyType,
-                                  replyUid: replyProvider.replyUid,
                                 );
                                 messageTech.clear();
                               },
+                        // onPressed: !isWriting
+                        //     ? null
+                        //     : () async {
+                        //         await chatMethods.addMessage(
+                        //           receiverUid: widget.receiverUid!,
+                        //           type: 'text',
+                        //           messageText: messageTech.text,
+                        //           isReply: context.read(replyPod).isReply,
+                        //           replyMediaUrl: context.read(replyPod).replyMediaUrl,
+                        //           replyMsgId: context.read(replyPod).replyMsgId,
+                        //           replyMsg: context.read(replyPod).replyMsg,
+                        //           replyType: context.read(replyPod).replyType,
+                        //           replyUid: context.read(replyPod).replyUid,
+                        //         );
+                        //         messageTech.clear();
+                        //       },
                       )),
                   textAlign: TextAlign.start,
                   keyboardType: TextInputType.multiline,

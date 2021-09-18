@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
-import 'package:hint/ui/components/convo/hint_video.dart';
+import 'package:hint/ui/components/hint/hint_video.dart';
 
 class SamplePrototype extends StatefulWidget {
   const SamplePrototype({Key? key}) : super(key: key);

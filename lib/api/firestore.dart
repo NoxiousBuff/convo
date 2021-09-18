@@ -5,13 +5,13 @@ import 'package:hint/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreApi {
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const String kDefaultPhotoUrl =
-      'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
-
   final log = getLogger('FirestoreApi');
+
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  static const String kDefaultPhotoUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
   CollectionReference usersCollection =
       _firestore.collection(usersFirestoreKey);
 

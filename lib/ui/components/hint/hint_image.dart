@@ -35,7 +35,7 @@ class _HintImageState extends State<HintImage> {
   String? savedFilePath = '';
   PathHelper pathHelper = PathHelper();
   HiveHelper hiveHelper = HiveHelper();
-  DioHelper dioHelper = DioHelper();
+  DioApi dioApi = DioApi();
 
   @override
   void initState() {

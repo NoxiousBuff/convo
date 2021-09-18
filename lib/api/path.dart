@@ -12,7 +12,7 @@ class PathHelper {
 
   Directory? globalDirectory;
   HiveHelper hiveHelper = HiveHelper();
-  DioHelper dioHelper = DioHelper();
+  DioApi dioApi = DioApi();
 
   Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {
@@ -115,7 +115,7 @@ class PathHelper {
       }
 
       if (await directory.exists()) {
-        await dioHelper.downloadMediaFromUrl(
+        await dioApi.downloadMediaFromUrl(
             mediaUrl: mediaUrl, savePath: savePath);
         await hiveHelper.saveFilePathInHive(
             hiveBoxName: hiveBoxName, key: uuid, filePath: savePath);

@@ -180,7 +180,7 @@ class LoginView extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => ChatListView()));
+                                      builder: (context) => const ChatListView()));
                             },
                           );
                         },

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final replyPod = ChangeNotifierProvider((ref) => ReplyProvider());
 
 class ReplyProvider extends ChangeNotifier {
   bool isReply = false;

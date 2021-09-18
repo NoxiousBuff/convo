@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/components/media/message/reply_message.dart';
-import 'package:provider/provider.dart';
-
 class ReplyKeyboardMedia extends StatelessWidget {
   final String? replyMsgId;
   final String? replyType;
@@ -23,7 +22,6 @@ class ReplyKeyboardMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final replyProvider = Provider.of<ReplyProvider>(context);
 
     return isReply ?? false
         ? Container(
@@ -48,7 +46,7 @@ class ReplyKeyboardMedia extends StatelessWidget {
                 IconButton(
                   onPressed: () {
                     getLogger('Reply Keyboard Media').wtf('IconButton is pressed');
-                    replyProvider.emptyReplyFields();
+                    context.read(replyPod).emptyReplyFields();
                   },
                   icon: const Icon(Icons.close),
                 ),

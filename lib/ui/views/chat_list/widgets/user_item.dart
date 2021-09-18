@@ -1,17 +1,17 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class UserItem extends StatelessWidget {
-  final FireUser? fireUser;
-  final ChatService chatMethods = ChatService();
-  UserItem({Key? key, this.fireUser}) : super(key: key);
+  final FireUser fireUser;
+  final Function onTap;
+  UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
 
   final Color randomColor = Color.fromARGB(Random().nextInt(256),
       Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
@@ -95,13 +95,8 @@ class UserItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        chatMethods.startConversation(
-          context,
-          fireUser!.id,
-          fireUser!.username,
-          fireUser!.photoUrl,
-          randomColor,
-        );
+        onTap();
+        getLogger('UserItem').i('Add A start conversation method');
       },
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -114,7 +109,7 @@ class UserItem extends StatelessWidget {
           showCupertinoModalBottomSheet(
               context: context,
               builder: (context) {
-                return buildChatListItemPopup(fireUser: fireUser!);
+                return buildChatListItemPopup(fireUser: fireUser);
               });
         },
         child: ClipOval(
@@ -133,10 +128,10 @@ class UserItem extends StatelessWidget {
             height: 56.0,
             width: 56.0,
             child: Text(
-              fireUser!.username[0],
+              fireUser.username[0].toUpperCase(),
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 32,
+                fontSize: 22,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -146,7 +141,7 @@ class UserItem extends StatelessWidget {
       title: Padding(
         padding: const EdgeInsets.only(bottom: 5.0),
         child: Text(
-          fireUser!.username,
+          fireUser.username,
           style: GoogleFonts.roboto(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -154,7 +149,7 @@ class UserItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        fireUser!.email,
+        fireUser.email,
       ),
     );
   }

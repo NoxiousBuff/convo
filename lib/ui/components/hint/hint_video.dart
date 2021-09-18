@@ -36,7 +36,7 @@ class _HintVideoState extends State<HintVideo> {
   String? savedFilePath = '';
   PathHelper pathHelper = PathHelper();
   HiveHelper hiveHelper = HiveHelper();
-  DioHelper dioHelper = DioHelper();
+  DioApi dioApi = DioApi();
   late VideoPlayerController _playerController;
   Future<void>? _initialiseVideoPlayer;
 

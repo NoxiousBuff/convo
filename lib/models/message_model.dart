@@ -18,7 +18,8 @@ class Message {
   final Timestamp timestamp;
   final String type;
 
-  Message({
+  
+Message({
     required this.isReply,
     this.link,
     this.location,
@@ -38,8 +39,10 @@ class Message {
   });
 
   //deserializing the user document
-  factory Message.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Message(
+  factory 
+Message.fromFirestore(DocumentSnapshot documentSnapshot) {
+    return 
+  Message(
       isReply: documentSnapshot['isReply'],
       link: documentSnapshot['link'],
       location: documentSnapshot['location'],

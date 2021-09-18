@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/ui/components/convo/hint_image.dart';
+import 'package:hint/ui/components/hint/hint_image.dart';
 
 class ImageMedia extends StatefulWidget {
   final String messageUid;

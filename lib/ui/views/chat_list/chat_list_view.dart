@@ -1,26 +1,15 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:stacked/stacked.dart';
+import 'chat_list_viewmodel.dart';
 
 class ChatListView extends StatelessWidget {
-  final ScrollController? scrollController = ScrollController();
-  final AuthService authMethods = AuthService();
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('users');
-  late final Future<QuerySnapshot>? usersContactFuture;
-  final ChatService chatMethods = ChatService();
-
-  ChatListView({Key? key}) : super(key: key);
+  const ChatListView({Key? key}) : super(key: key);
 
   Widget buildPinnedView(BuildContext context) {
     final deviceOrientation = MediaQuery.of(context).orientation;
@@ -34,11 +23,28 @@ class ChatListView extends StatelessWidget {
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
+          final Color randomColor = Color.fromARGB(
+              Random().nextInt(256),
+              Random().nextInt(256),
+              Random().nextInt(256),
+              Random().nextInt(256));
 
-          final Color randomColor = Color.fromARGB(Random().nextInt(256),
-      Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
-
-      final List letters = ['Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','F','G','H','J','K','L','Z','X','C','V','B','N','M',];
+          final List letters = [
+            'R',
+            'T',
+            'P',
+            'A',
+            'S',
+            'D',
+            'F',
+            'G',
+            'H',
+            'L',
+            'V',
+            'B',
+            'N',
+            'M',
+          ];
 
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -49,18 +55,20 @@ class ChatListView extends StatelessWidget {
                   alignment: Alignment.center,
                   height: 108.0,
                   width: 108.0,
-                  child: Text(letters[Random().nextInt(26)], style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),),
-                  decoration: BoxDecoration(
-                    // image: DecorationImage(
-                    //   image: AssetImage('images/img$index.jpg'),
-                    //   fit: BoxFit.cover,
-                    // ),
-                    color: randomColor.withAlpha(30)
+                  child: Text(
+                    letters[Random().nextInt(letters.length)],
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                  decoration: BoxDecoration(
+                      // image: DecorationImage(
+                      //   image: AssetImage('images/img$index.jpg'),
+                      //   fit: BoxFit.cover,
+                      // ),
+                      color: randomColor.withAlpha(30)),
                 ),
               ),
             ),
@@ -123,43 +131,39 @@ class ChatListView extends StatelessWidget {
     );
   }
 
-  Widget buildUserContact() {
-    return FutureBuilder<QuerySnapshot>(
-      future: usersCollection.get(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const CircularProgressIndicator();
-        }
-
-        if (snapshot.hasError) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0)),
-            title: const Text(
-              'Something Bad Happened',
-              textAlign: TextAlign.center,
-            ),
-            content: const Text(
-              'Please try again later.',
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              CupertinoButton(
-                child: const Text('Ok'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
+  Widget buildUserContact(ChatListViewModel model) {
+    return Builder(
+      builder: (context) {
+        if (!model.dataReady) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
           );
         }
 
+        if (model.hasError) {
+          return const Center(
+            child: Text('Model has Error'),
+          );
+        }
+
+        final Color randomColor = Color.fromARGB(
+            Random().nextInt(256),
+            Random().nextInt(256),
+            Random().nextInt(256),
+            Random().nextInt(256));
+
         List<UserItem> userResults = [];
-        for (var document in snapshot.data!.docs) {
-            FireUser fireUser = FireUser.fromFirestore(document);
-            UserItem userResult = UserItem(fireUser: fireUser);
-            userResults.add(userResult);
-          }
+        for (var document in model.data!.docs) {
+          FireUser fireUser = FireUser.fromFirestore(document);
+          UserItem userResult = UserItem(
+            fireUser: fireUser,
+            onTap: () {
+              model.chatService
+                  .startConversation(context, fireUser, randomColor);
+            },
+          );
+          userResults.add(userResult);
+        }
 
         return userResults.isNotEmpty
             ? ListView(
@@ -177,9 +181,11 @@ class ChatListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return ViewModelBuilder<ChatListViewModel>.reactive(
+      onModelReady: (model) {
+        model.scrollController = ScrollController();
+      },
+      builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         appBar: CupertinoNavigationBar(
@@ -197,10 +203,7 @@ class ChatListView extends StatelessWidget {
             style: GoogleFonts.poppins(fontSize: 18.0),
           ),
           leading: InkWell(
-            onTap: () {
-              Navigator.of(context, rootNavigator: false).push(
-                  CupertinoPageRoute(builder: (context) => const DistantView()));
-            },
+            onTap: () {},
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
@@ -214,7 +217,7 @@ class ChatListView extends StatelessWidget {
           ),
           trailing: IconButton(
             onPressed: () {
-              authMethods.signOut(context, onSignOut: () {} );
+              model.signOut(context);
             },
             icon: const Icon(
               Icons.arrow_forward_ios,
@@ -223,64 +226,82 @@ class ChatListView extends StatelessWidget {
             ),
           ),
         ),
-        body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: const SystemUiOverlayStyle(
-            systemNavigationBarColor: CupertinoColors.systemGroupedBackground,
-          ),
-          child: CupertinoScrollbar(
-            radius: const Radius.circular(20.0),
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              children: [
-                // SingleChildScrollView(
-                //   scrollDirection: Axis.horizontal,
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.start,
-                //     children: [
-                //       SizedBox(width: 15),
-                //       OutlinedButton(
-                //         child: Text('Hint Video'),
-                //         onPressed: () {
-                //           Navigator.of(context).push(MaterialPageRoute(
-                //               builder: (context) => SamplePrototype()));
-                //         },
-                //       ),
-                //       SizedBox(width: 15),
-                //       OutlinedButton(
-                //         child: Text('Sensors'),
-                //         onPressed: () {
-                //           Navigator.of(context).push(MaterialPageRoute(
-                //               builder: (context) => SensorPrototype()));
-                //         },
-                //       ),
-                //       SizedBox(width: 15),
-                //       OutlinedButton(
-                //         child: Text('Palette'),
-                //         onPressed: () {
-                //           Navigator.of(context).push(MaterialPageRoute(
-                //               builder: (context) => ImageColors(
-                //                   image: AssetImage('images/img18.jpg'))));
-                //         },
-                //       ),
-                //       SizedBox(width: 15),
-                //       OutlinedButton(
-                //         child: Text('Chat Ui'),
-                //         onPressed: () {
-                //           Navigator.of(context).push(MaterialPageRoute(
-                //               builder: (context) => ChatUiPrototype()));
-                //         },
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                buildPinnedView(context),
-                const SizedBox(height: 10),
-                buildUserContact(),
-              ],
-            ),
+        body: CupertinoScrollbar(
+          radius: const Radius.circular(20.0),
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            controller: model.scrollController,
+            children: [
+              // buildPinnedView(context),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 22),
+                    GestureDetector(
+                        onTap: () {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => ContactsView()));
+                          SystemChrome.setEnabledSystemUIMode(
+                              SystemUiMode.edgeToEdge);
+                        },
+                        child: const Chip(
+                            label: Text('Contacts'),
+                            backgroundColor: Colors.transparent,
+                            side: BorderSide(color: Colors.black12))),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                        // onTap: () {
+                        //   Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //           builder: (context) => hintImagePrototype()));
+                        // },
+                        child: const Chip(
+                            label: Text('hint Image'),
+                            backgroundColor: Colors.transparent,
+                            side: BorderSide(color: Colors.black12))),
+                    const SizedBox(width: 4),
+                    const Chip(
+                        label: Text('hint Video'),
+                        backgroundColor: Colors.transparent,
+                        side: BorderSide(color: Colors.black12)),
+                    const SizedBox(width: 4),
+                    const Chip(
+                        label: Text('Explore Feed'),
+                        backgroundColor: Colors.transparent,
+                        side: BorderSide(color: Colors.black12)),
+                    const SizedBox(width: 4),
+                    const Chip(
+                        label: Text('Settings'),
+                        backgroundColor: Colors.transparent,
+                        side: BorderSide(color: Colors.black12)),
+                    const SizedBox(width: 22),
+                  ],
+                ),
+              ),
+              buildPinnedView(context),
+              buildUserContact(model),
+            ],
           ),
         ),
       ),
+      viewModelBuilder: () => ChatListViewModel(),
     );
+  }
+}
+
+class FireUserResult extends StatelessWidget {
+  const FireUserResult({Key? key, required this.fireUser, required this.onTap})
+      : super(key: key);
+
+  final FireUser fireUser;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(title: Text(fireUser.email));
   }
 }
