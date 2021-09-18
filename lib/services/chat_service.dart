@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/routes/shared_axis_route.dart';
 import 'package:hint/ui/views/chat/chat_view.dart';
@@ -57,27 +58,28 @@ class ChatService {
     GeoPoint? location,
     bool isRead = false,
     String? messageText,
+    String? mediaUrl,
     List<String?>? mediaType,
     List<String?>? mediaList,
-    bool removeForMe = false,
   }) {
     String conversationId = getConversationId(receiverUid, liveUserUid);
-    String randomKey = const Uuid().v1();
-    final Map<String, dynamic> messageMap = {};
-    final Map<String, dynamic> replyMessageMap = {};
-    if (location != null) messageMap['location'] = location;
-    if (messageText != null) messageMap['messageText'] = messageText;
-    if (mediaList != null) messageMap['mediaList'] = mediaList;
-    if (mediaType != null) messageMap['mediaType'] = mediaType;
-    _conversationCollection.doc(conversationId).collection('Chat').add({
-      'isRead': isRead,
-      'isReply': isReply,
-      'message': messageMap,
-      'messageUid': randomKey,
-      'replyMessage': replyMessageMap,
-      'senderUid': liveUserUid,
-      'timestamp': Timestamp.now(),
-      'type': type,
+    String messageUid = const Uuid().v1();
+    final Map messageMap = {};
+    final Map replyMessageMap = {};
+    if (location != null) messageMap[MessageField.location] = location;
+    if (messageText != null) messageMap[MessageField.messageText] = messageText;
+    if (mediaUrl != null) messageMap[MessageField.mediaUrl] = mediaUrl;
+    if (mediaList != null) messageMap[MessageField.mediaList] = mediaList;
+    if (mediaType != null) messageMap[MessageField.mediaType] = mediaType;
+    _conversationCollection.doc(conversationId).collection(chatsFirestoreKey).add({
+      DocumentField.isRead: isRead,
+      DocumentField.isReply: isReply,
+      DocumentField.message: messageMap,
+      DocumentField.messageUid: messageUid,
+      DocumentField.replyMessage: replyMessageMap,
+      DocumentField.senderUid: liveUserUid,
+      DocumentField.timestamp: Timestamp.now(),
+      DocumentField.type: type,
     });
   }
 
@@ -97,7 +99,7 @@ class ChatService {
   }) {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String randomKey = const Uuid().v1();
-    _conversationCollection.doc(conversationId).collection('Chat').add({
+    _conversationCollection.doc(conversationId).collection(chatsFirestoreKey).add({
       'isReply': isReply,
       'link': link,
       'location': location,

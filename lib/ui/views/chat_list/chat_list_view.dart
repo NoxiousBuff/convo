@@ -233,56 +233,54 @@ class ChatListView extends StatelessWidget {
             controller: model.scrollController,
             children: [
               // buildPinnedView(context),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 22),
-                    GestureDetector(
-                        onTap: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => ContactsView()));
-                          SystemChrome.setEnabledSystemUIMode(
-                              SystemUiMode.edgeToEdge);
-                        },
-                        child: const Chip(
-                            label: Text('Contacts'),
-                            backgroundColor: Colors.transparent,
-                            side: BorderSide(color: Colors.black12))),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                        // onTap: () {
-                        //   Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //           builder: (context) => hintImagePrototype()));
-                        // },
-                        child: const Chip(
-                            label: Text('hint Image'),
-                            backgroundColor: Colors.transparent,
-                            side: BorderSide(color: Colors.black12))),
-                    const SizedBox(width: 4),
-                    const Chip(
-                        label: Text('hint Video'),
-                        backgroundColor: Colors.transparent,
-                        side: BorderSide(color: Colors.black12)),
-                    const SizedBox(width: 4),
-                    const Chip(
-                        label: Text('Explore Feed'),
-                        backgroundColor: Colors.transparent,
-                        side: BorderSide(color: Colors.black12)),
-                    const SizedBox(width: 4),
-                    const Chip(
-                        label: Text('Settings'),
-                        backgroundColor: Colors.transparent,
-                        side: BorderSide(color: Colors.black12)),
-                    const SizedBox(width: 22),
-                  ],
-                ),
-              ),
-              buildPinnedView(context),
+              // SingleChildScrollView(
+              //   scrollDirection: Axis.horizontal,
+              //   child: Row(
+              //     children: [
+              //       const SizedBox(width: 22),
+              //       GestureDetector(
+              //           onTap: () {
+              //             // Navigator.push(
+              //             //     context,
+              //             //     MaterialPageRoute(
+              //             //         builder: (context) => ContactsView()));
+              //           },
+              //           child: const Chip(
+              //               label: Text('Contacts'),
+              //               backgroundColor: Colors.transparent,
+              //               side: BorderSide(color: Colors.black12))),
+              //       const SizedBox(width: 4),
+              //       GestureDetector(
+              //           // onTap: () {
+              //           //   Navigator.push(
+              //           //       context,
+              //           //       MaterialPageRoute(
+              //           //           builder: (context) => hintImagePrototype()));
+              //           // },
+              //           child: const Chip(
+              //               label: Text('hint Image'),
+              //               backgroundColor: Colors.transparent,
+              //               side: BorderSide(color: Colors.black12))),
+              //       const SizedBox(width: 4),
+              //       const Chip(
+              //           label: Text('hint Video'),
+              //           backgroundColor: Colors.transparent,
+              //           side: BorderSide(color: Colors.black12)),
+              //       const SizedBox(width: 4),
+              //       const Chip(
+              //           label: Text('Explore Feed'),
+              //           backgroundColor: Colors.transparent,
+              //           side: BorderSide(color: Colors.black12)),
+              //       const SizedBox(width: 4),
+              //       const Chip(
+              //           label: Text('Settings'),
+              //           backgroundColor: Colors.transparent,
+              //           side: BorderSide(color: Colors.black12)),
+              //       const SizedBox(width: 22),
+              //     ],
+              //   ),
+              // ),
+              // buildPinnedView(context),
               buildUserContact(model),
             ],
           ),

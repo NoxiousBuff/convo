@@ -1,7 +1,5 @@
-import 'dart:collection';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/models/message_model.dart';
+import 'package:hint/models/new_message_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
@@ -24,35 +22,6 @@ class ChatView extends StatelessWidget {
     required this.conversationId,
     required this.randomColor,
   }) : super(key: key);
-
-  Widget buildNewChatView(ChatViewModel model) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: model.conversationCollection
-            .doc(conversationId)
-            .collection('Chat').orderBy('timestamp', descending:  true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Text(
-                'There is an error in the stream that you want to call write now.');
-          }
-          final docs = snapshot.data!.docs;
-          return ListView.builder(
-            reverse: true,
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                LinkedHashMap<String, dynamic> map = docs[index].get('message');
-                return SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        map['messageText'],
-                  style: const TextStyle(fontSize: 32),
-                ),
-                    ));
-              });
-        });
-  }
 
   Widget buildChatView(ChatViewModel model) {
     return Builder(builder: (context) {
@@ -95,7 +64,7 @@ class ChatView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return MessageBubble(
                     context: context,
-                    messageData: Message.fromFirestore(
+                    messageData: NewMessage.fromFirestore(
                       model.data!.docs[index],
                     ),
                   );
@@ -184,8 +153,7 @@ class ChatView extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Flexible(child: buildChatView(model)),
-                Flexible(child: buildNewChatView(model)),
+                Flexible(child: buildChatView(model)),
                 HintTextField(
                   focusNode: model.focusNode,
                   receiverUid: fireUser.id,

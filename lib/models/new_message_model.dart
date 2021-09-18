@@ -1,11 +1,13 @@
+import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/constants/message_string.dart';
 
 class NewMessage {
   final bool isRead;
   final bool isReply;
-  final Map<String, dynamic>? message;
+  final LinkedHashMap<String, dynamic> message;
   final String messageUid;
-  final Map<String, dynamic>? replyMessage;
+  final LinkedHashMap<String, dynamic>? replyMessage;
   final String senderUid;
   final Timestamp timestamp;
   final String type;
@@ -13,7 +15,7 @@ class NewMessage {
   NewMessage({
     required this.isRead,
     required this.isReply,
-    this.message,
+    required this.message,
     required this.messageUid,
     this.replyMessage,
     required this.senderUid,
@@ -21,15 +23,15 @@ class NewMessage {
     required this.type,
   });
 
-  factory NewMessage.fromFirestor(DocumentSnapshot doc) {
+  factory NewMessage.fromFirestore(DocumentSnapshot doc) {
     return NewMessage(
-        isRead: doc['isRead'],
-        isReply: doc['isReply'],
-        message: doc['message'],
-        messageUid: doc['messageUid'],
-        replyMessage: doc['replyMessage'],
-        senderUid: doc['senderUid'],
-        timestamp: doc['timestamp'],
-        type: doc['type']);
+        isRead: doc[DocumentField.isRead],
+        isReply: doc[DocumentField.isReply],
+        message: doc[DocumentField.message],
+        messageUid: doc[DocumentField.messageUid],
+        replyMessage: doc[DocumentField.replyMessage],
+        senderUid: doc[DocumentField.senderUid],
+        timestamp: doc[DocumentField.timestamp],
+        type: doc[DocumentField.type],);
   }
 }
