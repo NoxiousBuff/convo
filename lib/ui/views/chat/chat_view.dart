@@ -53,24 +53,22 @@ class ChatView extends StatelessWidget {
 
       final messages = model.data!.docs;
       return messages.isNotEmpty
-          ? CupertinoScrollbar(
-              child: ListView.builder(
-                reverse: true,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 20.0),
-                controller: model.scrollController,
-                physics: const BouncingScrollPhysics(),
-                itemCount: model.data!.docs.length,
-                itemBuilder: (context, index) {
-                  return MessageBubble(
-                    context: context,
-                    messageData: NewMessage.fromFirestore(
-                      model.data!.docs[index],
-                    ),
-                  );
-                },
-              ),
-            )
+          ? ListView.builder(
+            reverse: true,
+            padding: const EdgeInsets.symmetric(
+                vertical: 20.0, horizontal: 20.0),
+            controller: model.scrollController,
+            physics: const BouncingScrollPhysics(),
+            itemCount: model.data!.docs.length,
+            itemBuilder: (context, index) {
+              return MessageBubble(
+                context: context,
+                messageData: NewMessage.fromFirestore(
+                  model.data!.docs[index],
+                ),
+              );
+            },
+          )
           : const Center(
               child: SizedBox(
                 child: Text(
@@ -104,7 +102,7 @@ class ChatView extends StatelessWidget {
           backgroundColor: CupertinoColors.white,
           appBar: AppBar(
             systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarBrightness: Brightness.light),
+                statusBarBrightness: Brightness.dark),
             elevation: 0.0,
             //I could also use Cupertino Back Button
             leading: IconButton(
@@ -140,32 +138,22 @@ class ChatView extends StatelessWidget {
             centerTitle: true,
             backgroundColor: randomColor.withAlpha(30),
           ),
-          body: AnnotatedRegion(
-            value: const SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              // systemNavigationBarColor: Color.alphaBlend(
-              //   randomColor.withAlpha(20),
-              //   Colors.white,
-              // ),
-              systemNavigationBarIconBrightness: Brightness.dark,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Flexible(child: buildChatView(model)),
-                HintTextField(
-                  focusNode: model.focusNode,
-                  receiverUid: fireUser.id,
-                  randomColor: randomColor,
-                ),
-                Container(
-                  height: 15,
-                  width: double.infinity,
-                  color: randomColor,
-                )
-              ],
-            ),
+          body: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Flexible(child: buildChatView(model)),
+              HintTextField(
+                focusNode: model.focusNode,
+                receiverUid: fireUser.id,
+                randomColor: randomColor,
+              ),
+              Container(
+                height: 15,
+                width: double.infinity,
+                color: Color.alphaBlend(randomColor.withAlpha(20), Colors.white),
+              )
+            ],
           ),
         ),
       ),

@@ -1,10 +1,12 @@
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/prototypes/contact/contact_view.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:stacked/stacked.dart';
 import 'chat_list_viewmodel.dart';
 
@@ -203,7 +205,7 @@ class ChatListView extends StatelessWidget {
             style: GoogleFonts.poppins(fontSize: 18.0),
           ),
           leading: InkWell(
-            onTap: () {},
+            onTap: () => navService.cupertinoPageRoute(context, const DistantView()),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
@@ -226,80 +228,55 @@ class ChatListView extends StatelessWidget {
             ),
           ),
         ),
-        body: CupertinoScrollbar(
-          radius: const Radius.circular(20.0),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            controller: model.scrollController,
-            children: [
-              // buildPinnedView(context),
-              // SingleChildScrollView(
-              //   scrollDirection: Axis.horizontal,
-              //   child: Row(
-              //     children: [
-              //       const SizedBox(width: 22),
-              //       GestureDetector(
-              //           onTap: () {
-              //             // Navigator.push(
-              //             //     context,
-              //             //     MaterialPageRoute(
-              //             //         builder: (context) => ContactsView()));
-              //           },
-              //           child: const Chip(
-              //               label: Text('Contacts'),
-              //               backgroundColor: Colors.transparent,
-              //               side: BorderSide(color: Colors.black12))),
-              //       const SizedBox(width: 4),
-              //       GestureDetector(
-              //           // onTap: () {
-              //           //   Navigator.push(
-              //           //       context,
-              //           //       MaterialPageRoute(
-              //           //           builder: (context) => hintImagePrototype()));
-              //           // },
-              //           child: const Chip(
-              //               label: Text('hint Image'),
-              //               backgroundColor: Colors.transparent,
-              //               side: BorderSide(color: Colors.black12))),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('hint Video'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('Explore Feed'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('Settings'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 22),
-              //     ],
-              //   ),
-              // ),
-              // buildPinnedView(context),
-              buildUserContact(model),
-            ],
-          ),
+        body: ListView(
+          physics: const BouncingScrollPhysics(),
+          controller: model.scrollController,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  const SizedBox(width: 22),
+                  GestureDetector(
+                      onTap: () {
+                        navService.materialPageRoute(
+                            context, const ContactsView());
+                      },
+                      child: const Chip(
+                          label: Text('Contacts'),
+                          backgroundColor: Colors.transparent,
+                          side: BorderSide(color: Colors.black12))),
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                      child: const Chip(
+                          label: Text('hint Image'),
+                          backgroundColor: Colors.transparent,
+                          side: BorderSide(color: Colors.black12))),
+                  const SizedBox(width: 4),
+                  const Chip(
+                      label: Text('hint Video'),
+                      backgroundColor: Colors.transparent,
+                      side: BorderSide(color: Colors.black12)),
+                  const SizedBox(width: 4),
+                  const Chip(
+                      label: Text('Explore Feed'),
+                      backgroundColor: Colors.transparent,
+                      side: BorderSide(color: Colors.black12)),
+                  const SizedBox(width: 4),
+                  const Chip(
+                      label: Text('Settings'),
+                      backgroundColor: Colors.transparent,
+                      side: BorderSide(color: Colors.black12)),
+                  const SizedBox(width: 22),
+                ],
+              ),
+            ),
+            buildPinnedView(context),
+            buildUserContact(model),
+          ],
         ),
       ),
       viewModelBuilder: () => ChatListViewModel(),
     );
-  }
-}
-
-class FireUserResult extends StatelessWidget {
-  const FireUserResult({Key? key, required this.fireUser, required this.onTap})
-      : super(key: key);
-
-  final FireUser fireUser;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(title: Text(fireUser.email));
   }
 }
