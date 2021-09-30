@@ -15,6 +15,7 @@ class HintImage extends StatefulWidget {
   final String hiveBoxName;
   final String? folderPath;
   final VoidCallback? onTap;
+  final String conversationId;
   const HintImage({
     Key? key,
     required this.mediaUrl,
@@ -23,6 +24,7 @@ class HintImage extends StatefulWidget {
     this.folderPath,
     this.imageName,
     this.onTap,
+    required this.conversationId
   }) : super(key: key);
 
   @override
@@ -73,11 +75,13 @@ class _HintImageState extends State<HintImage> {
         getLogger('Hint Image').wtf('Here functions ends');
       }
     } else {
-      getLogger('Hint Image').wtf('This is the middle else that is been printed.');
+      getLogger('Hint Image')
+          .wtf('This is the middle else that is been printed.');
       setState(() {
         isDeleted = false;
       });
       generalWorker();
+     
     }
   }
 

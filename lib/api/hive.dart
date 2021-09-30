@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:hint/app/app_logger.dart';
 import 'package:hive/hive.dart';
 
+final hiveApi = HiveHelper();
+
 class HiveHelper {
   final log = getLogger('HiveApi');
-
+  static const String retryMessages = 'retryMessages';
   static const String hiveBoxImages = 'ImagesHiveBox';
   static const String hiveBoxAudio = 'AudioHiveBox';
   static const String hiveBoxVideo = 'VideosHiveBox';
@@ -15,6 +17,7 @@ class HiveHelper {
   static const String hiveBoxMultiMedia = 'MultiMediaHiveBox';
   static const String hiveBoxEmojies = 'EmojiesHiveBox';
   Future<void> initialiseHive() async {
+    await Hive.openBox(retryMessages);
     await Hive.openBox(hiveBoxProfilePhotos);
     await Hive.openBox(hiveBoxThumbnails);
     await Hive.openBox(hiveBoxImages);

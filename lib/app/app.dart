@@ -10,14 +10,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent, statusBarColor: Colors.transparent));
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        systemNavigationBarColor: Colors.transparent,
+        statusBarColor: Colors.transparent));
+
+    //SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        home: FirebaseAuth.instance.currentUser != null
-            ? const ChatListView()
-            : const EmailRegisterView(),
-      );
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      home: FirebaseAuth.instance.currentUser != null
+          ? const ChatListView()
+          : const EmailRegisterView(),
+    );
   }
 }

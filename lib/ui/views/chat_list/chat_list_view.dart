@@ -1,12 +1,15 @@
 import 'dart:math';
-import 'package:flutter/services.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/login/login_view.dart';
+
+import '../distant_view.dart';
+import 'chat_list_viewmodel.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
-import 'package:stacked/stacked.dart';
-import 'chat_list_viewmodel.dart';
 
 class ChatListView extends StatelessWidget {
   const ChatListView({Key? key}) : super(key: key);
@@ -14,66 +17,67 @@ class ChatListView extends StatelessWidget {
   Widget buildPinnedView(BuildContext context) {
     final deviceOrientation = MediaQuery.of(context).orientation;
     return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        shrinkWrap: true,
-        itemCount: 9,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: (deviceOrientation == Orientation.portrait) ? 3 : 5,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10),
-        itemBuilder: (context, index) {
-          final Color randomColor = Color.fromARGB(
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256));
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      shrinkWrap: true,
+      itemCount: 9,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: (deviceOrientation == Orientation.portrait) ? 3 : 5,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10),
+      itemBuilder: (context, index) {
+        final Color randomColor = Color.fromARGB(
+            Random().nextInt(256),
+            Random().nextInt(256),
+            Random().nextInt(256),
+            Random().nextInt(256));
 
-          final List letters = [
-            'R',
-            'T',
-            'P',
-            'A',
-            'S',
-            'D',
-            'F',
-            'G',
-            'H',
-            'L',
-            'V',
-            'B',
-            'N',
-            'M',
-          ];
+        final List letters = [
+          'R',
+          'T',
+          'P',
+          'A',
+          'S',
+          'D',
+          'F',
+          'G',
+          'H',
+          'L',
+          'V',
+          'B',
+          'N',
+          'M',
+        ];
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipOval(
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 108.0,
-                  width: 108.0,
-                  child: Text(
-                    letters[Random().nextInt(letters.length)],
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ClipOval(
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                alignment: Alignment.center,
+                height: 108.0,
+                width: 108.0,
+                child: Text(
+                  letters[Random().nextInt(letters.length)],
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
                   ),
-                  decoration: BoxDecoration(
-                      // image: DecorationImage(
-                      //   image: AssetImage('images/img$index.jpg'),
-                      //   fit: BoxFit.cover,
-                      // ),
-                      color: randomColor.withAlpha(30)),
                 ),
+                decoration: BoxDecoration(
+                    // image: DecorationImage(
+                    //   image: AssetImage('images/img$index.jpg'),
+                    //   fit: BoxFit.cover,
+                    // ),
+                    color: randomColor.withAlpha(30)),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   Widget buildStoriesView() {
@@ -146,32 +150,23 @@ class ChatListView extends StatelessWidget {
           );
         }
 
-        final Color randomColor = Color.fromARGB(
-            Random().nextInt(256),
-            Random().nextInt(256),
-            Random().nextInt(256),
-            Random().nextInt(256));
-
         List<UserItem> userResults = [];
         for (var document in model.data!.docs) {
           FireUser fireUser = FireUser.fromFirestore(document);
           UserItem userResult = UserItem(
             fireUser: fireUser,
-            onTap: () {
-              model.chatService
-                  .startConversation(context, fireUser, randomColor);
-            },
+            model: model,
           );
           userResults.add(userResult);
         }
 
         return userResults.isNotEmpty
-            ? ListView(
-                padding: const EdgeInsets.only(left: 5),
-                physics: const BouncingScrollPhysics(),
+            ? ListView.builder(
                 shrinkWrap: true,
-                children: userResults,
-              )
+                itemCount: userResults.length,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(left: 5),
+                itemBuilder: (context, i) => userResults[i])
             : const Center(
                 child: Text('Nothing Is Here'),
               );
@@ -182,9 +177,11 @@ class ChatListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatListViewModel>.reactive(
-      onModelReady: (model) {
+      onModelReady: (model) async {
         model.scrollController = ScrollController();
+        await model.currentUserDoc();
       },
+      disposeViewModel: true,
       builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
@@ -202,25 +199,30 @@ class ChatListView extends StatelessWidget {
             'Messages',
             style: GoogleFonts.poppins(fontSize: 18.0),
           ),
-          leading: InkWell(
-            onTap: () {},
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(CupertinoIcons.back, color: CupertinoColors.activeBlue),
-                Text(
-                  'All',
-                  style: TextStyle(color: CupertinoColors.activeBlue),
-                ),
-              ],
+          leading: TextButton(
+            onPressed: () => Navigator.push(
+                context,
+                cupertinoTransition(
+                    enterTo: DistantView(fireUser: model.fireUser),
+                    exitFrom: const ChatListView())),
+            child: const Text(
+              'All',
+              style: TextStyle(color: CupertinoColors.activeBlue),
             ),
           ),
           trailing: IconButton(
             onPressed: () {
               model.signOut(context);
+              Navigator.push(
+                context,
+                cupertinoTransition(
+                  enterTo: const LoginView(),
+                  exitFrom: const ChatListView(),
+                ),
+              );
             },
             icon: const Icon(
-              Icons.arrow_forward_ios,
+              Icons.logout_rounded,
               color: Colors.blue,
               size: 24.0,
             ),
@@ -281,6 +283,7 @@ class ChatListView extends StatelessWidget {
               //   ),
               // ),
               // buildPinnedView(context),
+
               buildUserContact(model),
             ],
           ),

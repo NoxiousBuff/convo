@@ -4,16 +4,34 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+FirestoreApi firestoreApi = FirestoreApi();
+
 class FirestoreApi {
   final log = getLogger('FirestoreApi');
 
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseAuth auth = FirebaseAuth.instance;
+  static final String liveUserUid = auth.currentUser!.uid;
 
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
   CollectionReference usersCollection =
       _firestore.collection(usersFirestoreKey);
+
+  User? getCurrentUser() => auth.currentUser;
+
+  Future<void> updateUser(
+      {required String uid,
+      required String updateProperty,
+      required String property}) {
+    return usersCollection
+        .doc(uid)
+        .update({property: updateProperty})
+        .then((value) => getLogger('FirestoreApi')
+            .wtf("$property is updated to $updateProperty"))
+        .catchError((error) =>
+            getLogger('FirestoreApi').e("Failed to update user: $error"));
+  }
 
   Future<void> createUserInFirebase(
       {required User user, String? userName, Function? onError}) async {
@@ -56,7 +74,7 @@ class FirestoreApi {
   }
 
   Future<void> changeUserDisplayName(String username) async {
-    final currentUser = _auth.currentUser!;
+    final currentUser = auth.currentUser!;
     await usersCollection
         .doc(currentUser.uid)
         .update({'username': username})
@@ -69,7 +87,7 @@ class FirestoreApi {
   }
 
   Future<void> changeUserPhoneNumber(String phoneNumber) async {
-    final currentUser = _auth.currentUser!;
+    final currentUser = auth.currentUser!;
     await usersCollection
         .doc(currentUser.uid)
         .update({'phone': phoneNumber})

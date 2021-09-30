@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
-class DefaultNavigation extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    throw UnimplementedError();
-  }
+Route cupertinoTransition({required Widget enterTo, required Widget exitFrom}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => enterTo,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return Stack(
+        children: [
+          SlideTransition(
+            position: Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                .animate(animation),
+            child: enterTo,
+          ),
+          SlideTransition(
+            position: Tween<Offset>(begin: Offset.zero, end: const Offset(-1.0, 0.0))
+                .animate(animation),
+            child: exitFrom,
+          ),
+        ],
+      );
+    },
+  );
 }

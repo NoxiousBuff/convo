@@ -10,11 +10,11 @@ class DocumentField {
 }
 
 class MessageField {
-  static const String messageText = 'messageText';
-  static const String mediaUrl = 'mediaUrl';
-  static const String mediaList = 'mediaList';
-  static const String mediaType = 'mediaType';
   static const String location = 'location';
+  static const String timestamp = 'timestamp';
+  static const String mediaUrls = 'mediaUrls';
+  static const String messageText = 'messageText';
+  static const String mediaUrlsType = 'mediaUrlsType';
 }
 
 class ReplyField {
@@ -29,6 +29,7 @@ class ReplyField {
 }
 
 class MediaType {
+  static const String text = 'text';
   static const String image = 'image';
   static const String video = 'video';
   static const String audio = 'audio';

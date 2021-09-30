@@ -6,12 +6,14 @@ import 'package:hint/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
-  final Function onTap;
-  UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
+  final ChatListViewModel model;
+  UserItem({Key? key, required this.fireUser, required this.model})
+      : super(key: key);
 
   final Color randomColor = Color.fromARGB(Random().nextInt(256),
       Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
@@ -49,7 +51,8 @@ class UserItem extends StatelessWidget {
             children: [
               Text(
                 fireUser.username,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 24.0),
               ),
             ],
           ),
@@ -95,7 +98,7 @@ class UserItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        onTap();
+        model.chatService.startConversation(context, fireUser, randomColor);
         getLogger('UserItem').i('Add A start conversation method');
       },
       shape: const RoundedRectangleBorder(

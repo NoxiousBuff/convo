@@ -5,6 +5,7 @@ const teal = Color(0xff23C7DA);
 const grey = Color(0xffE5E5EA);
 
 const black = Color(0xff3C3C3D);
+const black54 = Colors.black54;
 const green = Color(0xff04D939);
 const darkPink = Color(0xffdd2476);
 const lightBlue = Color(0xff55A5F5);

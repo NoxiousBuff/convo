@@ -5,22 +5,22 @@ import 'package:hint/constants/message_string.dart';
 class NewMessage {
   final bool isRead;
   final bool isReply;
-  final LinkedHashMap<String, dynamic> message;
-  final String messageUid;
-  final LinkedHashMap<String, dynamic>? replyMessage;
-  final String senderUid;
-  final Timestamp timestamp;
   final String type;
+  final String senderUid;
+  final String messageUid;
+  final Timestamp timestamp;
+  final LinkedHashMap<String, dynamic> message;
+  final LinkedHashMap<String, dynamic>? replyMessage;
 
   NewMessage({
+    this.replyMessage,
+    required this.type,
     required this.isRead,
     required this.isReply,
     required this.message,
     required this.messageUid,
-    this.replyMessage,
     required this.senderUid,
     required this.timestamp,
-    required this.type,
   });
 
   factory NewMessage.fromFirestore(DocumentSnapshot doc) {
