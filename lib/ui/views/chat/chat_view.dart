@@ -48,10 +48,15 @@ class ChatView extends StatelessWidget {
       systemNavigationBarColor: Colors.transparent,
     );
     return ViewModelBuilder<ChatViewModel>.reactive(
-      onModelReady: (model) => model.scrollController = ScrollController(),
+      onModelReady: (model) async {
+        model.scrollController = ScrollController();
+        // await Hive.box("ChatRoomMedia[$conversationId]").clear();
+        // await Hive.box('VideoThumbnails[$conversationId]').clear();
+      },
       onDispose: (model) async {
         await Hive.box(conversationId).close();
         await Hive.box("ChatRoomMedia[$conversationId]").close();
+        await Hive.box('VideoThumbnails[$conversationId]').close();
       },
       builder: (context, model, child) => OfflineBuilder(
         child: const Text("Yah Baby !!"),
@@ -118,6 +123,7 @@ class ChatView extends StatelessWidget {
                   Flexible(
                     child: ChatMessages(
                       model: model,
+                      fireuser: fireUser,
                       receiverUid: fireUser.id,
                       conversationId: conversationId,
                     ),
@@ -142,12 +148,14 @@ class ChatView extends StatelessWidget {
 }
 
 class ChatMessages extends StatelessWidget {
+  final FireUser fireuser;
   final ChatViewModel model;
   final String conversationId;
   final String receiverUid;
   const ChatMessages(
       {Key? key,
       required this.model,
+      required this.fireuser,
       required this.conversationId,
       required this.receiverUid})
       : super(key: key);
@@ -192,11 +200,11 @@ class ChatMessages extends StatelessWidget {
     }
 
     return ViewModelBuilder<ChatMessagesViewModel>.reactive(
-      viewModelBuilder: () =>
-          ChatMessagesViewModel(conversationId: conversationId),
+      viewModelBuilder: () => ChatMessagesViewModel(
+          conversationId: conversationId, fireUser: fireuser),
       builder: (context, viewModel, child) {
         if (!viewModel.dataReady) {
-          getLogger('chatView|ChatMsges').wtf("No unread messages available");
+          // getLogger('chatView|ChatMsges').wtf("No unread messages available");
         }
         if (viewModel.hasError) {
           viewModel.error(() {
@@ -213,6 +221,7 @@ class ChatMessages extends StatelessWidget {
                 final unreadMsges = data.docs;
                 for (var unreadMsg in unreadMsges) {
                   final msg = NewMessage.fromFirestore(unreadMsg);
+                  getLogger('chatview').wtf('isRead:${msg.isRead}');
                   if (!msg.isRead) {
                     final textMsg = chatService.addUnreadMsg(
                       isReply: msg.isReply,
@@ -226,6 +235,8 @@ class ChatMessages extends StatelessWidget {
                     getLogger('ChatView').wtf("unreadMsg: $textMsg");
                   }
                 }
+              } else {
+                getLogger('ChatView').wtf('no unread messages available');
               }
               model.seeMsg();
             }

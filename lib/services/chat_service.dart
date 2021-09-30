@@ -24,6 +24,7 @@ class ChatService {
     String conversationId = getConversationId(fireUser.id, liveUserUid);
     await Hive.openBox(conversationId);
     await Hive.openBox("ChatRoomMedia[$conversationId]");
+    await Hive.openBox('VideoThumbnails[$conversationId]');
     Map<String, dynamic> chatRoomMap = {
       'nearMe': false,
       'liveUserUid': liveUserUid,

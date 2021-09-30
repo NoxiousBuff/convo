@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -155,13 +158,19 @@ class MessageBubble extends StatelessWidget {
       // break;
       case MediaType.video:
         {
-          return VideoMedia(
-            isMe: isMe,
-            model: chatViewModel,
-            conversationId: conversationId,
-            videoPath: hiveMessage.mediaPaths,
-            messageUid: hiveMessage.messageUid,
-          );
+          final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+          Uint8List? thumbnail = hiveBox.get(hiveMessage.messageUid);
+          if (thumbnail != null) {
+            return VideoMedia(
+              isMe: isMe,
+              model: chatViewModel,
+              videoThumbnail: thumbnail,
+              conversationId: conversationId,
+              messageUid: hiveMessage.messageUid,
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
         }
       // break;
       case MediaType.text:
@@ -230,16 +239,18 @@ class MessageBubble extends StatelessWidget {
                 type: hiveMessage.messageType,
               ),
               isMe
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                        'unread',
-                        style: GoogleFonts.roboto(
-                          fontSize: 10.0,
-                          color: activeBlue,
-                        ),
-                      ),
-                    )
+                  ? hiveMessage.messageType == MediaType.text
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(
+                            'unread',
+                            style: GoogleFonts.roboto(
+                              fontSize: 10.0,
+                              color: activeBlue,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink()
                   : const SizedBox.shrink()
             ],
           ),

@@ -1,14 +1,17 @@
 import 'dart:async';
+import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessagesViewModel extends StreamViewModel<QuerySnapshot> {
-  ChatMessagesViewModel({required this.conversationId, });
+  ChatMessagesViewModel({
+    required this.conversationId,
+    required this.fireUser,
+  });
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FireUser fireUser;
 
 
   String conversationId;
@@ -20,7 +23,7 @@ class ChatMessagesViewModel extends StreamViewModel<QuerySnapshot> {
     final unreadMsges = conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
-        .where(DocumentField.senderUid, isNotEqualTo: _auth.currentUser!.uid)
+        .where(DocumentField.senderUid, isEqualTo: fireUser.id)
         .where(DocumentField.isRead, isEqualTo: false)
         .snapshots();
     return unreadMsges;

@@ -13,6 +13,7 @@ import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ChatViewModel extends StreamViewModel<BoxEvent> {
   final TextEditingController _messageTech = TextEditingController();
@@ -106,8 +107,8 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
   @override
   Stream<BoxEvent> get stream => getChats(conversationId);
 
-  double? _uploadingProgress;
-  double? get uploadingProgress => _uploadingProgress;
+  double _uploadingProgress = 0.0;
+  double get uploadingProgress => _uploadingProgress;
 
   final bool _isuploading = false;
   bool get isuploading => _isuploading;
@@ -132,6 +133,16 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
     );
     await Hive.box(hiveBoxName).add(message);
     getLogger('ChetViewModel|saveFileInHive').wtf("Added Message$message");
+    final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+    if (fileType == videoType) {
+      final thumbnail = await VideoThumbnail.thumbnailData(
+        video: filePath,
+        imageFormat: ImageFormat.JPEG,
+      );
+      hiveBox.put(messageUid, thumbnail);
+      final path = hiveBox.get(messageUid);
+      getLogger('VideoMedia').wtf('thumbnail added in hive:$path');
+    }
   }
 
   /// uploading a single file into the firebase storage and get progress

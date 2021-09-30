@@ -1,11 +1,12 @@
 import 'dart:ui';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/hint_message.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,13 +35,17 @@ class _ImageMediaState extends State<ImageMedia> {
   bool hiveContainPath = false;
   final borderRadius = BorderRadius.circular(16);
   final ChatService chatService = ChatService();
+
   @override
   void initState() {
     super.initState();
     final conversationId = widget.conversationId;
     final messageUid = widget.hiveMessage.messageUid;
-    hiveContainPath =
-        Hive.box("ChatRoomMedia[$conversationId]").containsKey(messageUid);
+    final hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
+    setState(() {
+      hiveContainPath = hiveBox.containsKey(messageUid);
+    });
+    getLogger('ImageMedia').wtf('hiveContainPath:$hiveContainPath');
   }
 
   Widget retryButton({required void Function()? onPressed}) {
@@ -54,17 +59,10 @@ class _ImageMediaState extends State<ImageMedia> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: isFileUploading
             ? Center(
-                child: Column(
-                children: [
-                  CircularProgressIndicator(
-                    value: model.uploadingProgress,
-                    backgroundColor: Colors.transparent,
-                  ),
-                  Text("${model.uploadingProgress!.toInt()}%",
-                      style: GoogleFonts.roboto(
-                          fontSize: 25.0, color: systemBackground)),
-                ],
-              ))
+                child: Text("${model.uploadingProgress.toInt()}%",
+                    style: GoogleFonts.roboto(
+                        fontSize: 25.0, color: systemBackground)),
+              )
             : TextButton(
                 onPressed: onPressed,
                 child: Row(
@@ -83,106 +81,68 @@ class _ImageMediaState extends State<ImageMedia> {
     );
   }
 
-  Widget senderImage() {
-    final messageUid = widget.hiveMessage.messageUid;
-    final imagePath = widget.hiveMessage.mediaPaths;
-    return imagePath != null
-        ? Stack(
-            alignment: Alignment.center,
-            children: [
-              ClipRRect(
-                borderRadius: borderRadius,
-                child: Container(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.width * 0.2,
-                    minWidth: MediaQuery.of(context).size.width * 0.2,
-                    maxWidth: MediaQuery.of(context).size.width * 0.7,
-                    maxHeight: MediaQuery.of(context).size.height * 0.4,
-                  ),
-                  child: ExtendedImage(
-                    image: FileImage(File(imagePath)),
-                  ),
-                ),
-              ),
-              retryButton(
-                onPressed: () async {
-                  final url = await widget.model.uploadFile(
-                    filePath: imagePath,
-                    messageUid: messageUid,
-                  );
-                  await chatService.addFirestoreMessage(
-                    type: imageType,
-                    messageText: url,
-                    messageUid: messageUid,
-                    timestamp: Timestamp.now(),
-                    receiverUid: widget.receiverUid,
-                  );
-                },
-              ),
-            ],
-          )
-        : const SizedBox.shrink();
-  }
-
-  Widget receiverImage() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: ExtendedImage(
-            filterQuality: FilterQuality.low,
-            image: FileImage(File("widget.firestoreImage!")),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: systemBackground),
-          ),
-          child: TextButton(
-            onPressed: () {},
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                IconButton(
-                  onPressed: null,
-                  icon: Icon(Icons.download),
-                ),
-                Text(
-                  'Download',
-                  style: TextStyle(color: systemBackground),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget imageWidget({required Widget child}) {
     return ClipRRect(
       borderRadius: borderRadius,
       child: Container(
         constraints: BoxConstraints(
           minHeight: MediaQuery.of(context).size.width * 0.2,
           minWidth: MediaQuery.of(context).size.width * 0.2,
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-          maxHeight: MediaQuery.of(context).size.height * 0.4,
+          maxWidth: MediaQuery.of(context).size.width * 0.6,
+          maxHeight: MediaQuery.of(context).size.height * 0.35,
         ),
-        child: senderImage(),
-        // HintImage(
-        //     onTap: () {},
-        //     uuid: widget.messageUid,
-        //     folderPath: 'Hint Images',
-        //     mediaUrl: widget.mediaUrl,
-        //     hiveBoxName: HiveHelper.hiveBoxImages,
-        //     conversationId: widget.conversationId,
-        //   ),
+        child: child,
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final messageUid = widget.hiveMessage.messageUid;
+    final imagePath = widget.hiveMessage.mediaPaths;
+    final hiveBox = Hive.box("ChatRoomMedia[${widget.conversationId}]");
+    setState(() {
+      hiveContainPath = hiveBox.containsKey(messageUid);
+    });
+    if (hiveContainPath) {
+      return imageWidget(
+        child: ExtendedImage(
+          filterQuality: FilterQuality.low,
+          image: FileImage(File(widget.hiveMessage.mediaPaths)),
+        ),
+      );
+    } else {
+      return imageWidget(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            imageWidget(
+              child: ExtendedImage(
+                image: FileImage(
+                  File(imagePath),
+                ),
+              ),
+            ),
+            !hiveContainPath
+                ? retryButton(
+                    onPressed: () async {
+                      final url = await widget.model.uploadFile(
+                        filePath: imagePath,
+                        messageUid: messageUid,
+                      );
+                      await chatService.addFirestoreMessage(
+                        type: imageType,
+                        messageText: url,
+                        messageUid: messageUid,
+                        timestamp: Timestamp.now(),
+                        receiverUid: widget.receiverUid,
+                      );
+                    },
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
+      );
+    }
   }
 }

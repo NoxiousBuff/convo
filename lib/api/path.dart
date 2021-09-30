@@ -109,6 +109,7 @@ class PathHelper {
 
       String savePath = directory!.path + "/$mediaName.jpg";
       log.i('Save Path: $savePath');
+      
 
       if (!await directory.exists()) {
         await directory.create(recursive: true);
