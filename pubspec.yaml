@@ -53,6 +53,7 @@ dependencies:
   logger: ^1.0.0
   sensors_plus: ^1.0.1
   json_annotation: ^4.1.0
+  contacts_service: ^0.6.1
   
 
 
@@ -70,5 +71,6 @@ flutter:
   uses-material-design: true
 
   assets:
+    - imagicons/
     - images/
     - activities/
