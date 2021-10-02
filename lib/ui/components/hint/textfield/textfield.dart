@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
 import 'package:logger/logger.dart';
@@ -12,12 +13,15 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/shared/pixaBay/pixabay.dart';
 import 'package:hint/ui/shared/memes/meme_view.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/shared/emojies/emojie_view.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:hint/ui/shared/text_editor/text_editor.dart';
 import 'package:hint/ui/shared/animal_memojie/animal_memojie.dart';
@@ -25,7 +29,6 @@ import 'package:hint/ui/shared/drawing_canvas/drawing_canvas.dart';
 import 'package:hint/ui/components/media/message/reply_message.dart';
 import 'package:hint/ui/components/media/reply/reply_keyboard_media.dart';
 import 'package:hint/ui/components/hint/textfield/textfield_viewmodel.dart';
-import 'package:uuid/uuid.dart';
 
 class HintTextField extends StatefulWidget {
   final Color randomColor;
@@ -195,629 +198,586 @@ class _HintTextFieldState extends State<HintTextField> {
     return ViewModelBuilder<TextFieldViewModel>.reactive(
       viewModelBuilder: () => TextFieldViewModel(),
       builder: (context, model, child) {
-        return GestureDetector(
-          dragStartBehavior: DragStartBehavior.start,
-          onVerticalDragUpdate: (dragDetails) {
-            int sensitivity = 4;
-            if (dragDetails.delta.dy > sensitivity) {
-              // Down Swipe
-              setState(() {
-                optionOpened = false;
-              });
-            } else if (dragDetails.delta.dy < -sensitivity) {
-              // Up Swipe
-              setState(() {
-                optionOpened = true;
-              });
-            }
-          },
-          child: ClipRect(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(4, 0, 2, 0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Divider(height: 0.0),
-                  Consumer(
-                    builder: (BuildContext context,
-                        T Function<T>(ProviderBase<Object?, T>) watch,
-                        Widget? child) {
-                      final replyProvider = watch(replyPod);
-                      return ReplyKeyboardMedia(
-                        replyType: replyProvider.replyType,
-                        replyMsg: replyProvider.replyMsg,
-                        replyMsgId: replyProvider.replyMsgId,
-                        isReply: replyProvider.isReply,
-                        replyUid: replyProvider.replyUid,
-                        replyMediaUrl: replyProvider.replyMediaUrl,
-                      );
-                    },
-                  ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                  //   child: CupertinoTextField(
-                  //     focusNode: widget.focusNode,
-                  //     style: TextStyle(color: Colors.black),
-                  //     controller: messageTech,
-                  //     placeholder: 'Text Message New',
-                  //     placeholderStyle: TextStyle(color: Colors.black38),
-                  //     minLines: 1,
-                  //     maxLines: 6,
-                  //     onChanged: (val) {
-                  //       (val.length > 0 && val.trim() != "")
-                  //           ? setWritingTo(true)
-                  //           : setWritingTo(false);
-                  //     },
-                  //     textAlign: TextAlign.start,
-                  //     keyboardType: TextInputType.multiline,
-                  //     keyboardAppearance: Brightness.light,
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(20),
-                  //       border: Border(
-                  //         top: BorderSide(
-                  //           color: CupertinoDynamicColor.withBrightness(
-                  //             color: Color(0x33000000),
-                  //             darkColor: Color(0x33FFFFFF),
-                  //           ),
-                  //           style: BorderStyle.solid,
-                  //           width: 0.0,
-                  //         ),
-                  //         bottom: BorderSide(
-                  //           color: CupertinoDynamicColor.withBrightness(
-                  //             color: Color(0x33000000),
-                  //             darkColor: Color(0x33FFFFFF),
-                  //           ),
-                  //           style: BorderStyle.solid,
-                  //           width: 0.0,
-                  //         ),
-                  //         right: BorderSide(
-                  //           color: CupertinoDynamicColor.withBrightness(
-                  //             color: Color(0x33000000),
-                  //             darkColor: Color(0x33FFFFFF),
-                  //           ),
-                  //           style: BorderStyle.solid,
-                  //           width: 0.0,
-                  //         ),
-                  //         left: BorderSide(
-                  //           color: CupertinoDynamicColor.withBrightness(
-                  //             color: Color(0x33000000),
-                  //             darkColor: Color(0x33FFFFFF),
-                  //           ),
-                  //           style: BorderStyle.solid,
-                  //           width: 0.0,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 40,
-                    child: CupertinoTextField(
-                      minLines: 1,
-                      maxLines: 6,
-                      controller: messageTech,
-                      placeholder: 'Text Message',
-                      focusNode: widget.focusNode,
-                      style: const TextStyle(color: Colors.black),
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      placeholderStyle: const TextStyle(color: Colors.black38),
-                      onChanged: (val) {
-                        (val.isNotEmpty && val.trim() != "")
-                            ? setWritingTo(true)
-                            : setWritingTo(false);
-                      },
-                      suffix: CupertinoButton(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Text(
-                          'Send',
-                          style: TextStyle(
-                            color: !isWriting
-                                ? Colors.black38
-                                : const Color.fromRGBO(10, 132, 255, 1),
+        return OfflineBuilder(
+            child: const Text('Yah Baby!!'),
+            connectivityBuilder: (context, connectivity, child) {
+              bool connected = connectivity != ConnectivityResult.none;
+              return GestureDetector(
+                dragStartBehavior: DragStartBehavior.start,
+                onVerticalDragUpdate: (dragDetails) {
+                  int sensitivity = 4;
+                  if (dragDetails.delta.dy > sensitivity) {
+                    // Down Swipe
+                    setState(() {
+                      optionOpened = false;
+                    });
+                  } else if (dragDetails.delta.dy < -sensitivity) {
+                    // Up Swipe
+                    setState(() {
+                      optionOpened = true;
+                    });
+                  }
+                },
+                child: ClipRect(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(4, 0, 2, 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Divider(height: 0.0),
+                        Consumer(
+                          builder: (BuildContext context,
+                              T Function<T>(ProviderBase<Object?, T>) watch,
+                              Widget? child) {
+                            final replyProvider = watch(replyPod);
+                            return ReplyKeyboardMedia(
+                              replyType: replyProvider.replyType,
+                              replyMsg: replyProvider.replyMsg,
+                              replyMsgId: replyProvider.replyMsgId,
+                              isReply: replyProvider.isReply,
+                              replyUid: replyProvider.replyUid,
+                              replyMediaUrl: replyProvider.replyMediaUrl,
+                            );
+                          },
+                        ),
+                        SizedBox(
+                          height: 40,
+                          child: CupertinoTextField(
+                            minLines: 1,
+                            maxLines: 6,
+                            controller: messageTech,
+                            placeholder: 'Text Message',
+                            focusNode: widget.focusNode,
+                            style: const TextStyle(color: Colors.black),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            placeholderStyle:
+                                const TextStyle(color: Colors.black38),
+                            onChanged: (val) {
+                              (val.isNotEmpty && val.trim() != "")
+                                  ? setWritingTo(true)
+                                  : setWritingTo(false);
+                            },
+                            suffix: CupertinoButton(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                'Send',
+                                style: TextStyle(
+                                  color: !isWriting
+                                      ? Colors.black38
+                                      : const Color.fromRGBO(10, 132, 255, 1),
+                                ),
+                              ),
+                              onPressed: !isWriting
+                                  ? null
+                                  : () async {
+                                      final timestamp = Timestamp.now();
+                                      String messageUid = const Uuid().v1();
+                                      bool isUrl = isURL(messageTech.text);
+                                      final msg = chatService.addHiveMessage(
+                                        isReply: false,
+                                        timestamp: timestamp,
+                                        messageUid: messageUid,
+                                        messageText: messageTech.text,
+                                        messageType: isUrl ? urlType : textType,
+                                        messageReading: connected
+                                            ? MsgRead.unread
+                                            : MsgRead.sended,
+                                      );
+                                      await Hive.box(boxId).add(msg);
+                                      getLogger('TextFieldView').wtf(msg);
+
+                                      await chatService.addFirestoreMessage(
+                                        type: textType,
+                                        timestamp: timestamp,
+                                        messageUid: messageUid,
+                                        messageText: messageTech.text,
+                                        receiverUid: widget.receiverUid,
+                                      );
+                                      messageTech.clear();
+                                    },
+                            ),
+                            textAlign: TextAlign.start,
+                            keyboardType: TextInputType.multiline,
+                            keyboardAppearance: Brightness.light,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
                           ),
                         ),
-                        onPressed: !isWriting
-                            ? null
-                            : () async {
-                                final timestamp = Timestamp.now();
-                                String messageUid = const Uuid().v1();
-                                final message = chatService.addHiveMessage(
-                                  isReply: false,
-                                  timestamp: timestamp,
-                                  messageType: textType,
-                                  messageUid: messageUid,
-                                  messageText: messageTech.text,
-                                );
-                                await Hive.box(boxId).add(message);
-                                getLogger('TextFieldView').wtf(message);
-
-                                await chatService.addFirestoreMessage(
-                                  type: textType,
-                                  timestamp: timestamp,
-                                  messageUid: messageUid,
-                                  messageText: messageTech.text,
-                                  receiverUid: widget.receiverUid,
-                                );
-                                messageTech.clear();
-                              },
-                        // onPressed: !isWriting
-                        //     ? null
-                        //     : () async {
-                        //         await chatService.addMessage(
-                        //           receiverUid: widget.receiverUid!,
-                        //           type: 'text',
-                        //           messageText: messageTech.text,
-                        //           isReply: context.read(replyPod).isReply,
-                        //           replyMediaUrl: context.read(replyPod).replyMediaUrl,
-                        //           replyMsgId: context.read(replyPod).replyMsgId,
-                        //           replyMsg: context.read(replyPod).replyMsg,
-                        //           replyType: context.read(replyPod).replyType,
-                        //           replyUid: context.read(replyPod).replyUid,
-                        //         );
-                        //         messageTech.clear();
-                        //       },
-                      ),
-                      textAlign: TextAlign.start,
-                      keyboardType: TextInputType.multiline,
-                      keyboardAppearance: Brightness.light,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 4),
-                      Container(
-                        height: 30,
-                        alignment: Alignment.topCenter,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            bottomButton(
-                              'assets/scribble.png',
-                              color: black,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                showCupertinoModalBottomSheet(
-                                  elevation: 0,
-                                  context: context,
-                                  enableDrag: false,
-                                  isDismissible: false,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) => const DrawingCanvas(),
-                                );
-                              },
-                            ),
-                            bottomButton(
-                              'assets/blackEmoji.png',
-                              color: extraLightBackgroundGray,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.toggleMemojies(false);
-                                switch (model.blackEmojie) {
-                                  case true:
-                                    {
-                                      model.emojieChanger(false);
-                                    }
-                                    break;
-                                  case false:
-                                    {
-                                      model.emojieChanger(true);
-                                    }
-                                    break;
-                                  default:
-                                }
-                              },
-                            ),
-                            bottomButton(
-                              'assets/camera.png',
-                              color: extraLightBackgroundGray,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                cameraOptions(
-                                  context: context,
-                                  takePicture: () async {
-                                    Navigator.pop(context);
-                                    final viewModel = widget.chatViewModel;
-                                    final file = await model.pickImage();
-                                    final timestamp = Timestamp.now();
-                                    final messageUid = const Uuid().v1();
-                                    if (file != null) {
-                                      final fileType =
-                                          lookupMimeType(file.path)!
-                                              .split("/")
-                                              .first;
-                                      final type = fileType == 'image'
-                                          ? imageType
-                                          : videoType;
-                                      getLogger('TextFielView')
-                                          .wtf('cameraOption|MessageType$type');
-                                      await viewModel.saveFileInHive(
-                                          isReply: false,
-                                          filePath: file.path,
-                                          messageTime: timestamp,
-                                          messageType: imageType,
-                                          messageUid: messageUid,
-                                          hiveBoxName: widget.conversationId);
-                                      final url = await viewModel.uploadFile(
-                                        filePath: file.path,
-                                        messageUid: messageUid,
-                                      );
-                                      await chatService.addFirestoreMessage(
-                                        mediaUrls: url,
-                                        type: fileType,
-                                        messageUid: messageUid,
-                                        mediaUrlsType: [fileType],
-                                        timestamp: Timestamp.now(),
-                                        receiverUid: widget.receiverUid,
-                                      );
-                                    }
-                                  },
-                                  recordVideo: () {
-                                    model.pickVideo();
-                                    Navigator.pop(context);
-                                  },
-                                );
-                              },
-                            ),
-                            bottomButton(
-                              'assets/editor.png',
-                              color: extraLightBackgroundGray,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                showCupertinoModalBottomSheet(
-                                  elevation: 0,
-                                  expand: true,
-                                  context: context,
-                                  enableDrag: false,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) {
-                                    return BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                            sigmaX: 8, sigmaY: 8),
-                                        child: const TextEditor());
-                                  },
-                                );
-                              },
-                            ),
-                            bottomButton(
-                              'assets/documents.png',
-                              color: black,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                              },
-                            ),
-                            bottomButton(
-                              'assets/photo.png',
-                              color: dirtyWhite,
-                              onTap: () async {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                final result = await FilePicker.platform
-                                    .pickFiles(type: FileType.media)
-                                    .catchError((e) {
-                                  getLogger('TextView').e(e);
-                                });
-                                if (result != null) {
-                                  for (var path in result.paths) {
-                                    if (path != null) {
-                                      final viewModel = widget.chatViewModel;
-                                      final timestamp = Timestamp.now();
-                                      final messageUid = const Uuid().v1();
-                                      final msgType = lookupMimeType(path)!
-                                          .split("/")
-                                          .first;
-
-                                      await viewModel.saveFileInHive(
-                                          filePath: path,
-                                          messageTime: timestamp,
-                                          messageUid: messageUid,
-                                          messageType: msgType,
-                                          hiveBoxName: widget.conversationId);
-                                      final url = await viewModel.uploadFile(
-                                        filePath: path,
-                                        messageUid: messageUid,
-                                      );
-                                      await chatService.addFirestoreMessage(
-                                        mediaUrls: url,
-                                        type: msgType,
-                                        messageUid: messageUid,
-                                        mediaUrlsType: [msgType],
-                                        timestamp: Timestamp.now(),
-                                        receiverUid: widget.receiverUid,
-                                      );
-                                    }
-                                  }
-                                }
-                              },
-                            ),
-                            bottomButton(
-                              'assets/meme.png',
-                              color: dirtyWhite,
-                              onTap: () {
-                                model.emojieChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.toggleMemojies(false);
-                                switch (model.showMemes) {
-                                  case true:
-                                    {
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 30,
+                              alignment: Alignment.topCenter,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                children: [
+                                  bottomButton(
+                                    'assets/scribble.png',
+                                    color: black,
+                                    onTap: () {
                                       model.memeChanger(false);
-                                    }
-
-                                    break;
-                                  case false:
-                                    {
-                                      model.memeChanger(true);
-                                    }
-                                    break;
-                                  default:
-                                }
-                              },
-                            ),
-                            bottomButton(
-                              'assets/memoji.webp',
-                              color: black,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                switch (model.showMemojies) {
-                                  case true:
-                                    {
-                                      model.toggleMemojies(false);
-                                    }
-
-                                    break;
-                                  case false:
-                                    {
-                                      model.toggleMemojies(true);
-                                    }
-                                    break;
-                                  default:
-                                }
-                              },
-                            ),
-                            bottomButton(
-                              'assets/pixabay.png',
-                              color: dirtyWhite,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.animalToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                switch (model.showPixaBay) {
-                                  case true:
-                                    {
-                                      model.pixaBayToggle(false);
-                                    }
-
-                                    break;
-                                  case false:
-                                    {
-                                      model.pixaBayToggle(true);
-                                    }
-                                    break;
-                                  default:
-                                }
-                              },
-                            ),
-                            bottomButton(
-                              'assets/panda.webp',
-                              color: black,
-                              onTap: () {
-                                model.memeChanger(false);
-                                model.pixaBayToggle(false);
-                                model.emojieChanger(false);
-                                model.toggleMemojies(false);
-                                switch (model.showAnimalMemohjies) {
-                                  case true:
-                                    {
                                       model.animalToggle(false);
-                                    }
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      showCupertinoModalBottomSheet(
+                                        elevation: 0,
+                                        context: context,
+                                        enableDrag: false,
+                                        isDismissible: false,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) =>
+                                            const DrawingCanvas(),
+                                      );
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/blackEmoji.png',
+                                    color: extraLightBackgroundGray,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.toggleMemojies(false);
+                                      switch (model.blackEmojie) {
+                                        case true:
+                                          {
+                                            model.emojieChanger(false);
+                                          }
+                                          break;
+                                        case false:
+                                          {
+                                            model.emojieChanger(true);
+                                          }
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/camera.png',
+                                    color: extraLightBackgroundGray,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      cameraOptions(
+                                        context: context,
+                                        takePicture: () async {
+                                          Navigator.pop(context);
+                                          final viewModel =
+                                              widget.chatViewModel;
+                                          final file = await model.pickImage();
+                                          final timestamp = Timestamp.now();
+                                          final messageUid = const Uuid().v1();
+                                          if (file != null) {
+                                            final fileType =
+                                                lookupMimeType(file.path)!
+                                                    .split("/")
+                                                    .first;
+                                            final type = fileType == 'image'
+                                                ? imageType
+                                                : videoType;
+                                            getLogger('TextFielView').wtf(
+                                                'cameraOption|MessageType$type');
+                                            await viewModel.saveFileInHive(
+                                              isReply: false,
+                                              filePath: file.path,
+                                              messageTime: timestamp,
+                                              messageType: imageType,
+                                              messageUid: messageUid,
+                                              hiveBoxName:
+                                                  widget.conversationId,
+                                              messageReading: connected
+                                                  ? MsgRead.unread
+                                                  : MsgRead.sended,
+                                            );
+                                            final url =
+                                                await viewModel.uploadFile(
+                                              filePath: file.path,
+                                              messageUid: messageUid,
+                                            );
+                                            await chatService
+                                                .addFirestoreMessage(
+                                              mediaUrls: url,
+                                              type: fileType,
+                                              messageUid: messageUid,
+                                              mediaUrlsType: [fileType],
+                                              timestamp: Timestamp.now(),
+                                              receiverUid: widget.receiverUid,
+                                            );
+                                          }
+                                        },
+                                        recordVideo: () {
+                                          model.pickVideo();
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/editor.png',
+                                    color: extraLightBackgroundGray,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      showCupertinoModalBottomSheet(
+                                        elevation: 0,
+                                        expand: true,
+                                        context: context,
+                                        enableDrag: false,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) {
+                                          return BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 8, sigmaY: 8),
+                                              child: const TextEditor());
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/documents.png',
+                                    color: black,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/photo.png',
+                                    color: dirtyWhite,
+                                    onTap: () async {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      final result = await FilePicker.platform
+                                          .pickFiles(type: FileType.media)
+                                          .catchError((e) {
+                                        getLogger('TextView').e(e);
+                                      });
+                                      if (result != null) {
+                                        for (var path in result.paths) {
+                                          if (path != null) {
+                                            final viewModel =
+                                                widget.chatViewModel;
+                                            final timestamp = Timestamp.now();
+                                            final messageUid =
+                                                const Uuid().v1();
+                                            final msgType =
+                                                lookupMimeType(path)!
+                                                    .split("/")
+                                                    .first;
 
-                                    break;
-                                  case false:
-                                    {
-                                      model.animalToggle(true);
-                                    }
-                                    break;
-                                  default:
-                                }
-                              },
+                                            await viewModel.saveFileInHive(
+                                              filePath: path,
+                                              messageType: msgType,
+                                              messageTime: timestamp,
+                                              messageUid: messageUid,
+                                              hiveBoxName:
+                                                  widget.conversationId,
+                                              messageReading: connected
+                                                  ? MsgRead.unread
+                                                  : MsgRead.sended,
+                                            );
+                                            final url =
+                                                await viewModel.uploadFile(
+                                              filePath: path,
+                                              messageUid: messageUid,
+                                            );
+                                            await chatService
+                                                .addFirestoreMessage(
+                                              mediaUrls: url,
+                                              type: msgType,
+                                              messageUid: messageUid,
+                                              mediaUrlsType: [msgType],
+                                              timestamp: Timestamp.now(),
+                                              receiverUid: widget.receiverUid,
+                                            );
+                                          }
+                                        }
+                                      }
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/meme.png',
+                                    color: dirtyWhite,
+                                    onTap: () {
+                                      model.emojieChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.toggleMemojies(false);
+                                      switch (model.showMemes) {
+                                        case true:
+                                          {
+                                            model.memeChanger(false);
+                                          }
+
+                                          break;
+                                        case false:
+                                          {
+                                            model.memeChanger(true);
+                                          }
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/memoji.webp',
+                                    color: black,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      switch (model.showMemojies) {
+                                        case true:
+                                          {
+                                            model.toggleMemojies(false);
+                                          }
+
+                                          break;
+                                        case false:
+                                          {
+                                            model.toggleMemojies(true);
+                                          }
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/pixabay.png',
+                                    color: dirtyWhite,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.animalToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      switch (model.showPixaBay) {
+                                        case true:
+                                          {
+                                            model.pixaBayToggle(false);
+                                          }
+
+                                          break;
+                                        case false:
+                                          {
+                                            model.pixaBayToggle(true);
+                                          }
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                  ),
+                                  bottomButton(
+                                    'assets/panda.webp',
+                                    color: black,
+                                    onTap: () {
+                                      model.memeChanger(false);
+                                      model.pixaBayToggle(false);
+                                      model.emojieChanger(false);
+                                      model.toggleMemojies(false);
+                                      switch (model.showAnimalMemohjies) {
+                                        case true:
+                                          {
+                                            model.animalToggle(false);
+                                          }
+
+                                          break;
+                                        case false:
+                                          {
+                                            model.animalToggle(true);
+                                          }
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                              // child: ListView(
+                              //   physics: BouncingScrollPhysics(),
+                              //   scrollDirection: Axis.horizontal,
+                              //   padding: const EdgeInsets.symmetric(horizontal: 2),
+                              //   children: [
+                              //     bottomButton(bottomWidth),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.camera_alt),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.photo_album),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.attach_file),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.audiotrack),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.timer),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.gif),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 4),
+                              //     Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 4, horizontal: 6),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(100),
+                              //         color: widget.randomColor!.withAlpha(50),
+                              //       ),
+                              //       child: IconButton(
+                              //         onPressed: () {},
+                              //         icon: Icon(Icons.location_pin),
+                              //         padding: const EdgeInsets.symmetric(
+                              //             vertical: 0, horizontal: 16),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                             ),
+                            const SizedBox(height: 10),
+                            AnimatedContainer(
+                              child: EmojiesView(),
+                              width: double.infinity,
+                              height: model.blackEmojie ? height : 0.0,
+                              duration: const Duration(milliseconds: 100),
+                            ),
+                            AnimatedContainer(
+                              child: const Memes(),
+                              height: model.showMemes ? height : 0.0,
+                              duration: const Duration(milliseconds: 100),
+                            ),
+                            AnimatedContainer(
+                              height: model.showPixaBay ? height : 0.0,
+                              child: const PixaBay(),
+                              duration: const Duration(milliseconds: 100),
+                            ),
+                            AnimatedContainer(
+                              height: model.showAnimalMemohjies ? height : 0.0,
+                              child: AnimalMemoji(),
+                              duration: const Duration(milliseconds: 100),
+                            ),
+                            //  bottomContainer(model),
                           ],
                         ),
-                        // child: ListView(
-                        //   physics: BouncingScrollPhysics(),
-                        //   scrollDirection: Axis.horizontal,
-                        //   padding: const EdgeInsets.symmetric(horizontal: 2),
-                        //   children: [
-                        //     bottomButton(bottomWidth),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.camera_alt),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.photo_album),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.attach_file),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.audiotrack),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.timer),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.gif),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 4),
-                        //     Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           vertical: 4, horizontal: 6),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(100),
-                        //         color: widget.randomColor!.withAlpha(50),
-                        //       ),
-                        //       child: IconButton(
-                        //         onPressed: () {},
-                        //         icon: Icon(Icons.location_pin),
-                        //         padding: const EdgeInsets.symmetric(
-                        //             vertical: 0, horizontal: 16),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                      ),
-                      const SizedBox(height: 10),
-                      AnimatedContainer(
-                        child: EmojiesView(),
-                        width: double.infinity,
-                        height: model.blackEmojie ? height : 0.0,
-                        duration: const Duration(milliseconds: 100),
-                      ),
-                      AnimatedContainer(
-                        child: const Memes(),
-                        height: model.showMemes ? height : 0.0,
-                        duration: const Duration(milliseconds: 100),
-                      ),
-                      AnimatedContainer(
-                        height: model.showPixaBay ? height : 0.0,
-                        child: const PixaBay(),
-                        duration: const Duration(milliseconds: 100),
-                      ),
-                      AnimatedContainer(
-                        height: model.showAnimalMemohjies ? height : 0.0,
-                        child: AnimalMemoji(),
-                        duration: const Duration(milliseconds: 100),
-                      ),
-                      //  bottomContainer(model),
-                    ],
-                  ),
-                  GestureDetector(
-                    onVerticalDragUpdate: (dragDetails) {
-                      if (dragDetails.delta.dy > 0) {
-                        setState(() {
-                          optionCurrentHeight = 600;
-                          logger.i(optionCurrentHeight);
-                        });
-                      }
-                      if (dragDetails.delta.dy < 0) {
-                        setState(() {
-                          optionCurrentHeight = 250;
-                          logger.i(optionCurrentHeight);
-                        });
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: optionActive ? optionCurrentHeight : 0,
+                        GestureDetector(
+                          onVerticalDragUpdate: (dragDetails) {
+                            if (dragDetails.delta.dy > 0) {
+                              setState(() {
+                                optionCurrentHeight = 600;
+                                logger.i(optionCurrentHeight);
+                              });
+                            }
+                            if (dragDetails.delta.dy < 0) {
+                              setState(() {
+                                optionCurrentHeight = 250;
+                                logger.i(optionCurrentHeight);
+                              });
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            height: optionActive ? optionCurrentHeight : 0,
+                          ),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        );
+                  ),
+                ),
+              );
+            });
       },
     );
   }

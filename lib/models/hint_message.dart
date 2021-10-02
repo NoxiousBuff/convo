@@ -8,6 +8,7 @@ class HintMessage {
   final String senderUid;
   final String messageUid;
   final String messageType;
+  final String messageReading;
   //-----------------------------------------//
   final dynamic mediaPathsType;
   final dynamic mediaPaths;
@@ -15,7 +16,6 @@ class HintMessage {
   final dynamic replyMessage;
   final String? replyType;
   final String? replyUid;
- 
 
   HintMessage({
     this.isRead = false,
@@ -25,6 +25,7 @@ class HintMessage {
     required this.senderUid,
     required this.timestamp,
     required this.messageType,
+    required this.messageReading,
     //-----------------------------------------//
     this.mediaPaths,
     this.mediaPathsType,
@@ -43,6 +44,7 @@ class HintMessage {
       messageUid: json["messageUid"] as String,
       senderUid: json["senderUid"] as String,
       messageType: json["messageType"] as String,
+      messageReading: json['messageReading'],
       timestamp: Timestamp.fromMillisecondsSinceEpoch(finalTimestamp),
       //-----------------------------------------//
       mediaPathsType: json["mediaPathsType"] as dynamic,

@@ -105,15 +105,16 @@ class Memes extends StatelessWidget {
     TextEditingController textEditingController = TextEditingController();
     return ViewModelBuilder<MemesViewModel>.reactive(
       viewModelBuilder: () => MemesViewModel(),
-      onModelReady: (viewModel) {
-        viewModel.fetchedMemes('memes');
-        viewModel.adController();
-      },
+      onModelReady: (viewModel) {},
       disposeViewModel: true,
       builder: (_, viewModel, __) {
         return OfflineBuilder(
           connectivityBuilder: (context, connectivity, child) {
             final bool connected = connectivity != ConnectivityResult.none;
+            if (connected) {
+              viewModel.fetchedMemes('memes');
+              // viewModel.adController();
+            }
             return !connected
                 ? connectionDialog(context)
                 : viewModel.memes == null
@@ -146,8 +147,8 @@ class Memes extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(30)),
                               ),
                             );
-                          } else if (i % 5 == 0) {
-                            return adWidget(context);
+                            // } else if (i % 5 == 0) {
+                            //   return adWidget(context);
                           } else {
                             return Consumer(
                               builder: (context, watch, child) {

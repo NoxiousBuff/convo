@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/hint_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 
 class ImageMedia extends StatefulWidget {
@@ -48,43 +46,39 @@ class _ImageMediaState extends State<ImageMedia> {
     getLogger('ImageMedia').wtf('hiveContainPath:$hiveContainPath');
   }
 
-  Widget retryButton({required void Function()? onPressed}) {
+  Widget retryButton() {
     final model = widget.model;
     final messageUid = widget.hiveMessage.messageUid;
     bool isFileUploading = model.uploadingMessageUid == messageUid;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: isFileUploading
-            ? Center(
-                child: Text("${model.uploadingProgress.toInt()}%",
-                    style: GoogleFonts.roboto(
-                        fontSize: 25.0, color: systemBackground)),
-              )
-            : TextButton(
-                onPressed: onPressed,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.upload, color: extraLightBackgroundGray),
-                    SizedBox(width: 10),
-                    Text(
-                      'Retry',
-                      style: TextStyle(color: systemBackground, fontSize: 15),
-                    )
-                  ],
-                ),
-              ),
-      ),
-    );
+    return isFileUploading
+        ? Positioned(bottom: 5, left: 5, child: uploadingProgress())
+        : TextButton(
+            onPressed: () {},
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.upload, color: extraLightBackgroundGray),
+                const SizedBox(width: 10),
+                Text(
+                  'Retry',
+                  style: GoogleFonts.roboto(
+                    fontSize: 15.0,
+                    color: systemBackground,
+                  ),
+                )
+              ],
+            ),
+          );
   }
 
   Widget imageWidget({required Widget child}) {
     return ClipRRect(
       borderRadius: borderRadius,
       child: Container(
+        decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.all(color: extraLightBackgroundGray, width: 5)),
         constraints: BoxConstraints(
           minHeight: MediaQuery.of(context).size.width * 0.2,
           minWidth: MediaQuery.of(context).size.width * 0.2,
@@ -93,6 +87,33 @@ class _ImageMediaState extends State<ImageMedia> {
         ),
         child: child,
       ),
+    );
+  }
+
+  Widget uploadingProgress() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        CircularProgressIndicator(
+          backgroundColor: systemBackground,
+          value: widget.model.uploadingProgress,
+        ),
+        Opacity(
+          opacity: 0.5,
+          child: CircleAvatar(
+            maxRadius: 18,
+            backgroundColor: black54,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                CupertinoIcons.clear,
+                color: systemBackground,
+                size: 18,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -106,9 +127,12 @@ class _ImageMediaState extends State<ImageMedia> {
     });
     if (hiveContainPath) {
       return imageWidget(
-        child: ExtendedImage(
-          filterQuality: FilterQuality.low,
-          image: FileImage(File(widget.hiveMessage.mediaPaths)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: ExtendedImage(
+            filterQuality: FilterQuality.low,
+            image: FileImage(File(widget.hiveMessage.mediaPaths)),
+          ),
         ),
       );
     } else {
@@ -116,30 +140,23 @@ class _ImageMediaState extends State<ImageMedia> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            imageWidget(
-              child: ExtendedImage(
-                image: FileImage(
-                  File(imagePath),
+            ClipRRect(
+              borderRadius: borderRadius,
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.width * 0.2,
+                  minWidth: MediaQuery.of(context).size.width * 0.2,
+                  maxWidth: MediaQuery.of(context).size.width * 0.6,
+                  maxHeight: MediaQuery.of(context).size.height * 0.35,
+                ),
+                child: ExtendedImage(
+                  image: FileImage(
+                    File(imagePath),
+                  ),
                 ),
               ),
             ),
-            !hiveContainPath
-                ? retryButton(
-                    onPressed: () async {
-                      final url = await widget.model.uploadFile(
-                        filePath: imagePath,
-                        messageUid: messageUid,
-                      );
-                      await chatService.addFirestoreMessage(
-                        type: imageType,
-                        messageText: url,
-                        messageUid: messageUid,
-                        timestamp: Timestamp.now(),
-                        receiverUid: widget.receiverUid,
-                      );
-                    },
-                  )
-                : const SizedBox.shrink(),
+            !hiveContainPath ? retryButton() : const SizedBox.shrink(),
           ],
         ),
       );

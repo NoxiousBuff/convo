@@ -20,7 +20,7 @@ class TextMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(20),
         color: isMe ? const Color(0x14350bdf) : CupertinoColors.systemGrey6,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),

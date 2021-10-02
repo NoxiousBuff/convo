@@ -16,7 +16,7 @@ import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 class PixaBay extends StatelessWidget {
   const PixaBay({Key? key}) : super(key: key);
-  
+
   Widget connectionDialog(BuildContext context) {
     return SizedBox(
       width: screenWidthPercentage(context, percentage: 0.6),
@@ -150,16 +150,17 @@ class PixaBay extends StatelessWidget {
 
     return ViewModelBuilder<PixaBayViewModel>.reactive(
       viewModelBuilder: () => PixaBayViewModel(),
-      onModelReady: (viewModel) {
-        viewModel.imagesCategory();
-        viewModel.adController();
-      },
+      onModelReady: (viewModel) {},
       disposeViewModel: true,
       builder: (_, viewModel, __) {
         return OfflineBuilder(
           child: const Text("Yah !!"),
           connectivityBuilder: (context, connectivity, child) {
             final bool connected = connectivity != ConnectivityResult.none;
+            if (connected) {
+              viewModel.imagesCategory();
+              // viewModel.adController();
+            }
             return !connected
                 ? connectionDialog(context)
                 : viewModel.images == null
@@ -200,8 +201,8 @@ class PixaBay extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(30)),
                                 ),
                               );
-                            } else if (i % 5 == 0) {
-                              return adWidget(context);
+                              // } else if (i % 5 == 0) {
+                              //   return adWidget(context);
                             } else {
                               return imageURL == null
                                   ? const Center(

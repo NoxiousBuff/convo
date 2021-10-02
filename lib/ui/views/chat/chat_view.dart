@@ -258,6 +258,7 @@ class ChatMessages extends StatelessWidget {
 
                           return MessageBubble(
                             index: i,
+                            fireUser: fireuser,
                             chatViewModel: model,
                             receiverUid: receiverUid,
                             hiveMessage: hiveMessage,

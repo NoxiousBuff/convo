@@ -152,23 +152,20 @@ class ChatService {
   Map<String, dynamic> updateHiveMsg({
     required bool isRead,
     required bool isReply,
-    required String replyUid,
     required String senderUid,
-    required String replyType,
     required String messageUid,
-    required bool removeMessage,
     required String messageType,
-    required String messageText,
-    required dynamic mediaPaths,
-    required String replyMessage,
     required Timestamp timestamp,
-    required dynamic mediaPathsType,
+    required String messageReading,
+    dynamic mediaPaths,
+    String? messageText,
+    dynamic mediaPathsType,
+    bool removeMessage = false,
+    Map<String, dynamic>? replyMessage,
   }) {
     return <String, dynamic>{
       "isRead": isRead,
       "isReply": isReply,
-      "replyUid": replyUid,
-      "replyType": replyType,
       "mediaPaths": mediaPaths,
       "messageUid": messageUid,
       "senderUid": liveUserUid,
@@ -177,6 +174,7 @@ class ChatService {
       "replyMessage": replyMessage,
       "removeMessage": removeMessage,
       "mediaPathsType": mediaPathsType,
+      "messageReading": messageReading,
       "timestamp": timestamp.millisecondsSinceEpoch,
     };
   }
@@ -186,13 +184,14 @@ class ChatService {
     required String messageUid,
     required String messageType,
     required Timestamp timestamp,
+    required String messageReading,
     dynamic mediaPaths,
     dynamic mediaPathsType,
     String? messageText,
     String? imagePath,
     String? replyUid,
     String? replyType,
-    dynamic replyMessage,
+    Map<String, dynamic>? replyMessage,
   }) {
     switch (messageType) {
       case textType:
@@ -200,14 +199,13 @@ class ChatService {
           return <String, dynamic>{
             "isRead": false,
             "isReply": isReply,
-            "replyUid": replyUid,
             "removeMessage": false,
-            "replyType": replyType,
             "messageUid": messageUid,
             "senderUid": liveUserUid,
             "messageType": messageType,
             "messageText": messageText,
             "replyMessage": replyMessage,
+            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
@@ -217,15 +215,14 @@ class ChatService {
           return <String, dynamic>{
             "isRead": false,
             "isReply": isReply,
-            "replyUid": replyUid,
             "removeMessage": false,
-            "replyType": replyType,
             "messageUid": messageUid,
             "senderUid": liveUserUid,
             "mediaPaths": mediaPaths,
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
+            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
@@ -234,15 +231,14 @@ class ChatService {
           return <String, dynamic>{
             "isRead": false,
             "isReply": isReply,
-            "replyUid": replyUid,
             "removeMessage": false,
-            "replyType": replyType,
             "messageUid": messageUid,
             "senderUid": liveUserUid,
             "mediaPaths": mediaPaths,
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
+            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
@@ -251,15 +247,14 @@ class ChatService {
           return <String, dynamic>{
             "isRead": false,
             "isReply": isReply,
-            "replyUid": replyUid,
             "removeMessage": false,
-            "replyType": replyType,
             "messageUid": messageUid,
             "senderUid": liveUserUid,
             "mediaPaths": mediaPaths,
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
+            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }

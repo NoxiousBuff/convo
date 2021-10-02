@@ -39,3 +39,8 @@ class MediaType {
   static const String dickster = 'dickster';
   static const String emoji = 'emoji';
 }
+
+class MsgRead {
+  static const String sended = 'sended';
+  static const String unread = 'unread';
+}

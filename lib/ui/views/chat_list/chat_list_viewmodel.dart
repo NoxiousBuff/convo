@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
@@ -7,6 +6,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatListViewModel extends FutureViewModel<QuerySnapshot> {
   final bool _scrollIsOnTop = true;

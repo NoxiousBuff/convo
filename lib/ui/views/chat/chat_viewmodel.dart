@@ -121,6 +121,7 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
     required String messageType,
     required String hiveBoxName,
     required Timestamp messageTime,
+    required String messageReading,
   }) async {
     final fileType = lookupMimeType(filePath)!.split("/").first;
     final message = chatService.addHiveMessage(
@@ -130,6 +131,7 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
       timestamp: messageTime,
       mediaPathsType: fileType,
       messageType: messageType,
+      messageReading: messageReading,
     );
     await Hive.box(hiveBoxName).add(message);
     getLogger('ChetViewModel|saveFileInHive').wtf("Added Message$message");
@@ -166,7 +168,8 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
     task.snapshotEvents.listen(
       (firebase_storage.TaskSnapshot snapshot) {
         getLogger(className).i('Task state: ${snapshot.state}');
-        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        var progress = snapshot.bytesTransferred.toDouble() /
+            snapshot.totalBytes.toDouble();
         _uploadingProgress = progress;
         notifyListeners();
 

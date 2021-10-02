@@ -41,28 +41,30 @@ dependencies:
   flutter_link_previewer: ^2.0.0
 
   # ui
-  extended_image: ^4.2.1
-  video_player: ^2.1.4
-  cached_network_image: ^3.0.0
   timeago: ^3.0.2
-  modal_bottom_sheet: ^2.0.0
+  video_player: ^2.1.4
+  extended_image: ^4.2.1
   dismissible_page: ^0.6.3
+  modal_bottom_sheet: ^2.0.0
+  cached_network_image: ^3.0.0
 
 
   #functional
-  shared_preferences: ^2.0.6
-  path_provider: ^2.0.2
-  mime: ^1.0.0
+  dependencies:
   dio: ^4.0.0
-  video_thumbnail: ^0.4.3
-  image_picker: ^0.8.4+2
-  permission_handler: ^8.0.0+2
+  mime: ^1.0.0
   hive: ^2.0.4
-  hive_flutter: ^1.0.0
-  device_info: ^2.0.2
   logger: ^1.0.0
+  device_info: ^2.0.2
+  hive_flutter: ^1.0.0
   sensors_plus: ^1.0.1
+  path_provider: ^2.0.2
+  image_picker: ^0.8.4+2
+  video_thumbnail: ^0.4.3
   json_annotation: ^4.1.0
+  string_validator: ^0.3.0
+  shared_preferences: ^2.0.6
+  permission_handler: ^8.0.0+2
   
 
 
