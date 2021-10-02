@@ -43,4 +43,5 @@ class MediaType {
 class MsgRead {
   static const String sended = 'sended';
   static const String unread = 'unread';
+  static const String readed = 'readed';
 }

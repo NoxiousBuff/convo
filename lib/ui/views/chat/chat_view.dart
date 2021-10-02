@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -12,6 +10,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/hint_message.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,10 +18,10 @@ import 'package:hint/services/chat_service.dart';
 import 'package:hint/models/new_message_model.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/ui/views/chat/chat_messages_viewmodel.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
 
@@ -199,29 +198,33 @@ class ChatMessages extends StatelessWidget {
       return match;
     }
 
-    return ViewModelBuilder<ChatMessagesViewModel>.reactive(
-      viewModelBuilder: () => ChatMessagesViewModel(
-          conversationId: conversationId, fireUser: fireuser),
-      builder: (context, viewModel, child) {
-        if (!viewModel.dataReady) {
-          // getLogger('chatView|ChatMsges').wtf("No unread messages available");
-        }
-        if (viewModel.hasError) {
-          viewModel.error(() {
-            getLogger('chatView|ChatMsges Error').e(e);
-          });
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection(conversationFirestorekey)
+          .doc(conversationId)
+          .collection(chatsFirestoreKey)
+          .where(DocumentField.senderUid, isEqualTo: fireuser.id)
+          .where(DocumentField.isRead, isEqualTo: false)
+          .snapshots(),
+      builder: (connext,
+          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        var data = snapshot.data;
+        if (data != null) {
+          if (data.docs.isEmpty) {
+            getLogger('ChatView').e('No unread messages available now !!');
+          }
         }
         return OfflineBuilder(
           child: const Text('Yahh !!'),
           connectivityBuilder: (context, connectivity, child) {
             bool connected = connectivity != ConnectivityResult.none;
             if (connected) {
-              final data = viewModel.data;
               if (data != null) {
-                final unreadMsges = data.docs;
-                for (var unreadMsg in unreadMsges) {
+                final unreadMessages = data.docs;
+                for (var unreadMsg in unreadMessages) {
                   final msg = NewMessage.fromFirestore(unreadMsg);
-                  getLogger('chatview').wtf('isRead:${msg.isRead}');
+                  getLogger('chatview')
+                      .wtf('isRead:${msg.isRead}\nMessage-${msg.message}');
                   if (!msg.isRead) {
                     final textMsg = chatService.addUnreadMsg(
                       isReply: msg.isReply,
@@ -232,7 +235,7 @@ class ChatMessages extends StatelessWidget {
                       messageText: msg.message[MessageField.messageText],
                     );
                     Hive.box(conversationId).add(textMsg);
-                    getLogger('ChatView').wtf("unreadMsg: $textMsg");
+                    getLogger('ChatView').wtf("unreadMessage: $textMsg");
                   }
                 }
               } else {

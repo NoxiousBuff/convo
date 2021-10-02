@@ -72,16 +72,6 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
     });
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getUnreadMsges() {
-    final unreadMsges = conversationCollection
-        .doc(conversationId)
-        .collection(chatsFirestoreKey)
-        .where(DocumentField.senderUid, isEqualTo: fireUser.id)
-        .where(DocumentField.isRead, isEqualTo: false)
-        .snapshots();
-    return unreadMsges;
-  }
-
   /// clear the chat from firestore or delete the all chat from firestore
   Future<void> clearChat() async {
     WriteBatch batch = FirebaseFirestore.instance.batch();

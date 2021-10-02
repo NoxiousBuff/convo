@@ -1,6 +1,4 @@
 import 'dart:typed_data';
-import 'package:hint/models/new_message_model.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +11,7 @@ import 'package:hint/models/hint_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/models/new_message_model.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_offline/flutter_offline.dart';
@@ -105,116 +104,85 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Future<void> updateMessage() async {
-    final msg = chatService.updateHiveMsg(
-      isRead: hiveMessage.isRead,
-      isReply: hiveMessage.isReply,
-      messageReading: MsgRead.unread,
-      timestamp: hiveMessage.timestamp,
-      senderUid: hiveMessage.senderUid,
-      messageUid: hiveMessage.messageUid,
-      messageType: hiveMessage.messageType,
-      messageText: hiveMessage.messageText,
-    );
-    await Hive.box(conversationId).put(index, msg);
-    getLogger('MsgBubble').wtf(msg);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final messageUid = hiveMessage.messageUid;
     final messageDate = hiveMessage.timestamp.toDate();
     bool isMe = MessageBubble.liveUserUid == hiveMessage.senderUid;
     final date = DateFormat('yyyy-MM-dd').format(messageDate).toString();
     final mainAxis = isMe ? MainAxisAlignment.end : MainAxisAlignment.start;
     final crossAxis = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-
+    date.toLowerCase;
     return StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection(conversationFirestorekey)
-            .doc(conversationId)
-            .collection(chatsFirestoreKey)
-            .doc(hiveMessage.messageUid)
-            .snapshots(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
-          if (!snapshot.hasData) {
-            //getLogger('MessageBubble').wtf('data is null now !!');
+      stream: FirebaseFirestore.instance
+          .collection(conversationFirestorekey)
+          .doc(conversationId)
+          .collection(chatsFirestoreKey)
+          .doc(messageUid)
+          .snapshots(),
+      builder: (context,
+          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+        var data = snapshot.data;
+        if (snapshot.hasData) {
+          if (data != null) {
+            if (!data.exists) {
+              getLogger('MessageBubble').e('message doesnot exists');
+            } 
           }
-          var data = snapshot.data;
-          if (snapshot.hasData) {
-            if (data != null) {
-              if (data.exists) {
-                //final msg = NewMessage.fromFirestore(data);
-                //getLogger('MessageBubble').wtf(msg.message);
-              } else {
-                getLogger('MessageBubble').wtf('message doesnot exists');
+        }
+        return OfflineBuilder(
+          child: const Text('Yah Baby !!'),
+          connectivityBuilder: (context, connectivity, child) {
+            bool connected = connectivity != ConnectivityResult.none;
+
+            if (connected) {
+              if (isMe) {
+                if (data != null) {
+                  if (data.exists) {
+                    var msg = NewMessage.fromFirestore(data);
+                    if (msg.messageUid == messageUid) {
+                      if (msg.isRead && !hiveMessage.isRead) {
+                        getLogger('MessageBubble').wtf(
+                            '$index\nMessage-${msg.message}\n${msg.isRead}');
+                      }
+                    }
+                  } 
+                }
               }
             }
-          }
 
-          return OfflineBuilder(
-            child: const Text('Yah Baby !!'),
-            connectivityBuilder: (context, connectivity, child) {
-              bool connected = connectivity != ConnectivityResult.none;
-
-              if (connected) {
-                getLogger('MsgBubble').wtf('connected');
-                if (hiveMessage.messageReading == MsgRead.sended) {
-                  updateMessage();
-                }
-              } else {
-                getLogger('MsgBubble').wtf('not connected');
-              }
-
-              // if (isMe) {
-              //   if (msg.isRead && !hiveMessage.isRead) {
-              //     final message = chatService.updateHiveMsg(
-              //       isRead: true,
-              //       isReply: hiveMessage.isReply,
-              //       replyUid: hiveMessage.replyUid!,
-              //       senderUid: hiveMessage.senderUid,
-              //       timestamp: hiveMessage.timestamp,
-              //       replyType: hiveMessage.replyType!,
-              //       mediaPaths: hiveMessage.mediaPaths,
-              //       messageUid: hiveMessage.messageUid,
-              //       messageType: hiveMessage.messageType,
-              //       messageText: hiveMessage.messageText!,
-              //       replyMessage: hiveMessage.replyMessage,
-              //       removeMessage: hiveMessage.removeMessage,
-              //       mediaPathsType: hiveMessage.mediaPathsType,
-              //     );
-              //     Hive.box(conversationId).putAt(index, message);
-              //   }
-              // }
-
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 2),
-                child: Column(
-                  mainAxisAlignment: mainAxis,
-                  crossAxisAlignment: crossAxis,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    classifyingDate(date, context),
-                    // ReplyMedia(
-                    //     isReply: messageData.isReply,
-                    //     replyType: messageData.replyMessage!['replyType'],
-                    //     replyMsg: messageData.replyMessage!['replyMsg'],
-                    //     replyMsgId: messageData.replyMessage!['replyMsgId'],
-                    //     replyUid: messageData.replyMessage!['replyUid']),
-                    mediaContent(
-                      isMe: isMe,
-                      messageType: hiveMessage.messageType,
-                    ),
-                    data != null
-                        ? NewMessage.fromFirestore(data).isRead
-                            ? const SizedBox.shrink()
-                            : messageRead(hiveMessage.messageReading)
-                        : const SizedBox.shrink()
-                  ],
-                ),
-              );
-            },
-          );
-        });
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 2),
+              child: Column(
+                mainAxisAlignment: mainAxis,
+                crossAxisAlignment: crossAxis,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  // classifyingDate(date, context),
+                  // ReplyMedia(
+                  //     isReply: messageData.isReply,
+                  //     replyType: messageData.replyMessage!['replyType'],
+                  //     replyMsg: messageData.replyMessage!['replyMsg'],
+                  //     replyMsgId: messageData.replyMessage!['replyMsgId'],
+                  //     replyUid: messageData.replyMessage!['replyUid']),
+                  mediaContent(
+                    isMe: isMe,
+                    messageType: hiveMessage.messageType,
+                  ),
+                  data != null
+                      ? data.exists
+                          ? NewMessage.fromFirestore(data).isRead
+                              ? const SizedBox.shrink()
+                              : messageRead('unread')
+                          : const SizedBox.shrink()
+                      : const SizedBox.shrink()
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> messageOptions(BuildContext context, String messageType) {

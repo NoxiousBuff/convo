@@ -150,13 +150,12 @@ class ChatService {
   }
 
   Map<String, dynamic> updateHiveMsg({
-    required bool isRead,
+
     required bool isReply,
     required String senderUid,
     required String messageUid,
     required String messageType,
     required Timestamp timestamp,
-    required String messageReading,
     dynamic mediaPaths,
     String? messageText,
     dynamic mediaPathsType,
@@ -164,7 +163,7 @@ class ChatService {
     Map<String, dynamic>? replyMessage,
   }) {
     return <String, dynamic>{
-      "isRead": isRead,
+      
       "isReply": isReply,
       "mediaPaths": mediaPaths,
       "messageUid": messageUid,
@@ -174,7 +173,6 @@ class ChatService {
       "replyMessage": replyMessage,
       "removeMessage": removeMessage,
       "mediaPathsType": mediaPathsType,
-      "messageReading": messageReading,
       "timestamp": timestamp.millisecondsSinceEpoch,
     };
   }
@@ -197,7 +195,6 @@ class ChatService {
       case textType:
         {
           return <String, dynamic>{
-            "isRead": false,
             "isReply": isReply,
             "removeMessage": false,
             "messageUid": messageUid,
@@ -205,7 +202,6 @@ class ChatService {
             "messageType": messageType,
             "messageText": messageText,
             "replyMessage": replyMessage,
-            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
@@ -213,7 +209,6 @@ class ChatService {
       case imageType:
         {
           return <String, dynamic>{
-            "isRead": false,
             "isReply": isReply,
             "removeMessage": false,
             "messageUid": messageUid,
@@ -222,14 +217,12 @@ class ChatService {
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
-            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
       case videoType:
         {
           return <String, dynamic>{
-            "isRead": false,
             "isReply": isReply,
             "removeMessage": false,
             "messageUid": messageUid,
@@ -238,14 +231,12 @@ class ChatService {
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
-            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
       case multiMediaType:
         {
           return <String, dynamic>{
-            "isRead": false,
             "isReply": isReply,
             "removeMessage": false,
             "messageUid": messageUid,
@@ -254,7 +245,6 @@ class ChatService {
             "messageType": messageType,
             "replyMessage": replyMessage,
             "mediaPathsType": mediaPathsType,
-            "messageReading": messageReading,
             "timestamp": timestamp.millisecondsSinceEpoch,
           };
         }
@@ -283,7 +273,9 @@ class ChatService {
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
     if (mediaUrls != null) messageMap[MessageField.mediaUrls] = mediaUrls;
-    if (mediaUrlsType != null) messageMap[MessageField.mediaUrlsType] = mediaUrlsType;
+    if (mediaUrlsType != null) {
+      messageMap[MessageField.mediaUrlsType] = mediaUrlsType;
+    }
     _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
