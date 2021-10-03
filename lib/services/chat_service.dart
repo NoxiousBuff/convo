@@ -182,7 +182,6 @@ class ChatService {
     required String messageUid,
     required String messageType,
     required Timestamp timestamp,
-    required String messageReading,
     dynamic mediaPaths,
     dynamic mediaPathsType,
     String? messageText,

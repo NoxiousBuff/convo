@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HintMessage {
-  bool isRead;
   bool isReply;
   bool removeMessage;
   final Timestamp timestamp;
@@ -17,7 +16,6 @@ class HintMessage {
   final String? replyUid;
 
   HintMessage({
-    this.isRead = false,
     this.isReply = false,
     this.removeMessage = false,
     required this.messageUid,
@@ -36,7 +34,7 @@ class HintMessage {
   factory HintMessage.fromJson(Map<String, dynamic> json) {
     final finalTimestamp = json["timestamp"] as int;
     return HintMessage(
-      isRead: json["isRead"] as bool,
+    
       isReply: json["isReply"] as bool,
       removeMessage: json["removeMessage"] as dynamic,
       messageUid: json["messageUid"] as String,

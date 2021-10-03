@@ -49,6 +49,7 @@ class ChatView extends StatelessWidget {
     return ViewModelBuilder<ChatViewModel>.reactive(
       onModelReady: (model) async {
         model.scrollController = ScrollController();
+        //await Hive.box(conversationId).clear();
         // await Hive.box("ChatRoomMedia[$conversationId]").clear();
         // await Hive.box('VideoThumbnails[$conversationId]').clear();
       },
@@ -211,7 +212,7 @@ class ChatMessages extends StatelessWidget {
         var data = snapshot.data;
         if (data != null) {
           if (data.docs.isEmpty) {
-            getLogger('ChatView').e('No unread messages available now !!');
+            //getLogger('ChatView').e('Docs is empty now!!');
           }
         }
         return OfflineBuilder(
@@ -220,28 +221,32 @@ class ChatMessages extends StatelessWidget {
             bool connected = connectivity != ConnectivityResult.none;
             if (connected) {
               if (data != null) {
-                final unreadMessages = data.docs;
-                for (var unreadMsg in unreadMessages) {
-                  final msg = NewMessage.fromFirestore(unreadMsg);
-                  getLogger('chatview')
-                      .wtf('isRead:${msg.isRead}\nMessage-${msg.message}');
-                  if (!msg.isRead) {
+                Future.wait(data.docs.map((doc) async {
+                  final unreadMsg = NewMessage.fromFirestore(doc);
+                  if (unreadMsg.isRead == false) {
                     final textMsg = chatService.addUnreadMsg(
-                      isReply: msg.isReply,
-                      messageType: msg.type,
-                      timestamp: msg.timestamp,
-                      senderUid: msg.senderUid,
-                      messageUid: msg.messageUid,
-                      messageText: msg.message[MessageField.messageText],
+                      isReply: unreadMsg.isReply,
+                      messageType: unreadMsg.type,
+                      timestamp: unreadMsg.timestamp,
+                      senderUid: unreadMsg.senderUid,
+                      messageUid: unreadMsg.messageUid,
+                      messageText: unreadMsg.message[MessageField.messageText],
                     );
-                    Hive.box(conversationId).add(textMsg);
+
+                    await Hive.box(conversationId).add(textMsg);
                     getLogger('ChatView').wtf("unreadMessage: $textMsg");
+                    return model.updateAProperty(
+                      messageUid: unreadMsg.messageUid,
+                      data: {'isRead': true},
+                    ).whenComplete(
+                        () => getLogger('ChatView').wtf('Property updated'));
+                  } else {
+                    Future.error('Message is already readed');
                   }
-                }
+                }));
               } else {
                 getLogger('ChatView').wtf('no unread messages available');
               }
-              model.seeMsg();
             }
             return hiveChatBox.isNotEmpty
                 ? ValueListenableBuilder(

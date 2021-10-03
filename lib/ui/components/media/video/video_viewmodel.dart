@@ -2,25 +2,20 @@
 
 import 'dart:io';
 import 'package:hive/hive.dart';
-import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class MessageBubbleViewModel extends BaseViewModel {
+class VideoViewModel extends BaseViewModel {
   final String conversationId;
-  MessageBubbleViewModel(this.conversationId);
+  VideoViewModel(this.conversationId);
 
-  double _uploadingProgress = 0.0;
-  double get uploadingProgress => _uploadingProgress;
+  double _uploadingVideo = 0.0;
+  double get uploadingVideo => _uploadingVideo;
 
   final bool _isuploading = false;
   bool get isuploading => _isuploading;
-
-  String? _uploadingMessageUid;
-  String? get uploadingMessageUid => _uploadingMessageUid;
 
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
@@ -33,14 +28,10 @@ class MessageBubbleViewModel extends BaseViewModel {
     var className = 'MessageBubbleViewModel';
     final hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
     final timestamp = Timestamp.now().millisecondsSinceEpoch;
-    final fileType = lookupMimeType(filePath)!.split("/").first;
-    String folder =
-        fileType == 'image' ? 'Images/IMG-$timestamp' : 'Videos/VID-$timestamp';
+    String folder = 'Videos/VID-$timestamp';
     setBusyForObject(_isuploading, true);
-    // _uploadingMessageUid = messageUid;
-    // notifyListeners();
 
-    getLogger('MessageBubble').wtf('isUploading Start:$isuploading');
+    getLogger('MessageBubble').wtf('isUploading Start:$_isuploading');
     firebase_storage.UploadTask task =
         storage.ref(folder).putFile(File(filePath));
 
@@ -49,10 +40,10 @@ class MessageBubbleViewModel extends BaseViewModel {
         getLogger(className).i('Task state: ${snapshot.state}');
         var progress = snapshot.bytesTransferred.toDouble() /
             snapshot.totalBytes.toDouble();
-        _uploadingProgress = progress;
+        _uploadingVideo = progress;
         notifyListeners();
 
-        print('Progress: $_uploadingProgress%');
+        print('Progress: $_uploadingVideo%');
       },
       onError: (e) {
         getLogger(className).e(task.snapshot);
@@ -68,15 +59,9 @@ class MessageBubbleViewModel extends BaseViewModel {
     if (!hiveBox.containsKey(messageUid)) {
       hiveBox.put(messageUid, filePath);
     }
-    //_uploadingMessageUid = null;
-    // notifyListeners();
 
     setBusyForObject(_isuploading, false);
-    getLogger('MessageBubble').wtf('isUploading End:$isuploading');
+    getLogger('MessageBubble').wtf('isUploading End:$_isuploading');
     return downloadURL;
-  }
-
-  void onError(error) {
-    getLogger('MessageBubbleViewModel onError').e(error);
   }
 }
