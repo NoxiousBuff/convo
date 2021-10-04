@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/model_string.dart';
 import 'package:hint/models/new_message_model.dart';
 import 'package:hint/ui/components/media/image/image_media.dart';
 import 'package:hint/ui/components/media/reply/reply_media.dart';

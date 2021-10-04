@@ -13,8 +13,8 @@ class UserItem extends StatelessWidget {
   final Function onTap;
   UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
 
-  final Color randomColor = Color.fromARGB(Random().nextInt(256),
-      Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
+  // final Color randomColor = Color.fromARGB(Random().nextInt(256),
+  //     Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
 
   buildChatListItemPopup({required FireUser fireUser}) {
     return Material(
@@ -118,8 +118,8 @@ class UserItem extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 colors: [
-                  randomColor.withAlpha(30),
-                  randomColor.withAlpha(50),
+                  Color(fireUser.colorHexCode).withAlpha(30),
+                  Color(fireUser.colorHexCode).withAlpha(50),
                 ],
                 focal: Alignment.topLeft,
                 radius: 0.8,

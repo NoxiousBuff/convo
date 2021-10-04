@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/model_string.dart';
 
 class NewMessage {
   final bool isRead;

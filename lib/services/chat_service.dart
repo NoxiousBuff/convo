@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/model_string.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/routes/shared_axis_route.dart';
 import 'package:hint/ui/views/chat/chat_view.dart';

@@ -132,6 +132,7 @@ class ChatListView extends StatelessWidget {
       ),
     );
   }
+  
 
   Widget buildUserContact(ChatListViewModel model) {
     return Builder(

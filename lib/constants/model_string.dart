@@ -38,3 +38,18 @@ class MediaType {
   static const String dickster = 'dickster';
   static const String emoji = 'emoji';
 }
+
+class FireUserStrings {
+  static const String id = 'id';
+  static const String email = 'email';
+  static const String photoUrl = 'photoUrl';
+  static const String bio = 'bio';
+  static const String status = 'status';
+  static const String username = 'username';
+  static const String userCreated = 'userCreated';
+  static const String lastSeen = 'lastSeen';
+  static const String phone = 'phone';
+  static const String colorHexCode = 'colorHexCode';
+  static const String interests = 'interests';
+  static const String country = 'country';
+}

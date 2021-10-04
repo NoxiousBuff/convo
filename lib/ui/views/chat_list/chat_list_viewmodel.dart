@@ -17,10 +17,13 @@ class ChatListViewModel extends FutureViewModel<QuerySnapshot> {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection(usersFirestoreKey);
 
+  final CollectionReference subsCollection =
+      FirebaseFirestore.instance.collection(subsFirestoreKey);
+
   void signOut(BuildContext context) => authService.signOut(context,onSignOut:  () {
                 getLogger('AuthService').wtf('User has been loggeed out.');
               });
 
   @override
-  Future<QuerySnapshot> futureToRun() => usersCollection.get();
+  Future<QuerySnapshot> futureToRun() => subsCollection.get();
 }
