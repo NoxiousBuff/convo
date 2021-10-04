@@ -52,6 +52,7 @@ class MessageBubble extends StatelessWidget {
         {
           return ImageMedia(
             isMe: isMe,
+            model: model,
             hiveMessage: hiveMessage,
             receiverUid: receiverUid,
             conversationId: conversationId,
@@ -66,6 +67,7 @@ class MessageBubble extends StatelessWidget {
           if (thumbnail != null) {
             return VideoMedia(
               isMe: isMe,
+              model: model,
               hiveMessage: hiveMessage,
               receiverUid: receiverUid,
               videoThumbnail: thumbnail,
@@ -123,23 +125,6 @@ class MessageBubble extends StatelessWidget {
             return OfflineBuilder(
               child: const Text('Yah Baby !!'),
               connectivityBuilder: (context, connectivity, child) {
-                //bool connected = connectivity != ConnectivityResult.none;
-                // if (connected) {
-                //   if (isMe) {
-                //     if (data != null) {
-                //       if (data.exists) {
-                //         var msg = NewMessage.fromFirestore(data);
-                //         if (msg.messageUid == messageUid) {
-                //           if (msg.isRead && !hiveMessage.isRead) {
-                //             getLogger('MessageBubble').wtf(
-                //                 '$index\nMessage-${msg.message}\n${msg.isRead}');
-                //           }
-                //         }
-                //       }
-                //     }
-                //   }
-                // }
-
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 2),
                   child: Column(

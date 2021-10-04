@@ -13,6 +13,9 @@ class MessageBubbleViewModel extends BaseViewModel {
   final String conversationId;
   MessageBubbleViewModel(this.conversationId);
 
+  firebase_storage.TaskState? _taskState;
+  firebase_storage.TaskState? get taskState => _taskState;
+
   double _uploadingProgress = 0.0;
   double get uploadingProgress => _uploadingProgress;
 
@@ -30,19 +33,21 @@ class MessageBubbleViewModel extends BaseViewModel {
     required String messageUid,
     required String filePath,
   }) async {
+    setBusyForObject(_isuploading, true);
     var className = 'MessageBubbleViewModel';
     final hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
     final timestamp = Timestamp.now().millisecondsSinceEpoch;
     final fileType = lookupMimeType(filePath)!.split("/").first;
     String folder =
         fileType == 'image' ? 'Images/IMG-$timestamp' : 'Videos/VID-$timestamp';
-    setBusyForObject(_isuploading, true);
-    // _uploadingMessageUid = messageUid;
-    // notifyListeners();
+    
 
-    getLogger('MessageBubble').wtf('isUploading Start:$isuploading');
+    getLogger('MessageBubble').wtf('isUploading Start:${busy(_isuploading)}');
     firebase_storage.UploadTask task =
         storage.ref(folder).putFile(File(filePath));
+
+    // _taskState = task.snapshot.state;
+    // notifyListeners();
 
     task.snapshotEvents.listen(
       (firebase_storage.TaskSnapshot snapshot) {
@@ -68,11 +73,12 @@ class MessageBubbleViewModel extends BaseViewModel {
     if (!hiveBox.containsKey(messageUid)) {
       hiveBox.put(messageUid, filePath);
     }
-    //_uploadingMessageUid = null;
+
+    // _taskState = null;
     // notifyListeners();
 
     setBusyForObject(_isuploading, false);
-    getLogger('MessageBubble').wtf('isUploading End:$isuploading');
+    getLogger('MessageBubble').wtf('isUploading End:${busy(_isuploading)}');
     return downloadURL;
   }
 

@@ -49,9 +49,9 @@ class ChatView extends StatelessWidget {
     return ViewModelBuilder<ChatViewModel>.reactive(
       onModelReady: (model) async {
         model.scrollController = ScrollController();
-        //await Hive.box(conversationId).clear();
-        // await Hive.box("ChatRoomMedia[$conversationId]").clear();
-        // await Hive.box('VideoThumbnails[$conversationId]').clear();
+       // await Hive.box(conversationId).clear();
+       // await Hive.box("ChatRoomMedia[$conversationId]").clear();
+       // await Hive.box('VideoThumbnails[$conversationId]').clear();
       },
       onDispose: (model) async {
         await Hive.box(conversationId).close();
@@ -162,7 +162,6 @@ class ChatMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatService chatService = ChatService();
     final hiveChatBox = Hive.box(conversationId);
     const padding = EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0);
     final hiveMessages = Hive.box(conversationId)
@@ -259,10 +258,8 @@ class ChatMessages extends StatelessWidget {
                         controller: model.scrollController,
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, i) {
-                          final message =
-                              hiveMessages[i].cast<String, dynamic>();
-                          HintMessage hiveMessage =
-                              HintMessage.fromJson(message);
+                          final msg = hiveMessages[i].cast<String, dynamic>();
+                          final hiveMessage = HintMessage.fromJson(msg);
 
                           return MessageBubble(
                             index: i,

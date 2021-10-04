@@ -8,7 +8,7 @@ class FireUser {
   final String status;
   final String username;
   final Timestamp userCreated;
-  final Timestamp? lastSeen;
+  // final Timestamp? timestamp;
   final String? phone;
 
   FireUser(
@@ -19,7 +19,8 @@ class FireUser {
       required this.status,
       required this.username,
       required this.userCreated,
-      this.lastSeen, this.phone,});
+    //  this.timestamp,
+       this.phone,});
 
   //deserializing the user document
   factory FireUser.fromFirestore(DocumentSnapshot doc) {
@@ -31,7 +32,7 @@ class FireUser {
       status: doc['status'],
       username: doc['username'],
       userCreated: doc['userCreated'],
-      lastSeen: doc['timestamp'],
+      // timestamp: doc['timestamp'],
       phone: doc['phone']
     );
   }

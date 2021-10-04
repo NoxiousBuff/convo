@@ -1,11 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
+import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'dart:io';
-import 'package:hive/hive.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HintImage extends StatefulWidget {
   //make sure that the hive box is already opened
@@ -16,16 +16,16 @@ class HintImage extends StatefulWidget {
   final String? folderPath;
   final VoidCallback? onTap;
   final String conversationId;
-  const HintImage({
-    Key? key,
-    required this.mediaUrl,
-    required this.uuid,
-    required this.hiveBoxName,
-    this.folderPath,
-    this.imageName,
-    this.onTap,
-    required this.conversationId
-  }) : super(key: key);
+  const HintImage(
+      {Key? key,
+      required this.mediaUrl,
+      required this.uuid,
+      required this.hiveBoxName,
+      this.folderPath,
+      this.imageName,
+      this.onTap,
+      required this.conversationId})
+      : super(key: key);
 
   @override
   _HintImageState createState() => _HintImageState();
@@ -61,14 +61,14 @@ class _HintImageState extends State<HintImage> {
   void imageDecider() async {
     if (hiveContainsPath!) {
       if (await File(savedFilePath!).exists()) {
-        setState(() {
-          isDeleted = false;
-        });
+        // setState(() {
+        //   isDeleted = false;
+        // });
         getLogger('Hint Image').wtf('Path of the value given does exist');
       } else {
-        setState(() {
-          isDeleted = true;
-        });
+        // setState(() {
+        //   isDeleted = true;
+        // });
         getLogger('Hint Image').wtf(
             'Path of the value does not exist.\n Here is the function starts.');
         generalWorker();
@@ -77,11 +77,10 @@ class _HintImageState extends State<HintImage> {
     } else {
       getLogger('Hint Image')
           .wtf('This is the middle else that is been printed.');
-      setState(() {
-        isDeleted = false;
-      });
+      // setState(() {
+      //   isDeleted = false;
+      // });
       generalWorker();
-     
     }
   }
 
