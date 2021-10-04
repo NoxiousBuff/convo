@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/app/app_logger.dart';
@@ -11,7 +10,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
   final Function onTap;
-  UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
+  const UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
 
   // final Color randomColor = Color.fromARGB(Random().nextInt(256),
   //     Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));

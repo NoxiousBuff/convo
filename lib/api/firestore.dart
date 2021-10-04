@@ -14,8 +14,7 @@ class FirestoreApi {
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
   CollectionReference subsCollection =
-      _firestore.collection(usersFirestoreKey);
-  CollectionReference usersCollection = _firestore.collection(usersFirestoreKey);
+      _firestore.collection(subsFirestoreKey);
   Future<void> createUserInFirebase(
       {required 
       User user, String? userName, Function? onError}) async {
