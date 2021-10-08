@@ -15,6 +15,7 @@ import 'package:hint/ui/components/media/image/image_viewmodel.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 
 class ImageMedia extends StatelessWidget {
+  final bool isRead;
   final Message message;
   final String receiverUid;
   final String conversationId;
@@ -22,6 +23,7 @@ class ImageMedia extends StatelessWidget {
   final MessageBubbleViewModel messageBubbleModel;
   ImageMedia({
     Key? key,
+    required this.isRead,
     required this.message,
     required this.memoryImage,
     required this.receiverUid,
@@ -103,7 +105,8 @@ class ImageMedia extends StatelessWidget {
     final borderRadius = BorderRadius.circular(12);
     final filePath = message.message[MessageField.mediaURL];
     var hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
-    final border = Border.all(color: extraLightBackgroundGray, width: 5);
+    final border = Border.all(
+        color: isRead ? extraLightBackgroundGray : unreadMsg, width: 5);
     final decoration = BoxDecoration(border: border, borderRadius: radius);
     return ViewModelBuilder<ImageViewModel>.reactive(
       viewModelBuilder: () => ImageViewModel(),

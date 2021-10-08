@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_print
 import 'dart:collection';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble_border.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,7 +36,7 @@ class ReplyMedia extends StatelessWidget {
     const crossAxisStart = CrossAxisAlignment.start;
     final userReply = '${fireUser.username} replied to you';
     final maxWidth = screenWidthPercentage(context, percentage: 0.7);
-
+    final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
     Widget replyDetector(BuildContext context) {
       switch (replyMessage[ReplyField.replyType]) {
         case MediaType.text:
@@ -249,35 +252,236 @@ class ReplyMedia extends StatelessWidget {
       }
     }
 
-    return GestureDetector(
-      child: Column(
-        crossAxisAlignment: isMe ? crossAxisEnd : crossAxisStart,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: isMe ? mainAxisEnd : mainAxisStart,
-            children: [
-              const Icon(CupertinoIcons.reply, size: 12, color: iconColor),
-              const SizedBox(width: 5),
-              Text(isMe ? youReply : userReply, style: style),
-            ],
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              color: const Color(0xfff7f7f8),
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  replyDetector(context),
-                  mediaDetector(context),
-                ],
+    Widget replyWidget() {
+      switch (replyMessage[ReplyField.replyType]) {
+        case MediaType.text:
+          {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
+              child: CustomPaint(
+                painter:
+                    ChatBubbleBorder(color: inActiveGrey, type: bubbleType),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
+                  child: Text(
+                    replyMessage[ReplyField.replyMessageText],
+                    maxLines: 3,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(fontSize: 12),
+                  ),
+                ),
+              ),
+            );
+          }
+        case MediaType.url:
+          {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter:
+                    ChatBubbleBorder(color: inActiveGrey, type: bubbleType),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
+                  child: Text(
+                    replyMessage[ReplyField.replyMessageText],
+                    maxLines: 3,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(fontSize: 12),
+                  ),
+                ),
+              ),
+            );
+          }
+        case MediaType.image:
+          {
+            final messageUid = replyMessage[ReplyField.replyMessageUid];
+            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter: ChatBubbleBorder(
+                    color: inActiveGrey, type: bubbleType, radius: 15),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: ExtendedImage(
+                          fit: BoxFit.cover,
+                          enableMemoryCache: true,
+                          handleLoadingProgress: true,
+                          image: MemoryImage(hiveBox.get(messageUid)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Photo',
+                        maxLines: 3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        case MediaType.video:
+          {
+            final messageUid = replyMessage[ReplyField.replyMessageUid];
+            final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter: ChatBubbleBorder(
+                    color: inActiveGrey, type: bubbleType, radius: 15),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: ExtendedImage(
+                              fit: BoxFit.cover,
+                              enableMemoryCache: true,
+                              handleLoadingProgress: true,
+                              image: MemoryImage(hiveBox.get(messageUid)),
+                            ),
+                          ),
+                          const Icon(Icons.play_arrow,
+                              color: systemBackground, size: 15),
+                        ],
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Video',
+                        maxLines: 3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          case MediaType.canvasImage:
+          {
+            final messageUid = replyMessage[ReplyField.replyMessageUid];
+            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter: ChatBubbleBorder(
+                    color: inActiveGrey, type: bubbleType, radius: 15),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: ExtendedImage(
+                          fit: BoxFit.cover,
+                          enableMemoryCache: true,
+                          handleLoadingProgress: true,
+                          image: MemoryImage(hiveBox.get(messageUid)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'CanvasImage',
+                        maxLines: 3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        default:
+          {
+            return const SizedBox.shrink();
+          }
+      }
+    }
+
+    return replyWidget();
+    // GestureDetector(
+    //   child: Column(
+    //     crossAxisAlignment: isMe ? crossAxisEnd : crossAxisStart,
+    //     children: [
+    //       Row(
+    //         mainAxisSize: MainAxisSize.min,
+    //         mainAxisAlignment: isMe ? mainAxisEnd : mainAxisStart,
+    //         children: [
+    //           const Icon(CupertinoIcons.reply, size: 12, color: iconColor),
+    //           const SizedBox(width: 5),
+    //           Text(isMe ? youReply : userReply, style: style),
+    //         ],
+    //       ),
+    //       ClipRRect(
+    //         borderRadius: BorderRadius.circular(16),
+    //         child: Container(
+    //           color: const Color(0xfff7f7f8),
+    //           constraints: BoxConstraints(maxWidth: maxWidth),
+    //           child: Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               replyDetector(context),
+    //               mediaDetector(context),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 }

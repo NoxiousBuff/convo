@@ -25,8 +25,8 @@ import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 
 class MessageBubble extends StatelessWidget {
   final int index;
-  final FireUser fireUser;
   final Message message;
+  final FireUser fireUser;
   final String receiverUid;
   final String conversationId;
   final bool isTimestampMatched;
@@ -57,6 +57,7 @@ class MessageBubble extends StatelessWidget {
           Uint8List memeoryImage = hiveBox.get(message.messageUid);
           return ImageMedia(
             message: message,
+            isRead: message.isRead,
             receiverUid: receiverUid,
             memoryImage: memeoryImage,
             messageBubbleModel: model,
@@ -71,6 +72,7 @@ class MessageBubble extends StatelessWidget {
           final thumbnail = hiveBox.get(message.messageUid);
           if (thumbnail != null) {
             return VideoMedia(
+              isRead: message.isRead,
               receiverUid: receiverUid,
               messageBubbleModel: model,
               videoThumbnail: thumbnail,

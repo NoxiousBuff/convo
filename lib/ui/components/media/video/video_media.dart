@@ -14,6 +14,7 @@ import 'package:hint/ui/components/media/video/video_viewmodel.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 
 class VideoMedia extends StatelessWidget {
+  final bool isRead;
   final String videoPath;
   final String messageUid;
   final String receiverUid;
@@ -22,6 +23,7 @@ class VideoMedia extends StatelessWidget {
   final MessageBubbleViewModel messageBubbleModel;
   VideoMedia({
     Key? key,
+    required this.isRead,
     required this.receiverUid,
     required this.messageUid,
     required this.videoPath,
@@ -104,7 +106,8 @@ class VideoMedia extends StatelessWidget {
     final radius = BorderRadius.circular(16);
     final borderRadius = BorderRadius.circular(12);
     final hiveBox = Hive.box('ThumbnailsPath[$conversationId]');
-    final border = Border.all(color: extraLightBackgroundGray, width: 5);
+    final border = Border.all(
+        color: isRead ? extraLightBackgroundGray : unreadMsg, width: 5);
     final decoration = BoxDecoration(border: border, borderRadius: radius);
     return ViewModelBuilder<VideoViewModel>.reactive(
       viewModelBuilder: () => VideoViewModel(),
