@@ -9,6 +9,7 @@ const black54 = Colors.black54;
 const green = Color(0xff04D939);
 const darkPink = Color(0xffdd2476);
 const lightBlue = Color(0xff55A5F5);
+const unreadMsg  = Color(0x14350bdf);
 const systemTeal = Color(0xff50c9c3);
 const dirtyWhite = Color(0xfff5f6f8);
 const systemOrange = Color(0xffff512f);

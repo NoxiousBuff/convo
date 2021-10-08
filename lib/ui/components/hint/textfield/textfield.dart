@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:uuid/uuid.dart';
-import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
 import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
@@ -9,25 +8,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/shared/pixaBay/pixabay.dart';
 import 'package:hint/ui/shared/memes/meme_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/shared/emojies/emojie_view.dart';
-import 'package:string_validator/string_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:hint/ui/shared/text_editor/text_editor.dart';
 import 'package:hint/ui/shared/animal_memojie/animal_memojie.dart';
 import 'package:hint/ui/shared/drawing_canvas/drawing_canvas.dart';
-import 'package:hint/ui/components/media/message/reply_message.dart';
-import 'package:hint/ui/components/media/message/message_viewmodel.dart';
-import 'package:hint/ui/components/media/reply/reply_keyboard_media.dart';
+import 'package:hint/ui/components/media/reply/reply_keyboard.dart';
+import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 import 'package:hint/ui/components/hint/textfield/textfield_viewmodel.dart';
 
 class HintTextField extends StatefulWidget {
@@ -35,9 +34,11 @@ class HintTextField extends StatefulWidget {
   final String receiverUid;
   final FocusNode focusNode;
   final String conversationId;
+  final FireUser fireUser;
   final ChatViewModel chatViewModel;
   const HintTextField({
     Key? key,
+    required this.fireUser,
     required this.focusNode,
     required this.receiverUid,
     required this.randomColor,
@@ -191,7 +192,6 @@ class _HintTextFieldState extends State<HintTextField> {
   }
 
   Widget textField() {
-    final boxId = widget.conversationId;
     return SizedBox(
       height: 40,
       child: CupertinoTextField(
@@ -208,41 +208,57 @@ class _HintTextFieldState extends State<HintTextField> {
               ? setWritingTo(true)
               : setWritingTo(false);
         },
-        suffix: CupertinoButton(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: Text(
-            'Send',
-            style: TextStyle(
-              color: !isWriting
-                  ? Colors.black38
-                  : const Color.fromRGBO(10, 132, 255, 1),
-            ),
-          ),
-          onPressed: !isWriting
-              ? null
-              : () async {
-                  final timestamp = Timestamp.now();
-                  String messageUid = const Uuid().v1();
-                  bool isUrl = isURL(messageTech.text);
-                  final msg = chatService.addHiveMessage(
-                    isReply: false,
-                    timestamp: timestamp,
-                    messageUid: messageUid,
-                    messageText: messageTech.text,
-                    messageType: isUrl ? urlType : textType,
-                  );
-                  await Hive.box(boxId).add(msg);
-                  getLogger('TextFieldView').wtf(msg);
-
-                  await chatService.addFirestoreMessage(
-                    type: textType,
-                    timestamp: timestamp,
-                    messageUid: messageUid,
-                    messageText: messageTech.text,
-                    receiverUid: widget.receiverUid,
-                  );
-                  messageTech.clear();
-                },
+        suffix: Consumer(
+          builder: (context, watch, child) {
+            final replyPod = watch(replyBackProvider);
+            return CupertinoButton(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                'Send',
+                style: TextStyle(
+                  color: !isWriting
+                      ? Colors.black38
+                      : const Color.fromRGBO(10, 132, 255, 1),
+                ),
+              ),
+              onPressed: !isWriting
+                  ? null
+                  : () async {
+                      final timestamp = Timestamp.now();
+                      String messageUid = const Uuid().v1();
+                      bool isUrl = isURL(messageTech.text);
+                      var replyMsg = replyPod.message;
+                      !replyPod.showReply
+                          ? await chatService.addFirestoreMessage(
+                              timestamp: timestamp,
+                              messageUid: messageUid,
+                              messageText: messageTech.text,
+                              receiverUid: widget.receiverUid,
+                              type: isUrl ? urlType : textType,
+                            )
+                          : await chatService.addFirestoreMessage(
+                              isReply: true,
+                              timestamp: timestamp,
+                              messageUid: messageUid,
+                              messageText: messageTech.text,
+                              receiverUid: widget.receiverUid,
+                              type: isUrl ? urlType : textType,
+                              replyMessage: {
+                                ReplyField.replyType: replyPod.messageType,
+                                ReplyField.replyMessageUid: replyPod.messageUid,
+                                ReplyField.replyMediaUrl: replyMsg != null
+                                    ? replyMsg[MessageField.mediaURL]
+                                    : null,
+                                ReplyField.replyMessageText: replyMsg != null
+                                    ? replyMsg[MessageField.messageText]
+                                    : null,
+                              },
+                            );
+                      messageTech.clear();
+                      replyPod.showReplyBool(false);
+                    },
+            );
+          },
         ),
         textAlign: TextAlign.start,
         keyboardType: TextInputType.multiline,
@@ -256,8 +272,6 @@ class _HintTextFieldState extends State<HintTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final boxId = widget.conversationId;
-    final buubleModel = MessageBubbleViewModel(boxId);
     final height = screenHeightPercentage(context, percentage: 0.5);
     return ViewModelBuilder<TextFieldViewModel>.reactive(
       viewModelBuilder: () => TextFieldViewModel(),
@@ -289,18 +303,15 @@ class _HintTextFieldState extends State<HintTextField> {
                       children: <Widget>[
                         const Divider(height: 0.0),
                         Consumer(
-                          builder: (BuildContext context,
-                              T Function<T>(ProviderBase<Object?, T>) watch,
-                              Widget? child) {
-                            final replyProvider = watch(replyPod);
-                            return ReplyKeyboardMedia(
-                              replyType: replyProvider.replyType,
-                              replyMsg: replyProvider.replyMsg,
-                              replyMsgId: replyProvider.replyMsgId,
-                              isReply: replyProvider.isReply,
-                              replyUid: replyProvider.replyUid,
-                              replyMediaUrl: replyProvider.replyMediaUrl,
-                            );
+                          builder: (_, watch, __) {
+                            final replyPod = watch(replyBackProvider);
+                            return replyPod.showReply
+                                ? ReplyKeyboard(
+                                    isMe: replyPod.isMe,
+                                    fireUser: widget.fireUser,
+                                    conversationId: widget.conversationId,
+                                  )
+                                : const SizedBox.shrink();
                           },
                         ),
                         textField(),
@@ -332,8 +343,10 @@ class _HintTextFieldState extends State<HintTextField> {
                                         enableDrag: false,
                                         isDismissible: false,
                                         backgroundColor: Colors.transparent,
-                                        builder: (context) =>
-                                            const DrawingCanvas(),
+                                        builder: (context) => DrawingCanvas(
+                                          receiverUid: widget.receiverUid,
+                                          conversationId: widget.conversationId,
+                                        ),
                                       );
                                     },
                                   ),
@@ -387,27 +400,13 @@ class _HintTextFieldState extends State<HintTextField> {
                                                 : videoType;
                                             getLogger('TextFielView').wtf(
                                                 'cameraOption|MessageType$type');
-                                            await model.saveFileInHive(
-                                              isReply: false,
-                                              hiveBoxName: boxId,
-                                              filePath: file.path,
-                                              messageTime: timestamp,
-                                              messageType: imageType,
-                                              messageUid: messageUid,
-                                            );
 
-                                            final url =
-                                                await buubleModel.uploadFile(
-                                              filePath: file.path,
-                                              messageUid: messageUid,
-                                            );
                                             await chatService
                                                 .addFirestoreMessage(
-                                              mediaUrls: url,
                                               type: fileType,
+                                              mediaURL: file.path,
+                                              timestamp: timestamp,
                                               messageUid: messageUid,
-                                              mediaUrlsType: [fileType],
-                                              timestamp: Timestamp.now(),
                                               receiverUid: widget.receiverUid,
                                             );
                                           }
@@ -463,33 +462,10 @@ class _HintTextFieldState extends State<HintTextField> {
                                       model.pixaBayToggle(false);
                                       model.emojieChanger(false);
                                       model.toggleMemojies(false);
-                                      final picker = FilePicker.platform;
-                                      final result = await picker.pickFiles(
-                                        type: FileType.media,
-                                        allowMultiple: true
-                                      );
-
-                                      if (result != null) {
-                                        for (var path in result.paths) {
-                                          if (path != null) {
-                                            final uid = const Uuid().v1();
-                                            final timestamp = Timestamp.now();
-                                            final mime = lookupMimeType(path);
-                                            final type = mime!.split('/').first;
-
-                                            await model.saveFileInHive(
-                                              filePath: path,
-                                              messageUid: uid,
-                                              hiveBoxName: boxId,
-                                              messageType: type,
-                                              messageTime: timestamp,
-                                            );
-                                          }
-                                        }
-                                      } else {
-                                        getLogger('TextFieldView')
-                                            .wtf('no media was selected');
-                                      }
+                                      model.pickMedias(
+                                          context: context,
+                                          boxId: widget.conversationId,
+                                          receiverUid: widget.receiverUid);
                                     },
                                   ),
                                   bottomButton(
@@ -646,116 +622,3 @@ class _HintTextFieldState extends State<HintTextField> {
     );
   }
 }
-
-// AnimatedContainer(
-// curve: Curves.easeOut,
-// duration: Duration(milliseconds: 200),
-// height: optionHeight(),
-// child: ListView(
-// shrinkWrap: true,
-// physics: BouncingScrollPhysics(),
-// scrollDirection: Axis.horizontal,
-// children: [
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.gesture_rounded,
-// iconName: 'Kickster',
-// onTap: () {}),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.camera_alt_outlined,
-// iconName: 'Camera',
-// onTap: () {}),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.gif_outlined,
-// iconName: 'Gif',
-// onTap: () {}),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.insert_drive_file_outlined,
-// iconName: 'Document',
-// onTap: () {}),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.photo_library_outlined,
-// iconName: 'Gallery',
-// onTap: () {
-// Navigator.push(
-// context,
-// MaterialPageRoute(
-// builder: (context) => MediaPickers()));
-// }),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.headset_outlined,
-// iconName: 'Audio',
-// onTap: () {}),
-// BottomTextFieldButton(
-// context: context,
-// optionOpened: optionOpened,
-// iconData: Icons.location_on_outlined,
-// iconName: 'Location',
-// onTap: () {}),
-// ],
-// ),
-// ),
-
-//TODO: this is the starting of the cupertino textfield
-
-// CupertinoTextField(
-// focusNode: widget.focusNode,
-// style: TextStyle(color: Colors.black),
-// controller: messageTech,
-// placeholder: 'Text Message',
-// placeholderStyle: TextStyle(color: Colors.black38),
-// padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-// minLines: 1,
-// maxLines: 6,
-// onChanged: (val) {
-// (val.length > 0 && val.trim() != "")
-// ? setWritingTo(true)
-//     : setWritingTo(false);
-// },
-// suffix: Padding(
-// padding: const EdgeInsets.only(right: 8.0),
-// child: CupertinoButton(
-// padding: EdgeInsets.zero,
-// child: Text(
-// 'Send',
-// style: TextStyle(
-// color: !isWriting
-// ? Colors.black38
-//     : Color.fromRGBO(10, 132, 255, 1),
-// ),
-// ),
-// onPressed: !isWriting
-// ? null
-// : () async {
-// await chatService.addMessage(
-// receiverUid: widget.receiverUid!,
-// type: 'text',
-// messageText: messageTech.text,
-// isReply: replyProvider.isReply,
-// replyMediaUrl: replyProvider.replyMediaUrl,
-// replyMsgId: replyProvider.replyMsgId,
-// replyMsg: replyProvider.replyMsg,
-// replyType: replyProvider.replyType,
-// replyUid: replyProvider.replyUid,
-// );
-// messageTech.clear();
-// },
-// )),
-// textAlign: TextAlign.start,
-// keyboardType: TextInputType.multiline,
-// keyboardAppearance: Brightness.light,
-// decoration: BoxDecoration(
-// borderRadius: BorderRadius.circular(20.0),
-// ),
-// ),

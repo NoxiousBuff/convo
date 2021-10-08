@@ -5,18 +5,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/constants/app_keys.dart';
-import 'package:hint/models/hint_message.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/models/message_model.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/models/new_message_model.dart';
-import 'package:hint/constants/message_string.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
@@ -32,8 +27,8 @@ class ChatView extends StatelessWidget {
   const ChatView({
     Key? key,
     required this.fireUser,
-    required this.conversationId,
     required this.randomColor,
+    required this.conversationId,
   }) : super(key: key);
 
   @override
@@ -49,13 +44,16 @@ class ChatView extends StatelessWidget {
     return ViewModelBuilder<ChatViewModel>.reactive(
       onModelReady: (model) async {
         model.scrollController = ScrollController();
-       // await Hive.box(conversationId).clear();
-       // await Hive.box("ChatRoomMedia[$conversationId]").clear();
-       // await Hive.box('VideoThumbnails[$conversationId]').clear();
+        //await Hive.box(conversationId).clear();
+        //await Hive.box('ImagesMemory[$conversationId]').clear();
+        //await Hive.box("ChatRoomMedia[$conversationId]").clear();
+        //await Hive.box('VideoThumbnails[$conversationId]').clear();
       },
       onDispose: (model) async {
         await Hive.box(conversationId).close();
+        await Hive.box('ImagesMemory[$conversationId]').close();
         await Hive.box("ChatRoomMedia[$conversationId]").close();
+        await Hive.box('ThumbnailsPath[$conversationId]').close();
         await Hive.box('VideoThumbnails[$conversationId]').close();
       },
       builder: (context, model, child) => OfflineBuilder(
@@ -129,6 +127,7 @@ class ChatView extends StatelessWidget {
                     ),
                   ),
                   HintTextField(
+                    fireUser: fireUser,
                     chatViewModel: model,
                     randomColor: randomColor,
                     receiverUid: fireUser.id,
@@ -162,115 +161,88 @@ class ChatMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hiveChatBox = Hive.box(conversationId);
     const padding = EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0);
-    final hiveMessages = Hive.box(conversationId)
-        .values
-        .toList(growable: true)
-        .reversed
-        .toList();
-    final groupByDate = groupBy(
-      hiveMessages,
-      (dynamic message) {
-        final jsonMsg = message.cast<String, dynamic>();
-        final msg = HintMessage.fromJson(jsonMsg);
-        final DateTime messageDate = msg.timestamp.toDate();
-        final formattedDate =
-            DateFormat('yyyy-MM-dd').format(messageDate).toString();
-        return formattedDate;
-      },
-    );
-    groupByDate.forEach(
-      (date, list) {
-        if (!model.messagesDate.contains(date)) {
-          model.getMessagesDate(date);
-        }
-        final json = list.last.cast<String, dynamic>();
-        final msg = HintMessage.fromJson(json);
-        if (!model.messagesTimestamp.contains(msg.timestamp)) {
-          model.getTimeStamp(msg.timestamp);
-        }
-      },
-    );
-    bool timestampMatch(HintMessage messageData) {
+    var data = model.data;
+
+    if (data != null) {
+      final groupByDate = groupBy(
+        data.docs,
+        (DocumentSnapshot message) {
+          final DateTime messageDate = message['timestamp'].toDate();
+          final dateString =
+              DateFormat('yyyy-MM-dd').format(messageDate).toString();
+          return dateString;
+        },
+      );
+      groupByDate.forEach(
+        (date, list) {
+          if (!model.messagesDate.contains(date)) {
+            model.getMessagesDate(date);
+          }
+          final firstTimestamp = list.last['timestamp'] as Timestamp;
+
+          if (!model.messagesTimestamp.contains(firstTimestamp)) {
+            model.getTimeStamp(firstTimestamp);
+          }
+        },
+      );
+    }
+    bool timestampMatch(Message messageData) {
       final match = model.messagesTimestamp
           .any((element) => messageData.timestamp == element);
       return match;
     }
 
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection(conversationFirestorekey)
-          .doc(conversationId)
-          .collection(chatsFirestoreKey)
-          .where(DocumentField.senderUid, isEqualTo: fireuser.id)
-          .where(DocumentField.isRead, isEqualTo: false)
-          .snapshots(),
-      builder: (connext,
-          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-        var data = snapshot.data;
-        if (data != null) {
-          if (data.docs.isEmpty) {
-            //getLogger('ChatView').e('Docs is empty now!!');
-          }
+    return ViewModelBuilder<ChatViewModel>.reactive(
+      viewModelBuilder: () =>
+          ChatViewModel(conversationId: conversationId, fireUser: fireuser),
+      builder: (context, model, child) {
+        var data = model.data;
+        if (!model.dataReady) {
+          return const Center(child: CircularProgressIndicator());
         }
+        if (model.hasError) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0)),
+            title: const Text(
+              'Something Bad Happened',
+              textAlign: TextAlign.center,
+            ),
+            content: const Text(
+              'Please try again later.',
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              CupertinoButton(
+                child: const Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        }
+        final messages = data!.docs;
         return OfflineBuilder(
           child: const Text('Yahh !!'),
           connectivityBuilder: (context, connectivity, child) {
-            bool connected = connectivity != ConnectivityResult.none;
-            if (connected) {
-              if (data != null) {
-                Future.wait(data.docs.map((doc) async {
-                  final unreadMsg = NewMessage.fromFirestore(doc);
-                  if (unreadMsg.isRead == false) {
-                    final textMsg = chatService.addUnreadMsg(
-                      isReply: unreadMsg.isReply,
-                      messageType: unreadMsg.type,
-                      timestamp: unreadMsg.timestamp,
-                      senderUid: unreadMsg.senderUid,
-                      messageUid: unreadMsg.messageUid,
-                      messageText: unreadMsg.message[MessageField.messageText],
-                    );
-
-                    await Hive.box(conversationId).add(textMsg);
-                    getLogger('ChatView').wtf("unreadMessage: $textMsg");
-                    return model.updateAProperty(
-                      messageUid: unreadMsg.messageUid,
-                      data: {'isRead': true},
-                    ).whenComplete(
-                        () => getLogger('ChatView').wtf('Property updated'));
-                  } else {
-                    Future.error('Message is already readed');
-                  }
-                }));
-              } else {
-                getLogger('ChatView').wtf('no unread messages available');
-              }
-            }
-            return hiveChatBox.isNotEmpty
-                ? ValueListenableBuilder(
-                    valueListenable: Hive.box(conversationId).listenable(),
-                    builder: (context, box, child) {
-                      return ListView.builder(
-                        reverse: true,
-                        padding: padding,
-                        itemCount: hiveMessages.length,
-                        controller: model.scrollController,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, i) {
-                          final msg = hiveMessages[i].cast<String, dynamic>();
-                          final hiveMessage = HintMessage.fromJson(msg);
-
-                          return MessageBubble(
-                            index: i,
-                            fireUser: fireuser,
-                            chatViewModel: model,
-                            receiverUid: receiverUid,
-                            hiveMessage: hiveMessage,
-                            conversationId: conversationId,
-                            isTimestampMatched: timestampMatch(hiveMessage),
-                          );
-                        },
+            return messages.isNotEmpty
+                ? ListView.builder(
+                    reverse: true,
+                    padding: padding,
+                    itemCount: messages.length,
+                    controller: model.scrollController,
+                    itemBuilder: (context, i) {
+                      final message = Message.fromFirestore(messages[i]);
+                      return MessageBubble(
+                        index: i,
+                        fireUser: fireuser,
+                        chatViewModel: model,
+                        receiverUid: receiverUid,
+                        message: message,
+                        conversationId: conversationId,
+                        isTimestampMatched: timestampMatch(message),
                       );
                     },
                   )

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:dio/dio.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -13,7 +15,8 @@ class DioApi {
         .download(mediaUrl, savePath, deleteOnError: true,
             onReceiveProgress: (downloaded, total) {
           final progress = (downloaded / total) * 100;
-          log.wtf('The $mediaUrl is downloaded $progress % . ');
+          print('Downloading Media Progress $progress');
+          
         })
         .then((value) => getLogger('DioApi').i(
             'The file with mediaUrl : $mediaUrl has been successfully downloaded at savePath : $savePath.'))

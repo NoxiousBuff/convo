@@ -1,64 +1,37 @@
+import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/constants/message_string.dart';
 
 class Message {
+  final bool isRead;
   final bool isReply;
-  final String? link;
-  final GeoPoint? location;
-  final String? mediaUrl;
-  final String? messageText;
-  final String messageUid;
-  final String receiverUid;
-  final String? replyMediaUrl;
-  final String? replyMsg;
-  final String? replyMsgId;
-  final String? replyType;
-  final String? replyUid;
-  final String? status;
-  final String senderUid;
-  final Timestamp timestamp;
   final String type;
+  final String senderUid;
+  final String messageUid;
+  final Timestamp timestamp;
+  final LinkedHashMap<dynamic, dynamic> message;
+  final LinkedHashMap<dynamic, dynamic>? replyMessage;
 
-  
-Message({
-    required this.isReply,
-    this.link,
-    this.location,
-    this.mediaUrl,
-    this.messageText,
-    required this.messageUid,
-    required this.receiverUid,
-    this.replyMediaUrl,
-    this.replyMsg,
-    this.replyMsgId,
-    this.replyType,
-    this.replyUid,
-    required this.senderUid,
-    this.status,
-    required this.timestamp,
+  Message({
+    this.replyMessage,
     required this.type,
+    required this.isRead,
+    required this.isReply,
+    required this.message,
+    required this.messageUid,
+    required this.senderUid,
+    required this.timestamp,
   });
 
-  //deserializing the user document
-  factory 
-Message.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return 
-  Message(
-      isReply: documentSnapshot['isReply'],
-      link: documentSnapshot['link'],
-      location: documentSnapshot['location'],
-      mediaUrl: documentSnapshot['mediaUrl'],
-      messageText: documentSnapshot['messageText'],
-      messageUid: documentSnapshot['messageUid'],
-      receiverUid: documentSnapshot['receiverUid'],
-      replyMediaUrl: documentSnapshot['replyMediaUrl'],
-      replyMsg: documentSnapshot['replyMsg'],
-      replyMsgId: documentSnapshot['replyMsgId'],
-      replyType: documentSnapshot['replyType'],
-      replyUid: documentSnapshot['replyUid'],
-      senderUid: documentSnapshot['senderUid'],
-      status: documentSnapshot['status'],
-      timestamp: documentSnapshot['timestamp'],
-      type: documentSnapshot['type'],
-    );
+  factory Message.fromFirestore(DocumentSnapshot doc) {
+    return Message(
+        isRead: doc[DocumentField.isRead],
+        isReply: doc[DocumentField.isReply],
+        message: doc[DocumentField.message],
+        messageUid: doc[DocumentField.messageUid],
+        replyMessage: doc[DocumentField.replyMessage],
+        senderUid: doc[DocumentField.senderUid],
+        timestamp: doc[DocumentField.timestamp],
+        type: doc[DocumentField.type],);
   }
 }

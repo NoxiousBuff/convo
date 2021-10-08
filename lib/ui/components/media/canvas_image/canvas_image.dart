@@ -2,35 +2,30 @@ import 'dart:ui';
 import 'dart:typed_data';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hint/ui/components/media/image/image_viewmodel.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
+import 'package:hint/ui/components/media/canvas_image/canvas_image_viewmodel.dart';
 
-class ImageMedia extends StatelessWidget {
+class CanvasImage extends StatelessWidget {
   final Message message;
-  final String receiverUid;
+  final Uint8List imageData;
   final String conversationId;
-  final Uint8List memoryImage;
   final MessageBubbleViewModel messageBubbleModel;
-  ImageMedia({
-    Key? key,
-    required this.message,
-    required this.memoryImage,
-    required this.receiverUid,
-    required this.conversationId,
-    required this.messageBubbleModel,
-  }) : super(key: key);
+  const CanvasImage(
+      {Key? key,
+      required this.message,
+      required this.imageData,
+      required this.conversationId,
+      required this.messageBubbleModel})
+      : super(key: key);
 
-  final radius = BorderRadius.circular(16);
-  final log = getLogger('ImageMedia');
   Widget retryButton() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
@@ -100,22 +95,23 @@ class ImageMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final messageUid = message.messageUid;
-    final borderRadius = BorderRadius.circular(12);
-    final filePath = message.message[MessageField.mediaURL];
+    final radius = BorderRadius.circular(16);
     var hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
-    final border = Border.all(color: extraLightBackgroundGray, width: 5);
-    final decoration = BoxDecoration(border: border, borderRadius: radius);
-    return ViewModelBuilder<ImageViewModel>.reactive(
-      viewModelBuilder: () => ImageViewModel(),
+    final decoration = BoxDecoration(borderRadius: radius);
+    return ViewModelBuilder<CanvasImageViewModel>.reactive(
+      viewModelBuilder: () => CanvasImageViewModel(),
       onModelReady: (model) async {
-        if (!hiveBox.containsKey(messageUid)) {
-          log.w('hive doesn\'t contain path of MessageUid:$messageUid');
-          await model.uploadAndSave(
-            filePath: filePath,
-            messageUid: messageUid,
-            model: messageBubbleModel,
-            conversationId: conversationId,
-          );
+        if (!hiveBox.containsKey(message.messageUid)) {
+          getLogger('CanvasImage').d('MessageUid:${message.messageUid}');
+          await model
+              .uploadAndSave(
+                  data: imageData,
+                  model: messageBubbleModel,
+                  messageUid: message.messageUid,
+                  conversationId: conversationId)
+              .catchError((e) {
+            getLogger('CanvasImage').e(e);
+          });
         }
       },
       builder: (context, model, child) {
@@ -131,9 +127,9 @@ class ImageMedia extends StatelessWidget {
                 maxHeight: MediaQuery.of(context).size.height * 0.35,
               ),
               child: ClipRRect(
-                borderRadius: borderRadius,
+                borderRadius: radius,
                 child: !hiveBox.containsKey(messageUid)
-                    ? ExtendedImage(image: MemoryImage(memoryImage))
+                    ? ExtendedImage(image: MemoryImage(imageData))
                     : ExtendedImage.file(File(hiveBox.get(messageUid))),
               ),
             ),
@@ -146,15 +142,3 @@ class ImageMedia extends StatelessWidget {
     );
   }
 }
-
-// !isURL(message.message[MessageField.mediaURL])
-//                     ? ExtendedImage.file(
-//                         File(message.message[MessageField.mediaURL]))
-//                     : HintImage(
-//                         mediaUrl: filePath,
-//                         messageUid: message.messageUid,
-//                         conversationId: conversationId,
-//                         folderPath: 'Media/Hint Images',
-//                         hiveBoxName: "ChatRoomMedia[$conversationId]",
-//                         mediaPath: message.message[MessageField.mediaPath],
-//                       ),

@@ -1,13 +1,22 @@
 import 'dart:ui';
+import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/shared/canvas_painter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fast_color_picker/fast_color_picker.dart';
 
 class DrawingCanvas extends StatefulWidget {
-  const DrawingCanvas({Key? key}) : super(key: key);
+  final String receiverUid;
+  final String conversationId;
+  const DrawingCanvas(
+      {Key? key, required this.receiverUid, required this.conversationId})
+      : super(key: key);
 
   @override
   _DrawingCanvasState createState() => _DrawingCanvasState();
@@ -32,6 +41,8 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
       painterController = newController();
     });
   }
+
+  void showPicture(PictureDetails picture) {}
 
   Widget slider(PainterController controller) {
     return AnimatedPositioned(
@@ -112,7 +123,22 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
                   },
                 ),
                 TextButton(
-                  onPressed: (){},
+                  onPressed: () async {
+                    final boxId = widget.conversationId;
+                    final messageUid = const Uuid().v1();
+                    final hiveBox = Hive.box('ImagesMemory[$boxId]');
+                    final imageData = await painterController.finish().toPNG();
+                    await hiveBox.put(messageUid, imageData);
+
+                    await chatService.addFirestoreMessage(
+                      mediaURL: imageData,
+                      type: canvasImageType,
+                      messageUid: messageUid,
+                      timestamp: Timestamp.now(),
+                      receiverUid: widget.receiverUid,
+                    );
+                    Navigator.pop(context);
+                  },
                   child: Text('Done',
                       style: Theme.of(context)
                           .textTheme

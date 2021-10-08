@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:hint/api/path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/api/path.dart';
-import 'package:hint/ui/components/hint/hint_video.dart';
 
 class SamplePrototype extends StatefulWidget {
   const SamplePrototype({Key? key}) : super(key: key);
@@ -34,14 +32,14 @@ class _SamplePrototypeState extends State<SamplePrototype> {
         child: ListView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 50),
-          children: [
-            const SizedBox(height: 20),
-            HintVideo(
-              mediaUrl: mediaUrl,
-              uuid: '1',
-              hiveBoxName: HiveHelper.hiveBoxVideo,
-              folderPath: 'Hint Videos',
-            )
+          children:const [
+             SizedBox(height: 20),
+            // HintVideo(
+            //   mediaUrl: mediaUrl,
+            //   messageUid: '1',
+            //   hiveBoxName: HiveHelper.hiveBoxVideo,
+            //   folderPath: 'Hint Videos',
+            // )
           ],
         ),
       ),

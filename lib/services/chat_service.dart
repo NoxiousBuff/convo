@@ -17,13 +17,15 @@ class ChatService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
   static final CollectionReference _conversationCollection =
-      _firestore.collection(conversationFirestorekey);
+      _firestore.collection(convoFirestorekey);
 
   startConversation(
       BuildContext context, FireUser fireUser, Color randomColor) async {
     String conversationId = getConversationId(fireUser.id, liveUserUid);
     await Hive.openBox(conversationId);
+    await Hive.openBox('ImagesMemory[$conversationId]');
     await Hive.openBox("ChatRoomMedia[$conversationId]");
+    await Hive.openBox('ThumbnailsPath[$conversationId]');
     await Hive.openBox('VideoThumbnails[$conversationId]');
     Map<String, dynamic> chatRoomMap = {
       'nearMe': false,
@@ -58,223 +60,26 @@ class ChatService {
     }
   }
 
-  Map<String, dynamic> addUnreadMsg({
-    required bool isReply,
-    required String senderUid,
-    required String messageUid,
-    required String messageType,
-    required Timestamp timestamp,
-    bool isRead = false,
-    dynamic mediaPaths,
-    dynamic mediaPathsType,
-    String? messageText,
-    String? imagePath,
-    String? replyUid,
-    String? replyType,
-    dynamic replyMessage,
-  }) {
-    switch (messageType) {
-      case textType:
-        {
-          return <String, dynamic>{
-            "isRead": isRead,
-            "isReply": isReply,
-            "replyUid": replyUid,
-            "removeMessage": false,
-            "replyType": replyType,
-            "messageUid": messageUid,
-            "senderUid": senderUid,
-            "messageType": messageType,
-            "messageText": messageText,
-            "replyMessage": replyMessage,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-
-      case imageType:
-        {
-          return <String, dynamic>{
-            "isRead": isRead,
-            "isReply": isReply,
-            "replyUid": replyUid,
-            "removeMessage": false,
-            "replyType": replyType,
-            "messageUid": messageUid,
-            "senderUid": senderUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      case videoType:
-        {
-          return <String, dynamic>{
-            "isRead": isRead,
-            "isReply": isReply,
-            "replyUid": replyUid,
-            "removeMessage": false,
-            "replyType": replyType,
-            "messageUid": messageUid,
-            "senderUid": senderUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      case multiMediaType:
-        {
-          return <String, dynamic>{
-            "isRead": isRead,
-            "isReply": isReply,
-            "replyUid": replyUid,
-            "removeMessage": false,
-            "replyType": replyType,
-            "messageUid": messageUid,
-            "senderUid": senderUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      default:
-        {
-          return {};
-        }
-    }
-  }
-
-  Map<String, dynamic> updateHiveMsg({
-
-    required bool isReply,
-    required String senderUid,
-    required String messageUid,
-    required String messageType,
-    required Timestamp timestamp,
-    dynamic mediaPaths,
-    String? messageText,
-    dynamic mediaPathsType,
-    bool removeMessage = false,
-    Map<String, dynamic>? replyMessage,
-  }) {
-    return <String, dynamic>{
-      
-      "isReply": isReply,
-      "mediaPaths": mediaPaths,
-      "messageUid": messageUid,
-      "senderUid": liveUserUid,
-      "messageType": messageType,
-      "messageText": messageText,
-      "replyMessage": replyMessage,
-      "removeMessage": removeMessage,
-      "mediaPathsType": mediaPathsType,
-      "timestamp": timestamp.millisecondsSinceEpoch,
-    };
-  }
-
-  Map<String, dynamic> addHiveMessage({
-    required bool isReply,
-    required String messageUid,
-    required String messageType,
-    required Timestamp timestamp,
-    dynamic mediaPaths,
-    dynamic mediaPathsType,
-    String? messageText,
-    String? imagePath,
-    String? replyUid,
-    String? replyType,
-    Map<String, dynamic>? replyMessage,
-  }) {
-    switch (messageType) {
-      case textType:
-        {
-          return <String, dynamic>{
-            "isReply": isReply,
-            "removeMessage": false,
-            "messageUid": messageUid,
-            "senderUid": liveUserUid,
-            "messageType": messageType,
-            "messageText": messageText,
-            "replyMessage": replyMessage,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-
-      case imageType:
-        {
-          return <String, dynamic>{
-            "isReply": isReply,
-            "removeMessage": false,
-            "messageUid": messageUid,
-            "senderUid": liveUserUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      case videoType:
-        {
-          return <String, dynamic>{
-            "isReply": isReply,
-            "removeMessage": false,
-            "messageUid": messageUid,
-            "senderUid": liveUserUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      case multiMediaType:
-        {
-          return <String, dynamic>{
-            "isReply": isReply,
-            "removeMessage": false,
-            "messageUid": messageUid,
-            "senderUid": liveUserUid,
-            "mediaPaths": mediaPaths,
-            "messageType": messageType,
-            "replyMessage": replyMessage,
-            "mediaPathsType": mediaPathsType,
-            "timestamp": timestamp.millisecondsSinceEpoch,
-          };
-        }
-      default:
-        {
-          return {};
-        }
-    }
-  }
-
   addFirestoreMessage({
     bool isReply = false,
     GeoPoint? location,
     bool isRead = false,
     String? messageText,
-    dynamic mediaUrls,
-    dynamic mediaUrlsType,
+    dynamic mediaURL,
     required String type,
+    bool uploaded = false,
+    final Map? replyMessage,
     required String messageUid,
     required String receiverUid,
     required Timestamp timestamp,
   }) {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     final Map messageMap = {};
-    final Map replyMessageMap = {};
+    messageMap[MessageField.uploaded] = false;
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
-    if (mediaUrls != null) messageMap[MessageField.mediaUrls] = mediaUrls;
-    if (mediaUrlsType != null) {
-      messageMap[MessageField.mediaUrlsType] = mediaUrlsType;
-    }
+    if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
+
     _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
@@ -287,7 +92,7 @@ class ChatService {
       DocumentField.timestamp: timestamp,
       DocumentField.messageUid: messageUid,
       DocumentField.senderUid: liveUserUid,
-      DocumentField.replyMessage: replyMessageMap,
+      DocumentField.replyMessage: replyMessage,
     });
   }
 

@@ -17,7 +17,7 @@ class ChatMessagesViewModel extends StreamViewModel<QuerySnapshot> {
   String conversationId;
 
   final CollectionReference conversationCollection =
-      FirebaseFirestore.instance.collection(conversationFirestorekey);
+      FirebaseFirestore.instance.collection(convoFirestorekey);
 
   Stream<QuerySnapshot> getChats(String conversationId) {
     final unreadMsges = conversationCollection

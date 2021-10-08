@@ -1,13 +1,22 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:hint/constants/message_string.dart';
 import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
+import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 
 class TextFieldViewModel extends BaseViewModel {
   /// If it is true then emojies will display,
@@ -84,36 +93,66 @@ class TextFieldViewModel extends BaseViewModel {
     }
   }
 
-  /// message added in hiveMessages chat list
-  Future<void> saveFileInHive({
-    bool isReply = false,
-    required String filePath,
-    required String messageUid,
-    required String messageType,
-    required String hiveBoxName,
-    required Timestamp messageTime,
-  }) async {
-    const className = 'TextFieldViewModel';
-    final fileType = lookupMimeType(filePath)!.split("/").first;
-    final message = chatService.addHiveMessage(
-      isReply: isReply,
-      mediaPaths: filePath,
-      messageUid: messageUid,
-      timestamp: messageTime,
-      mediaPathsType: fileType,
-      messageType: messageType,
-    );
-    await Hive.box(hiveBoxName).add(message);
-    getLogger(className).wtf(" Message added in hive :$message");
-    final hiveBox = Hive.box('VideoThumbnails[$hiveBoxName]');
-    if (fileType == videoType) {
-      final thumbnail = await VideoThumbnail.thumbnailData(
-        video: filePath,
-        imageFormat: ImageFormat.JPEG,
-      );
-      hiveBox.put(messageUid, thumbnail);
-      final path = hiveBox.get(messageUid);
-      getLogger('VideoMedia').wtf('thumbnail added in hive:$path');
+  Future<void> pickMedias(
+      {required String boxId, required String receiverUid, required BuildContext context}) async {
+    const pickFile = FileType.media;
+    final picker = FilePicker.platform;
+    final result = await picker.pickFiles(type: pickFile, allowMultiple: true);
+    final replyPod = context.read(replyBackProvider);
+    if (result != null) {
+      for (var path in result.paths) {
+        if (path != null) {
+          final uid = const Uuid().v1();
+          final timestamp = Timestamp.now();
+          final mime = lookupMimeType(path);
+          final type = mime!.split('/').first;
+
+          final videoBox = Hive.box('VideoThumbnails[$boxId]');
+          final imagesBox = Hive.box('ImagesMemory[$boxId]');
+          if (type == videoType) {
+            Uint8List? thumbnail = await VideoThumbnail.thumbnailData(
+              video: path,
+              imageFormat: ImageFormat.PNG,
+            ).catchError((e){getLogger('TextField').e('Thumbnail:$e')});
+            if (thumbnail != null) {
+              await videoBox.put(uid, thumbnail);
+              getLogger('TextField').wtf('Thumbnail:${videoBox.get(uid)}');
+            } else {
+              getLogger('TextField').e('Thumbnail is null now!!');
+            }
+          } else if (type == imageType) {
+            Uint8List bytes = await File(path).readAsBytes();
+            await imagesBox.put(uid, bytes);
+            var memoryImage = imagesBox.get(uid);
+            getLogger('TextField').wtf('MemoryImage:$memoryImage');
+          }
+          final replyMsg =  replyPod.message;
+         !replyPod.showReply ? await chatService.addFirestoreMessage(
+            type: type,
+            mediaURL: path,
+            messageUid: uid,
+            timestamp: timestamp,
+            receiverUid: receiverUid,
+          ) :await chatService.addFirestoreMessage(
+            type: type,
+            isReply: true,
+            mediaURL: path,
+            messageUid: uid,
+            timestamp: timestamp,
+            receiverUid: receiverUid,
+            replyMessage: {
+              ReplyField.replyType: replyPod.messageType,
+              ReplyField.replyMessageUid:replyPod.messageUid,
+              ReplyField.replyMediaUrl: replyMsg != null ? replyMsg[MessageField.mediaURL] : null,
+              ReplyField.replyMessageText: replyMsg!= null ? replyMsg[MessageField.messageText]: null,
+            }
+          )  ;
+          
+        } 
+      }
+       replyPod.showReplyBool(false);
+    } else {
+      getLogger('TextFieldView').w('no media was selected');
     }
   }
 }

@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
@@ -10,7 +9,7 @@ import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class ChatViewModel extends StreamViewModel<BoxEvent> {
+class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final TextEditingController _messageTech = TextEditingController();
   TextEditingController get messageTech => _messageTech;
   ChatService chatService = ChatService();
@@ -36,11 +35,18 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
       firebase_storage.FirebaseStorage.instance;
 
   final CollectionReference conversationCollection =
-      FirebaseFirestore.instance.collection(conversationFirestorekey);
+      FirebaseFirestore.instance.collection(convoFirestorekey);
 
-  Stream<BoxEvent> getChats(String conversationId) =>
-      Hive.box(conversationId).watch();
-
+  Stream<QuerySnapshot> getChats(String conversationId) {
+    return conversationCollection
+        .doc(conversationId)
+        .collection(chatsFirestoreKey)
+        .orderBy(
+          DocumentField.timestamp,
+          descending: true
+        )
+        .snapshots();
+  }
   void getMessagesDate(String date) {
     _messagesDate.add(date);
   }
@@ -49,29 +55,7 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
     _messagesTimestamp.add(_timestamp);
   }
 
-  Future<void> updateAProperty({
-    required String messageUid,
-    required Map<String, Object?> data,
-  }) async {
-    try {
-      final query = await conversationCollection
-          .doc(conversationId)
-          .collection('Chat')
-          .where("messageUid", isEqualTo: messageUid)
-          .get();
 
-      // print('Length:${query.docs.length}\n messageUid: $messageUid');
-
-      // getLogger('UpdateAProperty')
-      //     .wtf('Length:${query.docs.length}\n messageUid: $messageUid');
-
-      for (var doc in query.docs) {
-        doc.reference.update(data).whenComplete(() {});
-      }
-    } catch (e) {
-      getLogger('UpdateAProperty Error').e(e);
-    }
-  }
 
   Future<void> seeMsg() async {
     WriteBatch batch = FirebaseFirestore.instance.batch();
@@ -114,5 +98,5 @@ class ChatViewModel extends StreamViewModel<BoxEvent> {
   }
 
   @override
-  Stream<BoxEvent> get stream => getChats(conversationId);
+  Stream<QuerySnapshot> get stream => getChats(conversationId);
 }

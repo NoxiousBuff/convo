@@ -1,29 +1,30 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:hint/app/app_logger.dart';
+import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
-import 'package:hint/app/app_logger.dart';
-import 'dart:io';
-import 'package:hive/hive.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:video_player/video_player.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:string_validator/string_validator.dart';
 
 class HintVideo extends StatefulWidget {
   //make sure that the hive box is already opened
   final String mediaUrl;
-  final String? videoName;
-  final String uuid;
+  final String messageUid;
   final String hiveBoxName;
-  final String? folderPath;
-  final VoidCallback? onTap;
+  final String folderPath;
+  final Uint8List videoThumbnail;
   const HintVideo({
     Key? key,
     required this.mediaUrl,
-    required this.uuid,
+    required this.messageUid,
     required this.hiveBoxName,
     required this.folderPath,
-    this.videoName,
-    this.onTap,
+    required this.videoThumbnail,
   }) : super(key: key);
 
   @override
@@ -31,9 +32,8 @@ class HintVideo extends StatefulWidget {
 }
 
 class _HintVideoState extends State<HintVideo> {
-  bool? hiveContainsPath;
-  bool? isDeleted;
-  String? savedFilePath = '';
+  bool hiveContainsPath = false;
+  late Uint8List videoThumbnail;
   PathHelper pathHelper = PathHelper();
   HiveHelper hiveHelper = HiveHelper();
   DioApi dioApi = DioApi();
@@ -42,17 +42,35 @@ class _HintVideoState extends State<HintVideo> {
 
   @override
   void initState() {
-    hiveContainsPath = Hive.box(widget.hiveBoxName).containsKey(widget.uuid);
-    savedFilePath = Hive.box(widget.hiveBoxName).get(widget.uuid);
-    videoDecider();
-    _playerController = hiveContainsPath ?? false
-        ? VideoPlayerController.file(File(savedFilePath!))
-        : VideoPlayerController.network(widget.mediaUrl);
-    _playerController.setLooping(true);
-    // _playerController.play();
-    _initialiseVideoPlayer = _playerController.initialize();
+    var hiveBox = Hive.box(widget.hiveBoxName);
+    setState(() {
+      videoThumbnail = widget.videoThumbnail;
+      hiveContainsPath = hiveBox.containsKey(widget.messageUid);
+    });
 
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    var hiveBox = Hive.box(widget.hiveBoxName);
+    if (!hiveContainsPath) {
+      if (isURL(widget.mediaUrl)) {
+        getLogger('HintVideo').wtf('MediaURL:${widget.mediaUrl}');
+        await pathHelper.saveMediaAtPath(
+          mediaUrl: widget.mediaUrl,
+          messageUid: widget.messageUid,
+          folderPath: widget.folderPath,
+          hiveBoxName: widget.hiveBoxName,
+          mediaName: '${widget.messageUid}.mp4',
+        );
+      }
+    } else {
+      _playerController =
+          VideoPlayerController.file(File(hiveBox.get(widget.messageUid)));
+      _initialiseVideoPlayer = _playerController.initialize();
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -61,86 +79,33 @@ class _HintVideoState extends State<HintVideo> {
     super.dispose();
   }
 
-  void generalWorker() async {
-    await pathHelper.saveMediaAtPath(
-      folderPath: widget.folderPath ?? 'Videos/Samples',
-      mediaName: widget.videoName ?? widget.uuid,
-      mediaUrl: widget.mediaUrl,
-      uuid: widget.uuid,
-      hiveBoxName: widget.hiveBoxName,
-    );
-  }
-
-  void videoDecider() async {
-    if (hiveContainsPath!) {
-      if (await File(savedFilePath!).exists()) {
-        setState(() {
-          isDeleted = false;
-        });
-        getLogger('Hint Video').wtf('Path of the value given does exist');
-      } else {
-        setState(() {
-          isDeleted = true;
-        });
-        getLogger('Hint Video').wtf(
-            'Path of the value does not exist.\n Here is the function starts.');
-        generalWorker();
-        getLogger('Hint Video').wtf('Here functions ends');
-      }
-    } else {
-      getLogger('Hint Video').wtf('This is the middle else that is been printed.');
-      setState(() {
-        isDeleted = false;
-      });
-      generalWorker();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return hiveContainsPath ?? false
-        ? isDeleted ?? false
-            ? Center(
-                child: TextButton(
-                  onPressed: () {
-                    generalWorker();
-                  },
-                  child: const Text('Download Again'),
-                ),
-              )
-            : Column(
-                children: [
-                  FutureBuilder(
-                    future: _initialiseVideoPlayer,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return AspectRatio(
-                          aspectRatio: _playerController.value.aspectRatio,
-                          child: VideoPlayer(_playerController),
-                        );
-                      }
-                      return const CupertinoActivityIndicator();
-                    },
-                  ),
-                  const Text(' This is from Hive')
-                ],
-              )
-        : Column(
-            children: [
-              FutureBuilder(
-                future: _initialiseVideoPlayer,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return AspectRatio(
-                      aspectRatio: _playerController.value.aspectRatio,
-                      child: VideoPlayer(_playerController),
-                    );
-                  }
-                  return const CupertinoActivityIndicator();
-                },
-              ),
-              const Text(' This is from Network.')
-            ],
+    switch (hiveContainsPath) {
+      case true:
+        {
+          return FutureBuilder(
+            future: _initialiseVideoPlayer,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return AspectRatio(
+                  aspectRatio: _playerController.value.aspectRatio,
+                  child: VideoPlayer(_playerController),
+                );
+              }
+              return const CupertinoActivityIndicator();
+            },
           );
+        }
+
+      case false:
+        {
+          return ExtendedImage.memory(widget.videoThumbnail);
+        }
+      default:
+        {
+          return const SizedBox.shrink();
+        }
+    }
   }
 }

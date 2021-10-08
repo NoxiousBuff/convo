@@ -1,43 +1,44 @@
 class DocumentField {
+  static const String type = 'type';
   static const String isRead = 'isRead';
   static const String isReply = 'isReply';
   static const String message = 'message';
-  static const String messageUid = 'messageUid';
-  static const String replyMessage = 'replyMessage';
   static const String senderUid = 'senderUid';
   static const String timestamp = 'timestamp';
-  static const String type = 'type';
+  static const String messageUid = 'messageUid';
+  static const String replyMessage = 'replyMessage';
 }
 
 class MessageField {
+  static const String uploaded = 'uploaded';
   static const String location = 'location';
+  static const String mediaURL = 'mediaURL';
   static const String timestamp = 'timestamp';
-  static const String mediaUrls = 'mediaUrls';
   static const String messageText = 'messageText';
-  static const String mediaUrlsType = 'mediaUrlsType';
 }
 
 class ReplyField {
   static const String replyType = 'replyType';
-  static const String replyMessageText = 'replyMessageText';
+  static const String replyLocation = 'replyLocation';
   static const String replyMediaUrl = 'replyMediaUrl';
   static const String replyMediaList = 'replyMediaList';
   static const String replyMediaType = 'replyMediaType';
-  static const String replyLocation = 'replyLocation';
-  static const String replyMessageUid = 'replyMessageUid';
   static const String replySenderUid = 'replySenderUid';
+  static const String replyMessageUid = 'replyMessageUid';
+  static const String replyMessageText = 'replyMessageText';
 }
 
 class MediaType {
+  static const String pdf = 'pdf';
+  static const String url = 'URL';
   static const String text = 'text';
   static const String image = 'image';
   static const String video = 'video';
   static const String audio = 'audio';
-  static const String pdf = 'pdf';
-  static const String multiMedia = 'multiMedia';
-  static const String url = 'URL';
-  static const String dickster = 'dickster';
   static const String emoji = 'emoji';
+  static const String dickster = 'dickster';
+  static const String multiMedia = 'multiMedia';
+  static const String canvasImage = 'canvasImage';
 }
 
 class MsgRead {
