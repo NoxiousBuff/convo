@@ -12,13 +12,11 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/shared/pixaBay/pixabay.dart';
 import 'package:hint/ui/shared/memes/meme_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
-import 'package:string_validator/string_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/shared/emojies/emojie_view.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -51,6 +49,7 @@ class HintTextField extends StatefulWidget {
 }
 
 class _HintTextFieldState extends State<HintTextField> {
+  final log = getLogger('TextFieldView');
   final TextEditingController messageTech = TextEditingController();
   bool isWriting = false;
   bool optionOpened = false;
@@ -191,82 +190,74 @@ class _HintTextFieldState extends State<HintTextField> {
     }
   }
 
-  Widget textField() {
+  Widget textField(TextFieldViewModel model) {
     return SizedBox(
       height: 40,
-      child: CupertinoTextField(
-        minLines: 1,
-        maxLines: 6,
-        controller: messageTech,
-        placeholder: 'Text Message',
-        focusNode: widget.focusNode,
-        style: const TextStyle(color: Colors.black),
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        placeholderStyle: const TextStyle(color: Colors.black38),
-        onChanged: (val) {
-          (val.isNotEmpty && val.trim() != "")
-              ? setWritingTo(true)
-              : setWritingTo(false);
-        },
-        suffix: Consumer(
-          builder: (context, watch, child) {
-            final replyPod = watch(replyBackProvider);
-            return CupertinoButton(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Text(
-                'Send',
-                style: TextStyle(
-                  color: !isWriting
-                      ? Colors.black38
-                      : const Color.fromRGBO(10, 132, 255, 1),
+      child: OfflineBuilder(
+          child: const Text(''),
+          connectivityBuilder: (context, connectivity, child) {
+            bool connected = connectivity != ConnectivityResult.none;
+            return CupertinoTextField(
+              minLines: 1,
+              maxLines: 6,
+              controller: messageTech,
+              placeholder: 'Text Message',
+              focusNode: widget.focusNode,
+              style: const TextStyle(color: Colors.black),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              placeholderStyle: const TextStyle(color: Colors.black38),
+              onChanged: (val) async {
+                (val.isNotEmpty && val.trim() != "")
+                    ? setWritingTo(true)
+                    : setWritingTo(false);
+                // if (isURL(val) && connected) {
+                //   final urlDataPod = context.read(urlDataProvider);
+                //   final extractedData = await MetadataFetch.extract(val);
+                //   if (extractedData != null) {
+                //     final previewImage = extractedData.image;
+                //     http.Response response = await http
+                //         .get(Uri.parse(previewImage!))
+                //         .catchError((e) {
+                //       log.e(e);
+                //     });
+                //     log.wtf('URLImage:${response.bodyBytes}');
+                //     final urlData = <String, dynamic>{
+                //       'url': extractedData.url,
+                //       'title': extractedData.title,
+                //       'previewImage': response.bodyBytes,
+                //       'discription': extractedData.description,
+                //     };
+                //     urlDataPod.getURLData(urlData);
+                //   }
+                // }
+              },
+              suffix: CupertinoButton(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Text(
+                  'Send',
+                  style: TextStyle(
+                    color: !isWriting
+                        ? Colors.black38
+                        : const Color.fromRGBO(10, 132, 255, 1),
+                  ),
                 ),
+                onPressed: !isWriting
+                    ? null
+                    : model.textFieldMessage(
+                        context: context,
+                        connected: connected,
+                        controller: messageTech,
+                        receiverUid: widget.receiverUid,
+                        conversationId: widget.conversationId),
               ),
-              onPressed: !isWriting
-                  ? null
-                  : () async {
-                      final timestamp = Timestamp.now();
-                      String messageUid = const Uuid().v1();
-                      bool isUrl = isURL(messageTech.text);
-                      var replyMsg = replyPod.message;
-                      !replyPod.showReply
-                          ? await chatService.addFirestoreMessage(
-                              timestamp: timestamp,
-                              messageUid: messageUid,
-                              messageText: messageTech.text,
-                              receiverUid: widget.receiverUid,
-                              type: isUrl ? urlType : textType,
-                            )
-                          : await chatService.addFirestoreMessage(
-                              isReply: true,
-                              timestamp: timestamp,
-                              messageUid: messageUid,
-                              messageText: messageTech.text,
-                              receiverUid: widget.receiverUid,
-                              type: isUrl ? urlType : textType,
-                              replyMessage: {
-                                ReplyField.replyType: replyPod.messageType,
-                                ReplyField.replyMessageUid: replyPod.messageUid,
-                                ReplyField.replyMediaUrl: replyMsg != null
-                                    ? replyMsg[MessageField.mediaURL]
-                                    : null,
-                                ReplyField.replyMessageText: replyMsg != null
-                                    ? replyMsg[MessageField.messageText]
-                                    : null,
-                              },
-                            );
-                      messageTech.clear();
-                      replyPod.showReplyBool(false);
-                    },
+              textAlign: TextAlign.start,
+              keyboardType: TextInputType.multiline,
+              keyboardAppearance: Brightness.light,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
             );
-          },
-        ),
-        textAlign: TextAlign.start,
-        keyboardType: TextInputType.multiline,
-        keyboardAppearance: Brightness.light,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
+          }),
     );
   }
 
@@ -314,7 +305,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                 : const SizedBox.shrink();
                           },
                         ),
-                        textField(),
+                        textField(model),
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

@@ -60,6 +60,7 @@ dependencies:
   hive_flutter: ^1.0.0
   sensors_plus: ^1.0.1
   path_provider: ^2.0.2
+  metadata_fetch: ^0.4.1
   image_picker: ^0.8.4+2
   video_thumbnail: ^0.4.3
   json_annotation: ^4.1.0

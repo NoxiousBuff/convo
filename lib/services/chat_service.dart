@@ -23,6 +23,7 @@ class ChatService {
       BuildContext context, FireUser fireUser, Color randomColor) async {
     String conversationId = getConversationId(fireUser.id, liveUserUid);
     await Hive.openBox(conversationId);
+    await Hive.openBox('UrlData[$conversationId]');
     await Hive.openBox('ImagesMemory[$conversationId]');
     await Hive.openBox("ChatRoomMedia[$conversationId]");
     await Hive.openBox('ThumbnailsPath[$conversationId]');

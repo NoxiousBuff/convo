@@ -106,7 +106,7 @@ class ImageMedia extends StatelessWidget {
     final filePath = message.message[MessageField.mediaURL];
     var hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
     final border = Border.all(
-        color: isRead ? extraLightBackgroundGray : unreadMsg, width: 5);
+        color: isRead ? iconColor : unreadMsg, width: 5);
     final decoration = BoxDecoration(border: border, borderRadius: radius);
     return ViewModelBuilder<ImageViewModel>.reactive(
       viewModelBuilder: () => ImageViewModel(),

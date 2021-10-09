@@ -51,6 +51,7 @@ class ChatView extends StatelessWidget {
       },
       onDispose: (model) async {
         await Hive.box(conversationId).close();
+        await Hive.box('UrlData[$conversationId]').close();
         await Hive.box('ImagesMemory[$conversationId]').close();
         await Hive.box("ChatRoomMedia[$conversationId]").close();
         await Hive.box('ThumbnailsPath[$conversationId]').close();

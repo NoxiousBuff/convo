@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'dart:collection';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/ui/components/media/chat_bubble/chat_bubble.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble_border.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
 import 'package:hive/hive.dart';
@@ -28,143 +27,146 @@ class ReplyMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.caption;
-    const mainAxisEnd = MainAxisAlignment.end;
-    const youReply = 'you replied to yourself';
-    const crossAxisEnd = CrossAxisAlignment.end;
-    const mainAxisStart = MainAxisAlignment.start;
-    const crossAxisStart = CrossAxisAlignment.start;
-    final userReply = '${fireUser.username} replied to you';
-    final maxWidth = screenWidthPercentage(context, percentage: 0.7);
+    final borderRadius = BorderRadius.circular(4);
+    //final style = Theme.of(context).textTheme.caption;
+    // const mainAxisEnd = MainAxisAlignment.end;
+    //const youReply = 'you replied to yourself';
+    //const crossAxisEnd = CrossAxisAlignment.end;
+    //const mainAxisStart = MainAxisAlignment.start;
+    //const crossAxisStart = CrossAxisAlignment.start;
+    //final userReply = '${fireUser.username} replied to you';
+    //final maxWidth = screenWidthPercentage(context, percentage: 0.7);
     final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
-    Widget replyDetector(BuildContext context) {
-      switch (replyMessage[ReplyField.replyType]) {
-        case MediaType.text:
-          {
-            return Container(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 10, 8),
-                child: Text(
-                  replyMessage[ReplyField.replyMessageText],
-                  maxLines: 3,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(fontSize: 12),
-                ),
-              ),
-            );
-          }
-        case MediaType.emoji:
-          {
-            final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
-            return Container(
-              padding: const EdgeInsets.only(bottom: 10),
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
-              child: ExtendedImage(
-                fit: BoxFit.contain,
-                enableMemoryCache: true,
-                handleLoadingProgress: true,
-                image: MemoryImage(hiveBox.get(messageUid)),
-              ),
-            );
-          }
-        case MediaType.image:
-          {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(4, 10, 8, 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.photo, color: iconColor, size: 20),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Photo',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 12),
-                  ),
-                ],
-              ),
-            );
-          }
-        case MediaType.video:
-          {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    CupertinoIcons.videocam,
-                    color: iconColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Video',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 12),
-                  ),
-                ],
-              ),
-            );
-          }
-        case MediaType.canvasImage:
-          {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(CupertinoIcons.scribble,
-                      color: iconColor, size: 20),
-                  const SizedBox(width: 5),
-                  Text(
-                    'CanvasImage',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 12),
-                  ),
-                ],
-              ),
-            );
-          }
-        case MediaType.url:
-          {
-            return Container(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                child: Text(
-                  replyMessage[ReplyField.replyMessageText],
-                  maxLines: 2,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(fontSize: 12),
-                ),
-              ),
-            );
-          }
+    final textStyle =
+        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
+    // Widget replyDetector(BuildContext context) {
+    //   switch (replyMessage[ReplyField.replyType]) {
+    //     case MediaType.text:
+    //       {
+    //         return Container(
+    //           constraints: BoxConstraints(maxWidth: maxWidth),
+    //           child: Padding(
+    //             padding: const EdgeInsets.fromLTRB(8, 8, 10, 8),
+    //             child: Text(
+    //               replyMessage[ReplyField.replyMessageText],
+    //               maxLines: 3,
+    //               softWrap: false,
+    //               overflow: TextOverflow.ellipsis,
+    //               style: Theme.of(context)
+    //                   .textTheme
+    //                   .bodyText2!
+    //                   .copyWith(fontSize: 12),
+    //             ),
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.emoji:
+    //       {
+    //         final messageUid = replyMessage[ReplyField.replyMessageUid];
+    //         final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+    //         return Container(
+    //           padding: const EdgeInsets.only(bottom: 10),
+    //           margin: const EdgeInsets.symmetric(horizontal: 8),
+    //           constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
+    //           child: ExtendedImage(
+    //             fit: BoxFit.contain,
+    //             enableMemoryCache: true,
+    //             handleLoadingProgress: true,
+    //             image: MemoryImage(hiveBox.get(messageUid)),
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.image:
+    //       {
+    //         return Padding(
+    //           padding: const EdgeInsets.fromLTRB(4, 10, 8, 0),
+    //           child: Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               const Icon(Icons.photo, color: iconColor, size: 20),
+    //               const SizedBox(width: 5),
+    //               Text(
+    //                 'Photo',
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyText2!
+    //                     .copyWith(fontSize: 12),
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.video:
+    //       {
+    //         return Padding(
+    //           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+    //           child: Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               const Icon(
+    //                 CupertinoIcons.videocam,
+    //                 color: iconColor,
+    //                 size: 20,
+    //               ),
+    //               const SizedBox(width: 5),
+    //               Text(
+    //                 'Video',
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyText2!
+    //                     .copyWith(fontSize: 12),
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.canvasImage:
+    //       {
+    //         return Padding(
+    //           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+    //           child: Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               const Icon(CupertinoIcons.scribble,
+    //                   color: iconColor, size: 20),
+    //               const SizedBox(width: 5),
+    //               Text(
+    //                 'CanvasImage',
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyText2!
+    //                     .copyWith(fontSize: 12),
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.url:
+    //       {
+    //         return Container(
+    //           constraints: BoxConstraints(maxWidth: maxWidth),
+    //           child: Padding(
+    //             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+    //             child: Text(
+    //               replyMessage[ReplyField.replyMessageText],
+    //               maxLines: 2,
+    //               softWrap: false,
+    //               overflow: TextOverflow.ellipsis,
+    //               style: Theme.of(context)
+    //                   .textTheme
+    //                   .bodyText2!
+    //                   .copyWith(fontSize: 12),
+    //             ),
+    //           ),
+    //         );
+    //       }
 
-        default:
-          {
-            return const SizedBox.shrink();
-          }
-      }
-    }
+    //     default:
+    //       {
+    //         return const SizedBox.shrink();
+    //       }
+    //   }
+    // }
 
     // RegExp exp = RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+',
     //     caseSensitive: false);
@@ -178,79 +180,79 @@ class ReplyMedia extends StatelessWidget {
     //   viewModel.replyMediaURLMatch(messageTextURL);
     // });
 
-    Widget mediaDetector(BuildContext context) {
-      switch (replyMessage[ReplyField.replyType]) {
-        case MediaType.text:
-          {
-            return const SizedBox.shrink();
-          }
-        case MediaType.emoji:
-          {
-            return const SizedBox.shrink();
-          }
-        case MediaType.image:
-          {
-            final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
-            return Container(
-              margin: const EdgeInsets.only(left: 16),
-              constraints: const BoxConstraints(maxHeight: 40, maxWidth: 80),
-              child: ExtendedImage(
-                fit: BoxFit.contain,
-                enableMemoryCache: true,
-                handleLoadingProgress: true,
-                image: MemoryImage(hiveBox.get(messageUid)),
-              ),
-            );
-          }
-        case MediaType.video:
-          {
-            final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  ExtendedImage(
-                    fit: BoxFit.contain,
-                    enableMemoryCache: true,
-                    handleLoadingProgress: true,
-                    image: MemoryImage(hiveBox.get(messageUid)),
-                  ),
-                  const Icon(CupertinoIcons.videocam,
-                      color: systemBackground, size: 20)
-                ],
-              ),
-            );
-          }
-        case MediaType.canvasImage:
-          {
-            final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
-              child: ExtendedImage(
-                fit: BoxFit.contain,
-                enableMemoryCache: true,
-                handleLoadingProgress: true,
-                image: MemoryImage(hiveBox.get(messageUid)),
-              ),
-            );
-          }
-        case MediaType.url:
-          {
-            return const SizedBox.shrink();
-          }
+    // Widget mediaDetector(BuildContext context) {
+    //   switch (replyMessage[ReplyField.replyType]) {
+    //     case MediaType.text:
+    //       {
+    //         return const SizedBox.shrink();
+    //       }
+    //     case MediaType.emoji:
+    //       {
+    //         return const SizedBox.shrink();
+    //       }
+    //     case MediaType.image:
+    //       {
+    //         final messageUid = replyMessage[ReplyField.replyMessageUid];
+    //         final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+    //         return Container(
+    //           margin: const EdgeInsets.only(left: 16),
+    //           constraints: const BoxConstraints(maxHeight: 40, maxWidth: 80),
+    //           child: ExtendedImage(
+    //             fit: BoxFit.contain,
+    //             enableMemoryCache: true,
+    //             handleLoadingProgress: true,
+    //             image: MemoryImage(hiveBox.get(messageUid)),
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.video:
+    //       {
+    //         final messageUid = replyMessage[ReplyField.replyMessageUid];
+    //         final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+    //         return Container(
+    //           margin: const EdgeInsets.symmetric(horizontal: 8),
+    //           constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
+    //           child: Stack(
+    //             alignment: Alignment.center,
+    //             children: [
+    //               ExtendedImage(
+    //                 fit: BoxFit.contain,
+    //                 enableMemoryCache: true,
+    //                 handleLoadingProgress: true,
+    //                 image: MemoryImage(hiveBox.get(messageUid)),
+    //               ),
+    //               const Icon(CupertinoIcons.videocam,
+    //                   color: systemBackground, size: 20)
+    //             ],
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.canvasImage:
+    //       {
+    //         final messageUid = replyMessage[ReplyField.replyMessageUid];
+    //         final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+    //         return Container(
+    //           margin: const EdgeInsets.symmetric(horizontal: 8),
+    //           constraints: const BoxConstraints(maxHeight: 60, maxWidth: 80),
+    //           child: ExtendedImage(
+    //             fit: BoxFit.contain,
+    //             enableMemoryCache: true,
+    //             handleLoadingProgress: true,
+    //             image: MemoryImage(hiveBox.get(messageUid)),
+    //           ),
+    //         );
+    //       }
+    //     case MediaType.url:
+    //       {
+    //         return const SizedBox.shrink();
+    //       }
 
-        default:
-          {
-            return const SizedBox.shrink();
-          }
-      }
-    }
+    //     default:
+    //       {
+    //         return const SizedBox.shrink();
+    //       }
+    //   }
+    // }
 
     Widget replyWidget() {
       switch (replyMessage[ReplyField.replyType]) {
@@ -271,10 +273,7 @@ class ReplyMedia extends StatelessWidget {
                     maxLines: 3,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 12),
+                    style: textStyle,
                   ),
                 ),
               ),
@@ -297,10 +296,7 @@ class ReplyMedia extends StatelessWidget {
                     maxLines: 3,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 12),
+                    style: textStyle,
                   ),
                 ),
               ),
@@ -323,14 +319,17 @@ class ReplyMedia extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: ExtendedImage(
-                          fit: BoxFit.cover,
-                          enableMemoryCache: true,
-                          handleLoadingProgress: true,
-                          image: MemoryImage(hiveBox.get(messageUid)),
+                      ClipRRect(
+                        borderRadius: borderRadius,
+                        child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: ExtendedImage(
+                            fit: BoxFit.cover,
+                            enableMemoryCache: true,
+                            handleLoadingProgress: true,
+                            image: MemoryImage(hiveBox.get(messageUid)),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -339,10 +338,7 @@ class ReplyMedia extends StatelessWidget {
                         maxLines: 3,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText2!
-                            .copyWith(fontSize: 12),
+                        style: textStyle,
                       ),
                     ],
                   ),
@@ -370,14 +366,17 @@ class ReplyMedia extends StatelessWidget {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: ExtendedImage(
-                              fit: BoxFit.cover,
-                              enableMemoryCache: true,
-                              handleLoadingProgress: true,
-                              image: MemoryImage(hiveBox.get(messageUid)),
+                          ClipRRect(
+                            borderRadius: borderRadius,
+                            child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: ExtendedImage(
+                                fit: BoxFit.cover,
+                                enableMemoryCache: true,
+                                handleLoadingProgress: true,
+                                image: MemoryImage(hiveBox.get(messageUid)),
+                              ),
                             ),
                           ),
                           const Icon(Icons.play_arrow,
@@ -390,10 +389,7 @@ class ReplyMedia extends StatelessWidget {
                         maxLines: 3,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText2!
-                            .copyWith(fontSize: 12),
+                        style: textStyle,
                       ),
                     ],
                   ),
@@ -401,7 +397,7 @@ class ReplyMedia extends StatelessWidget {
               ),
             );
           }
-          case MediaType.canvasImage:
+        case MediaType.canvasImage:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
             final hiveBox = Hive.box('ImagesMemory[$conversationId]');
@@ -434,10 +430,7 @@ class ReplyMedia extends StatelessWidget {
                         maxLines: 3,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText2!
-                            .copyWith(fontSize: 12),
+                        style: textStyle,
                       ),
                     ],
                   ),

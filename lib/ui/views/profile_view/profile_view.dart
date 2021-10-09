@@ -116,6 +116,7 @@ class ProfileView extends StatelessWidget {
                     Navigator.pop(context);
                     await model.clearChat();
                     await Hive.box(conversationId).clear();
+                    await Hive.box('UrlData[$conversationId]').clear();
                     await Hive.box('ImagesMemory[$conversationId]').clear();
                     await Hive.box("ChatRoomMedia[$conversationId]").clear();
                     await Hive.box('VideoThumbnails[$conversationId]').clear();

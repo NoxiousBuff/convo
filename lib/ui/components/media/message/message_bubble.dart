@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:hint/ui/components/media/url/url_preview.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -95,11 +96,24 @@ class MessageBubble extends StatelessWidget {
             messageText: message.message[MessageField.messageText],
           );
         }
+      case MediaType.url:
+        {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: URLPreview(
+              isMe: isMe,
+              isRead: isRead,
+              conversationId: conversationId,
+              messageUid: message.messageUid,
+              url: message.message[MessageField.messageText],
+            ),
+          );
+        }
       case MediaType.canvasImage:
         {
           final hiveBox = Hive.box('ImagesMemory[$conversationId]');
-          List<int> imageData =
-              hiveBox.get(message.messageUid).cast<int>().toList();
+          final data = hiveBox.get(message.messageUid);
+          final imageData = data.cast<int>().toList();
           return CanvasImage(
             message: message,
             messageBubbleModel: model,
@@ -146,7 +160,7 @@ class MessageBubble extends StatelessWidget {
             getLogger('MsgBubble').wtf('Message${replyRiverPod.message}');
           },
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: message.isReply ? 8 : 2),
+            margin: EdgeInsets.symmetric(vertical: message.isReply ? 10 : 4),
             child: Column(
               mainAxisAlignment: mainAxis,
               crossAxisAlignment: crossAxis,
@@ -166,7 +180,6 @@ class MessageBubble extends StatelessWidget {
                   isRead: message.isRead,
                   messageType: message.type,
                 ),
-                
               ],
             ),
           ),

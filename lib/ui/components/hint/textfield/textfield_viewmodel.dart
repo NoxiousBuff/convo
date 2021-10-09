@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:hint/constants/message_string.dart';
 import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
@@ -13,12 +12,17 @@ import 'package:file_picker/file_picker.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 
+
 class TextFieldViewModel extends BaseViewModel {
+  final log = getLogger('TextFieldViewModel');
+
   /// If it is true then emojies will display,
   bool _blackEmojie = false;
   bool get blackEmojie => _blackEmojie;
@@ -92,6 +96,62 @@ class TextFieldViewModel extends BaseViewModel {
       getLogger('ChatViewModel').wtf('pickVideo | Video was not recorded');
     }
   }
+
+  void Function() textFieldMessage({
+  required bool connected,
+  required String receiverUid,
+  required BuildContext context, 
+  required String conversationId,
+  required TextEditingController controller,
+   }) => ()async{
+     final timestamp = Timestamp.now();
+     final replyPod = context.read(replyBackProvider);
+     String messageUid = const Uuid().v1();
+     bool isUrl = isURL(controller.text);
+     var replyMsg = replyPod.message;
+     !replyPod.showReply
+         ? await chatService.addFirestoreMessage(
+             timestamp: timestamp,
+             messageUid: messageUid,
+             receiverUid: receiverUid,
+             messageText: controller.text,
+             type: isUrl ? urlType : textType,
+           )
+         : await chatService.addFirestoreMessage(
+             isReply: true,
+             timestamp: timestamp,
+             messageUid: messageUid,
+             receiverUid: receiverUid,
+             messageText: controller.text,
+             type: isUrl ? urlType : textType,
+             replyMessage: {
+               ReplyField.replyType: replyPod.messageType,
+               ReplyField.replyMessageUid: replyPod.messageUid,
+               ReplyField.replyMediaUrl: replyMsg != null
+                   ? replyMsg[MessageField.mediaURL]
+                   : null,
+               ReplyField.replyMessageText: replyMsg != null
+                   ? replyMsg[MessageField.messageText]
+                   : null,
+             },
+           );
+  // if(isUrl){
+  //   final data = urlDataPod.urlPreviewData;
+  //   if(data != null){
+  //   final hiveBox = Hive.box('UrlData[$conversationId]');
+  //    await hiveBox.put(messageUid, data);
+  //    log.wtf(hiveBox.get(messageUid));
+  //    urlDataPod.removeURLData();
+  //   }else{
+  //     log.w('URLData is null now !!');
+  //   }
+  // }
+  controller.clear();
+  replyPod.showReplyBool(false);
+    
+   };
+
+
 
   Future<void> pickMedias(
       {required String boxId, required String receiverUid, required BuildContext context}) async {
