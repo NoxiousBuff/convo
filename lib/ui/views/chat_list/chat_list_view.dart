@@ -257,62 +257,13 @@ class ChatListView extends StatelessWidget {
           );
         }
 
-        // final Color randomColor = Color.fromARGB(
-        //   Random().nextInt(256),
-        //   Random().nextInt(256),
-        //   Random().nextInt(256),
-        //   Random().nextInt(256),
-        // );
-
         List<UserListItem> userResults = [];
 
         for (var document in model.data!.docs) {
-          // log.i(document);
-          // FireUser fireUser = FireUser.fromFirestore(document);
-          // log.w(fireUser);
-          // UserItem userResult = UserItem(
-          //   fireUser: fireUser,
-          //   onTap: () {
-          //     model.chatService
-          //         .startConversation(context, fireUser, randomColor);
-          //   },
-          // );
-          // userResults.add(userResult);
-          // log.wtf(userResults);
-          UserListItem userListItem = UserListItem(userUid: document.get('userUid'));
+          UserListItem userListItem =
+              UserListItem(userUid: document.get('userUid'));
           userResults.add(userListItem);
         }
-        // log.w('Future loop started');
-        // Future.forEach<QueryDocumentSnapshot>(model.data!.docs,
-        //     (element) async {
-        //   try {
-        //     log.wtf('The $element started here');
-        //     final userDoc = await FirebaseFirestore.instance
-        //         .collection(subsFirestoreKey)
-        //         .doc(element.get('userUid'))
-        //         .get();
-        //     log.w('userDoc : ${userDoc.get('email')}');
-        //     FireUser fireUser = FireUser.fromFirestore(userDoc);
-        //     log.wtf(fireUser.id);
-        //     UserItem userResult = UserItem(
-        //         fireUser: fireUser,
-        //         onTap: () {
-        //           model.chatService
-        //               .startConversation(context, fireUser, randomColor);
-        //         });
-        //     log.i('UserResult has not been added');
-        //     userResults.add(userResult);
-        //     log.d(userResults);
-        //     log.i('UserResult has been added');
-        //     log.wtf('The $userDoc ended here');
-        //   } catch (e) {
-        //     log.e(e);
-        //   }
-        // });
-
-        // log.w('Future loop ended');
-        // String hjkhjkhjk = userResults.length.toString();
-        // log.d(hjkhjkhjk);
 
         return userResults.isNotEmpty
             ? ListView(
@@ -323,6 +274,19 @@ class ChatListView extends StatelessWidget {
             : const Center(
                 child: Text('fbdjskfbjfdsbjxdbnvfbhsdjvkb'),
               );
+
+        // return userResults.isNotEmpty
+        //     ? ImplicitlyAnimatedReorderableList<UserListItem>(
+        //         items: userResults,
+        //         itemBuilder: (context, animationIndex, animation, index) {},
+        //         areItemsTheSame: (a, b) => a.userUid == b.userUid,
+        //         onReorderFinished: (a, x, y, userResultsList) {
+        //           return ;
+        //         },
+        //       )
+        //     : const Center(
+        //         child: Text('fbdjskfbjfdsbjxdbnvfbhsdjvkb'),
+        //       );
       },
     );
   }
