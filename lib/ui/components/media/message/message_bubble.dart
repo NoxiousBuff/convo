@@ -53,7 +53,7 @@ class MessageBubble extends StatelessWidget {
     bool isMe = liveUserUid == messageData.senderUid;
     // final replyProvider = Provider.of<ReplyProvider>(context, listen: false);
     return Row(
-      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment: isMe ? MainAxisAlignment.start : MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
       children: [
         Column(

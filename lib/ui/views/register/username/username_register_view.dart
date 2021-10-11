@@ -127,7 +127,7 @@ class UsernameRegisterView extends StatelessWidget {
                                       context,
                                       CupertinoPageRoute(
                                           builder: (context) =>
-                                              const ChatListView()));
+                                               ChatListView()));
                                 });
                               }
                             },

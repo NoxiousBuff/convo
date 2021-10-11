@@ -5,6 +5,7 @@ const String usersFirestoreKey = 'users';
 const String conversationFirestorekey = 'convo';
 const String chatsFirestoreKey = 'Chat';
 const String subsFirestoreKey = 'subs';
+const String recentFirestoreKey = 'recentList';
 
 //default folders
 const String defaultImagesFolder = 'Images/Samples';

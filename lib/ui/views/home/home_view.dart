@@ -38,11 +38,11 @@ class _HomeViewState extends State<HomeView> {
             case 0:
               return const MainView();
             case 1:
-              return const ChatListView();
+              return  ChatListView();
             case 2:
               return const SocialView();
             default:
-              return const ChatListView();
+              return  ChatListView();
           }
         },
       ),

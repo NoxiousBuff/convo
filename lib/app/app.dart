@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         title: appName,
         theme: ThemeData(),
         home: FirebaseAuth.instance.currentUser != null
-            ? const ChatListView()
+            ?  ChatListView()
             : const EmailRegisterView(),
       );
   }

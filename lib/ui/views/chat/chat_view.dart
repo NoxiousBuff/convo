@@ -54,21 +54,21 @@ class ChatView extends StatelessWidget {
       final messages = model.data!.docs;
       return messages.isNotEmpty
           ? ListView.builder(
-            reverse: true,
-            padding: const EdgeInsets.symmetric(
-                vertical: 20.0, horizontal: 20.0),
-            controller: model.scrollController,
-            physics: const BouncingScrollPhysics(),
-            itemCount: model.data!.docs.length,
-            itemBuilder: (context, index) {
-              return MessageBubble(
-                context: context,
-                messageData: NewMessage.fromFirestore(
-                  model.data!.docs[index],
-                ),
-              );
-            },
-          )
+              reverse: true,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+              controller: model.scrollController,
+              physics: const BouncingScrollPhysics(),
+              itemCount: model.data!.docs.length,
+              itemBuilder: (context, index) {
+                return MessageBubble(
+                  context: context,
+                  messageData: NewMessage.fromFirestore(
+                    model.data!.docs[index],
+                  ),
+                );
+              },
+            )
           : const Center(
               child: SizedBox(
                 child: Text(
@@ -86,6 +86,7 @@ class ChatView extends StatelessWidget {
       onModelReady: (model) {
         model.scrollController = ScrollController();
       },
+      onDispose: (model) => model.onDispose(),
       builder: (context, model, child) => GestureDetector(
         onTap: () {
           MediaQuery.of(context).viewInsets.bottom == 0
@@ -102,7 +103,8 @@ class ChatView extends StatelessWidget {
           backgroundColor: CupertinoColors.white,
           appBar: AppBar(
             systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarBrightness: Brightness.dark),
+              statusBarIconBrightness: Brightness.dark,
+            ),
             elevation: 0.0,
             //I could also use Cupertino Back Button
             leading: IconButton(
@@ -151,7 +153,8 @@ class ChatView extends StatelessWidget {
               Container(
                 height: 15,
                 width: double.infinity,
-                color: Color.alphaBlend(randomColor.withAlpha(20), Colors.white),
+                color:
+                    Color.alphaBlend(randomColor.withAlpha(20), Colors.white),
               )
             ],
           ),
