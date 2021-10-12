@@ -5,6 +5,7 @@ import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
@@ -23,9 +24,12 @@ class CanvasImageViewModel extends BaseViewModel {
       required MessageBubbleViewModel model}) async {
     final downloadURL = await model
         .uploadData(
-            data: data, messageUid: messageUid, conversationId: conversationId,)
+      data: data,
+      messageUid: messageUid,
+      conversationId: conversationId,
+    )
         .whenComplete(() {
-      getLogger('CanvasImageViewModel').i('canvasImg uploaded succesfully !!');
+      log.i('canvasImg uploaded succesfully !!');
     });
     await saveMediaPath(
       mediaURL: downloadURL,
@@ -40,15 +44,17 @@ class CanvasImageViewModel extends BaseViewModel {
     required String conversationId,
   }) async {
     final now = DateTime.now();
-    final mediaName =
-        '${now.year}${now.hour}${now.minute}${now.second}${now.millisecond}${now.microsecond}';
-    getLogger('CanvasViewModel').wtf('mediaName:$mediaName');
+    final firstPart = '${now.year}${now.month}${now.day}';
+    final secondPart =
+        '${now.hour}${now.minute}${now.second}${now.millisecond}${now.microsecond}';
+    final mediaName = '$firstPart-H$secondPart';
+    log.wtf('mediaName:$mediaName');
     await savePath(
       mediaUrl: mediaURL,
       messageUid: messageUid,
       mediaName: 'IMG-$mediaName.jpeg',
       folderPath: 'Media/Hint Images',
-      hiveBoxName: "ChatRoomMedia[$conversationId]",
+      hiveBoxName: chatRoomMedia(conversationId),
     );
   }
 

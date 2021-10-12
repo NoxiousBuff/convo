@@ -1,13 +1,15 @@
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:hive/hive.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_widget.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hint/ui/components/media/video/video_viewmodel.dart';
@@ -103,18 +105,10 @@ class VideoMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(16);
-    final borderRadius = BorderRadius.circular(12);
-    final hiveBox = Hive.box('ThumbnailsPath[$conversationId]');
-    final border = Border.all(
-        color: isRead ? extraLightBackgroundGray : unreadMsg, width: 5);
-    final decoration = BoxDecoration(border: border, borderRadius: radius);
+    final hiveBox = thumbnailsPathHiveBox(conversationId);
     return ViewModelBuilder<VideoViewModel>.reactive(
       viewModelBuilder: () => VideoViewModel(),
       onModelReady: (model) async {
-        // log.d('MessageUid:$messageUid');
-        // log.d('hivePath:${hiveBox.get(messageUid)}');
-
         if (!hiveBox.containsKey(messageUid)) {
           log.w('hive doesn\'t contain path of MessageUid:$messageUid');
           await model.uploadAndSave(
@@ -126,41 +120,39 @@ class VideoMedia extends StatelessWidget {
         }
       },
       builder: (context, model, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: decoration,
-              constraints: BoxConstraints(
-                maxHeight: double.infinity,
-                minWidth: MediaQuery.of(context).size.width * 0.2,
-                maxWidth: MediaQuery.of(context).size.width * 0.65,
-                minHeight: MediaQuery.of(context).size.width * 0.2,
-              ),
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: !hiveBox.containsKey(messageUid)
-                    ? ExtendedImage(image: MemoryImage(videoThumbnail))
-                    : ExtendedImage(
-                        enableLoadState: true,
-                        handleLoadingProgress: true,
-                        image: FileImage(File(hiveBox.get(messageUid)))),
-              ),
-            ),
-            messageBubbleModel.isuploading
-                ? uploadingProgress(messageBubbleModel)
-                : const CircleAvatar(
-                    maxRadius: 28,
-                    backgroundColor: black54,
-                    child: Center(
-                      child: Icon(
-                        CupertinoIcons.play_fill,
-                        color: systemBackground,
-                        size: 28,
+        return ValueListenableBuilder<Box>(
+          valueListenable: hiveBox.listenable(),
+          builder: (context, box, child) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                mediaBubble(
+                    context: context,
+                    isRead: isRead,
+                    child: !hiveBox.containsKey(messageUid)
+                        ? ExtendedImage(image: MemoryImage(videoThumbnail))
+                        : ExtendedImage(
+                            enableLoadState: true,
+                            handleLoadingProgress: true,
+                            image: FileImage(File(hiveBox.get(messageUid))))),
+                !box.containsKey(messageUid)
+                    ? messageBubbleModel.isuploading
+                        ? uploadingProgress(messageBubbleModel)
+                        : retryButton()
+                    : const CircleAvatar(
+                        maxRadius: 28,
+                        backgroundColor: black54,
+                        child: Center(
+                          child: Icon(
+                            CupertinoIcons.play_fill,
+                            color: systemBackground,
+                            size: 28,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-          ],
+              ],
+            );
+          },
         );
       },
     );

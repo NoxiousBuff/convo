@@ -38,7 +38,7 @@ class ReplyMedia extends StatelessWidget {
     //final maxWidth = screenWidthPercentage(context, percentage: 0.7);
     final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
     final textStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
+        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12, color: black);
     // Widget replyDetector(BuildContext context) {
     //   switch (replyMessage[ReplyField.replyType]) {
     //     case MediaType.text:

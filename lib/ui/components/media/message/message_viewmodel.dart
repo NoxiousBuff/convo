@@ -16,6 +16,8 @@ class MessageBubbleViewModel extends BaseViewModel {
   firebase_storage.TaskState? _taskState;
   firebase_storage.TaskState? get taskState => _taskState;
 
+ 
+
   double _uploadingProgress = 0.0;
   double get uploadingProgress => _uploadingProgress;
 

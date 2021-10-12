@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -6,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -42,20 +41,15 @@ class ChatView extends StatelessWidget {
       systemNavigationBarColor: Colors.transparent,
     );
     return ViewModelBuilder<ChatViewModel>.reactive(
-      onModelReady: (model) async {
+      onModelReady: (model) {
         model.scrollController = ScrollController();
-        //await Hive.box(conversationId).clear();
-        //await Hive.box('ImagesMemory[$conversationId]').clear();
-        //await Hive.box("ChatRoomMedia[$conversationId]").clear();
-        //await Hive.box('VideoThumbnails[$conversationId]').clear();
       },
       onDispose: (model) async {
-        await Hive.box(conversationId).close();
-        await Hive.box('UrlData[$conversationId]').close();
-        await Hive.box('ImagesMemory[$conversationId]').close();
-        await Hive.box("ChatRoomMedia[$conversationId]").close();
-        await Hive.box('ThumbnailsPath[$conversationId]').close();
-        await Hive.box('VideoThumbnails[$conversationId]').close();
+        await urlDataHiveBox(conversationId).close();
+        await imagesMemoryHiveBox(conversationId).close();
+        await chatRoomMediaHiveBox(conversationId).close();
+        await thumbnailsPathHiveBox(conversationId).close();
+        await videoThumbnailsHiveBox(conversationId).close();
       },
       builder: (context, model, child) => OfflineBuilder(
         child: const Text("Yah Baby !!"),
@@ -238,10 +232,10 @@ class ChatMessages extends StatelessWidget {
                       final message = Message.fromFirestore(messages[i]);
                       return MessageBubble(
                         index: i,
+                        message: message,
                         fireUser: fireuser,
                         chatViewModel: model,
                         receiverUid: receiverUid,
-                        message: message,
                         conversationId: conversationId,
                         isTimestampMatched: timestampMatch(message),
                       );

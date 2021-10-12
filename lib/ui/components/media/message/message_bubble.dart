@@ -1,6 +1,4 @@
 import 'dart:typed_data';
-import 'package:hint/ui/components/media/url/url_preview.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +6,7 @@ import 'package:swipe_to/swipe_to.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -16,6 +15,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/ui/components/media/meme/meme_media.dart';
+import 'package:hint/ui/components/media/url/url_preview.dart';
 import 'package:hint/ui/components/media/text/text_media.dart';
 import 'package:hint/ui/components/media/reply/reply_media.dart';
 import 'package:hint/ui/components/media/video/video_media.dart';
@@ -23,6 +24,7 @@ import 'package:hint/ui/components/media/image/image_media.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 import 'package:hint/ui/components/media/canvas_image/canvas_image.dart';
 import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
+import 'package:hint/ui/components/media/pixabay_image/pixabay_image.dart';
 
 class MessageBubble extends StatelessWidget {
   final int index;
@@ -32,7 +34,7 @@ class MessageBubble extends StatelessWidget {
   final String conversationId;
   final bool isTimestampMatched;
   final ChatViewModel chatViewModel;
-  const MessageBubble({
+  MessageBubble({
     Key? key,
     required this.index,
     required this.fireUser,
@@ -45,16 +47,19 @@ class MessageBubble extends StatelessWidget {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
 
+  final log = getLogger('MessageBubble');
+
   Widget mediaContent({
     required bool isMe,
     required bool isRead,
+    required String messageUid,
     required String messageType,
     required MessageBubbleViewModel model,
   }) {
     switch (messageType) {
       case MediaType.image:
         {
-          final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+          final hiveBox = imagesMemoryHiveBox(conversationId);
           Uint8List memeoryImage = hiveBox.get(message.messageUid);
           return ImageMedia(
             message: message,
@@ -65,26 +70,33 @@ class MessageBubble extends StatelessWidget {
             conversationId: conversationId,
           );
         }
-      //todo: to figure out what does this break statement do in null safety and why is it dead code
-      // break;
       case MediaType.video:
         {
-          final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+          final hiveBox = videoThumbnailsHiveBox(conversationId);
           final thumbnail = hiveBox.get(message.messageUid);
           if (thumbnail != null) {
             return VideoMedia(
+              messageUid: messageUid,
               isRead: message.isRead,
               receiverUid: receiverUid,
               messageBubbleModel: model,
               videoThumbnail: thumbnail,
               conversationId: conversationId,
-              messageUid: message.messageUid,
               videoPath: message.message[MessageField.mediaURL],
             );
           } else {
-            getLogger('MessageBubble').e('Thumbnail is null now');
+            log.e('Thumbnail is null now');
             return const SizedBox.shrink();
           }
+        }
+      case MediaType.meme:
+        {
+          return MemeMedia(
+            message: message,
+            isRead: message.isRead,
+            conversationId: conversationId,
+            messageUid: message.messageUid,
+          );
         }
       // break;
       case MediaType.text:
@@ -103,22 +115,33 @@ class MessageBubble extends StatelessWidget {
             child: URLPreview(
               isMe: isMe,
               isRead: isRead,
+              messageUid: messageUid,
               conversationId: conversationId,
-              messageUid: message.messageUid,
               url: message.message[MessageField.messageText],
             ),
           );
         }
       case MediaType.canvasImage:
         {
-          final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+          final hiveBox = imagesMemoryHiveBox(conversationId);
           final data = hiveBox.get(message.messageUid);
           final imageData = data.cast<int>().toList();
           return CanvasImage(
+            isRead: isRead,
             message: message,
             messageBubbleModel: model,
             conversationId: conversationId,
             imageData: Uint8List.fromList(imageData),
+          );
+        }
+      case MediaType.pixaBayImage:
+        {
+         
+          return PixaBayImage(
+            isRead: isRead,
+            message: message,
+            messageUid: messageUid,
+            conversationId: conversationId,
           );
         }
       default:
@@ -140,14 +163,17 @@ class MessageBubble extends StatelessWidget {
     final crossAxis = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     return ViewModelBuilder<MessageBubbleViewModel>.reactive(
       viewModelBuilder: () => MessageBubbleViewModel(),
+      onModelReady: (model) {
+        log.w('Index:$index MessageUid:${message.messageUid}');
+      },
       builder: (context, model, child) {
         if (model.hasError) {
-          getLogger('Messagebubble').e('There is an error');
+          log.e('There is an error');
         }
         return SwipeTo(
           onRightSwipe: () {
             replyRiverPod.showReplyBool(true);
-            getLogger('MsgBubble').wtf('showReply: ${replyRiverPod.showReply}');
+            log.wtf('showReply: ${replyRiverPod.showReply}');
             replyRiverPod.getSwipedValue(
               isMeBool: isMe,
               fireuser: fireUser,
@@ -157,7 +183,7 @@ class MessageBubble extends StatelessWidget {
               swipedTimestamp: message.timestamp,
               swipedMessageUid: message.messageUid,
             );
-            getLogger('MsgBubble').wtf('Message${replyRiverPod.message}');
+            log.wtf('Message${replyRiverPod.message}');
           },
           child: Container(
             margin: EdgeInsets.symmetric(vertical: message.isReply ? 10 : 4),
@@ -179,6 +205,7 @@ class MessageBubble extends StatelessWidget {
                   model: model,
                   isRead: message.isRead,
                   messageType: message.type,
+                  messageUid: message.messageUid,
                 ),
               ],
             ),

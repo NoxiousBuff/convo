@@ -1,21 +1,33 @@
 import 'dart:io';
 import 'dart:ui';
 import 'dart:async';
+import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/api/hive_helper.dart';
+import 'package:hint/constants/message_string.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:uuid/uuid.dart';
 import 'pixabay_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 class PixaBay extends StatelessWidget {
-  const PixaBay({Key? key}) : super(key: key);
+  final String receiverUid;
+  final String conversationId;
+  const PixaBay(
+      {Key? key, required this.receiverUid, required this.conversationId})
+      : super(key: key);
 
   Widget connectionDialog(BuildContext context) {
     return SizedBox(
@@ -144,129 +156,107 @@ class PixaBay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = getLogger('PixaBay');
+    final imagesBox = imagesMemoryHiveBox(conversationId);
+
     const margin = EdgeInsets.fromLTRB(8, 0, 8, 8);
     final height = screenHeightPercentage(context, percentage: 0.4);
     TextEditingController textEditingcontroller = TextEditingController();
 
-    return ViewModelBuilder<PixaBayViewModel>.reactive(
-      viewModelBuilder: () => PixaBayViewModel(),
-      onModelReady: (viewModel) {},
-      disposeViewModel: true,
-      builder: (_, viewModel, __) {
-        return OfflineBuilder(
-          child: const Text("Yah !!"),
-          connectivityBuilder: (context, connectivity, child) {
-            final bool connected = connectivity != ConnectivityResult.none;
-            if (connected) {
-              viewModel.imagesCategory();
-              // viewModel.adController();
-            }
+    return OfflineBuilder(
+      child: const Text(''),
+      connectivityBuilder: (context, connectivity, child) {
+        bool connected = connectivity != ConnectivityResult.none;
+        return ViewModelBuilder<PixaBayViewModel>.reactive(
+          viewModelBuilder: () => PixaBayViewModel(),
+          onModelReady: (viewModel) async =>
+              connected ? viewModel.imagesCategory() : null,
+          builder: (_, viewModel, __) {
             return !connected
                 ? connectionDialog(context)
                 : viewModel.images == null
                     ? const Center(child: CircularProgressIndicator())
-                    : SizedBox(
-                        width: screenWidth(context),
-                        height: screenHeight(context),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: viewModel.images!.hits!.length,
-                          itemBuilder: (context, i) {
-                            final hits = viewModel.images!.hits![i];
-                            // String? downloadUrl = hits.getDownloadLink();
-                            String? imageURL = hits.getThumbnailLink();
-                            int? downloads = hits.downloads;
-                            int? likes = hits.likes;
-                            if (i == 0) {
-                              return Container(
-                                height: 40,
-                                margin: margin,
-                                child: CupertinoTextField(
-                                  controller: textEditingcontroller,
-                                  textAlign: TextAlign.start,
-                                  placeholder: 'Search Images',
-                                  style: Theme.of(context).textTheme.bodyText2,
-                                  prefix: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(CupertinoIcons.search,
-                                        color: iconColor),
-                                  ),
-                                  onChanged: (val) => viewModel.getImages(val),
-                                  onSubmitted: (val) =>
-                                      viewModel.getImages(val),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: iconColor),
-                                      borderRadius: BorderRadius.circular(30)),
-                                ),
-                              );
-                              // } else if (i % 5 == 0) {
-                              //   return adWidget(context);
-                            } else {
-                              return imageURL == null
-                                  ? const Center(
-                                      child: CircularProgressIndicator())
-                                  : Consumer(
-                                      builder: (context, watch, child) {
-                                        // final value = watch(getValueProvider);
-                                        //const hiveBaxName = HiveHelper.hiveBoxImages;
-                                        return InkWell(
-                                          onTap: () async {
-                                            // await chatService
-                                            //     .addMessage(
-                                            //   type: imageType,
-                                            //   context: context,
-                                            //   urlsType: ['image'],
-                                            //   urlsList: [downloadUrl],
-                                            //   receiverUid: receiverUid,
-                                            // )
-                                            //     .whenComplete(() {
-                                            //   final date = DateTime.now();
-                                            //   final name =
-                                            //       date.microsecondsSinceEpoch;
-                                            //   final uid = value.messageUid;
-                                            //   getLogger('PixaBayMessageUid')
-                                            //       .wtf(uid);
-                                            //   getLogger('PixaBayURL')
-                                            //       .wtf(downloadUrl);
-                                            //   model
-                                            //       .downloadInDevice(
-                                            //     hiveKey: uid!,
-                                            //     mediaUrl: downloadUrl!,
-                                            //     hiveBoxName: hiveBaxName,
-                                            //     folderName: 'Convo Images',
-                                            //     fileName: 'IMG-$name.jpeg',
-                                            //   )
-                                            //       .catchError((e) {
-                                            //     getLogger('PixaBayView').e(e);
-                                            //   });
-                                            // });
-                                            // value.removeMessageUid();
-                                          },
-                                          child: Container(
-                                            height: height,
-                                            margin: margin,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image:
-                                                    CachedNetworkImageProvider(
-                                                        imageURL),
-                                              ),
-                                            ),
-                                            child: imageDetails(
-                                              downloads,
-                                              context,
-                                              likes,
-                                            ),
+                    : Column(
+                        children: [
+                          Container(
+                            height: 40,
+                            margin: margin,
+                            child: CupertinoTextField(
+                              controller: textEditingcontroller,
+                              textAlign: TextAlign.start,
+                              placeholder: 'Search Images',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2!
+                                  .copyWith(color: black),
+                              prefix: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(CupertinoIcons.search,
+                                    color: iconColor),
+                              ),
+                              onSubmitted: (val) => viewModel.getImages(val),
+                            ),
+                          ),
+                          Flexible(
+                            child: PreloadPageView.builder(
+                              preloadPagesCount: 10,
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: viewModel.images!.hits!.length,
+                              itemBuilder: (context, index) {
+                                final hits = viewModel.images!.hits![index];
+                                String? imageURL = hits.getThumbnailLink();
+                                int? downloads = hits.downloads;
+                                int? likes = hits.likes;
+                                if (imageURL != null) {
+                                  var im = CachedNetworkImageProvider(imageURL);
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      var messageUid = const Uuid().v1();
+                                      chatService.addFirestoreMessage(
+                                        type: MediaType.pixaBayImage,
+                                        mediaURL: imageURL,
+                                        messageUid: messageUid,
+                                        receiverUid: receiverUid,
+                                        timestamp: Timestamp.now(),
+                                      );
+                                      Uint8List bytes =
+                                          (await NetworkAssetBundle(
+                                                      Uri.parse(imageURL))
+                                                  .load(imageURL))
+                                              .buffer
+                                              .asUint8List();
+                                      log.wtf('PixaBay:$bytes');
+                                      await imagesBox.put(messageUid, bytes);
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        height: height,
+                                        margin: margin,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          image: DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: im,
                                           ),
-                                        );
-                                      },
-                                    );
-                            }
-                          },
-                        ),
+                                        ),
+                                        child: imageDetails(
+                                          downloads,
+                                          context,
+                                          likes,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       );
           },
         );

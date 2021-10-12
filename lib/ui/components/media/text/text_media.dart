@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
 
@@ -23,33 +22,30 @@ class TextMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChatBubble(
-      radius: messageText!.length > 3 ? 18 : 19,
-      bubbleType: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble,
-      bubbleColor: isMe
-          ? isRead
-              ? activeBlue
-              : unreadMsg
-          : CupertinoColors.systemGrey6,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.7,
-            minWidth: MediaQuery.of(context).size.width * 0.1),
-        child: messageText != null
-            ? Text(
-                messageText!,
-                style: GoogleFonts.roboto(
-                  fontSize: 14.0,
-                  color: isMe
-                      ? isRead
-                          ? systemBackground
-                          : CupertinoColors.black
-                      : Colors.black,
-                ),
-              )
-            : const SizedBox.shrink(),
-      ),
-    );
+    if (messageText != null) {
+      int length = messageText!.length;
+      return ChatBubble(
+        radius: length > 3 ? 20 : 20,
+        bubbleType: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble,
+        bubbleColor: isMe
+            ? isRead
+                ? activeBlue
+                : lightBlue
+            : CupertinoColors.systemGrey6,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.7,
+              minWidth: MediaQuery.of(context).size.width * 0.1),
+          child: Text(messageText!,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText2!
+                  .copyWith(color: systemBackground)),
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 }

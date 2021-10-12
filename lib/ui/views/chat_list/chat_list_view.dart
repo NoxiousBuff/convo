@@ -1,14 +1,13 @@
 import 'dart:math';
-import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:hint/ui/views/login/login_view.dart';
-
-import '../distant_view.dart';
 import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/ui/views/distant_view.dart';
+import 'package:hint/ui/views/login/login_view.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
 class ChatListView extends StatelessWidget {

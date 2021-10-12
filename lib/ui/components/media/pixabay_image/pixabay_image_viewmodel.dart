@@ -1,48 +1,30 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hive/hive.dart';
-import 'package:hint/api/dio.dart';
-import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 
-class ImageViewModel extends BaseViewModel {
-  final log = getLogger('ImageViewModel');
+class PixaBayImageViewModel extends BaseViewModel {
+  double _progress = 0.0;
+  double get downloadingProgress => _progress;
 
-  DioApi dioApi = DioApi();
-  Directory? globalDirectory;
-  HiveHelper hiveHelper = HiveHelper();
+  final bool _isDownloading = false;
+  bool get isDownloading => _isDownloading;
 
-  Future<void> uploadAndSave(
-      {required String filePath,
-      required String messageUid,
-      required String conversationId,
-      required MessageBubbleViewModel model}) async {
-    final downloadURL = await model
-        .uploadFile(
-            filePath: filePath,
-            messageUid: messageUid,
-            conversationId: conversationId)
-        .whenComplete(() {
-      log.i('Image uploaded succesfully !!');
-    });
-    await saveMediaPath(
-      mediaURL: downloadURL,
-      messageUid: messageUid,
-      conversationId: conversationId,
-    );
-  }
+  final log = getLogger('PixaBayImageViewModel');
 
-  Future<void> saveMediaPath({
+  Future<void> downloadAndSavePath({
     required String mediaURL,
     required String messageUid,
     required String conversationId,
   }) async {
     final now = DateTime.now();
-    final firstPart = '${now.year}${now.month}${now.day}';
+   final firstPart = '${now.year}${now.month}${now.day}';
     final secondPart =
         '${now.hour}${now.minute}${now.second}${now.millisecond}${now.microsecond}';
     final mediaName = '$firstPart-H$secondPart';
@@ -50,8 +32,8 @@ class ImageViewModel extends BaseViewModel {
     await savePath(
       mediaUrl: mediaURL,
       messageUid: messageUid,
-      mediaName: 'IMG-$mediaName.jpeg',
       folderPath: 'Media/Hint Images',
+      mediaName: 'IMG-$mediaName.jpeg',
       hiveBoxName: chatRoomMedia(conversationId),
     );
   }
@@ -102,8 +84,7 @@ class ImageViewModel extends BaseViewModel {
       }
 
       if (await directory.exists()) {
-        await dioApi.downloadMediaFromUrl(
-            mediaUrl: mediaUrl, savePath: savePath);
+        await downloadMediaFromUrl(mediaUrl: mediaUrl, savePath: savePath);
         await Hive.box(hiveBoxName).put(messageUid, savePath);
       }
     } catch (err) {
@@ -121,5 +102,28 @@ class ImageViewModel extends BaseViewModel {
       }
     }
     return false;
+  }
+
+  Future<void> downloadMediaFromUrl({
+    required String mediaUrl,
+    required String savePath,
+  }) async {
+    setBusyForObject(_isDownloading, true);
+    await Dio()
+        .download(mediaUrl, savePath, deleteOnError: true,
+            onReceiveProgress: (downloaded, total) {
+          final progress = downloaded / total;
+          _progress = progress;
+          notifyListeners();
+          print('Downloading Media Progress $progress');
+        })
+        .then((value) => getLogger('DioApi').i(
+            'The file with mediaUrl : $mediaUrl has been successfully downloaded at savePath : $savePath.'))
+        .catchError((err) {
+        log.w(
+              'There has been a problem with downloading a file. Error : $err');
+         log.w('MediaUrl: $mediaUrl and savePath: $savePath');
+        });
+    setBusyForObject(_isDownloading, false);
   }
 }

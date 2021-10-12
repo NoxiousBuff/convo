@@ -1,20 +1,30 @@
+import 'dart:typed_data';
 import 'dart:ui';
+import 'package:flutter/services.dart';
+import 'package:hint/api/hive_helper.dart';
+import 'package:hint/app/app_logger.dart';
 import 'meme_viewmodel.dart';
+import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 class Memes extends StatelessWidget {
-  const Memes({
-    Key? key,
-  }) : super(key: key);
+  final String receiverUid;
+  final String conversationId;
+  const Memes(
+      {Key? key, required this.receiverUid, required this.conversationId})
+      : super(key: key);
 
   Widget adWidget(BuildContext context) {
     return ClipRRect(
@@ -99,111 +109,101 @@ class Memes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = getLogger('MemeView');
+    final hiveBox = videoThumbnailsHiveBox(conversationId);
     final height = screenHeightPercentage(context, percentage: 0.05);
     const margin = EdgeInsets.symmetric(vertical: 10, horizontal: 20);
     final gifHeight = screenHeightPercentage(context, percentage: 0.4);
     TextEditingController textEditingController = TextEditingController();
-    return ViewModelBuilder<MemesViewModel>.reactive(
-      viewModelBuilder: () => MemesViewModel(),
-      onModelReady: (viewModel) {},
-      disposeViewModel: true,
-      builder: (_, viewModel, __) {
-        return OfflineBuilder(
-          connectivityBuilder: (context, connectivity, child) {
-            final bool connected = connectivity != ConnectivityResult.none;
+    return OfflineBuilder(
+      child: const Text(''),
+      connectivityBuilder: (context, connectivity, child) {
+        bool connected = connectivity != ConnectivityResult.none;
+        return ViewModelBuilder<MemesViewModel>.reactive(
+          viewModelBuilder: () => MemesViewModel(),
+          onModelReady: (viewModel) async {
             if (connected) {
-              viewModel.fetchedMemes('memes');
-              // viewModel.adController();
+              await viewModel.fetchedMemes('memes');
+              await viewModel.fetchNextSet('memes');
             }
+          },
+          builder: (_, viewModel, __) {
             return !connected
                 ? connectionDialog(context)
                 : viewModel.memes == null
                     ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: viewModel.memes!.results.length,
-                        itemBuilder: (context, i) {
-                          final memes = viewModel.memes!.results[i];
-                          final memeURL = memes.media!.gif!.url;
-
-                          if (i == 0) {
-                            return Container(
-                              margin: margin,
-                              height: height,
-                              child: CupertinoTextField(
-                                prefix: prefix(),
-                                textAlign: TextAlign.start,
-                                placeholder: 'Search Tenor',
-                                controller: textEditingController,
-                                style: Theme.of(context).textTheme.bodyText2,
-                                onChanged: (val) =>
-                                    viewModel.fetchedMemes(val + 'memes'),
-                                onSubmitted: (val) =>
-                                    viewModel.fetchedMemes(val + 'memes'),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: iconColor),
-                                    borderRadius: BorderRadius.circular(30)),
-                              ),
-                            );
-                            // } else if (i % 5 == 0) {
-                            //   return adWidget(context);
-                          } else {
-                            return Consumer(
-                              builder: (context, watch, child) {
-                                //final value = watch(getValueProvider);
-                                return InkWell(
-                                  onTap: () async {
-                                    // await chatService
-                                    //     .addMessage(
-                                    //   type: imageType,
-                                    //   context: context,
-                                    //   urlsList: [memeURL],
-                                    //   urlsType: ['image'],
-                                    //   receiverUid: receiverUid,
-                                    // )
-                                    //     .whenComplete(() {
-                                    //   final date = DateTime.now();
-                                    //   final name = date.microsecondsSinceEpoch;
-                                    //   final uid = value.messageUid;
-                                    //   getLogger('MemeMessageUid').wtf(uid);
-                                    //   getLogger('MemeURL').wtf(memeURL);
-                                    //   model
-                                    //       .downloadInDevice(
-                                    //     hiveKey: uid!,
-                                    //     mediaUrl: memeURL!,
-                                    //     folderName: 'Convo Animated Gif',
-                                    //     fileName: 'VID-$name.mp4',
-                                    //     hiveBoxName: HiveHelper.hiveBoxImages,
-                                    //   )
-                                    //       .catchError((e) {
-                                    //     getLogger('MemeView').e(e);
-                                    //   });
-                                    // });
-
-                                    // value.removeMessageUid();
-                                  },
-                                  child: Container(
-                                    height: gifHeight,
-                                    margin: const EdgeInsets.all(8),
-                                    child: ExtendedImage(
-                                      fit: BoxFit.fill,
-                                      enableLoadState: true,
-                                      enableMemoryCache: true,
-                                      handleLoadingProgress: true,
-                                      image: NetworkImage(memeURL!),
-                                      filterQuality: FilterQuality.high,
+                    : Column(
+                        children: [
+                          Container(
+                            margin: margin,
+                            height: height,
+                            child: CupertinoTextField(
+                              prefix: prefix(),
+                              textAlign: TextAlign.start,
+                              placeholder: 'Search Tenor',
+                              controller: textEditingController,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2!
+                                  .copyWith(color: black),
+                              onSubmitted: (val) =>
+                                  viewModel.fetchedMemes(val + 'memes'),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: iconColor),
+                                  borderRadius: BorderRadius.circular(30)),
+                            ),
+                          ),
+                          Flexible(
+                            child: PreloadPageView.builder(
+                              preloadPagesCount: 10,
+                              itemCount: viewModel.memes!.results.length,
+                              itemBuilder: (context, index) {
+                                final memes = viewModel.memes!.results[index];
+                                final memeURL = memes.media!.gif!.url;
+                                if (memeURL != null) {
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      final messageUid = const Uuid().v1();
+                                      chatService.addFirestoreMessage(
+                                        mediaURL: memeURL,
+                                        type: MediaType.meme,
+                                        messageUid: messageUid,
+                                        receiverUid: receiverUid,
+                                        timestamp: Timestamp.now(),
+                                      );
+                                      Uint8List bytes =
+                                          (await NetworkAssetBundle(
+                                                      Uri.parse(memeURL))
+                                                  .load(memeURL))
+                                              .buffer
+                                              .asUint8List();
+                                      log.wtf('Meme:$bytes');
+                                      await hiveBox.put(messageUid, bytes);
+                                      
+                                    },
+                                    child: Container(
+                                      height: gifHeight,
+                                      margin: const EdgeInsets.all(8),
+                                      child: ExtendedImage(
+                                        fit: BoxFit.fill,
+                                        enableLoadState: true,
+                                        enableMemoryCache: true,
+                                        handleLoadingProgress: true,
+                                        image: NetworkImage(memeURL),
+                                        filterQuality: FilterQuality.low,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
                               },
-                            );
-                          }
-                        },
+                            ),
+                          ),
+                        ],
                       );
           },
-          child: const Text('Yay'),
         );
       },
     );

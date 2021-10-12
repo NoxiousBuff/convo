@@ -1,3 +1,4 @@
+import 'package:hint/api/hive_helper.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,12 +23,11 @@ class ChatService {
   startConversation(
       BuildContext context, FireUser fireUser, Color randomColor) async {
     String conversationId = getConversationId(fireUser.id, liveUserUid);
-    await Hive.openBox(conversationId);
-    await Hive.openBox('UrlData[$conversationId]');
-    await Hive.openBox('ImagesMemory[$conversationId]');
-    await Hive.openBox("ChatRoomMedia[$conversationId]");
-    await Hive.openBox('ThumbnailsPath[$conversationId]');
-    await Hive.openBox('VideoThumbnails[$conversationId]');
+    await Hive.openBox(urlData(conversationId));
+    await Hive.openBox(imagesMemory(conversationId));
+    await Hive.openBox(chatRoomMedia(conversationId));
+    await Hive.openBox(thumbnailsPath(conversationId));
+    await Hive.openBox(videoThumbnails(conversationId));
     Map<String, dynamic> chatRoomMap = {
       'nearMe': false,
       'liveUserUid': liveUserUid,
@@ -76,10 +76,31 @@ class ChatService {
   }) {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     final Map messageMap = {};
-    messageMap[MessageField.uploaded] = false;
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
     if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
+
+    switch (type) {
+      case MediaType.image:
+        {
+          messageMap[MessageField.uploaded] = false;
+        }
+        break;
+      case MediaType.video:
+        {
+          messageMap[MessageField.uploaded] = false;
+        }
+        break;
+      case MediaType.canvasImage:
+        {
+          messageMap[MessageField.uploaded] = false;
+        }
+        break;
+      default:
+        {
+          null;
+        }
+    }
 
     _conversationCollection
         .doc(conversationId)

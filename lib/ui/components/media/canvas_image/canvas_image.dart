@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:hive/hive.dart';
+import 'package:hint/api/hive_helper.dart';
+import 'package:hint/app/app_widget.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +15,14 @@ import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 import 'package:hint/ui/components/media/canvas_image/canvas_image_viewmodel.dart';
 
 class CanvasImage extends StatelessWidget {
+  final bool isRead;
   final Message message;
   final Uint8List imageData;
   final String conversationId;
   final MessageBubbleViewModel messageBubbleModel;
   const CanvasImage(
       {Key? key,
+      required this.isRead,
       required this.message,
       required this.imageData,
       required this.conversationId,
@@ -94,15 +97,14 @@ class CanvasImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = getLogger('CanvasImage');
     final messageUid = message.messageUid;
-    final radius = BorderRadius.circular(16);
-    var hiveBox = Hive.box("ChatRoomMedia[$conversationId]");
-    final decoration = BoxDecoration(borderRadius: radius);
+    var hiveBox = chatRoomMediaHiveBox(conversationId);
     return ViewModelBuilder<CanvasImageViewModel>.reactive(
       viewModelBuilder: () => CanvasImageViewModel(),
       onModelReady: (model) async {
         if (!hiveBox.containsKey(message.messageUid)) {
-          getLogger('CanvasImage').d('MessageUid:${message.messageUid}');
+          log.d('MessageUid:${message.messageUid}');
           await model
               .uploadAndSave(
                   data: imageData,
@@ -110,34 +112,17 @@ class CanvasImage extends StatelessWidget {
                   messageUid: message.messageUid,
                   conversationId: conversationId)
               .catchError((e) {
-            getLogger('CanvasImage').e(e);
+            log.e(e);
           });
         }
       },
       builder: (context, model, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: decoration,
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * 0.2,
-                maxWidth: MediaQuery.of(context).size.width * 0.65,
-                minHeight: MediaQuery.of(context).size.width * 0.2,
-                maxHeight: MediaQuery.of(context).size.height * 0.35,
-              ),
-              child: ClipRRect(
-                borderRadius: radius,
-                child: !hiveBox.containsKey(messageUid)
-                    ? ExtendedImage(image: MemoryImage(imageData))
-                    : ExtendedImage.file(File(hiveBox.get(messageUid))),
-              ),
-            ),
-            messageBubbleModel.isuploading
-                ? uploadingProgress(messageBubbleModel)
-                : const SizedBox.shrink()
-          ],
-        );
+        return mediaBubble(
+            context: context,
+            isRead: isRead,
+            child: !hiveBox.containsKey(messageUid)
+                ? ExtendedImage(image: MemoryImage(imageData))
+                : ExtendedImage.file(File(hiveBox.get(messageUid))));
       },
     );
   }

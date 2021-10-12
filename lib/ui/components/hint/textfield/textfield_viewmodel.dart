@@ -2,12 +2,12 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
@@ -81,7 +81,7 @@ class TextFieldViewModel extends BaseViewModel {
     if (selectedImage != null) {
       return File(selectedImage.path);
     } else {
-      getLogger('ChatViewModel').wtf('pickImage | Image not clicked');
+      log.wtf('pickImage | Image not clicked');
     }
   }
 
@@ -93,7 +93,7 @@ class TextFieldViewModel extends BaseViewModel {
     if (selectedVideo != null) {
       return File(selectedVideo.path);
     } else {
-      getLogger('ChatViewModel').wtf('pickVideo | Video was not recorded');
+       log.wtf('pickVideo | Video was not recorded');
     }
   }
 
@@ -135,17 +135,6 @@ class TextFieldViewModel extends BaseViewModel {
                    : null,
              },
            );
-  // if(isUrl){
-  //   final data = urlDataPod.urlPreviewData;
-  //   if(data != null){
-  //   final hiveBox = Hive.box('UrlData[$conversationId]');
-  //    await hiveBox.put(messageUid, data);
-  //    log.wtf(hiveBox.get(messageUid));
-  //    urlDataPod.removeURLData();
-  //   }else{
-  //     log.w('URLData is null now !!');
-  //   }
-  // }
   controller.clear();
   replyPod.showReplyBool(false);
     
@@ -154,7 +143,9 @@ class TextFieldViewModel extends BaseViewModel {
 
 
   Future<void> pickMedias(
-      {required String boxId, required String receiverUid, required BuildContext context}) async {
+      {required String boxId, 
+      required String receiverUid,
+     required BuildContext context,}) async {
     const pickFile = FileType.media;
     final picker = FilePicker.platform;
     final result = await picker.pickFiles(type: pickFile, allowMultiple: true);
@@ -167,24 +158,24 @@ class TextFieldViewModel extends BaseViewModel {
           final mime = lookupMimeType(path);
           final type = mime!.split('/').first;
 
-          final videoBox = Hive.box('VideoThumbnails[$boxId]');
-          final imagesBox = Hive.box('ImagesMemory[$boxId]');
+          final videoBox = videoThumbnailsHiveBox(boxId);
+          final imagesBox = imagesMemoryHiveBox(boxId);
           if (type == videoType) {
             Uint8List? thumbnail = await VideoThumbnail.thumbnailData(
               video: path,
               imageFormat: ImageFormat.PNG,
-            ).catchError((e){getLogger('TextField').e('Thumbnail:$e')});
+            ).catchError((e){log.e('Thumbnail:$e')});
             if (thumbnail != null) {
               await videoBox.put(uid, thumbnail);
-              getLogger('TextField').wtf('Thumbnail:${videoBox.get(uid)}');
+              log.wtf('Thumbnail:${videoBox.get(uid)}');
             } else {
-              getLogger('TextField').e('Thumbnail is null now!!');
+             log.e('Thumbnail is null now!!');
             }
           } else if (type == imageType) {
             Uint8List bytes = await File(path).readAsBytes();
             await imagesBox.put(uid, bytes);
             var memoryImage = imagesBox.get(uid);
-            getLogger('TextField').wtf('MemoryImage:$memoryImage');
+            log.wtf('MemoryImage:$memoryImage');
           }
           final replyMsg =  replyPod.message;
          !replyPod.showReply ? await chatService.addFirestoreMessage(
@@ -212,7 +203,7 @@ class TextFieldViewModel extends BaseViewModel {
       }
        replyPod.showReplyBool(false);
     } else {
-      getLogger('TextFieldView').w('no media was selected');
+      log.w('no media was selected');
     }
   }
 }

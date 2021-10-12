@@ -1,7 +1,7 @@
-import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/url_preview_model.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
 
@@ -21,7 +21,7 @@ class URLPreviewViewModel extends BaseViewModel {
 
   void getHiveData(
       {required String conversationId, required String messageUid}) {
-    final hiveBox = Hive.box('UrlData[$conversationId]');
+    final hiveBox = urlDataHiveBox(conversationId);
     final savedData = hiveBox.get(messageUid);
     Map<String, dynamic> urlData = savedData.cast<String, dynamic>();
     hiveData = URLPreviewModel.fromJson(urlData);
@@ -48,7 +48,7 @@ class URLPreviewViewModel extends BaseViewModel {
           'previewImage': response.bodyBytes,
           'discription': extractedData.description,
         };
-        final hiveBox = Hive.box('UrlData[$conversationId]');
+        final hiveBox = urlDataHiveBox(conversationId);
         await hiveBox.put(messageUid, urlData);
         log.wtf(hiveBox.get(messageUid));
         _isExtracted = true;

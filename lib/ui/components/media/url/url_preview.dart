@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:hint/ui/components/media/chat_bubble/chat_bubble.dart';
-import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -12,7 +11,9 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/models/url_preview_model.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble.dart';
 import 'package:hint/ui/components/media/url/url_preview_viewmodel.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
 
 class URLPreview extends StatelessWidget {
   final bool isMe;
@@ -48,7 +49,7 @@ class URLPreview extends StatelessWidget {
     return OfflineBuilder(
       child: const Text(''),
       connectivityBuilder: (context, connectivity, child) {
-        final hiveBox = Hive.box('UrlData[$conversationId]');
+        final hiveBox = urlDataHiveBox(conversationId);
         bool connected = connectivity != ConnectivityResult.none;
         return ViewModelBuilder<URLPreviewViewModel>.reactive(
           viewModelBuilder: () => URLPreviewViewModel(),

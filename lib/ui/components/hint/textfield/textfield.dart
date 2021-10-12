@@ -210,26 +210,6 @@ class _HintTextFieldState extends State<HintTextField> {
                 (val.isNotEmpty && val.trim() != "")
                     ? setWritingTo(true)
                     : setWritingTo(false);
-                // if (isURL(val) && connected) {
-                //   final urlDataPod = context.read(urlDataProvider);
-                //   final extractedData = await MetadataFetch.extract(val);
-                //   if (extractedData != null) {
-                //     final previewImage = extractedData.image;
-                //     http.Response response = await http
-                //         .get(Uri.parse(previewImage!))
-                //         .catchError((e) {
-                //       log.e(e);
-                //     });
-                //     log.wtf('URLImage:${response.bodyBytes}');
-                //     final urlData = <String, dynamic>{
-                //       'url': extractedData.url,
-                //       'title': extractedData.title,
-                //       'previewImage': response.bodyBytes,
-                //       'discription': extractedData.description,
-                //     };
-                //     urlDataPod.getURLData(urlData);
-                //   }
-                // }
               },
               suffix: CupertinoButton(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -389,7 +369,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                             final type = fileType == 'image'
                                                 ? imageType
                                                 : videoType;
-                                            getLogger('TextFielView').wtf(
+                                            log.wtf(
                                                 'cameraOption|MessageType$type');
 
                                             await chatService
@@ -566,14 +546,19 @@ class _HintTextFieldState extends State<HintTextField> {
                               duration: const Duration(milliseconds: 100),
                             ),
                             AnimatedContainer(
-                              child: const Memes(),
+                              child: Memes(
+                                receiverUid: widget.receiverUid,
+                                conversationId: widget.conversationId,
+                              ),
                               height: model.showMemes ? height : 0.0,
                               duration: const Duration(milliseconds: 100),
                             ),
                             AnimatedContainer(
                               height: model.showPixaBay ? height : 0.0,
-                              child: const PixaBay(),
                               duration: const Duration(milliseconds: 100),
+                              child: PixaBay(
+                                  receiverUid: widget.receiverUid,
+                                  conversationId: widget.conversationId),
                             ),
                             AnimatedContainer(
                               height: model.showAnimalMemohjies ? height : 0.0,

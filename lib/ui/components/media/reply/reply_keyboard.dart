@@ -26,8 +26,10 @@ class ReplyKeyboard extends ConsumerWidget {
   Widget build(BuildContext context, watch) {
     final replyPod = watch(replyBackProvider);
     var message = replyPod.message;
-    final replyStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
+    final replyStyle = Theme.of(context)
+        .textTheme
+        .bodyText2!
+        .copyWith(fontSize: 12, color: black);
     final style = Theme.of(context)
         .textTheme
         .bodyText2!

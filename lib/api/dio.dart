@@ -14,7 +14,7 @@ class DioApi {
     await dio
         .download(mediaUrl, savePath, deleteOnError: true,
             onReceiveProgress: (downloaded, total) {
-          final progress = (downloaded / total) * 100;
+          final progress = ((downloaded / total) * 100).toInt();
           print('Downloading Media Progress $progress');
           
         })
