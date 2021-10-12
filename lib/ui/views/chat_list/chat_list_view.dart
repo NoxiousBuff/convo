@@ -7,7 +7,6 @@ import 'package:hint/prototypes/contact/contact_view.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
-import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:hint/ui/views/search/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'chat_list_viewmodel.dart';
@@ -267,6 +266,7 @@ class ChatListView extends StatelessWidget {
 
         return userResults.isNotEmpty
             ? ListView(
+                padding: const EdgeInsets.only(left: 5),
                 physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
                 children: userResults,
@@ -300,53 +300,69 @@ class ChatListView extends StatelessWidget {
       builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
-        appBar: CupertinoNavigationBar(
-          border: const Border(
-            bottom: BorderSide(
-              color: Colors.transparent,
-              width: 1.0, // One physical pixel.
-              style: BorderStyle.solid,
+        // appBar: CupertinoNavigationBar(
+        //   border: const Border(
+        //     bottom: BorderSide(
+        //       color: Colors.transparent,
+        //       width: 1.0, // One physical pixel.
+        //       style: BorderStyle.solid,
+        //     ),
+        //   ),
+        //   transitionBetweenRoutes: true,
+        //   backgroundColor: Colors.white,
+        //   middle: Text(
+        //     'Messages',
+        //     style: GoogleFonts.poppins(fontSize: 18.0),
+        //   ),
+        //   leading: InkWell(
+        //     onTap: () =>
+        //         navService.cupertinoPageRoute(context, const DistantView()),
+        //     child: Row(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: const [
+        //         Icon(CupertinoIcons.back, color: CupertinoColors.activeBlue),
+        //         Text(
+        //           'All',
+        //           style: TextStyle(color: CupertinoColors.activeBlue),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        //   trailing: IconButton(
+        //     onPressed: () {
+        //       model.signOut(context);
+        //     },
+        //     icon: const Icon(
+        //       Icons.logout,
+        //       color: Colors.blue,
+        //       size: 24.0,
+        //     ),
+        //   ),
+        // ),
+        // body: ListView(
+        //   physics: const BouncingScrollPhysics(),
+        //   controller: model.scrollController,
+        //   children: [
+
+        //   ],
+        body:
+            CustomScrollView(physics: const BouncingScrollPhysics(), slivers: [
+          CupertinoSliverNavigationBar(
+            stretch: true,
+            backgroundColor: Colors.white,
+            leading: const Icon(Icons.ac_unit),
+            trailing: const Icon(Icons.logout),
+            largeTitle: const Text(
+              'Messages',
+              // style: GoogleFonts.poppins(),
             ),
+            border: Border.all(width: 0.0, color: Colors.transparent),
           ),
-          transitionBetweenRoutes: true,
-          backgroundColor: Colors.white,
-          middle: Text(
-            'Messages',
-            style: GoogleFonts.poppins(fontSize: 18.0),
-          ),
-          leading: InkWell(
-            onTap: () =>
-                navService.cupertinoPageRoute(context, const DistantView()),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(CupertinoIcons.back, color: CupertinoColors.activeBlue),
-                Text(
-                  'All',
-                  style: TextStyle(color: CupertinoColors.activeBlue),
-                ),
-              ],
-            ),
-          ),
-          trailing: IconButton(
-            onPressed: () {
-              model.signOut(context);
-            },
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.blue,
-              size: 24.0,
-            ),
-          ),
-        ),
-        body: ListView(
-          physics: const BouncingScrollPhysics(),
-          controller: model.scrollController,
-          children: [
+          SliverList(
+              delegate: SliverChildListDelegate([
             // buildUpperScrollView(context),
-            // buildPinnedView(context),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Hero(
                 tag: 'search',
                 child: CupertinoTextField.borderless(
@@ -365,11 +381,12 @@ class ChatListView extends StatelessWidget {
                 ),
               ),
             ),
+            buildPinnedView(context),
             buildUserContact(model),
-          ],
-        ),
-        // body: buildEmptyListUi(context),
+          ]))
+        ]),
       ),
+      // body: buildEmptyListUi(context),
       viewModelBuilder: () => ChatListViewModel(),
     );
   }
