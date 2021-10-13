@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/app/app_logger.dart';
@@ -10,10 +11,13 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
   final Function onTap;
-  const UserItem({Key? key, required this.fireUser, required this.onTap}) : super(key: key);
+ UserItem({Key? key, required this.fireUser, required this.onTap})
+      : super(key: key);
 
   // final Color randomColor = Color.fromARGB(Random().nextInt(256),
   //     Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
+
+  final int randomNumber = Random().nextInt(3) + 1;
 
   buildChatListItemPopup({required FireUser fireUser}) {
     return Material(
@@ -48,7 +52,8 @@ class UserItem extends StatelessWidget {
             children: [
               Text(
                 fireUser.username,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 24.0),
               ),
             ],
           ),
@@ -112,29 +117,30 @@ class UserItem extends StatelessWidget {
               });
         },
         child: ClipOval(
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  Color(fireUser.colorHexCode).withAlpha(30),
-                  Color(fireUser.colorHexCode).withAlpha(50),
-                ],
-                focal: Alignment.topLeft,
-                radius: 0.8,
-              ),
-            ),
-            height: 56.0,
-            width: 56.0,
-            child: Text(
-              fireUser.username[0].toUpperCase(),
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          // child: Container(
+          //   alignment: Alignment.center,
+          //   decoration: BoxDecoration(
+          //     gradient: RadialGradient(
+          //       colors: [
+          //         Color(fireUser.colorHexCode).withAlpha(30),
+          //         Color(fireUser.colorHexCode).withAlpha(50),
+          //       ],
+          //       focal: Alignment.topLeft,
+          //       radius: 0.8,
+          //     ),
+          //   ),
+          //   height: 56.0,
+          //   width: 56.0,
+          //   child: Text(
+          //     fireUser.username[0].toUpperCase(),
+          //     style: const TextStyle(
+          //       color: Colors.black,
+          //       fontSize: 22,
+          //       fontWeight: FontWeight.w600,
+          //     ),
+          //   ),
+          // ),
+          child: Image.asset('avatars/default${randomNumber.toString()}.png'),
         ),
       ),
       title: Padding(

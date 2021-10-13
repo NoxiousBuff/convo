@@ -1,12 +1,11 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/prototypes/contact/contact_view.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/search/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'chat_list_viewmodel.dart';
@@ -27,56 +26,58 @@ class ChatListView extends StatelessWidget {
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
-          final Color randomColor = Color.fromARGB(
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256));
+          final int randomNumber = Random().nextInt(4) + 1;
+          // final Color randomColor = Color.fromARGB(
+          //     Random().nextInt(256),
+          //     Random().nextInt(256),
+          //     Random().nextInt(256),
+          //     Random().nextInt(256));
 
-          final List letters = [
-            'R',
-            'T',
-            'P',
-            'A',
-            'S',
-            'D',
-            'F',
-            'G',
-            'H',
-            'L',
-            'V',
-            'B',
-            'N',
-            'M',
-          ];
+          // final List letters = [
+          //   'R',
+          //   'T',
+          //   'P',
+          //   'A',
+          //   'S',
+          //   'D',
+          //   'F',
+          //   'G',
+          //   'H',
+          //   'L',
+          //   'V',
+          //   'B',
+          //   'N',
+          //   'M',
+          // ];
 
           return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipOval(
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 108.0,
-                  width: 108.0,
-                  child: Text(
-                    letters[Random().nextInt(letters.length)],
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                      // image: DecorationImage(
-                      //   image: AssetImage('images/img$index.jpg'),
-                      //   fit: BoxFit.cover,
-                      // ),
-                      color: randomColor.withAlpha(30)),
-                ),
-              ),
-            ),
-          );
+              padding: const EdgeInsets.all(8.0),
+              // child: ClipOval(
+              //   child: GestureDetector(
+              //     onTap: () {},
+              //     child: Container(
+              //       alignment: Alignment.center,
+              //       height: 108.0,
+              //       width: 108.0,
+              //       child: Text(
+              //         letters[Random().nextInt(letters.length)],
+              //         style: const TextStyle(
+              //           color: Colors.black,
+              //           fontSize: 22,
+              //           fontWeight: FontWeight.w600,
+              //         ),
+              //       ),
+              //       decoration: BoxDecoration(
+              //           // image: DecorationImage(
+              //           //   image: AssetImage('images/img$index.jpg'),
+              //           //   fit: BoxFit.cover,
+              //           // ),
+              //           color: randomColor.withAlpha(30)),
+              //     ),
+              //   ),
+              // ),
+              child:
+                  Image.asset('avatars/default${randomNumber.toString()}.png'));
         });
   }
 
@@ -345,46 +346,55 @@ class ChatListView extends StatelessWidget {
         //   children: [
 
         //   ],
-        body:
-            CustomScrollView(physics: const BouncingScrollPhysics(), slivers: [
-          CupertinoSliverNavigationBar(
-            stretch: true,
-            backgroundColor: Colors.white,
-            leading: const Icon(Icons.ac_unit),
-            trailing: const Icon(Icons.logout),
-            largeTitle: const Text(
-              'Messages',
-              // style: GoogleFonts.poppins(),
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            CupertinoSliverNavigationBar(
+              stretch: true,
+              backgroundColor: Colors.white,
+              //FIXME: put the logo down there
+              // leading: GestureDetector(child: const Icon(Icons.arrow_back), onTap: () {
+              //   navService.materialPageRoute(context, const DistantView());
+              // },),
+              trailing: Image.asset('avatars/default3.png'),
+              largeTitle: const Text(
+                'Messages',
+                // style: GoogleFonts.poppins(),
+              ),
+              border: Border.all(width: 0.0, color: Colors.transparent),
             ),
-            border: Border.all(width: 0.0, color: Colors.transparent),
-          ),
-          SliverList(
-              delegate: SliverChildListDelegate([
-            // buildUpperScrollView(context),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Hero(
-                tag: 'search',
-                child: CupertinoTextField.borderless(
-                  padding: const EdgeInsets.all(8.0),
-                  readOnly: true,
-                  onTap: () =>
-                      navService.materialPageRoute(context, const SearchView()),
-                  placeholder: 'Search for someone',
-                  placeholderStyle: TextStyle(color: Colors.indigo.shade900),
-                  decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
-                    border:
-                        Border.all(color: CupertinoColors.lightBackgroundGray),
-                    borderRadius: BorderRadius.circular(12.0),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  // buildUpperScrollView(context),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Hero(
+                      tag: 'search',
+                      child: CupertinoTextField.borderless(
+                        padding: const EdgeInsets.all(8.0),
+                        readOnly: true,
+                        onTap: () => navService.materialPageRoute(
+                            context, const SearchView()),
+                        placeholder: 'Search for someone',
+                        placeholderStyle:
+                            TextStyle(color: Colors.indigo.shade900),
+                        decoration: BoxDecoration(
+                          color: Colors.indigo.shade50,
+                          border: Border.all(
+                              color: CupertinoColors.lightBackgroundGray),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  buildPinnedView(context),
+                  buildUserContact(model),
+                ],
               ),
             ),
-            buildPinnedView(context),
-            buildUserContact(model),
-          ]))
-        ]),
+          ],
+        ),
       ),
       // body: buildEmptyListUi(context),
       viewModelBuilder: () => ChatListViewModel(),

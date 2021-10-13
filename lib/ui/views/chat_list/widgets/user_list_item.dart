@@ -101,31 +101,4 @@ class UserListItem extends StatelessWidget {
       ),
     );
   }
-
-  // Widget buildUserListItem (BuildContext context, UserListItemModel model {
-  //   return Builder(
-  //     builder: (context) {
-  //       if(!model.dataReady) {
-  //         return const CircularProgressIndicator.adaptive();
-  //       }
-  //       if (model.hasError) {
-  //         return const Center(
-  //           child: Text('Model has Error'),
-  //         );
-  //       }
-  //       return User
-  //   });
-  // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return ViewModelBuilder<UserListItemModel>.reactive(
-  //       viewModelBuilder: () => UserListItemModel(userUid: userUid),
-  //       builder: (context, model, child) {
-  //         return UserItem(
-  //             fireUser: model.fireUser!,
-  //             onTap: model.chatService.startConversation(
-  //                 context, model.fireUser!, Colors.red.shade100));
-  //       });
-  // }
 }

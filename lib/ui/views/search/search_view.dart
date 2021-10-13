@@ -59,6 +59,7 @@ class SearchView extends StatelessWidget {
         final searchResults = snapshot.data!.docs;
         return searchResults.isNotEmpty
             ? ListView.builder(
+              physics: const BouncingScrollPhysics(),
                 itemCount: searchResults.length,
                 itemBuilder: (context, i) {
                   FireUser localFireUser =
