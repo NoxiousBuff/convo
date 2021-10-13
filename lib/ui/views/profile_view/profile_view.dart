@@ -1,13 +1,15 @@
 import 'dart:async';
-import 'package:hint/app/app_logger.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/views/profile_view/profile_viewmodel.dart';
@@ -28,11 +30,12 @@ class ProfileView extends StatelessWidget {
   final TextEditingController biocontroller = TextEditingController();
   final bool switchBool = false;
 
-  Widget profileOption(
-      {required String title,
-      required IconData icon,
-      void Function()? onTap,
-      required BuildContext context}) {
+  Widget profileOption({
+    required String title,
+    required IconData icon,
+    void Function()? onTap,
+    required BuildContext context,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -46,6 +49,7 @@ class ProfileView extends StatelessWidget {
             ),
             backgroundColor: dirtyWhite,
           ),
+          const SizedBox(height: 10),
           Text(
             title,
             style: Theme.of(context).textTheme.bodyText2,
@@ -57,7 +61,6 @@ class ProfileView extends StatelessWidget {
 
   Widget profileDialog(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Container(
         constraints: BoxConstraints(
           maxHeight: screenHeightPercentage(context, percentage: 0.4),
@@ -143,8 +146,14 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget profileBox(
-      {required BuildContext context, required ProfileViewModel model}) {
+  Widget profileBox({
+    required BuildContext context,
+    required ProfileViewModel model,
+  }) {
+    final borderRadius = BorderRadius.circular(8);
+    final shape = RoundedRectangleBorder(borderRadius: borderRadius);
+    final maxWidth = screenWidthPercentage(context, percentage: 0.6);
+    final maxHeight = screenHeightPercentage(context, percentage: 0.5);
     final backGroundImage = CachedNetworkImageProvider(fireUser.photoUrl!);
     return Container(
       padding: const EdgeInsets.all(8),
@@ -154,7 +163,7 @@ class ProfileView extends StatelessWidget {
         children: [
           CircleAvatar(
             maxRadius: 70,
-            backgroundColor: activeGreen,
+            backgroundColor: activeBlue,
             backgroundImage: backGroundImage,
           ),
           SizedBox(
@@ -193,13 +202,8 @@ class ProfileView extends StatelessWidget {
                       onTap: () => showDialog(
                         context: context,
                         builder: (context) {
-                          final maxHeight =
-                              screenHeightPercentage(context, percentage: 0.5);
-                          final maxWidth =
-                              screenWidthPercentage(context, percentage: 0.6);
                           return Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                            shape: shape,
                             child: Container(
                               constraints: BoxConstraints(
                                 maxHeight: maxHeight,
@@ -220,7 +224,6 @@ class ProfileView extends StatelessWidget {
                                   ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: model.optionName.length,
-                                    //physics: NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, index) {
                                       return RadioListTile(
                                         value: index,
@@ -278,24 +281,109 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget options(BuildContext context) {
-    return Container(
-      color: systemBackground,
-      child: Column(
-        children: [
-          ListTile(
-            onTap: () => clearChatDialog(context),
-            title: Text('Clear Chat',
-                style: Theme.of(context).textTheme.bodyText2),
-            trailing: const Icon(CupertinoIcons.delete),
-          ),
-          ListTile(
-            title: Text('Disappearing messages',
-                style: Theme.of(context).textTheme.bodyText2),
-            trailing: const Icon(CupertinoIcons.timer),
-          ),
-        ],
-      ),
+  Widget defaultOptions(BuildContext context) {
+    Widget optionTile({
+      IconData? icon,
+      required String title,
+      void Function()? onTap,
+    }) =>
+        ValueListenableBuilder<Box>(
+          valueListenable: appSettings.listenable(),
+          builder: (context, box, child) {
+            bool darkTheme = box.get(darkModeKey);
+            return ListTileTheme(
+              tileColor: darkTheme ? darkModeColor : null,
+              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+              child: ListTile(
+                onTap: onTap,
+                trailing: Icon(icon, size: 20),
+                title:
+                    Text(title, style: Theme.of(context).textTheme.bodyText2),
+              ),
+            );
+          },
+        );
+
+    return Column(
+      children: [
+        optionTile(title: 'Clear Chat', icon: CupertinoIcons.delete),
+        optionTile(title: 'Background', icon: CupertinoIcons.photo),
+        optionTile(title: 'Encryption', icon: CupertinoIcons.lock),
+        optionTile(title: 'Disappearing Messages', icon: CupertinoIcons.timer),
+      ],
+    );
+  }
+
+  Widget moreActionOption(BuildContext context) {
+    Widget optionTile({
+      IconData? icon,
+      required String title,
+      void Function()? onTap,
+    }) =>
+        ValueListenableBuilder<Box>(
+          valueListenable: appSettings.listenable(),
+          builder: (context, box, child) {
+            bool darkTheme = box.get(darkModeKey);
+            return ListTileTheme(
+              tileColor: darkTheme ? darkModeColor : null,
+              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+              child: ListTile(
+                onTap: onTap,
+                trailing: Icon(icon, size: 20),
+                title:
+                    Text(title, style: Theme.of(context).textTheme.bodyText2),
+              ),
+            );
+          },
+        );
+
+    return Column(
+      children: [
+        optionTile(title: 'Share Contact', icon: Icons.share_outlined),
+        optionTile(
+            title: 'View Media and Links',
+            icon: CupertinoIcons.photo_on_rectangle),
+        optionTile(
+            title: 'Create Group with Vikas', icon: CupertinoIcons.person_3),
+      ],
+    );
+  }
+
+  Widget privacyOption(BuildContext context) {
+    Widget optionTile({
+      IconData? icon,
+      Widget? subtitle,
+      required String title,
+      void Function()? onTap,
+    }) =>
+        ValueListenableBuilder<Box>(
+          valueListenable: appSettings.listenable(),
+          builder: (context, box, child) {
+            bool darkTheme = box.get(darkModeKey);
+            return ListTileTheme(
+              tileColor: darkTheme ? darkModeColor : null,
+              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+              child: ListTile(
+                onTap: onTap,
+                subtitle: subtitle,
+                trailing: Icon(icon, size: 20),
+                title:
+                    Text(title, style: Theme.of(context).textTheme.bodyText2),
+              ),
+            );
+          },
+        );
+
+    return Column(
+      children: [
+        optionTile(title: 'Block Contact', icon: Icons.block_outlined),
+        optionTile(title: 'ignore Messages', icon: CupertinoIcons.chat_bubble),
+        optionTile(
+          title: 'Something\'s went wroung',
+          subtitle: Text('Give feedback and report conversation',
+              style: Theme.of(context).textTheme.caption),
+        ),
+      ],
     );
   }
 
@@ -308,127 +396,46 @@ class ProfileView extends StatelessWidget {
         elevation: 0,
         automaticallyImplyLeading: true,
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: activeBlue),
       ),
       body: ViewModelBuilder<ProfileViewModel>.reactive(
         viewModelBuilder: () => ProfileViewModel(),
+        onDispose: (model) async {
+          await Hive.openBox(urlData(conversationId));
+          await Hive.openBox(imagesMemory(conversationId));
+          await Hive.openBox(chatRoomMedia(conversationId));
+          await Hive.openBox(thumbnailsPath(conversationId));
+          await Hive.openBox(videoThumbnails(conversationId));
+        },
         builder: (_, viewModel, child) {
-          return ListView(
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            children: [
-              profileBox(context: context, model: viewModel),
-              options(context),
-              SizedBox(
-                height: 40,
-                child: ListTile(
-                  title: Text(
-                    'More Actions',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(color: black),
+          return Scaffold(
+            body: ListView(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              children: [
+                profileBox(context: context, model: viewModel),
+                defaultOptions(context),
+                SizedBox(
+                  height: 60,
+                  child: ListTile(
+                    title: Text(
+                      'More Actions',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
                   ),
                 ),
-              ),
-              ListTile(
-                title: Text('View Photos and Videos and Links',
-                    style: Theme.of(context).textTheme.bodyText2!),
-                trailing: const Icon(CupertinoIcons.photo),
-              ),
-              ListTile(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) {
-                    final maxHeight =
-                        screenHeightPercentage(context, percentage: 0.18);
-                    final maxWidth =
-                        screenWidthPercentage(context, percentage: 0.6);
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Container(
-                        constraints: BoxConstraints(
-                            maxHeight: maxHeight, maxWidth: maxWidth),
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                              child: Text(
-                                'Groups are currently in beta version we will soon add groups and unable this feature',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2!
-                                    .copyWith(color: black),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'OK',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1!
-                                        .copyWith(color: activeBlue),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                title: Text('Create Group with Vikas',
-                    style: Theme.of(context).textTheme.bodyText2!),
-                trailing: const Icon(CupertinoIcons.person_3),
-              ),
-              ListTile(
-                title: Text('Share Contact',
-                    style: Theme.of(context).textTheme.bodyText2!),
-                trailing: const Icon(Icons.share),
-              ),
-              SizedBox(
-                height: 40,
-                child: ListTile(
-                  title: Text(
-                    'Privacy',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(color: black),
+                moreActionOption(context),
+                SizedBox(
+                  height: 60,
+                  child: ListTile(
+                    title: Text(
+                      'Privacy',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
                   ),
                 ),
-              ),
-              ListTile(
-                title: Text('Block',
-                    style: Theme.of(context).textTheme.bodyText2!),
-                trailing: const Icon(CupertinoIcons.minus_circle),
-              ),
-              ListTile(
-                title: Text('Ignore Messages',
-                    style: Theme.of(context).textTheme.bodyText2!),
-                trailing: const Icon(CupertinoIcons.chat_bubble),
-              ),
-              Container(
-                color: systemBackground,
-                child: ListTile(
-                  title: Text('Something\'s Wrong',
-                      style: Theme.of(context).textTheme.bodyText2!),
-                  subtitle: Text(
-                    'Give feedback and report conversation',
-                    style: Theme.of(context).textTheme.caption,
-                  ),
-                ),
-              ),
-            ],
+                privacyOption(context),
+              ],
+            ),
           );
         },
       ),

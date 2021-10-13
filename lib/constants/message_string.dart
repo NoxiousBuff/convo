@@ -29,16 +29,12 @@ class ReplyField {
 }
 
 class MediaType {
-  static const String pdf = 'pdf';
   static const String url = 'URL';
   static const String text = 'text';
   static const String meme = 'meme';
   static const String image = 'image';
   static const String video = 'video';
-  static const String audio = 'audio';
   static const String emoji = 'emoji';
-  static const String dickster = 'dickster';
-  static const String multiMedia = 'multiMedia';
   static const String canvasImage = 'canvasImage';
   static const String pixaBayImage = 'pixaBayImage';
 }

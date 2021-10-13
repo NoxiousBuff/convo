@@ -1,9 +1,3 @@
-// await Hive.openBox('UrlData[$conversationId]');
-//     await Hive.openBox('ImagesMemory[$conversationId]');
-//     await Hive.openBox("ChatRoomMedia[$conversationId]");
-//     await Hive.openBox('ThumbnailsPath[$conversationId]');
-//     await Hive.openBox('VideoThumbnails[$conversationId]');
-
 import 'package:hive_flutter/hive_flutter.dart';
 
 Box urlDataHiveBox(String conversationId) =>
@@ -21,6 +15,9 @@ Box thumbnailsPathHiveBox(String conversationId) =>
 Box videoThumbnailsHiveBox(String conversationId) =>
     Hive.box('VideoThumbnails[$conversationId]');
 
+Box appSettings = Hive.box('AppSettings');
+
+// -----------------------------------------------------------------------------
 String urlData(String conversationId) => 'URLData[$conversationId]';
 
 String imagesMemory(String conversationId) => 'ImagesMemory[$conversationId]';
@@ -32,3 +29,11 @@ String thumbnailsPath(String conversationId) =>
 
 String videoThumbnails(String conversationId) =>
     'VideoThumbnails[$conversationId]';
+
+const String appSettingsBoxName = 'AppSettings';
+
+const String darkModeKey = 'darkMode'; 
+
+// -----------------------------------------------------------------------------
+
+

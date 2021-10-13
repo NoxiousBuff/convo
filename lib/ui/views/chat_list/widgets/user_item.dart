@@ -1,13 +1,16 @@
-import 'dart:math';
 import 'dart:ui';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/hive_helper.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
@@ -96,64 +99,74 @@ class UserItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        model.chatService.startConversation(context, fireUser, randomColor);
-        getLogger('UserItem').i('Add A start conversation method');
-      },
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
-        ),
-      ),
-      leading: GestureDetector(
-        onTap: () {
-          showCupertinoModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return buildChatListItemPopup(fireUser: fireUser);
-              });
-        },
-        child: ClipOval(
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  randomColor.withAlpha(30),
-                  randomColor.withAlpha(50),
-                ],
-                focal: Alignment.topLeft,
-                radius: 0.8,
+    return ValueListenableBuilder<Box>(
+      valueListenable: appSettings.listenable(),
+      builder: (context, box, child) {
+        bool darkMode = box.get(darkModeKey);
+        return ListTile(
+          onTap: () {
+            model.chatService.startConversation(context, fireUser, randomColor);
+            getLogger('UserItem').i('Add A start conversation method');
+          },
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: () {
+              showCupertinoModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return buildChatListItemPopup(fireUser: fireUser);
+                  });
+            },
+            child: ClipOval(
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      randomColor.withAlpha(30),
+                      randomColor.withAlpha(50),
+                    ],
+                    focal: Alignment.topLeft,
+                    radius: 0.8,
+                  ),
+                ),
+                height: 56.0,
+                width: 56.0,
+                child: Text(
+                  fireUser.username[0].toUpperCase(),
+                  style:  TextStyle(
+                    color: darkMode ? systemBackground : black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 22,
+                  ),
+                ),
               ),
             ),
-            height: 56.0,
-            width: 56.0,
+          ),
+          title: Padding(
+            padding: const EdgeInsets.only(bottom: 5.0),
             child: Text(
-              fireUser.username[0].toUpperCase(),
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
+              fireUser.username,
+              style: GoogleFonts.roboto(
+                fontSize: 20,
+                color: darkMode ? systemBackground : black,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ),
-      ),
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5.0),
-        child: Text(
-          fireUser.username,
-          style: GoogleFonts.roboto(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+          subtitle: Text(
+            fireUser.email,
+            style: TextStyle(
+              color: darkMode ? systemBackground : black,
+            ),
           ),
-        ),
-      ),
-      subtitle: Text(
-        fireUser.email,
-      ),
+        );
+      },
     );
   }
 }

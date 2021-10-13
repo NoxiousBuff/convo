@@ -1,3 +1,4 @@
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -10,12 +11,12 @@ import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/models/message_model.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
 
@@ -67,41 +68,46 @@ class ChatView extends StatelessWidget {
                   : const Text('');
             },
             child: Scaffold(
-              backgroundColor: systemBackground,
               appBar: AppBar(
                 elevation: 0.0,
-                systemOverlayStyle: systemUiOverlays,
-                //I could also use Cupertino Back Button
-                leading: IconButton(
-                    color: Colors.black,
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back)),
+                automaticallyImplyLeading: true,
                 title: Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () => Navigator.push(
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => ProfileView(
-                                  model: model,
-                                  fireUser: fireUser,
-                                  conversationId: conversationId))),
-                      child: CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(
-                            fireUser.photoUrl ?? 'images/img2.jpg'),
+                          cupertinoTransition(
+                            enterTo: ProfileView(
+                                model: model,
+                                fireUser: fireUser,
+                                conversationId: conversationId),
+                            exitFrom: ChatView(
+                                fireUser: fireUser,
+                                randomColor: randomColor,
+                                conversationId: conversationId),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: ExtendedImage(
+                          height: 50,
+                          width: 50,
+                          enableLoadState: true,
+                          handleLoadingProgress: true,
+                          image: NetworkImage(
+                            fireUser.photoUrl ?? 'images/img2.jpg',
+                          ),
+                        ),
                       ),
                     ),
                     verticalSpaceTiny,
                     Text(
                       fireUser.username,
-                      style: GoogleFonts.openSans(
-                        letterSpacing: -0.5,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.0,
-                        color: Colors.black,
-                      ),
+                      style: Theme.of(context).textTheme.bodyText2,
                     ),
                   ],
                 ),

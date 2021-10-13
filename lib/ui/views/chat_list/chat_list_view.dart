@@ -3,11 +3,14 @@ import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/ui/views/distant_view.dart';
 import 'package:hint/ui/views/login/login_view.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/distent_view/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
 class ChatListView extends StatelessWidget {
@@ -65,12 +68,7 @@ class ChatListView extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                decoration: BoxDecoration(
-                    // image: DecorationImage(
-                    //   image: AssetImage('images/img$index.jpg'),
-                    //   fit: BoxFit.cover,
-                    // ),
-                    color: randomColor.withAlpha(30)),
+                decoration: BoxDecoration(color: randomColor.withAlpha(30)),
               ),
             ),
           ),
@@ -181,114 +179,74 @@ class ChatListView extends StatelessWidget {
         await model.currentUserDoc();
       },
       disposeViewModel: true,
-      builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
-        extendBodyBehindAppBar: true,
-        appBar: CupertinoNavigationBar(
-          border: const Border(
-            bottom: BorderSide(
-              color: Colors.transparent,
-              width: 1.0, // One physical pixel.
-              style: BorderStyle.solid,
-            ),
-          ),
-          transitionBetweenRoutes: true,
-          backgroundColor: Colors.white,
-          middle: Text(
-            'Messages',
-            style: GoogleFonts.poppins(fontSize: 18.0),
-          ),
-          leading: TextButton(
-            onPressed: () => Navigator.push(
-                context,
-                cupertinoTransition(
-                    enterTo: DistantView(fireUser: model.fireUser),
-                    exitFrom: const ChatListView())),
-            child: const Text(
-              'All',
-              style: TextStyle(color: CupertinoColors.activeBlue),
-            ),
-          ),
-          trailing: IconButton(
-            onPressed: () {
-              model.signOut(context);
-              Navigator.push(
-                context,
-                cupertinoTransition(
-                  enterTo: const LoginView(),
-                  exitFrom: const ChatListView(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.logout_rounded,
-              color: Colors.blue,
-              size: 24.0,
-            ),
-          ),
-        ),
-        body: CupertinoScrollbar(
-          radius: const Radius.circular(20.0),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            controller: model.scrollController,
-            children: [
-              // buildPinnedView(context),
-              // SingleChildScrollView(
-              //   scrollDirection: Axis.horizontal,
-              //   child: Row(
-              //     children: [
-              //       const SizedBox(width: 22),
-              //       GestureDetector(
-              //           onTap: () {
-              //             // Navigator.push(
-              //             //     context,
-              //             //     MaterialPageRoute(
-              //             //         builder: (context) => ContactsView()));
-              //           },
-              //           child: const Chip(
-              //               label: Text('Contacts'),
-              //               backgroundColor: Colors.transparent,
-              //               side: BorderSide(color: Colors.black12))),
-              //       const SizedBox(width: 4),
-              //       GestureDetector(
-              //           // onTap: () {
-              //           //   Navigator.push(
-              //           //       context,
-              //           //       MaterialPageRoute(
-              //           //           builder: (context) => hintImagePrototype()));
-              //           // },
-              //           child: const Chip(
-              //               label: Text('hint Image'),
-              //               backgroundColor: Colors.transparent,
-              //               side: BorderSide(color: Colors.black12))),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('hint Video'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('Explore Feed'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 4),
-              //       const Chip(
-              //           label: Text('Settings'),
-              //           backgroundColor: Colors.transparent,
-              //           side: BorderSide(color: Colors.black12)),
-              //       const SizedBox(width: 22),
-              //     ],
-              //   ),
-              // ),
-              // buildPinnedView(context),
-
-              buildUserContact(model),
-            ],
-          ),
-        ),
-      ),
       viewModelBuilder: () => ChatListViewModel(),
+      builder: (context, model, child) {
+        return ValueListenableBuilder<Box>(
+          valueListenable: appSettings.listenable(),
+          builder: (context, box, child) {
+            var darkMode = box.get(darkModeKey);
+            return Scaffold(
+              appBar: CupertinoNavigationBar(
+                border: const Border(
+                  bottom: BorderSide(
+                    color: Colors.transparent,
+                    width: 1.0, // One physical pixel.
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                transitionBetweenRoutes: true,
+                backgroundColor: darkMode ? black54 : systemBackground,
+                middle: Text(
+                  'Messages',
+                  style: GoogleFonts.poppins(
+                      fontSize: 18.0,
+                      color: darkMode ? systemBackground : black54),
+                ),
+                leading: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        cupertinoTransition(
+                            enterTo: DistantView(fireUser: model.fireUser),
+                            exitFrom: const ChatListView()));
+                  },
+                  child: Text(
+                    'All',
+                    style: Theme.of(context).textTheme.bodyText2,
+                  ),
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    model.signOut(context);
+                    Navigator.push(
+                      context,
+                      cupertinoTransition(
+                        enterTo: const LoginView(),
+                        exitFrom: const ChatListView(),
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.logout_rounded,
+                    color: darkMode ? systemBackground : activeBlue,
+                    size: 24.0,
+                  ),
+                ),
+              ),
+              body: CupertinoScrollbar(
+                radius: const Radius.circular(20.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    buildUserContact(model),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

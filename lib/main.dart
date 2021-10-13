@@ -2,6 +2,7 @@ import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
@@ -16,8 +17,8 @@ Future<void> main() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
-
   HiveHelper().initialiseHive();
+  await Hive.openBox(appSettingsBoxName);
 
   runApp(const ProviderScope(child: MyApp()));
 }

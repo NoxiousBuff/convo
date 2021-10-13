@@ -194,50 +194,48 @@ class _HintTextFieldState extends State<HintTextField> {
     return SizedBox(
       height: 40,
       child: OfflineBuilder(
-          child: const Text(''),
-          connectivityBuilder: (context, connectivity, child) {
-            bool connected = connectivity != ConnectivityResult.none;
-            return CupertinoTextField(
-              minLines: 1,
-              maxLines: 6,
-              controller: messageTech,
-              placeholder: 'Text Message',
-              focusNode: widget.focusNode,
-              style: const TextStyle(color: Colors.black),
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-              placeholderStyle: const TextStyle(color: Colors.black38),
-              onChanged: (val) async {
-                (val.isNotEmpty && val.trim() != "")
-                    ? setWritingTo(true)
-                    : setWritingTo(false);
-              },
-              suffix: CupertinoButton(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Text(
-                  'Send',
-                  style: TextStyle(
-                    color: !isWriting
-                        ? Colors.black38
-                        : const Color.fromRGBO(10, 132, 255, 1),
-                  ),
-                ),
-                onPressed: !isWriting
-                    ? null
-                    : model.textFieldMessage(
-                        context: context,
-                        connected: connected,
-                        controller: messageTech,
-                        receiverUid: widget.receiverUid,
-                        conversationId: widget.conversationId),
-              ),
-              textAlign: TextAlign.start,
-              keyboardType: TextInputType.multiline,
-              keyboardAppearance: Brightness.light,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-            );
-          }),
+        child: const Text(''),
+        connectivityBuilder: (context, connectivity, child) {
+          bool connected = connectivity != ConnectivityResult.none;
+          return CupertinoTextField(
+            minLines: 1,
+            maxLines: 6,
+            controller: messageTech,
+            placeholder: 'Text Message',
+            focusNode: widget.focusNode,
+            style: Theme.of(context).textTheme.bodyText2,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            placeholderStyle: Theme.of(context).textTheme.bodyText2,
+            onChanged: (val) async {
+              (val.isNotEmpty && val.trim() != "")
+                  ? setWritingTo(true)
+                  : setWritingTo(false);
+            },
+            suffix: CupertinoButton(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text('Send',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2!
+                      .copyWith(color: isWriting ? activeBlue : null)),
+              onPressed: !isWriting
+                  ? null
+                  : model.textFieldMessage(
+                      context: context,
+                      connected: connected,
+                      controller: messageTech,
+                      receiverUid: widget.receiverUid,
+                      conversationId: widget.conversationId),
+            ),
+            textAlign: TextAlign.start,
+            keyboardType: TextInputType.multiline,
+            keyboardAppearance: Brightness.light,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -273,6 +271,7 @@ class _HintTextFieldState extends State<HintTextField> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         const Divider(height: 0.0),
+                        const SizedBox(height: 8),
                         Consumer(
                           builder: (_, watch, __) {
                             final replyPod = watch(replyBackProvider);
@@ -301,7 +300,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                 children: [
                                   bottomButton(
                                     'assets/scribble.png',
-                                    color: black,
+                                    color: dirtyWhite,
                                     onTap: () {
                                       model.memeChanger(false);
                                       model.animalToggle(false);
@@ -323,7 +322,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                   ),
                                   bottomButton(
                                     'assets/blackEmoji.png',
-                                    color: extraLightBackgroundGray,
+                                    color: dirtyWhite,
                                     onTap: () {
                                       model.memeChanger(false);
                                       model.animalToggle(false);
@@ -346,7 +345,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                   ),
                                   bottomButton(
                                     'assets/camera.png',
-                                    color: extraLightBackgroundGray,
+                                    color: dirtyWhite,
                                     onTap: () {
                                       model.memeChanger(false);
                                       model.animalToggle(false);
@@ -389,41 +388,41 @@ class _HintTextFieldState extends State<HintTextField> {
                                       );
                                     },
                                   ),
-                                  bottomButton(
-                                    'assets/editor.png',
-                                    color: extraLightBackgroundGray,
-                                    onTap: () {
-                                      model.memeChanger(false);
-                                      model.animalToggle(false);
-                                      model.pixaBayToggle(false);
-                                      model.emojieChanger(false);
-                                      model.toggleMemojies(false);
-                                      showCupertinoModalBottomSheet(
-                                        elevation: 0,
-                                        expand: true,
-                                        context: context,
-                                        enableDrag: false,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (context) {
-                                          return BackdropFilter(
-                                              filter: ImageFilter.blur(
-                                                  sigmaX: 8, sigmaY: 8),
-                                              child: const TextEditor());
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  bottomButton(
-                                    'assets/documents.png',
-                                    color: black,
-                                    onTap: () {
-                                      model.memeChanger(false);
-                                      model.animalToggle(false);
-                                      model.pixaBayToggle(false);
-                                      model.emojieChanger(false);
-                                      model.toggleMemojies(false);
-                                    },
-                                  ),
+                                  // bottomButton(
+                                  //   'assets/editor.png',
+                                  //   color: extraLightBackgroundGray,
+                                  //   onTap: () {
+                                  //     model.memeChanger(false);
+                                  //     model.animalToggle(false);
+                                  //     model.pixaBayToggle(false);
+                                  //     model.emojieChanger(false);
+                                  //     model.toggleMemojies(false);
+                                  //     showCupertinoModalBottomSheet(
+                                  //       elevation: 0,
+                                  //       expand: true,
+                                  //       context: context,
+                                  //       enableDrag: false,
+                                  //       backgroundColor: Colors.transparent,
+                                  //       builder: (context) {
+                                  //         return BackdropFilter(
+                                  //             filter: ImageFilter.blur(
+                                  //                 sigmaX: 8, sigmaY: 8),
+                                  //             child: const TextEditor());
+                                  //       },
+                                  //     );
+                                  //   },
+                                  // ),
+                                  // bottomButton(
+                                  //   'assets/documents.png',
+                                  //   color: black,
+                                  //   onTap: () {
+                                  //     model.memeChanger(false);
+                                  //     model.animalToggle(false);
+                                  //     model.pixaBayToggle(false);
+                                  //     model.emojieChanger(false);
+                                  //     model.toggleMemojies(false);
+                                  //   },
+                                  // ),
                                   bottomButton(
                                     'assets/photo.png',
                                     color: dirtyWhite,
@@ -465,7 +464,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                   ),
                                   bottomButton(
                                     'assets/memoji.webp',
-                                    color: black,
+                                    color: dirtyWhite,
                                     onTap: () {
                                       model.memeChanger(false);
                                       model.animalToggle(false);
@@ -513,7 +512,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                   ),
                                   bottomButton(
                                     'assets/panda.webp',
-                                    color: black,
+                                    color: dirtyWhite,
                                     onTap: () {
                                       model.memeChanger(false);
                                       model.pixaBayToggle(false);

@@ -1,43 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import '../user_account/account_view.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/help_view.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import 'help_view.dart';
-import 'privacy/privacy.dart';
-import 'storage_media.dart';
-import 'user_account/account_view.dart';
+import 'package:hint/ui/views/storage_media.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:hint/ui/views/privacy/privacy.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
 
 class DistantView extends StatelessWidget {
   final FireUser fireUser;
   const DistantView({Key? key, required this.fireUser}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Widget optionTile({
+      required String text,
+      required IconData icon,
+      required BuildContext context,
+      Function? onTap,
+      Widget? trailing,
+    }) {
+      return ValueListenableBuilder<Box>(
+        valueListenable: appSettings.listenable(),
+        builder: (context, box, child) {
+          bool darkMode = box.get(darkModeKey);
+          return Container(
+            color:darkMode ? darkModeColor : systemBackground,
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: onTap as void Function()?,
+                  child: ListTile(
+                    trailing: trailing,
+                    title: Text(text,
+                        style: Theme.of(context).textTheme.bodyText2),
+                    leading: Icon(icon,color:darkMode ? dirtyWhite : iconColor),
+                  ),
+                ),
+                const Divider(height: 0.0),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
-      backgroundColor: CupertinoColors.extraLightBackgroundGray,
       appBar: AppBar(
         elevation: 0,
+        automaticallyImplyLeading: true,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.back, color: activeBlue, size: 30),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SizedBox(
         width: screenWidth(context),
         child: Column(
           children: [
-            Align(
+            Container(
               alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: CircleAvatar(
-                  maxRadius: 50,
-                  backgroundImage:
-                      CachedNetworkImageProvider(fireUser.photoUrl!),
+              margin: const EdgeInsets.only(left: 16, bottom: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: ExtendedImage(
+                  width: 200,
+                  height: 200,
+                  enableLoadState: true,
+                  handleLoadingProgress: true,
+                  image: NetworkImage(fireUser.photoUrl!),
                 ),
               ),
             ),
@@ -47,7 +79,7 @@ class DistantView extends StatelessWidget {
                 width: screenWidthPercentage(context, percentage: 0.9),
                 child: Column(
                   children: [
-                    widget(
+                    optionTile(
                         context: context,
                         text: 'Account',
                         icon: CupertinoIcons.person,
@@ -60,7 +92,7 @@ class DistantView extends StatelessWidget {
                             ),
                           );
                         }),
-                    widget(
+                    optionTile(
                       context: context,
                       text: 'Privacy & Safety',
                       icon: CupertinoIcons.lock,
@@ -72,13 +104,13 @@ class DistantView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    widget(
+                    optionTile(
                       context: context,
                       text: 'Notifications',
                       icon: CupertinoIcons.bell,
                       onTap: () {},
                     ),
-                    widget(
+                    optionTile(
                       context: context,
                       text: 'Help',
                       icon: CupertinoIcons.question_circle,
@@ -90,7 +122,7 @@ class DistantView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    widget(
+                    optionTile(
                       context: context,
                       text: 'Media',
                       icon: CupertinoIcons.photo_on_rectangle,
@@ -102,43 +134,29 @@ class DistantView extends StatelessWidget {
                         ),
                       ),
                     ),
+                    ValueListenableBuilder<Box>(
+                      valueListenable: appSettings.listenable(),
+                      builder: (context, box, child) {
+                        var darkMode = box.get(darkModeKey);
+                        return optionTile(
+                          context: context,
+                          text: darkMode ? 'Light Theme' : 'Dark Theme',
+                          icon: CupertinoIcons.person,
+                          trailing: CupertinoSwitch(
+                            value: box.get(darkModeKey),
+                            onChanged: (bool val) {
+                              box.put(darkModeKey, val);
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget widget({
-    required BuildContext context,
-    required String text,
-    required IconData icon,
-    required Function onTap,
-  }) {
-    return Container(
-      color: systemBackground,
-      child: Column(
-        children: [
-          InkWell(
-            onTap: onTap as void Function()?,
-            child: ListTile(
-              title: Text(
-                text,
-                style: Theme.of(context).textTheme.bodyText2,
-              ),
-              leading: Icon(icon),
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.black26,
-                size: 14.0,
-              ),
-            ),
-          ),
-          const Divider(height: 0.0),
-        ],
       ),
     );
   }

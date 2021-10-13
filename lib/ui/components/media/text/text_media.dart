@@ -37,11 +37,13 @@ class TextMedia extends StatelessWidget {
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.7,
               minWidth: MediaQuery.of(context).size.width * 0.1),
-          child: Text(messageText!,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(color: systemBackground)),
+          child: Text(
+            messageText!,
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2!
+                .copyWith(color: systemBackground),
+          ),
         ),
       );
     } else {

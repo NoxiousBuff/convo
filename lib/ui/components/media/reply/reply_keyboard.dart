@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:hint/api/hive_helper.dart';
 import 'package:hive/hive.dart';
 import 'reply_back_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -29,11 +30,11 @@ class ReplyKeyboard extends ConsumerWidget {
     final replyStyle = Theme.of(context)
         .textTheme
         .bodyText2!
-        .copyWith(fontSize: 12, color: black);
+        .copyWith(fontSize: 12);
     final style = Theme.of(context)
         .textTheme
         .bodyText2!
-        .copyWith(fontSize: 12, color: black);
+        .copyWith(fontSize: 12);
 
     // RegExp exp = RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+',
     //     caseSensitive: false);
@@ -79,9 +80,44 @@ class ReplyKeyboard extends ConsumerWidget {
           }
         case MediaType.image:
           {
-            return Text(
-              MediaType.image,
-              style: replyStyle,
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(CupertinoIcons.photo),
+                const SizedBox(width: 10),
+                Text(
+                  MediaType.image,
+                  style: replyStyle,
+                ),
+              ],
+            );
+          }
+        case MediaType.pixaBayImage:
+          {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(CupertinoIcons.photo),
+                const SizedBox(width: 10),
+                Text(
+                  MediaType.image,
+                  style: replyStyle,
+                ),
+              ],
+            );
+          }
+        case MediaType.meme:
+          {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(CupertinoIcons.memories),
+                const SizedBox(width: 10),
+                Text(
+                  MediaType.meme,
+                  style: replyStyle,
+                ),
+              ],
             );
           }
         case MediaType.video:
@@ -128,7 +164,33 @@ class ReplyKeyboard extends ConsumerWidget {
         case MediaType.image:
           {
             var messageUid = replyPod.messageUid;
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            final hiveBox = imagesMemoryHiveBox(conversationId);
+            final memoryImage = hiveBox.get(messageUid);
+            return memoryImage != null
+                ? Container(
+                    height: 50,
+                    width: 50,
+                    margin: const EdgeInsets.only(top: 8),
+                    child: ExtendedImage(image: MemoryImage(memoryImage)))
+                : const SizedBox.shrink();
+          }
+        case MediaType.meme:
+          {
+            var messageUid = replyPod.messageUid;
+            final hiveBox = videoThumbnailsHiveBox(conversationId);
+            final memoryImage = hiveBox.get(messageUid);
+            return memoryImage != null
+                ? Container(
+                    height: 50,
+                    width: 50,
+                    margin: const EdgeInsets.only(top: 8),
+                    child: ExtendedImage(image: MemoryImage(memoryImage)))
+                : const SizedBox.shrink();
+          }
+        case MediaType.pixaBayImage:
+          {
+            var messageUid = replyPod.messageUid;
+            final hiveBox = imagesMemoryHiveBox(conversationId);
             final memoryImage = hiveBox.get(messageUid);
             return memoryImage != null
                 ? Container(
@@ -141,7 +203,7 @@ class ReplyKeyboard extends ConsumerWidget {
         case MediaType.video:
           {
             var messageUid = replyPod.messageUid;
-            final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+            final hiveBox = videoThumbnailsHiveBox(conversationId);
             final videoThumbnail = hiveBox.get(messageUid);
             return videoThumbnail != null
                 ? Stack(
@@ -161,7 +223,7 @@ class ReplyKeyboard extends ConsumerWidget {
         case MediaType.canvasImage:
           {
             var messageUid = replyPod.messageUid;
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            final hiveBox = imagesMemoryHiveBox(conversationId);
             return Container(
               height: 50,
               width: 50,
@@ -192,7 +254,9 @@ class ReplyKeyboard extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isMe ? 'Replying to yourself ' : 'Replying to ${fireUser.id}',
+                  isMe
+                      ? 'Replying to yourself '
+                      : 'Replying to ${fireUser.username}',
                   style: style,
                 ),
                 const SizedBox(height: 4),

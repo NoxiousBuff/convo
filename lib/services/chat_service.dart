@@ -1,7 +1,7 @@
-import 'package:hint/api/hive_helper.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive_helper.dart';
 import 'package:animations/animations.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -117,43 +117,4 @@ class ChatService {
       DocumentField.replyMessage: replyMessage,
     });
   }
-
-  // addMessage({
-  //   required String receiverUid,
-  //   required String type,
-  //   required bool isReply,
-  //   String? messageText,
-  //   String? mediaUrl,
-  //   String? link,
-  //   GeoPoint? location,
-  //   String? replyMediaUrl,
-  //   String? replyMsg,
-  //   String? replyMsgId,
-  //   String? replyType,
-  //   String? replyUid,
-  // }) {
-  //   String conversationId = getConversationId(receiverUid, liveUserUid);
-  //   String randomKey = const Uuid().v1();
-  //   _conversationCollection
-  //       .doc(conversationId)
-  //       .collection(chatsFirestoreKey)
-  //       .add({
-  //     'isReply': isReply,
-  //     'link': link,
-  //     'location': location,
-  //     'mediaUrl': mediaUrl,
-  //     'messageText': messageText,
-  //     'messageUid': randomKey,
-  //     'receiverUid': receiverUid,
-  //     'replyMediaUrl': replyMediaUrl,
-  //     'replyMsgId': replyMsgId,
-  //     'replyMsg': replyMsg,
-  //     'replyType': replyType,
-  //     'replyUid': replyUid,
-  //     'senderUid': liveUserUid,
-  //     'status': 'Delivered',
-  //     'timestamp': Timestamp.now(),
-  //     'type': type,
-  //   });
-  // }
 }
