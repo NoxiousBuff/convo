@@ -44,3 +44,7 @@ class MsgRead {
   static const String unread = 'unread';
   static const String readed = 'readed';
 }
+
+class UserField {
+  static const String photoURL = 'photoUrl';
+}

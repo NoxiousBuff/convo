@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 import 'dart:collection';
+import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble_border.dart';
 import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
@@ -37,8 +37,10 @@ class ReplyMedia extends StatelessWidget {
     //final userReply = '${fireUser.username} replied to you';
     //final maxWidth = screenWidthPercentage(context, percentage: 0.7);
     final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
-    final textStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12, color: black);
+    final textStyle = Theme.of(context)
+        .textTheme
+        .bodyText2!
+        .copyWith(fontSize: 12, color: black);
     // Widget replyDetector(BuildContext context) {
     //   switch (replyMessage[ReplyField.replyType]) {
     //     case MediaType.text:
@@ -265,12 +267,12 @@ class ReplyMedia extends StatelessWidget {
               ),
               child: CustomPaint(
                 painter:
-                    ChatBubbleBorder(color: inActiveGrey, type: bubbleType),
+                    ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
-                    maxLines: 3,
+                    maxLines: 2,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
                     style: textStyle,
@@ -288,12 +290,12 @@ class ReplyMedia extends StatelessWidget {
               ),
               child: CustomPaint(
                 painter:
-                    ChatBubbleBorder(color: inActiveGrey, type: bubbleType),
+                    ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
-                    maxLines: 3,
+                    maxLines: 2,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
                     style: textStyle,
@@ -305,7 +307,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.image:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            final hiveBox = imagesMemoryHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -313,7 +315,7 @@ class ReplyMedia extends StatelessWidget {
               ),
               child: CustomPaint(
                 painter: ChatBubbleBorder(
-                    color: inActiveGrey, type: bubbleType, radius: 15),
+                    color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
                   child: Row(
@@ -349,7 +351,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.video:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('VideoThumbnails[$conversationId]');
+            final hiveBox = videoThumbnailsHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -357,7 +359,55 @@ class ReplyMedia extends StatelessWidget {
               ),
               child: CustomPaint(
                 painter: ChatBubbleBorder(
-                    color: inActiveGrey, type: bubbleType, radius: 15),
+                    color: lightBlue, type: bubbleType, radius: 15),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(alignment: Alignment.center, children: [
+                        ClipRRect(
+                          borderRadius: borderRadius,
+                          child: SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: ExtendedImage(
+                              fit: BoxFit.cover,
+                              enableMemoryCache: true,
+                              handleLoadingProgress: true,
+                              image: MemoryImage(hiveBox.get(messageUid)),
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.play_arrow,
+                            color: systemBackground, size: 15),
+                      ]),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Video',
+                        maxLines: 3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        case MediaType.meme:
+          {
+            final messageUid = replyMessage[ReplyField.replyMessageUid];
+            final hiveBox = videoThumbnailsHiveBox(conversationId);
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter: ChatBubbleBorder(
+                    color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
                   child: Row(
@@ -379,13 +429,11 @@ class ReplyMedia extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const Icon(Icons.play_arrow,
-                              color: systemBackground, size: 15),
                         ],
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'Video',
+                        'Meme',
                         maxLines: 3,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
@@ -400,7 +448,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.canvasImage:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = Hive.box('ImagesMemory[$conversationId]');
+            final hiveBox = imagesMemoryHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -408,7 +456,7 @@ class ReplyMedia extends StatelessWidget {
               ),
               child: CustomPaint(
                 painter: ChatBubbleBorder(
-                    color: inActiveGrey, type: bubbleType, radius: 15),
+                    color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
                   child: Row(
@@ -427,6 +475,47 @@ class ReplyMedia extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text(
                         'CanvasImage',
+                        maxLines: 3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        case MediaType.pixaBayImage:
+          {
+            final messageUid = replyMessage[ReplyField.replyMessageUid];
+            final hiveBox = imagesMemoryHiveBox(conversationId);
+            return Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              constraints: BoxConstraints(
+                maxWidth: screenWidthPercentage(context, percentage: 0.6),
+              ),
+              child: CustomPaint(
+                painter: ChatBubbleBorder(
+                    color: lightBlue, type: bubbleType, radius: 15),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: ExtendedImage(
+                          fit: BoxFit.cover,
+                          enableMemoryCache: true,
+                          handleLoadingProgress: true,
+                          image: MemoryImage(hiveBox.get(messageUid)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Image',
                         maxLines: 3,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,

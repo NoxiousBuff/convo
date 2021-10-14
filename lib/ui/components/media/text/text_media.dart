@@ -31,18 +31,20 @@ class TextMedia extends StatelessWidget {
             ? isRead
                 ? activeBlue
                 : lightBlue
-            : CupertinoColors.systemGrey6,
+            : inActiveGrey,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.7,
               minWidth: MediaQuery.of(context).size.width * 0.1),
-          child: Text(
-            messageText!,
-            style: Theme.of(context)
-                .textTheme
-                .bodyText2!
-                .copyWith(color: systemBackground),
+          child: RichText(
+            text: TextSpan(
+              text: messageText!,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText2!
+                  .copyWith(color: systemBackground),
+            ),
           ),
         ),
       );

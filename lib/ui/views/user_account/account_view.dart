@@ -1,11 +1,7 @@
-import 'dart:io';
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/user_account/profile_photo.dart';
 import 'package:hint/ui/views/user_account/update_user.dart';
@@ -19,24 +15,7 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  String? connection;
-  Map _source = {ConnectivityResult.none: false};
-  final MyConnectivity _connectivity = MyConnectivity.instance;
   final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
-  @override
-  void initState() {
-    super.initState();
-    _connectivity.initialise();
-    _connectivity.myStream.listen((source) {
-      setState(() => _source = source);
-    });
-  }
-
-  @override
-  void dispose() {
-    _connectivity.disposeStream();
-    super.dispose();
-  }
 
   Widget heading({required BuildContext context, required String title}) {
     return ListTile(
@@ -49,18 +28,7 @@ class _AccountState extends State<Account> {
 
   @override
   Widget build(BuildContext context) {
-    switch (_source.keys.toList()[0]) {
-      case ConnectivityResult.none:
-        connection = "Offline";
-        break;
-      case ConnectivityResult.mobile:
-        connection = "Online";
-        break;
-      case ConnectivityResult.wifi:
-        connection = "Online";
-    }
     return Scaffold(
-      backgroundColor: extraLightBackgroundGray,
       appBar: CupertinoNavigationBar(
         backgroundColor: Colors.transparent,
         border: Border.all(color: Colors.transparent),
@@ -75,7 +43,7 @@ class _AccountState extends State<Account> {
       ),
       body: Column(
         children: [
-          ProfilePhoto(fireUser: widget.fireUser, connection: connection),
+          ProfilePhoto(fireUser: widget.fireUser, connection: 'Online'),
           Container(
             color: systemBackground,
             child: Column(
@@ -142,7 +110,6 @@ class _AccountState extends State<Account> {
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.black26,
                 size: 14.0,
               ),
             ),
@@ -174,7 +141,6 @@ class _AccountState extends State<Account> {
                 Text(trailingText!),
                 const Icon(
                   Icons.arrow_forward_ios,
-                  color: Colors.black26,
                   size: 14.0,
                 ),
               ],
@@ -185,44 +151,4 @@ class _AccountState extends State<Account> {
       ],
     );
   }
-}
-
-class MyConnectivity {
-  MyConnectivity._internal();
-
-  static final MyConnectivity _instance = MyConnectivity._internal();
-
-  static MyConnectivity get instance => _instance;
-
-  Connectivity connectivity = Connectivity();
-
-  StreamController controller = StreamController.broadcast();
-
-  Stream get myStream => controller.stream;
-
-  void initialise() async {
-    ConnectivityResult result = await connectivity.checkConnectivity();
-    _checkStatus(result);
-    connectivity.onConnectivityChanged.listen((result) {
-      _checkStatus(result);
-    });
-  }
-
-  void _checkStatus(ConnectivityResult result) async {
-    bool isOnline = false;
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        isOnline = true;
-      } else {
-        isOnline = false;
-      }
-    } on SocketException catch (_) {
-      isOnline = false;
-    }
-    //controller.sink.add({result: isOnline});
-    getLogger('account_view').i(isOnline);
-  }
-
-  void disposeStream() => controller.close();
 }

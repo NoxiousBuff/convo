@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
@@ -86,6 +86,68 @@ class ProfileView extends StatelessWidget {
     );
   }
 
+  Widget notificationDialog(BuildContext context, ProfileViewModel model) {
+    final maxWidth = screenWidthPercentage(context, percentage: 0.6);
+    final maxHeight = screenHeightPercentage(context, percentage: 0.52);
+    return Dialog(
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: maxHeight,
+          maxWidth: maxWidth,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Text(
+                'Mute notification for this conversation',
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: model.optionName.length,
+              itemBuilder: (context, index) {
+                return RadioListTile(
+                  value: index,
+                  groupValue: model.value,
+                  title: Text(
+                    model.optionName[index],
+                    style: Theme.of(context).textTheme.bodyText2,
+                  ),
+                  onChanged: (int? i) {
+                    model.currentIndex(i);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextButton(
+                  onPressed: () {
+                    model.currentIndex(null);
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Don\'t Mute',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(color: lightBlue),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> clearChatDialog(BuildContext context) async {
     final maxWidth = screenWidthPercentage(context, percentage: 0.55);
     final maxHeight = screenHeightPercentage(context, percentage: 0.18);
@@ -150,10 +212,6 @@ class ProfileView extends StatelessWidget {
     required BuildContext context,
     required ProfileViewModel model,
   }) {
-    final borderRadius = BorderRadius.circular(8);
-    final shape = RoundedRectangleBorder(borderRadius: borderRadius);
-    final maxWidth = screenWidthPercentage(context, percentage: 0.6);
-    final maxHeight = screenHeightPercentage(context, percentage: 0.5);
     final backGroundImage = CachedNetworkImageProvider(fireUser.photoUrl!);
     return Container(
       padding: const EdgeInsets.all(8),
@@ -202,72 +260,7 @@ class ProfileView extends StatelessWidget {
                       onTap: () => showDialog(
                         context: context,
                         builder: (context) {
-                          return Dialog(
-                            shape: shape,
-                            child: Container(
-                              constraints: BoxConstraints(
-                                maxHeight: maxHeight,
-                                maxWidth: maxWidth,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    child: Text(
-                                      'Mute notification for this conversation',
-                                      style:
-                                          Theme.of(context).textTheme.bodyText1,
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: model.optionName.length,
-                                    itemBuilder: (context, index) {
-                                      return RadioListTile(
-                                        value: index,
-                                        activeColor: activeBlue,
-                                        groupValue: model.value,
-                                        title: Text(
-                                          model.optionName[index],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2,
-                                        ),
-                                        onChanged: (int? i) {
-                                          model.currentIndex(i);
-                                          getLogger('ProfileView')
-                                              .wtf("value:${model.value}");
-                                          Navigator.pop(context);
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          model.currentIndex(null);
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          'Don\'t Mute',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2!
-                                              .copyWith(color: lightBlue),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
+                          return notificationDialog(context, model);
                         },
                       ),
                     ),
@@ -281,7 +274,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget defaultOptions(BuildContext context) {
+  Widget defaultOptions(BuildContext context, ProfileViewModel model) {
     Widget optionTile({
       IconData? icon,
       required String title,
@@ -307,7 +300,45 @@ class ProfileView extends StatelessWidget {
     return Column(
       children: [
         optionTile(title: 'Clear Chat', icon: CupertinoIcons.delete),
-        optionTile(title: 'Background', icon: CupertinoIcons.photo),
+        optionTile(
+          title: 'Background',
+          icon: CupertinoIcons.photo,
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text(
+                    'Pick Image From',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  content: Column(
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          await model.pickImage(ImageSource.camera);
+                        },
+                        child: Text(
+                          'Camera',
+                          style: Theme.of(context).textTheme.bodyText2,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await model.pickImage(ImageSource.gallery);
+                        },
+                        child: Text(
+                          'Gallery',
+                          style: Theme.of(context).textTheme.bodyText2,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
         optionTile(title: 'Encryption', icon: CupertinoIcons.lock),
         optionTile(title: 'Disappearing Messages', icon: CupertinoIcons.timer),
       ],
@@ -389,56 +420,47 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: systemBackground,
-      appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: true,
-        backgroundColor: Colors.transparent,
-      ),
-      body: ViewModelBuilder<ProfileViewModel>.reactive(
-        viewModelBuilder: () => ProfileViewModel(),
-        onDispose: (model) async {
-          await Hive.openBox(urlData(conversationId));
-          await Hive.openBox(imagesMemory(conversationId));
-          await Hive.openBox(chatRoomMedia(conversationId));
-          await Hive.openBox(thumbnailsPath(conversationId));
-          await Hive.openBox(videoThumbnails(conversationId));
-        },
-        builder: (_, viewModel, child) {
-          return Scaffold(
-            body: ListView(
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              children: [
-                profileBox(context: context, model: viewModel),
-                defaultOptions(context),
-                SizedBox(
-                  height: 60,
-                  child: ListTile(
-                    title: Text(
-                      'More Actions',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
+    return ViewModelBuilder<ProfileViewModel>.reactive(
+      viewModelBuilder: () => ProfileViewModel(),
+      onDispose: (model) async {
+        await Hive.openBox(urlData(conversationId));
+        await Hive.openBox(imagesMemory(conversationId));
+        await Hive.openBox(chatRoomMedia(conversationId));
+        await Hive.openBox(thumbnailsPath(conversationId));
+        await Hive.openBox(videoThumbnails(conversationId));
+      },
+      builder: (_, viewModel, child) {
+        return Scaffold(
+          body: ListView(
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            children: [
+              profileBox(context: context, model: viewModel),
+              defaultOptions(context, viewModel),
+              SizedBox(
+                height: 60,
+                child: ListTile(
+                  title: Text(
+                    'More Actions',
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
-                moreActionOption(context),
-                SizedBox(
-                  height: 60,
-                  child: ListTile(
-                    title: Text(
-                      'Privacy',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
+              ),
+              moreActionOption(context),
+              SizedBox(
+                height: 60,
+                child: ListTile(
+                  title: Text(
+                    'Privacy',
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
-                privacyOption(context),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+              privacyOption(context),
+            ],
+          ),
+        );
+      },
     );
   }
 }

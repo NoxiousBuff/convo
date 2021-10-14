@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +185,7 @@ class ChatListView extends StatelessWidget {
         return ValueListenableBuilder<Box>(
           valueListenable: appSettings.listenable(),
           builder: (context, box, child) {
-            var darkMode = box.get(darkModeKey);
+            var darkMode = box.get(darkModeKey, defaultValue: false);
             return Scaffold(
               appBar: CupertinoNavigationBar(
                 border: const Border(

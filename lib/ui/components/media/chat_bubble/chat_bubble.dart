@@ -12,7 +12,7 @@ class ChatBubble extends StatelessWidget {
   const ChatBubble({
     Key? key,
     this.radius = 18,
-    this.nipSize = 10,
+    this.nipSize = 7,
     required this.child,
     required this.bubbleType,
     required this.bubbleColor,

@@ -12,7 +12,7 @@ class ChatBubbleBorder extends CustomPainter {
       {required this.color,
       required this.type,
       this.radius = 18,
-      this.nipSize = 10,
+      this.nipSize = 7,
       this.borderderWidth = 1.0,
       });
 

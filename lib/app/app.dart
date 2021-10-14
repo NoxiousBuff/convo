@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
       builder: (context, box, child) {
-        bool darkTheme = box.get(darkModeKey);
+        var darkTheme = box.get(darkModeKey, defaultValue: false);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
@@ -49,6 +49,10 @@ class MyApp extends StatelessWidget {
                 fontSize: 18,
                 color: systemBackground,
                 fontWeight: FontWeight.bold,
+              ),
+              bodyText1: GoogleFonts.roboto(
+                fontSize: 16,
+                color: systemBackground,
               ),
               bodyText2: GoogleFonts.roboto(
                 fontSize: 14,
@@ -81,8 +85,13 @@ class MyApp extends StatelessWidget {
                 color: darkModeColor,
                 fontWeight: FontWeight.bold,
               ),
+              bodyText1: GoogleFonts.roboto(
+                fontSize: 16,
+                color: darkModeColor,
+              ),
               bodyText2: GoogleFonts.roboto(
                 fontSize: 14,
+                height: 1.2,
                 color: darkModeColor,
               ),
               caption: GoogleFonts.roboto(

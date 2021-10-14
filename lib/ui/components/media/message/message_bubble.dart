@@ -1,12 +1,13 @@
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
-import 'package:swipe_to/swipe_to.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
+import 'package:hint/widgets/swipe_to.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -136,7 +137,6 @@ class MessageBubble extends StatelessWidget {
         }
       case MediaType.pixaBayImage:
         {
-         
           return PixaBayImage(
             isRead: isRead,
             message: message,
@@ -155,12 +155,13 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final replyMessage = message.replyMessage;
-    final replyRiverPod = context.read(replyBackProvider);
     final messageDate = message.timestamp.toDate();
+    final replyRiverPod = context.read(replyBackProvider);
     bool isMe = MessageBubble.liveUserUid == message.senderUid;
-    final date = DateFormat('yyyy-MM-dd').format(messageDate).toString();
+    final date = DateFormat('yMMMMd').format(messageDate).toString();
     final mainAxis = isMe ? MainAxisAlignment.end : MainAxisAlignment.start;
     final crossAxis = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final replyAlignment = isMe ? Alignment.centerLeft : Alignment.centerRight;
     return ViewModelBuilder<MessageBubbleViewModel>.reactive(
       viewModelBuilder: () => MessageBubbleViewModel(),
       onModelReady: (model) {
@@ -170,45 +171,56 @@ class MessageBubble extends StatelessWidget {
         if (model.hasError) {
           log.e('There is an error');
         }
-        return SwipeTo(
-          onRightSwipe: () {
-            replyRiverPod.showReplyBool(true);
-            log.wtf('showReply: ${replyRiverPod.showReply}');
-            replyRiverPod.getSwipedValue(
-              isMeBool: isMe,
-              fireuser: fireUser,
-              swipedReply: message.isReply,
-              swipedMessage: message.message,
-              swipedMessageType: message.type,
-              swipedTimestamp: message.timestamp,
-              swipedMessageUid: message.messageUid,
-            );
-            log.wtf('Message${replyRiverPod.message}');
-          },
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: message.isReply ? 10 : 4),
-            child: Column(
-              mainAxisAlignment: mainAxis,
-              crossAxisAlignment: crossAxis,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                classifyingDate(date, context),
-                message.isReply
-                    ? ReplyMedia(
-                        isMe: isMe,
-                        fireUser: fireUser,
-                        replyMessage: replyMessage!,
-                        conversationId: conversationId)
-                    : const SizedBox.shrink(),
-                mediaContent(
-                  isMe: isMe,
-                  model: model,
-                  isRead: message.isRead,
-                  messageType: message.type,
-                  messageUid: message.messageUid,
-                ),
-              ],
-            ),
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: message.isReply ? 8 : 0),
+          child: Column(
+            mainAxisAlignment: mainAxis,
+            crossAxisAlignment: crossAxis,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              classifyingDate(date, context),
+              Column(
+                mainAxisAlignment: mainAxis,
+                crossAxisAlignment: crossAxis,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  message.isReply
+                      ? Align(
+                          alignment: replyAlignment,
+                          child: ReplyMedia(
+                              isMe: isMe,
+                              fireUser: fireUser,
+                              replyMessage: replyMessage!,
+                              conversationId: conversationId),
+                        )
+                      : const SizedBox.shrink(),
+                  const SizedBox(height: 10),
+                  SwipeTo(
+                    onRightSwipe: () {
+                      replyRiverPod.showReplyBool(true);
+                      log.wtf('showReply: ${replyRiverPod.showReply}');
+                      replyRiverPod.getSwipedValue(
+                        isMeBool: isMe,
+                        fireuser: fireUser,
+                        swipedReply: message.isReply,
+                        swipedMessage: message.message,
+                        swipedMessageType: message.type,
+                        swipedTimestamp: message.timestamp,
+                        swipedMessageUid: message.messageUid,
+                      );
+                      log.wtf('Message${replyRiverPod.message}');
+                    },
+                    child: mediaContent(
+                      isMe: isMe,
+                      model: model,
+                      isRead: message.isRead,
+                      messageType: message.type,
+                      messageUid: message.messageUid,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         );
       },
@@ -222,7 +234,7 @@ class MessageBubble extends StatelessWidget {
         read,
         style: GoogleFonts.roboto(
           fontSize: 10.0,
-          color: inActiveGrey,
+          color: inactiveGray,
         ),
       ),
     );
@@ -238,7 +250,7 @@ class MessageBubble extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: iconColor),
+            Icon(icon, color: inactiveGray),
             Text(
               title,
               style: Theme.of(context)
@@ -318,13 +330,27 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget classifyingDate(String dateRead, BuildContext context) {
+    final dateTime = DateTime.now();
+    final yesterDay = DateTime.now().subtract(const Duration(days: 1));
+    final todayDate = DateFormat('yMMMMd').format(dateTime).toString();
+    final yesterDayDate = DateFormat('yMMMMd').format(yesterDay).toString();
+    String date() {
+      if (dateRead == todayDate) {
+        return 'Today';
+      } else if (dateRead == yesterDayDate) {
+        return 'Yesterday';
+      } else {
+        return dateRead;
+      }
+    }
+
     return isTimestampMatched
-        ? Container(
-            margin: const EdgeInsets.symmetric(vertical: 40),
-            width: screenWidth(context),
-            child: Center(
+        ? Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
-                dateRead,
+                date(),
                 style: Theme.of(context).textTheme.bodyText2,
               ),
             ),

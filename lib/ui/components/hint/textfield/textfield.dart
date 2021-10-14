@@ -20,7 +20,6 @@ import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/shared/emojies/emojie_view.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:hint/ui/shared/text_editor/text_editor.dart';
 import 'package:hint/ui/shared/animal_memojie/animal_memojie.dart';
 import 'package:hint/ui/shared/drawing_canvas/drawing_canvas.dart';
 import 'package:hint/ui/components/media/reply/reply_keyboard.dart';

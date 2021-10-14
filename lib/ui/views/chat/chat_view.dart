@@ -1,10 +1,10 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
@@ -41,6 +41,7 @@ class ChatView extends StatelessWidget {
       systemNavigationBarDividerColor: black,
       systemNavigationBarColor: Colors.transparent,
     );
+    getLogger('$systemUiOverlays');
     return ViewModelBuilder<ChatViewModel>.reactive(
       onModelReady: (model) {
         model.scrollController = ScrollController();
