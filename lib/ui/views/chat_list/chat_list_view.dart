@@ -6,6 +6,7 @@ import 'package:hint/prototypes/contact/contact_view.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:hint/ui/views/search/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'chat_list_viewmodel.dart';
@@ -26,7 +27,7 @@ class ChatListView extends StatelessWidget {
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
-          final int randomNumber = Random().nextInt(4) + 1;
+          final int randomNumber = Random().nextInt(4);
           // final Color randomColor = Color.fromARGB(
           //     Random().nextInt(256),
           //     Random().nextInt(256),
@@ -356,7 +357,12 @@ class ChatListView extends StatelessWidget {
               // leading: GestureDetector(child: const Icon(Icons.arrow_back), onTap: () {
               //   navService.materialPageRoute(context, const DistantView());
               // },),
-              trailing: Image.asset('avatars/default3.png'),
+              trailing: GestureDetector(
+                child: Image.asset('avatars/default3.png'),
+                onTap: () {
+                  navService.materialPageRoute(context, const DistantView());
+                },
+              ),
               largeTitle: const Text(
                 'Messages',
                 // style: GoogleFonts.poppins(),

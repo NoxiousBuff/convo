@@ -8,13 +8,22 @@ class UsernameRegisterViewModel extends BaseViewModel {
   static final AuthService _authService = AuthService();
   static final FirestoreApi _firestoreApi = FirestoreApi();
 
-  final TextEditingController _controller = TextEditingController();
-  TextEditingController get usernameTech => _controller;
+  final TextEditingController _firstNameController = TextEditingController();
+  TextEditingController get firstNameTech => _firstNameController;
 
-  bool usernameEmpty = true;
+  final TextEditingController _lastNameController = TextEditingController();
+  TextEditingController get lastNameTech => _lastNameController;
 
-  void updateUsernameEmpty() {
-    usernameEmpty = usernameTech.text.isEmpty;
+  bool firstNameEmpty = true;
+  bool lastNameEmpty = true;
+
+  void updateFirstNameEmpty() {
+    firstNameEmpty = firstNameTech.text.isEmpty;
+    notifyListeners();
+  }
+
+  void updateSecondNameEmpty() {
+    lastNameEmpty = lastNameTech.text.isEmpty;
     notifyListeners();
   }
 

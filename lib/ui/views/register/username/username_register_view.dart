@@ -75,14 +75,47 @@ class UsernameRegisterView extends StatelessWidget {
                         return null;
                       }
                     },
-                    controller: model.usernameTech,
-                    onChanged: (value) => model.updateUsernameEmpty(),
+                    controller: model.firstNameTech,
+                    onChanged: (value) => model.updateFirstNameEmpty(),
                     cursorColor: Colors.blue,
                     decoration: InputDecoration(
                       fillColor: CupertinoColors.extraLightBackgroundGray,
                       filled: true,
                       isDense: true,
-                      hintText: 'Full Name',
+                      hintText: 'First Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: CupertinoColors.lightBackgroundGray,
+                        ),
+                      ),
+                    ),
+                  ),
+                  verticalSpaceSmall,
+                  TextFormField(
+                    autofocus: true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is mandatory to fill';
+                      }
+                      if (value.length < 5) {
+                        return 'must be at least 5 characters';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: model.lastNameTech,
+                    onChanged: (value) => model.updateSecondNameEmpty(),
+                    cursorColor: Colors.blue,
+                    decoration: InputDecoration(
+                      fillColor: CupertinoColors.extraLightBackgroundGray,
+                      filled: true,
+                      isDense: true,
+                      hintText: 'Last Name',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide.none,
@@ -99,7 +132,7 @@ class UsernameRegisterView extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: model.usernameEmpty
+                      color: model.firstNameEmpty || model.lastNameEmpty
                           ? Colors.blue.shade700.withOpacity(0.5)
                           : Colors.blue.shade700,
                       borderRadius: BorderRadius.circular(8.0),
@@ -109,15 +142,13 @@ class UsernameRegisterView extends StatelessWidget {
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: model.usernameEmpty
+                      onPressed: model.firstNameEmpty || model.lastNameEmpty
                           ? null
                           : () {
                               if (model.usernameFormKey.currentState!
                                   .validate()) {
-                                getLogger('UsernameRegisterView')
-                                    .i(model.usernameTech.text);
                                 model.updateUserDisplayName(
-                                    model.usernameTech.text, onError: () {
+                                    '${model.firstNameTech.text} ${model.lastNameTech.text}', onError: () {
                                   getLogger('UsernameRegisterView')
                                       .i('Error Occurred.');
                                   // ignore: todo

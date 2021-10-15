@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/views/register/avatar/avatar_register_view.dart';
+import 'package:hint/ui/views/register/interests/interests_view.dart';
 
 class DistantView extends StatelessWidget {
   const DistantView({Key? key}) : super(key: key);
@@ -76,11 +80,56 @@ class DistantView extends StatelessWidget {
                   const Divider(height: 0.0),
                   InkWell(
                     onTap: () {},
+                    child: const ListTile(
+                      title: Text('Calls'),
+                      leading: Icon(CupertinoIcons.doc),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.black26,
+                        size: 14.0,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 0.0),
+                  InkWell(
+                    onTap: () {
+                      navService.materialPageRoute(context, InterestsView());
+                    },
+                    child: const ListTile(
+                      title: Text('Interest Based'),
+                      leading: Icon(CupertinoIcons.doc),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.black26,
+                        size: 14.0,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 0.0),
+                  InkWell(
+                    onTap: () {
+                      navService.materialPageRoute(context, const AvatarRegisterView());
+                    },
+                    child: const ListTile(
+                      title: Text('Avatar View'),
+                      leading: Icon(CupertinoIcons.doc),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.black26,
+                        size: 14.0,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 0.0),
+                  InkWell(
+                    onTap: () {
+                      AuthService().signOut(context);
+                    },
                     borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0)),
                     child: const ListTile(
-                      title: Text('Calls'),
+                      title: Text('LogOut'),
                       leading: Icon(CupertinoIcons.phone),
                       trailing: Icon(
                         Icons.arrow_forward_ios,
