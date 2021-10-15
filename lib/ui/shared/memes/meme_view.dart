@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'meme_viewmodel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
@@ -22,8 +23,9 @@ import 'package:native_admob_flutter/native_admob_flutter.dart';
 class Memes extends StatelessWidget {
   final String receiverUid;
   final String conversationId;
+  final ChatViewModel chatViewModel;
   const Memes(
-      {Key? key, required this.receiverUid, required this.conversationId})
+      {Key? key, required this.receiverUid, required this.conversationId, required this.chatViewModel})
       : super(key: key);
 
   Widget adWidget(BuildContext context) {
@@ -127,6 +129,7 @@ class Memes extends StatelessWidget {
               await viewModel.fetchNextSet('memes');
             }
           },
+          disposeViewModel: true,
           builder: (_, viewModel, __) {
             return !connected
                 ? connectionDialog(context)
@@ -170,6 +173,7 @@ class Memes extends StatelessWidget {
                                         messageUid: messageUid,
                                         receiverUid: receiverUid,
                                         timestamp: Timestamp.now(),
+                                        userBlockMe: chatViewModel.userBlockMe
                                       );
                                       Uint8List bytes =
                                           (await NetworkAssetBundle(

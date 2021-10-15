@@ -15,12 +15,18 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   ChatService chatService = ChatService();
   ChatViewModel({required this.conversationId, required this.fireUser});
 
+  String _backgroundImagePath = '';
+  String get backgroungImagePath => _backgroundImagePath;
+
+  bool _iBlockThisUser = false;
+  bool get iBlockThisUser => _iBlockThisUser;
+
+  bool _userBlockMe = false;
+  bool get userBlockMe => _userBlockMe;
+
   FireUser fireUser;
 
   String conversationId;
-
-  String? _uploadingMessageUid;
-  String? get uploadingMessageUid => _uploadingMessageUid;
 
   final List<String> _messagesDate = [];
   List<String> get messagesDate => _messagesDate;
@@ -37,16 +43,54 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
 
+  void iBlockThisUserValue(bool block) {
+    _iBlockThisUser = block;
+    notifyListeners();
+  }
+
+  void getBackgroundImagePath(String path) {
+    _backgroundImagePath = path;
+    notifyListeners();
+    getLogger('ChatView').w('path:$path');
+  }
+
+  Future<bool> iBlockThisUserCkecker(
+      String currentUserId, String fireUserId) async {
+    final query = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(currentUserId)
+        .get();
+
+    final firestoreUser = FireUser.fromFirestore(query);
+
+    _iBlockThisUser = firestoreUser.blockedUsers.contains(fireUserId);
+    notifyListeners();
+
+    return firestoreUser.blockedUsers.contains(fireUserId);
+  }
+
+  Future<bool> userBlockMeChecker(
+      String fireuserId, String currentUserId) async {
+    final query = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(fireuserId)
+        .get();
+
+    final firestoreUser = FireUser.fromFirestore(query);
+
+    _userBlockMe = firestoreUser.blockedUsers.contains(currentUserId);
+    notifyListeners();
+    return firestoreUser.blockedUsers.contains(currentUserId);
+  }
+
   Stream<QuerySnapshot> getChats(String conversationId) {
     return conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
-        .orderBy(
-          DocumentField.timestamp,
-          descending: true
-        )
+        .orderBy(DocumentField.timestamp, descending: true)
         .snapshots();
   }
+
   void getMessagesDate(String date) {
     _messagesDate.add(date);
   }
@@ -55,8 +99,6 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
     _messagesTimestamp.add(_timestamp);
   }
 
-
-
   Future<void> seeMsg() async {
     WriteBatch batch = FirebaseFirestore.instance.batch();
     await conversationCollection
@@ -64,6 +106,7 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
         .collection(chatsFirestoreKey)
         .where(DocumentField.senderUid, isEqualTo: fireUser.id)
         .where(DocumentField.isRead, isEqualTo: false)
+        .where(DocumentField.userBlockMe, isEqualTo: false)
         .get()
         .then((query) {
       for (var document in query.docs) {

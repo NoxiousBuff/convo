@@ -31,7 +31,7 @@ class TextMedia extends StatelessWidget {
             ? isRead
                 ? activeBlue
                 : lightBlue
-            : inActiveGrey,
+            : inactiveGray,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           constraints: BoxConstraints(

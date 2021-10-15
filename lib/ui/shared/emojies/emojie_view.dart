@@ -173,8 +173,8 @@ class EmojiesView extends StatelessWidget {
             children: [
               TabBar(
                 indicatorWeight: 2.0,
-                indicatorColor: inActiveGrey,
-                unselectedLabelColor: inActiveGrey,
+                indicatorColor: inactiveGray,
+                unselectedLabelColor: inactiveGray,
                 automaticIndicatorColorAdjustment: true,
                 tabs: [
                   IconButton(

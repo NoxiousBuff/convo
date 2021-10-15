@@ -2,38 +2,43 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FireUser {
   final String id;
-  final String email;
-  final String? photoUrl;
   final String? bio;
+  final String email;
   final String status;
-  final String username;
-  final Timestamp userCreated;
-  // final Timestamp? timestamp;
   final String? phone;
+  final String username;
+  final String? photoUrl;
+  final Timestamp lastSeen;
+  final Timestamp userCreated;
+  final List<dynamic> blockedUsers;
 
-  FireUser(
-      {required this.id,
-      required this.email,
-      this.photoUrl,
-      this.bio,
-      required this.status,
-      required this.username,
-      required this.userCreated,
+  FireUser({
+    this.bio,
+    this.phone,
+    this.photoUrl,
+    required this.id,
+    required this.email,
+    required this.status,
+    required this.lastSeen,
+    required this.username,
+    required this.userCreated,
+    required this.blockedUsers,
     //  this.timestamp,
-       this.phone,});
+  });
 
   //deserializing the user document
   factory FireUser.fromFirestore(DocumentSnapshot doc) {
     return FireUser(
       id: doc['id'],
-      email: doc['email'],
-      photoUrl: doc['photoUrl'],
       bio: doc['bio'],
+      email: doc['email'],
+      phone: doc['phone'],
       status: doc['status'],
+      photoUrl: doc['photoUrl'],
       username: doc['username'],
+      lastSeen: doc['lastSeen'],
       userCreated: doc['userCreated'],
-      // timestamp: doc['timestamp'],
-      phone: doc['phone']
+      blockedUsers: doc ['blockedUsers']
     );
   }
 }

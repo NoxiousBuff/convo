@@ -23,6 +23,7 @@ const activeBlue = CupertinoColors.activeBlue;
 const activeGreen = CupertinoColors.activeGreen;
 const systemGrey6 = CupertinoColors.systemGrey6;
 const inactiveGray = CupertinoColors.inactiveGray;
+const iconColor = CupertinoColors.inactiveGray;
 const systemBackground = CupertinoColors.systemBackground;
 const extraLightBackgroundGray = CupertinoColors.extraLightBackgroundGray;
 

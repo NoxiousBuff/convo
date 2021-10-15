@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:uuid/uuid.dart';
 import 'pixabay_viewmodel.dart';
 import 'package:stacked/stacked.dart';
@@ -25,8 +26,9 @@ import 'package:native_admob_flutter/native_admob_flutter.dart';
 class PixaBay extends StatelessWidget {
   final String receiverUid;
   final String conversationId;
+  final ChatViewModel chatViewModel;
   const PixaBay(
-      {Key? key, required this.receiverUid, required this.conversationId})
+      {Key? key, required this.receiverUid, required this.conversationId, required this.chatViewModel})
       : super(key: key);
 
   Widget connectionDialog(BuildContext context) {
@@ -214,11 +216,12 @@ class PixaBay extends StatelessWidget {
                                     onTap: () async {
                                       var messageUid = const Uuid().v1();
                                       chatService.addFirestoreMessage(
-                                        type: MediaType.pixaBayImage,
                                         mediaURL: imageURL,
                                         messageUid: messageUid,
                                         receiverUid: receiverUid,
                                         timestamp: Timestamp.now(),
+                                        type: MediaType.pixaBayImage,
+                                        userBlockMe: chatViewModel.userBlockMe,
                                       );
                                       Uint8List bytes =
                                           (await NetworkAssetBundle(

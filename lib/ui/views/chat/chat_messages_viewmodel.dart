@@ -13,7 +13,6 @@ class ChatMessagesViewModel extends StreamViewModel<QuerySnapshot> {
 
   FireUser fireUser;
 
-
   String conversationId;
 
   final CollectionReference conversationCollection =

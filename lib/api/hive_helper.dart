@@ -32,7 +32,9 @@ String videoThumbnails(String conversationId) =>
 
 const String appSettingsBoxName = 'AppSettings';
 
-const String darkModeKey = 'darkMode'; 
+const String darkModeKey = 'darkMode';
+const String blockedUsersKey = 'blockedUsers';
+const String chatBackgroundKey = 'chatBackgroundImage';
 
 // -----------------------------------------------------------------------------
 

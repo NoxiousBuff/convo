@@ -224,6 +224,7 @@ class _HintTextFieldState extends State<HintTextField> {
                       connected: connected,
                       controller: messageTech,
                       receiverUid: widget.receiverUid,
+                      chatViewModel: widget.chatViewModel,
                       conversationId: widget.conversationId),
             ),
             textAlign: TextAlign.start,
@@ -314,6 +315,7 @@ class _HintTextFieldState extends State<HintTextField> {
                                         backgroundColor: Colors.transparent,
                                         builder: (context) => DrawingCanvas(
                                           receiverUid: widget.receiverUid,
+                                          chatViewModel: widget.chatViewModel,
                                           conversationId: widget.conversationId,
                                         ),
                                       );
@@ -377,6 +379,8 @@ class _HintTextFieldState extends State<HintTextField> {
                                               timestamp: timestamp,
                                               messageUid: messageUid,
                                               receiverUid: widget.receiverUid,
+                                              userBlockMe: widget
+                                                  .chatViewModel.userBlockMe,
                                             );
                                           }
                                         },
@@ -432,9 +436,11 @@ class _HintTextFieldState extends State<HintTextField> {
                                       model.emojieChanger(false);
                                       model.toggleMemojies(false);
                                       model.pickMedias(
-                                          context: context,
-                                          boxId: widget.conversationId,
-                                          receiverUid: widget.receiverUid);
+                                        context: context,
+                                        boxId: widget.conversationId,
+                                        receiverUid: widget.receiverUid,
+                                        chatViewModel: widget.chatViewModel,
+                                      );
                                     },
                                   ),
                                   bottomButton(
@@ -546,6 +552,7 @@ class _HintTextFieldState extends State<HintTextField> {
                             AnimatedContainer(
                               child: Memes(
                                 receiverUid: widget.receiverUid,
+                                chatViewModel: widget.chatViewModel,
                                 conversationId: widget.conversationId,
                               ),
                               height: model.showMemes ? height : 0.0,
@@ -556,6 +563,7 @@ class _HintTextFieldState extends State<HintTextField> {
                               duration: const Duration(milliseconds: 100),
                               child: PixaBay(
                                   receiverUid: widget.receiverUid,
+                                  chatViewModel: widget.chatViewModel,
                                   conversationId: widget.conversationId),
                             ),
                             AnimatedContainer(

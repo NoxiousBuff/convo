@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
@@ -102,6 +103,7 @@ class TextFieldViewModel extends BaseViewModel {
   required String receiverUid,
   required BuildContext context, 
   required String conversationId,
+  required ChatViewModel chatViewModel,
   required TextEditingController controller,
    }) => ()async{
      final timestamp = Timestamp.now();
@@ -116,6 +118,7 @@ class TextFieldViewModel extends BaseViewModel {
              receiverUid: receiverUid,
              messageText: controller.text,
              type: isUrl ? urlType : textType,
+             userBlockMe: chatViewModel.userBlockMe,
            )
          : await chatService.addFirestoreMessage(
              isReply: true,
@@ -124,6 +127,7 @@ class TextFieldViewModel extends BaseViewModel {
              receiverUid: receiverUid,
              messageText: controller.text,
              type: isUrl ? urlType : textType,
+             userBlockMe: chatViewModel.userBlockMe,
              replyMessage: {
                ReplyField.replyType: replyPod.messageType,
                ReplyField.replyMessageUid: replyPod.messageUid,
@@ -142,10 +146,12 @@ class TextFieldViewModel extends BaseViewModel {
 
 
 
-  Future<void> pickMedias(
-      {required String boxId, 
-      required String receiverUid,
-     required BuildContext context,}) async {
+  Future<void> pickMedias({
+     required String boxId, 
+     required String receiverUid,
+     required BuildContext context,
+     required ChatViewModel chatViewModel,
+     }) async {
     const pickFile = FileType.media;
     final picker = FilePicker.platform;
     final result = await picker.pickFiles(type: pickFile, allowMultiple: true);
@@ -184,6 +190,7 @@ class TextFieldViewModel extends BaseViewModel {
             messageUid: uid,
             timestamp: timestamp,
             receiverUid: receiverUid,
+            userBlockMe: chatViewModel.userBlockMe,
           ) :await chatService.addFirestoreMessage(
             type: type,
             isReply: true,
@@ -191,6 +198,7 @@ class TextFieldViewModel extends BaseViewModel {
             messageUid: uid,
             timestamp: timestamp,
             receiverUid: receiverUid,
+            userBlockMe: chatViewModel.userBlockMe,
             replyMessage: {
               ReplyField.replyType: replyPod.messageType,
               ReplyField.replyMessageUid:replyPod.messageUid,

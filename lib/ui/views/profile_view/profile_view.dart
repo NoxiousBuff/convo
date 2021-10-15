@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
@@ -15,13 +16,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/views/profile_view/profile_viewmodel.dart';
 
 class ProfileView extends StatelessWidget {
+  final bool iBlockThisUser;
   final FireUser fireUser;
   final ChatViewModel model;
   final String conversationId;
   ProfileView(
       {Key? key,
-      required this.fireUser,
       required this.model,
+      required this.fireUser,
+      required this.iBlockThisUser,
       required this.conversationId})
       : super(key: key);
 
@@ -29,6 +32,7 @@ class ProfileView extends StatelessWidget {
   final TextEditingController emailcontroller = TextEditingController();
   final TextEditingController biocontroller = TextEditingController();
   final bool switchBool = false;
+  final log = getLogger('ProfileView');
 
   Widget profileOption({
     required String title,
@@ -300,45 +304,6 @@ class ProfileView extends StatelessWidget {
     return Column(
       children: [
         optionTile(title: 'Clear Chat', icon: CupertinoIcons.delete),
-        optionTile(
-          title: 'Background',
-          icon: CupertinoIcons.photo,
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text(
-                    'Pick Image From',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  content: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () async {
-                          await model.pickImage(ImageSource.camera);
-                        },
-                        child: Text(
-                          'Camera',
-                          style: Theme.of(context).textTheme.bodyText2,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await model.pickImage(ImageSource.gallery);
-                        },
-                        child: Text(
-                          'Gallery',
-                          style: Theme.of(context).textTheme.bodyText2,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
         optionTile(title: 'Encryption', icon: CupertinoIcons.lock),
         optionTile(title: 'Disappearing Messages', icon: CupertinoIcons.timer),
       ],
@@ -380,7 +345,8 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget privacyOption(BuildContext context) {
+  Widget privacyOption(BuildContext context, ProfileViewModel model,
+      ChatViewModel chatViewModel) {
     Widget optionTile({
       IconData? icon,
       Widget? subtitle,
@@ -407,7 +373,22 @@ class ProfileView extends StatelessWidget {
 
     return Column(
       children: [
-        optionTile(title: 'Block Contact', icon: Icons.block_outlined),
+        optionTile(
+          title: iBlockThisUser ? 'Unblock' : 'Block this Contact',
+          icon: Icons.block_outlined,
+          onTap: () => iBlockThisUser
+              ? model.blockAndUnBlock(
+                  fireUserId: fireUser.id,
+                  chatViewModel: chatViewModel,
+                  currentUserID: FirestoreApi.auth.currentUser!.uid,
+                )
+              : model.blockContactDialog(
+                  context: context,
+                  fireUser: fireUser,
+                  fireUserId: fireUser.id,
+                  chatViewModel: chatViewModel,
+                ),
+        ),
         optionTile(title: 'ignore Messages', icon: CupertinoIcons.chat_bubble),
         optionTile(
           title: 'Something\'s went wroung',
@@ -422,7 +403,7 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
-      onDispose: (model) async {
+      onModelReady: (model) async {
         await Hive.openBox(urlData(conversationId));
         await Hive.openBox(imagesMemory(conversationId));
         await Hive.openBox(chatRoomMedia(conversationId));
@@ -431,6 +412,11 @@ class ProfileView extends StatelessWidget {
       },
       builder: (_, viewModel, child) {
         return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            automaticallyImplyLeading: true,
+            backgroundColor: Colors.transparent,
+          ),
           body: ListView(
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
@@ -456,7 +442,7 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
               ),
-              privacyOption(context),
+              privacyOption(context, viewModel, model)
             ],
           ),
         );

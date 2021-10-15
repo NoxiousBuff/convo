@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
               ),
               caption: GoogleFonts.roboto(
                 fontSize: 12,
-                color: inActiveGrey,
+                color: inactiveGray,
               ),
             ),
           ),
@@ -96,7 +96,7 @@ class MyApp extends StatelessWidget {
               ),
               caption: GoogleFonts.roboto(
                 fontSize: 12,
-                color: inActiveGrey,
+                color: inactiveGray,
               ),
             ),
           ),

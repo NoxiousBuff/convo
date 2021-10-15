@@ -179,47 +179,49 @@ class MessageBubble extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               classifyingDate(date, context),
-              Column(
-                mainAxisAlignment: mainAxis,
-                crossAxisAlignment: crossAxis,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  message.isReply
-                      ? Align(
-                          alignment: replyAlignment,
-                          child: ReplyMedia(
-                              isMe: isMe,
-                              fireUser: fireUser,
-                              replyMessage: replyMessage!,
-                              conversationId: conversationId),
-                        )
-                      : const SizedBox.shrink(),
-                  const SizedBox(height: 10),
-                  SwipeTo(
-                    onRightSwipe: () {
-                      replyRiverPod.showReplyBool(true);
-                      log.wtf('showReply: ${replyRiverPod.showReply}');
-                      replyRiverPod.getSwipedValue(
-                        isMeBool: isMe,
-                        fireuser: fireUser,
-                        swipedReply: message.isReply,
-                        swipedMessage: message.message,
-                        swipedMessageType: message.type,
-                        swipedTimestamp: message.timestamp,
-                        swipedMessageUid: message.messageUid,
-                      );
-                      log.wtf('Message${replyRiverPod.message}');
-                    },
-                    child: mediaContent(
-                      isMe: isMe,
-                      model: model,
-                      isRead: message.isRead,
-                      messageType: message.type,
-                      messageUid: message.messageUid,
-                    ),
-                  ),
-                ],
-              ),
+              !isMe && message.userBlockMe
+                  ? const SizedBox.shrink()
+                  : Column(
+                      mainAxisAlignment: mainAxis,
+                      crossAxisAlignment: crossAxis,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        message.isReply
+                            ? Align(
+                                alignment: replyAlignment,
+                                child: ReplyMedia(
+                                    isMe: isMe,
+                                    fireUser: fireUser,
+                                    replyMessage: replyMessage!,
+                                    conversationId: conversationId),
+                              )
+                            : const SizedBox.shrink(),
+                        const SizedBox(height: 10),
+                        SwipeTo(
+                          onRightSwipe: () {
+                            replyRiverPod.showReplyBool(true);
+                            log.wtf('showReply: ${replyRiverPod.showReply}');
+                            replyRiverPod.getSwipedValue(
+                              isMeBool: isMe,
+                              fireuser: fireUser,
+                              swipedReply: message.isReply,
+                              swipedMessage: message.message,
+                              swipedMessageType: message.type,
+                              swipedTimestamp: message.timestamp,
+                              swipedMessageUid: message.messageUid,
+                            );
+                            log.wtf('Message${replyRiverPod.message}');
+                          },
+                          child: mediaContent(
+                            isMe: isMe,
+                            model: model,
+                            isRead: message.isRead,
+                            messageType: message.type,
+                            messageUid: message.messageUid,
+                          ),
+                        ),
+                      ],
+                    )
             ],
           ),
         );

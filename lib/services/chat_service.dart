@@ -30,9 +30,9 @@ class ChatService {
     await Hive.openBox(videoThumbnails(conversationId));
     Map<String, dynamic> chatRoomMap = {
       'nearMe': false,
+      'backgroundImage': null,
       'liveUserUid': liveUserUid,
       'receiverUid': fireUser.id,
-      'chatRoomId': conversationId,
     };
 
     createChatRoom(conversationId, chatRoomMap);
@@ -62,14 +62,16 @@ class ChatService {
   }
 
   addFirestoreMessage({
-    bool isReply = false,
+    dynamic mediaURL,
     GeoPoint? location,
     bool isRead = false,
     String? messageText,
-    dynamic mediaURL,
-    required String type,
+    bool isReply = false,
     bool uploaded = false,
+    // ---------------------//
+    required String type,
     final Map? replyMessage,
+    required bool userBlockMe,
     required String messageUid,
     required String receiverUid,
     required Timestamp timestamp,
@@ -114,6 +116,7 @@ class ChatService {
       DocumentField.timestamp: timestamp,
       DocumentField.messageUid: messageUid,
       DocumentField.senderUid: liveUserUid,
+      DocumentField.userBlockMe: userBlockMe,
       DocumentField.replyMessage: replyMessage,
     });
   }

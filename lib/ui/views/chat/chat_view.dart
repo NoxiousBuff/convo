@@ -2,10 +2,9 @@ import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
@@ -20,6 +19,14 @@ import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
 
+// const systemUiOverlays = SystemUiOverlayStyle(
+//   statusBarBrightness: dark,
+//   statusBarIconBrightness: dark,
+//   systemNavigationBarDividerColor: black,
+//   systemNavigationBarColor: Colors.transparent,
+// );
+// getLogger('$systemUiOverlays');
+
 class ChatView extends StatelessWidget {
   final FireUser fireUser;
   final Color randomColor;
@@ -33,29 +40,41 @@ class ChatView extends StatelessWidget {
 
   @override
   build(BuildContext context) {
-    const dark = Brightness.dark;
+    final log = getLogger('ChatView');
 
-    const systemUiOverlays = SystemUiOverlayStyle(
-      statusBarBrightness: dark,
-      statusBarIconBrightness: dark,
-      systemNavigationBarDividerColor: black,
-      systemNavigationBarColor: Colors.transparent,
-    );
-    getLogger('$systemUiOverlays');
     return ViewModelBuilder<ChatViewModel>.reactive(
-      onModelReady: (model) {
+      viewModelBuilder: () =>
+          ChatViewModel(conversationId: conversationId, fireUser: fireUser),
+      onModelReady: (model) async {
         model.scrollController = ScrollController();
+        await model.iBlockThisUserCkecker(
+            firestoreApi.getCurrentUser()!.uid, fireUser.id);
+        log.wtf('iBlockThisUser:${model.iBlockThisUser}');
+        await model.userBlockMeChecker(
+            fireUser.id, firestoreApi.getCurrentUser()!.uid);
+        log.wtf('userBlockMe:${model.userBlockMe}');
       },
       onDispose: (model) async {
-        await urlDataHiveBox(conversationId).close();
-        await imagesMemoryHiveBox(conversationId).close();
-        await chatRoomMediaHiveBox(conversationId).close();
-        await thumbnailsPathHiveBox(conversationId).close();
-        await videoThumbnailsHiveBox(conversationId).close();
+        if (urlDataHiveBox(conversationId).isOpen) {
+          await urlDataHiveBox(conversationId).close();
+        } else if (imagesMemoryHiveBox(conversationId).isOpen) {
+          await imagesMemoryHiveBox(conversationId).close();
+        } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
+          await chatRoomMediaHiveBox(conversationId).close();
+        } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
+          await thumbnailsPathHiveBox(conversationId).close();
+        } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
+          await videoThumbnailsHiveBox(conversationId).close();
+        }
       },
       builder: (context, model, child) => OfflineBuilder(
         child: const Text("Yah Baby !!"),
         connectivityBuilder: (context, connectivity, child) {
+          bool connected = connectivity != ConnectivityResult.none;
+
+          if (connected) {
+            model.seeMsg();
+          }
           return GestureDetector(
             onTap: () {
               MediaQuery.of(context).viewInsets.bottom == 0
@@ -84,7 +103,8 @@ class ChatView extends StatelessWidget {
                             enterTo: ProfileView(
                                 model: model,
                                 fireUser: fireUser,
-                                conversationId: conversationId),
+                                conversationId: conversationId,
+                                iBlockThisUser: model.iBlockThisUser),
                             exitFrom: ChatView(
                                 fireUser: fireUser,
                                 randomColor: randomColor,
@@ -128,13 +148,17 @@ class ChatView extends StatelessWidget {
                       conversationId: conversationId,
                     ),
                   ),
-                  HintTextField(
-                    fireUser: fireUser,
-                    chatViewModel: model,
-                    randomColor: randomColor,
-                    receiverUid: fireUser.id,
-                    focusNode: model.focusNode,
-                    conversationId: conversationId,
+                  hintTextField(
+                    model: model,
+                    context: context,
+                    child: HintTextField(
+                      fireUser: fireUser,
+                      chatViewModel: model,
+                      randomColor: randomColor,
+                      receiverUid: fireUser.id,
+                      focusNode: model.focusNode,
+                      conversationId: conversationId,
+                    ),
                   ),
                 ],
               ),
@@ -142,9 +166,25 @@ class ChatView extends StatelessWidget {
           );
         },
       ),
-      viewModelBuilder: () =>
-          ChatViewModel(conversationId: conversationId, fireUser: fireUser),
     );
+  }
+
+  Widget hintTextField(
+      {required Widget child,
+      required ChatViewModel model,
+      required BuildContext context}) {
+    if (model.iBlockThisUser) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'You block ${fireUser.username} If you want to send messages. \nYou have to first unblock ${fireUser.username}',
+          style: Theme.of(context).textTheme.bodyText2,
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else {
+      return child;
+    }
   }
 }
 

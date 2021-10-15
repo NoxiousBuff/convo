@@ -69,7 +69,7 @@ class _UpdateUserState extends State<UpdateUser> {
                   placeholderStyle: Theme.of(context).textTheme.bodyText2,
                   decoration: const BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: inActiveGrey),
+                      bottom: BorderSide(color: inactiveGray),
                     ),
                   ),
                 ),

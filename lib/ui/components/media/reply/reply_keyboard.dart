@@ -281,7 +281,7 @@ class ReplyKeyboard extends ConsumerWidget {
                 child: Icon(
                   CupertinoIcons.clear,
                   size: 16,
-                  color: inActiveGrey,
+                  color: inactiveGray,
                 ),
               ),
             ),

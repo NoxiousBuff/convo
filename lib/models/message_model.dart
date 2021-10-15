@@ -6,6 +6,7 @@ class Message {
   final bool isRead;
   final bool isReply;
   final String type;
+  final bool userBlockMe;
   final String senderUid;
   final String messageUid;
   final Timestamp timestamp;
@@ -21,17 +22,20 @@ class Message {
     required this.messageUid,
     required this.senderUid,
     required this.timestamp,
+    required this.userBlockMe,
   });
 
   factory Message.fromFirestore(DocumentSnapshot doc) {
     return Message(
-        isRead: doc[DocumentField.isRead],
-        isReply: doc[DocumentField.isReply],
-        message: doc[DocumentField.message],
-        messageUid: doc[DocumentField.messageUid],
-        replyMessage: doc[DocumentField.replyMessage],
-        senderUid: doc[DocumentField.senderUid],
-        timestamp: doc[DocumentField.timestamp],
-        type: doc[DocumentField.type],);
+      type: doc[DocumentField.type],
+      isRead: doc[DocumentField.isRead],
+      isReply: doc[DocumentField.isReply],
+      message: doc[DocumentField.message],
+      senderUid: doc[DocumentField.senderUid],
+      timestamp: doc[DocumentField.timestamp],
+      messageUid: doc[DocumentField.messageUid],
+      userBlockMe: doc[DocumentField.userBlockMe],
+      replyMessage: doc[DocumentField.replyMessage],
+    );
   }
 }

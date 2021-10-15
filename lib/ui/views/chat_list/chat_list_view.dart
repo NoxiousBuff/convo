@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/constants/app_keys.dart';
+
 import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +14,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/views/login/login_view.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:hint/ui/views/distent_view/distant_view.dart';
+import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
 class ChatListView extends StatelessWidget {
@@ -240,6 +243,20 @@ class ChatListView extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const BouncingScrollPhysics(),
                   children: [
+                    TextButton(
+                      onPressed: () {
+                        FirebaseFirestore.instance
+                            .collection(usersFirestoreKey)
+                            .get()
+                            .then((querysnapshot) {
+                          for (var document in querysnapshot.docs) {
+                            document.reference.set({'blockedUsers': <String>[]},
+                                SetOptions(merge: true));
+                          }
+                        });
+                      },
+                      child: const Text('BlockedUsers'),
+                    ),
                     buildUserContact(model),
                   ],
                 ),

@@ -6,6 +6,7 @@ class DocumentField {
   static const String senderUid = 'senderUid';
   static const String timestamp = 'timestamp';
   static const String messageUid = 'messageUid';
+  static const String userBlockMe = 'userBlockMe';
   static const String replyMessage = 'replyMessage';
 }
 
@@ -45,6 +46,11 @@ class MsgRead {
   static const String readed = 'readed';
 }
 
+class ChatRoomField {
+  static const String backgroungImage = 'backgroundImage';
+}
+
 class UserField {
-  static const String photoURL = 'photoUrl';
+  static const lastSeen = 'lastSeen';
+  static const blockedUsers = 'blockedUsers';
 }

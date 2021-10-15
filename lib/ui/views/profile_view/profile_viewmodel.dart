@@ -1,12 +1,13 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
+import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/message_string.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:stacked/stacked.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileViewModel extends BaseViewModel {
   final log = getLogger('ProfileViewModel');
@@ -29,76 +30,87 @@ class ProfileViewModel extends BaseViewModel {
     'Until I turn it back on'
   ];
 
-  /// Clicking Image from camera
-  Future<File?> pickImage(ImageSource imageSource) async {
-    final selectedImage = await ImagePicker().pickImage(source: imageSource);
+  Future<void> unBlockUser(dynamic fireUserId) async {
+    await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(firestoreApi.getCurrentUser()!.uid)
+        .get()
+        .then((query) {
+      query.reference.update({
+        UserField.blockedUsers: FieldValue.arrayRemove(fireUserId),
+      });
+    });
+  }
 
-    if (selectedImage != null) {
-      return File(selectedImage.path);
+  Future<void> blockAndUnBlock(
+      {required dynamic fireUserId,
+      required String currentUserID,
+      required ChatViewModel chatViewModel}) async {
+    final usercollection = FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(currentUserID);
+
+    final docSnap = await usercollection.get();
+    List queue = docSnap.get(UserField.blockedUsers);
+
+    if (queue.contains(fireUserId) == true) {
+      usercollection.update({
+        UserField.blockedUsers: FieldValue.arrayRemove([fireUserId])
+      });
+      chatViewModel.iBlockThisUserValue(false);
+      log.wtf('User is unblock now !!');
     } else {
-      log.wtf('pickImage | Image not clicked');
+      usercollection.update({
+        UserField.blockedUsers: FieldValue.arrayUnion([fireUserId])
+      });
+      chatViewModel.iBlockThisUserValue(true);
+      log.wtf('This contact is block now !!');
     }
   }
 
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
+  Future<void> blockContactDialog(
+      {required FireUser fireUser,
+      required String fireUserId,
+      required BuildContext context,
+      required ChatViewModel chatViewModel}) {
+    var text =
+        'Block ${fireUser.username}?\nblocked contacts will no longer send messages and you also not be able to send messages';
 
-  Future<void> updateMediaDocument(
-      {required String fireUserId, required String downloadURL}) async {
-    FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .doc(fireUserId)
-        .set({
-      'message': {UserField.photoURL: downloadURL},
-    }, SetOptions(merge: true)).catchError((e) {
-      getLogger('MessageBubble_viewModel').e('update Message:$e');
-    });
-  }
-
-  /// uploading a single file into the firebase storage and get progress
-  Future<String> uploadFile({
-    required String filePath,
-    required String messageUid,
-    required String conversationId,
-  }) async {
-    var now = DateTime.now();
-    var firstPart = '${now.year}${now.month}${now.day}';
-    var secondPart = '${now.hour}${now.minute}${now.second}';
-
-    final profileImage = 'IMG-$firstPart-P$secondPart';
-
-    firebase_storage.UploadTask task =
-        storage.ref('ProfileImages/$profileImage').putFile(File(filePath));
-
-    task.snapshotEvents.listen(
-      (firebase_storage.TaskSnapshot snapshot) {
-        log.i('Task state: ${snapshot.state}');
-        var progress = snapshot.bytesTransferred.toDouble() /
-            snapshot.totalBytes.toDouble();
-        setBusyForObject(_isUploading, true);
-
-        log.i('UploadingProgress: $progress%');
-      },
-      onError: (e) {
-        log.e(task.snapshot);
-        if (e.code == 'permission-denied') {
-          log.i('User does not have permission to upload to this reference.');
-        }
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyText1,
+            textAlign: TextAlign.start,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2!
+                      .copyWith(color: activeBlue)),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await blockAndUnBlock(
+                        fireUserId: fireUserId,
+                        chatViewModel: chatViewModel,
+                        currentUserID: firestoreApi.getCurrentUser()!.uid)
+                    .catchError((e) {
+                  log.e('Bloack This User$e');
+                });
+              },
+              child:
+                  Text('Block', style: Theme.of(context).textTheme.bodyText2),
+            ),
+          ],
+        );
       },
     );
-    await task;
-    String downloadURL =
-        await storage.ref('ProfileImages/$profileImage').getDownloadURL();
-
-    await updateMediaDocument(
-            downloadURL: downloadURL, fireUserId: conversationId)
-        .then((value) => log.wtf('Profile Image Updated'))
-        .catchError((e) {
-      log.wtf('uploadFile| updating ProfileImage:$e');
-    });
-
-    log.wtf('Video uploaded !!');
-    setBusyForObject(_isUploading, false);
-    return downloadURL;
   }
 }

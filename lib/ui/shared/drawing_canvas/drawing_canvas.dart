@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,9 @@ import 'package:fast_color_picker/fast_color_picker.dart';
 class DrawingCanvas extends StatefulWidget {
   final String receiverUid;
   final String conversationId;
+  final ChatViewModel chatViewModel;
   const DrawingCanvas(
-      {Key? key, required this.receiverUid, required this.conversationId})
+      {Key? key, required this.receiverUid, required this.conversationId, required this.chatViewModel})
       : super(key: key);
 
   @override
@@ -136,6 +138,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
                       messageUid: messageUid,
                       timestamp: Timestamp.now(),
                       receiverUid: widget.receiverUid,
+                      userBlockMe: widget.chatViewModel.userBlockMe,
                     );
                     Navigator.pop(context);
                   },
