@@ -42,7 +42,7 @@ class EmailRegisterView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                     const  Text(
+                      const Text(
                         'Already Have An Account.',
                       ),
                       CupertinoButton(
@@ -158,11 +158,12 @@ class EmailRegisterView extends StatelessWidget {
                           : () {
                               if (model.emailFormKey.currentState!.validate()) {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PasswordRegisterView(
-                                                email: model.emailTech.text)));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PasswordRegisterView(
+                                        email: model.emailTech.text),
+                                  ),
+                                );
                               }
                             },
                     ),
