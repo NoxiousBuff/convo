@@ -16,7 +16,7 @@ class UsernameRegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<UsernameRegisterViewModel>.reactive(
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-       value: const SystemUiOverlayStyle(
+        value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
           // ignore: todo
           //TODO: Apply for dark theme
@@ -105,7 +105,7 @@ class UsernameRegisterView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child:const  Text(
+                      child: const Text(
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -124,10 +124,12 @@ class UsernameRegisterView extends StatelessWidget {
                                   //TODO: Define an alert dialog for error or something.
                                 }, onComplete: () {
                                   Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                          builder: (context) =>
-                                              const ChatListView()));
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const ChatListView(),
+                                    ),
+                                  );
                                 });
                               }
                             },
