@@ -48,7 +48,7 @@ class ProfileView extends StatelessWidget {
             child: Center(
               child: Icon(
                 icon,
-                color: iconColor,
+                color: inactiveGray,
               ),
             ),
             backgroundColor: dirtyWhite,

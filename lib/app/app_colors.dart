@@ -6,6 +6,7 @@ const grey = Color(0xffE5E5EA);
 
 const black = Colors.black;
 const black54 = Colors.black54;
+const transparent = Colors.transparent;
 // --------- ColorCodes --------------------------------------------------------
 const green = Color(0xff04D939);
 const darkPink = Color(0xffdd2476);
@@ -17,13 +18,11 @@ const systemOrange = Color(0xffff512f);
 const darkModeColor = Color(0xFF3C3C3D);
 const darkModeSecondColor = Color(0xff2b2b2b);
 //---------- CupertinoColors ---------------------------------------------------
-const deepPurple = Colors.deepPurpleAccent;
 const systemRed = CupertinoColors.systemRed;
 const activeBlue = CupertinoColors.activeBlue;
 const activeGreen = CupertinoColors.activeGreen;
 const systemGrey6 = CupertinoColors.systemGrey6;
+const deepPurpleAccent = Colors.deepPurpleAccent;
 const inactiveGray = CupertinoColors.inactiveGray;
-const iconColor = CupertinoColors.inactiveGray;
 const systemBackground = CupertinoColors.systemBackground;
 const extraLightBackgroundGray = CupertinoColors.extraLightBackgroundGray;
-

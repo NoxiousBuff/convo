@@ -15,6 +15,14 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   ChatService chatService = ChatService();
   ChatViewModel({required this.conversationId, required this.fireUser});
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> statusStream(
+      String fireUserID) {
+    return FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(fireUserID)
+        .snapshots();
+  }
+
   String _backgroundImagePath = '';
   String get backgroungImagePath => _backgroundImagePath;
 

@@ -249,7 +249,7 @@ class DistantView extends StatelessWidget {
                   trailing: trailing,
                   title:
                       Text(text, style: Theme.of(context).textTheme.bodyText2),
-                  leading: Icon(icon, color: darkMode ? dirtyWhite : iconColor),
+                  leading: Icon(icon, color: darkMode ? dirtyWhite : inactiveGray),
                 ),
               ),
               const Divider(height: 0.0),

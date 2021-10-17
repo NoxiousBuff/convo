@@ -181,7 +181,7 @@ class EmojiesView extends StatelessWidget {
                     icon: const Icon(
                       Icons.restore,
                       size: 20,
-                      color: iconColor,
+                      color: inactiveGray,
                     ),
                     onPressed: () {},
                   ),

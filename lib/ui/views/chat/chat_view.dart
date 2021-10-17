@@ -4,12 +4,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,7 +43,10 @@ class ChatView extends StatelessWidget {
   @override
   build(BuildContext context) {
     final log = getLogger('ChatView');
-
+    final statusStyle =
+        Theme.of(context).textTheme.bodyText2!.copyWith(color: activeGreen);
+    final lastSeenStyle =
+        Theme.of(context).textTheme.bodyText2!.copyWith(color: inactiveGray);
     return ViewModelBuilder<ChatViewModel>.reactive(
       viewModelBuilder: () =>
           ChatViewModel(conversationId: conversationId, fireUser: fireUser),
@@ -90,51 +95,74 @@ class ChatView extends StatelessWidget {
             child: Scaffold(
               appBar: AppBar(
                 elevation: 0.0,
-                automaticallyImplyLeading: true,
-                title: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          cupertinoTransition(
-                            enterTo: ProfileView(
-                                model: model,
-                                fireUser: fireUser,
-                                conversationId: conversationId,
-                                iBlockThisUser: model.iBlockThisUser),
-                            exitFrom: ChatView(
-                                fireUser: fireUser,
-                                randomColor: randomColor,
-                                conversationId: conversationId),
-                          ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: ExtendedImage(
-                          height: 50,
-                          width: 50,
-                          enableLoadState: true,
-                          handleLoadingProgress: true,
-                          image: NetworkImage(
-                            fireUser.photoUrl ?? 'images/img2.jpg',
-                          ),
-                        ),
-                      ),
-                    ),
-                    verticalSpaceTiny,
-                    Text(
-                      fireUser.username,
-                      style: Theme.of(context).textTheme.bodyText2,
-                    ),
-                  ],
-                ),
-                toolbarHeight: 70.0,
                 centerTitle: true,
+                toolbarHeight: 80.0,
+                automaticallyImplyLeading: true,
                 backgroundColor: randomColor.withAlpha(60),
+                leading: StreamBuilder<DocumentSnapshot>(
+                    stream: model.statusStream(fireUser.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        String status = snapshot.data!['status'];
+                        bool isOnline = snapshot.data!['status'] == 'Online';
+                        var timestamp = snapshot.data!['lastSeen'] as Timestamp;
+                        var lastSeen =
+                            time.format(timestamp.toDate(), allowFromNow: true);
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                cupertinoTransition(
+                                  enterTo: ProfileView(
+                                      model: model,
+                                      fireUser: fireUser,
+                                      conversationId: conversationId,
+                                      iBlockThisUser: model.iBlockThisUser),
+                                  exitFrom: ChatView(
+                                      fireUser: fireUser,
+                                      randomColor: randomColor,
+                                      conversationId: conversationId),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 2,
+                                      color:
+                                          isOnline ? activeGreen : transparent,
+                                    ),
+                                  ),
+                                  child: ExtendedImage(
+                                    height: 50,
+                                    width: 50,
+                                    enableLoadState: true,
+                                    handleLoadingProgress: true,
+                                    image: NetworkImage(
+                                      fireUser.photoUrl ?? 'images/img2.jpg',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            verticalSpaceTiny,
+                            isOnline
+                                ? Text(status, style: statusStyle)
+                                : Text(lastSeen, style: lastSeenStyle)
+                          ],
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    }),
+                title: Text(
+                  fireUser.username,
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
               ),
               body: Column(
                 mainAxisSize: MainAxisSize.max,

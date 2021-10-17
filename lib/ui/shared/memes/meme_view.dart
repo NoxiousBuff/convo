@@ -81,7 +81,7 @@ class Memes extends StatelessWidget {
           Container(
               margin: const EdgeInsets.only(top: 20),
               child:
-                  const Icon(CupertinoIcons.wifi, color: iconColor, size: 40)),
+                  const Icon(CupertinoIcons.wifi, color: inactiveGray, size: 40)),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
@@ -105,7 +105,7 @@ class Memes extends StatelessWidget {
   Widget prefix() {
     return const Padding(
       padding: EdgeInsets.all(8.0),
-      child: Icon(CupertinoIcons.search, color: iconColor),
+      child: Icon(CupertinoIcons.search, color: inactiveGray),
     );
   }
 
@@ -152,7 +152,7 @@ class Memes extends StatelessWidget {
                               onSubmitted: (val) =>
                                   viewModel.fetchedMemes(val + 'memes'),
                               decoration: BoxDecoration(
-                                  border: Border.all(color: iconColor),
+                                  border: Border.all(color: inactiveGray),
                                   borderRadius: BorderRadius.circular(30)),
                             ),
                           ),

@@ -41,7 +41,7 @@ class PixaBay extends StatelessWidget {
           Container(
               margin: const EdgeInsets.only(top: 20),
               child:
-                  const Icon(CupertinoIcons.wifi, color: iconColor, size: 40)),
+                  const Icon(CupertinoIcons.wifi, color: inactiveGray, size: 40)),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
@@ -194,7 +194,7 @@ class PixaBay extends StatelessWidget {
                               prefix: IconButton(
                                 onPressed: () {},
                                 icon: const Icon(CupertinoIcons.search,
-                                    color: iconColor),
+                                    color: inactiveGray),
                               ),
                               onSubmitted: (val) => viewModel.getImages(val),
                             ),

@@ -60,7 +60,7 @@ class ProfilePhoto extends StatelessWidget {
             Container(
                 margin: const EdgeInsets.only(top: 20),
                 child: const Icon(CupertinoIcons.wifi,
-                    color: iconColor, size: 40)),
+                    color: inactiveGray, size: 40)),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               child: Text(
