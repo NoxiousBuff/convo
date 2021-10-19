@@ -43,7 +43,7 @@ class PhoneAuthViewModel extends BaseViewModel {
       },
       codeSent: (String verificationId, int? resendToken) async {
         // Update the UI - wait for the user to enter the SMS code
-        String smsCode = '7591';
+        //String smsCode = '7591';
 
         // Create a PhoneAuthCredential with the code
         PhoneAuthCredential credential = PhoneAuthProvider.credential(

@@ -1,7 +1,8 @@
 import 'dart:core';
 
+final userInterest = Interest();
 
-class UserInterest {
+class Interest {
   final science = [
     'Animals',
     'Astronomy',
@@ -28,6 +29,5 @@ class UserInterest {
     'Kotlin',
     'Ruby',
     'Go'
-
   ];
 }

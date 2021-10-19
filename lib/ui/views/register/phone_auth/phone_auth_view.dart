@@ -1,11 +1,10 @@
-import 'package:hint/app/app_logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/verify_phone/verify_phone.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_viewmodel.dart';

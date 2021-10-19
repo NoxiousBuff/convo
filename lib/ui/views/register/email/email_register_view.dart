@@ -1,14 +1,14 @@
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/login/login_view.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hint/ui/views/register/username/username_register_view.dart';
-import 'package:stacked/stacked.dart';
 import 'email_register_viewmodel.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/ui/views/login/login_view.dart';
 import 'package:string_validator/string_validator.dart';
+import 'package:hint/ui/views/register/username/username_register_view.dart';
 
 class EmailRegisterView extends StatefulWidget {
   const EmailRegisterView({Key? key}) : super(key: key);
