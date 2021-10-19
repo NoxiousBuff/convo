@@ -7,13 +7,25 @@ import 'package:hint/pods/genral_code.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:otp_autofill/otp_autofill.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/ui/views/register/user_interests/user_interest.dart';
 import 'package:hint/ui/views/register/verify_phone/verifyphone_viewmodel.dart';
 
 class VerifyPhoneView extends StatefulWidget {
-  const VerifyPhoneView({Key? key}) : super(key: key);
+  final String email;
+  final String username;
+  final User? createdUser;
+  final String phoneNumber;
+  const VerifyPhoneView({
+    Key? key,
+    required this.email,
+    required this.username,
+    required this.createdUser,
+    required this.phoneNumber,
+  }) : super(key: key);
 
   @override
   State<VerifyPhoneView> createState() => _VerifyPhoneViewState();
@@ -50,8 +62,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
       );
   }
 
-
-@override
+  @override
   Future<void> dispose() async {
     await controller.stopListen();
     super.dispose();
@@ -59,6 +70,9 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
 
   @override
   Widget build(BuildContext context) {
+    final createdUser = widget.createdUser;
+    final pod = context.read(codeProvider);
+    final log = getLogger('VerifyPhoneView');
     return ViewModelBuilder<VerifyPhone>.reactive(
       viewModelBuilder: () => VerifyPhone(),
       builder: (context, model, child) => Scaffold(
@@ -90,6 +104,8 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                     validator: (value) {
                       if (value!.length < 6) {
                         return 'code length must be 6';
+                      } else if (value != pod.optCode) {
+                        return 'code didn\'t matched';
                       }
                     },
                     controller: controller,
@@ -124,16 +140,37 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
               verticalSpaceLarge,
               CupertinoButton(
                 color: activeBlue,
-                onPressed: () {
+                onPressed: () async {
+                  log.d('username:${widget.username}');
                   if (model.formKey.currentState!.validate()) {
-                    final pod = context.read(codeProvider);
-                    if (controller.text == pod.optCode) {
-                      log.wtf('code verfied successfully');
+                    log.wtf('code verfied successfully');
+                    const photoURL = AuthService.kDefaultPhotoUrl;
+                    if (createdUser != null) {
+                      final credential = pod.phoneAuthCredential;
+                      await createdUser.updateDisplayName(widget.username);
+                      log.wtf('DisplayName:${createdUser.displayName}');
+                      await createdUser.updatePhotoURL(photoURL);
+                      log.wtf('PhotoURL:${createdUser.photoURL}');
+                      if (credential != null) {
+                        await createdUser.updatePhoneNumber(credential);
+                        log.wtf('phoneNumber:${createdUser.phoneNumber}');
+                        log.wtf('email:${createdUser.email}');
+                      }
                       Navigator.push(
                         context,
                         cupertinoTransition(
-                          enterTo: const ChatListView(),
-                          exitFrom: const VerifyPhoneView(),
+                          enterTo: InterestsView(
+                            email: widget.email,
+                            username: widget.username,
+                            createdUser: widget.createdUser,
+                            phoneNumber: widget.phoneNumber,
+                          ),
+                          exitFrom: VerifyPhoneView(
+                            email: widget.email,
+                            username: widget.username,
+                            createdUser: widget.createdUser,
+                            phoneNumber: widget.phoneNumber,
+                          ),
                         ),
                       );
                     }

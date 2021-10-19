@@ -33,8 +33,12 @@ class FirestoreApi {
             getLogger('FirestoreApi').e("Failed to update user: $error"));
   }
 
-  Future<void> createUserInFirebase(
-      {required User user, String? userName, Function? onError}) async {
+  Future<void> createUserInFirebase({
+    String? userName,
+    Function? onError,
+    required User user,
+    String? phoneNumber,
+  }) async {
     try {
       await usersCollection.doc(user.uid).set({
         'id': user.uid,

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,13 @@ class PhoneAuthView extends StatelessWidget {
   final String email;
   final String password;
   final String username;
+  final User? createdUser;
   const PhoneAuthView({
     Key? key,
     required this.email,
     required this.password,
     required this.username,
+    required this.createdUser,
   }) : super(key: key);
 
   @override
@@ -115,17 +118,23 @@ class PhoneAuthView extends StatelessWidget {
                 onPressed: () async {
                   if (model.formKey.currentState!.validate()) {
                     var phoneNumber =
-                        '+${model.countryCode} ${model.phoneTech.text}';
+                        '+${model.countryCode}${model.phoneTech.text}';
                     log.wtf('phoneNumber:$phoneNumber');
                     AuthService().signUpWithPhone(phoneNumber, context);
                     Navigator.push(
                       context,
                       cupertinoTransition(
-                        enterTo: const VerifyPhoneView(),
+                        enterTo: VerifyPhoneView(
+                          email: email,
+                          username: username,
+                          phoneNumber: phoneNumber,
+                          createdUser: createdUser,
+                        ),
                         exitFrom: PhoneAuthView(
                           email: email,
                           password: password,
                           username: username,
+                          createdUser: createdUser,
                         ),
                       ),
                     );

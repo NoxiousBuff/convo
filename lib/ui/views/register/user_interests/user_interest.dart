@@ -1,19 +1,29 @@
-import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
+import 'dart:math';
+import 'package:tcard/tcard.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
 final List<String> _activityNames = [
-  'Do Anything',
-  'Clean',
-  'Code',
-  'Cook',
-  'Create',
-  'Raise Money',
+  'Hobbies',
+  'School/Work',
+  'Travel',
+  'Entertainment'
+      'Cooking',
+  'Past Experience'
+      'Create',
+  'Future Plans',
+  'Human Relationships'
+      'Raise Money',
   'Experiment',
   'Spread Love',
   'Groove',
@@ -35,6 +45,8 @@ List<String> get activityNames => _activityNames;
 final List<Widget> _cards = List.generate(
   20,
   (index) => Card(
+    elevation: 0,
+    color: colors[Random().nextInt(16)],
     child: Center(
       child: Text(
         _activityNames[index],
@@ -45,7 +57,17 @@ final List<Widget> _cards = List.generate(
 );
 
 class InterestsView extends StatelessWidget {
-  InterestsView({Key? key}) : super(key: key);
+  final String email;
+  final String username;
+  final String phoneNumber;
+  final User? createdUser;
+  InterestsView({
+    Key? key,
+    required this.email,
+    required this.username,
+    required this.phoneNumber,
+    required this.createdUser,
+  }) : super(key: key);
 
   final List<String> activityLocationNames = [
     // 'activities/anything.gif',
@@ -72,6 +94,7 @@ class InterestsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = getLogger('InterestView');
     return ViewModelBuilder<InterestsViewModel>.reactive(
       viewModelBuilder: () => InterestsViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -111,7 +134,46 @@ class InterestsView extends StatelessWidget {
                 ],
               ),
               verticalSpaceMedium,
-             // TCard(cards: _cards),
+              TCard(
+                cards: _cards,
+                lockYAxis: true,
+                onForward: (index, info) {
+                  if (info.direction == SwipDirection.Right) {
+                    model.addInterest(_activityNames[index]);
+                  }
+                },
+              ),
+              verticalSpaceLarge,
+              CupertinoButton(
+                onPressed: () async {
+                  if (model.length() > 5) {
+                    await firestoreApi
+                        .createUserInFirebase(
+                            user: createdUser!,
+                            phoneNumber: phoneNumber)
+                        .then((value) => log.wtf('user created in firestore'));
+                    Navigator.push(
+                      context,
+                      cupertinoTransition(
+                        enterTo: const ChatListView(),
+                        exitFrom: InterestsView(
+                          email: email,
+                          username: username,
+                          phoneNumber: phoneNumber,
+                          createdUser: createdUser,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  'Next',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2!
+                      .copyWith(color: systemBackground),
+                ),
+              )
             ],
           ),
         ),

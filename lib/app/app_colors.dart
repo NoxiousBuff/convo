@@ -26,3 +26,23 @@ const deepPurpleAccent = Colors.deepPurpleAccent;
 const inactiveGray = CupertinoColors.inactiveGray;
 const systemBackground = CupertinoColors.systemBackground;
 const extraLightBackgroundGray = CupertinoColors.extraLightBackgroundGray;
+
+List<Color> colors = [
+  teal,
+  grey,
+  green,
+  darkPink,
+  lightBlue,
+  unreadMsg,
+  systemTeal,
+  dirtyWhite,
+  systemOrange,
+  systemRed,
+  activeBlue,
+  activeGreen,
+  systemGrey6,
+  deepPurpleAccent,
+  inactiveGray,
+  systemBackground,
+  extraLightBackgroundGray,
+];

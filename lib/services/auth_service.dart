@@ -7,6 +7,8 @@ import 'package:hint/pods/genral_code.dart';
 
 String verificationCode = '';
 
+final authService = AuthService();
+
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static const String kDefaultPhotoUrl =
@@ -123,14 +125,13 @@ class AuthService {
     return FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {
-        log.wtf('Verification Completed Successfuly.');
         final pod = context.read(codeProvider);
         final localSmsCode = credential.smsCode;
         if (localSmsCode != null) pod.getCode(localSmsCode);
+        pod.getPhoneCredentials(credential);
         log.wtf('credential.smsCode : $localSmsCode');
-        log.w('Phone Auth Credential: $credential');
-        FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential);
-        getLogger('Authservice').wtf(credential);
+        log.wtf('Phone Auth Credential: $credential');
+        log.wtf('Verification Completed Successfuly.');
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
@@ -142,13 +143,12 @@ class AuthService {
       codeSent: (String verificationId, int? resendToken) async {
         // Update the UI - wait for the user to enter the SMS code
         //String smsCode = '7591';
-        getLogger('AuthService')
-            .wtf('Id:$verificationId, recendToken : $resendToken');
+        log.v('Id:$verificationId, recendToken : $resendToken');
 
         // Create a PhoneAuthCredential with the code
         PhoneAuthCredential credential = PhoneAuthProvider.credential(
             verificationId: verificationId, smsCode: resendToken.toString());
-        log.w('Phone Auth Credential: $credential');
+        log.v('Phone Auth Credential: $credential');
       },
       timeout: const Duration(seconds: 60),
       codeAutoRetrievalTimeout: (String verificationId) {
