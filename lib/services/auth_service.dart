@@ -27,10 +27,13 @@ class AuthService {
       );
 
       log.i('User has been created in the firebase authentication.');
-      await userCredential.user!.updatePhotoURL(kDefaultPhotoUrl).
-          catchError((e) => getLogger('AuthService').e(e));
-      await _firestoreApi.createUserInFirebase(
-          user: userCredential.user!, onError: randomError).then((value) => onComplete);
+      await userCredential.user!
+          .updatePhotoURL(kDefaultPhotoUrl)
+          .catchError((e) => getLogger('AuthService').e(e));
+      await _firestoreApi
+          .createUserInFirebase(
+              user: userCredential.user!, onError: randomError)
+          .then((value) => onComplete);
       await userCredential.user!.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -59,10 +62,12 @@ class AuthService {
     Function? onError,
   }) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password).then((value) {
-      getLogger('AuthService from Login')
-          .i('The User with email : $email has been successfully logged In');
-      onComplete();
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) {
+        getLogger('AuthService from Login')
+            .i('The User with email : $email has been successfully logged In');
+        onComplete();
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -77,7 +82,7 @@ class AuthService {
     }
   }
 
-  signOut(BuildContext context,{ required Function onSignOut }) async {
+  signOut(BuildContext context, {required Function onSignOut}) async {
     await _auth.signOut();
     getLogger('AuthMethod').i('The user has been signed out successfully.');
     onSignOut();
@@ -85,8 +90,8 @@ class AuthService {
     //     context, MaterialPageRoute(builder: (context) => EmailRegisterView()));
   }
 
-  Future<void> forgotPassword(
-      String email,{ Function? onComplete, Function? onError}) async {
+  Future<void> forgotPassword(String email,
+      {Function? onComplete, Function? onError}) async {
     await _auth.sendPasswordResetEmail(email: email).then((value) {
       if (onComplete != null) onComplete();
       log.i(
@@ -108,5 +113,36 @@ class AuthService {
       getLogger('Auth Service')
           .w('Error occurred in changing display name. Error : $err');
     });
+  }
+
+  Future<void> signUpWithPhone(String phoneNumber) async {
+    return FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) {
+        log.wtf('Verification Completed Successfuly.');
+
+        log.w('Phone Auth Credential: $credential');
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          log.e('The provided phone number is not valid.');
+        } else {
+          log.e('This was the error in creating phone auth credential : $e');
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        // Update the UI - wait for the user to enter the SMS code
+        //String smsCode = '7591';
+
+        // Create a PhoneAuthCredential with the code
+        PhoneAuthCredential credential = PhoneAuthProvider.credential(
+            verificationId: verificationId, smsCode: resendToken.toString());
+        log.w('Phone Auth Credential: $credential');
+      },
+      timeout: const Duration(seconds: 60),
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Auto-resolution timed out...
+      },
+    );
   }
 }

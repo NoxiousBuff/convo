@@ -69,6 +69,8 @@ class MyApp extends StatelessWidget {
             iconTheme: const IconThemeData(color: black54),
             dialogBackgroundColor: extraLightBackgroundGray,
             appBarTheme: const AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
               iconTheme: IconThemeData(color: black54),
             ),
             dialogTheme: DialogTheme(

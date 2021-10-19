@@ -3,18 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
 import 'package:hint/ui/views/register/username/username_register_viewmodel.dart';
 
 class UsernameRegisterView extends StatelessWidget {
-  const UsernameRegisterView({Key? key}) : super(key: key);
+  final String email;
+  final String password;
+  const UsernameRegisterView(
+      {Key? key, required this.email, required this.password})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<UsernameRegisterViewModel>.reactive(
+      disposeViewModel: true,
+      onDispose: (model) {
+        model.usernameTech.dispose();
+      },
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
@@ -28,7 +36,7 @@ class UsernameRegisterView extends StatelessWidget {
           backgroundColor: systemBackground,
           body: Center(
             child: Form(
-              key: model.usernameFormKey,
+              key: model.key,
               child: ListView(
                 shrinkWrap: true,
                 children: [
@@ -54,7 +62,7 @@ class UsernameRegisterView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Please Use Your Full Name.',
+                        'choose a username name for you.',
                         style: GoogleFonts.openSans(
                             color: Colors.black54,
                             fontSize: 14.0,
@@ -64,7 +72,6 @@ class UsernameRegisterView extends StatelessWidget {
                   ),
                   verticalSpaceMedium,
                   TextFormField(
-                    autofocus: true,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'This field is mandatory to fill';
@@ -76,13 +83,19 @@ class UsernameRegisterView extends StatelessWidget {
                       }
                     },
                     controller: model.usernameTech,
-                    onChanged: (value) => model.updateUsernameEmpty(),
+                    onChanged: (value) {
+                      value.toLowerCase();
+                      model.updateUsernameEmpty();
+                    },
+                    inputFormatters: [
+                      LowerCaseTextFormatter(),
+                    ],
                     cursorColor: Colors.blue,
                     decoration: InputDecoration(
                       fillColor: CupertinoColors.extraLightBackgroundGray,
                       filled: true,
                       isDense: true,
-                      hintText: 'Full Name',
+                      hintText: 'username',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide.none,
@@ -109,30 +122,28 @@ class UsernameRegisterView extends StatelessWidget {
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: model.usernameEmpty
-                          ? null
-                          : () {
-                              if (model.usernameFormKey.currentState!
-                                  .validate()) {
-                                getLogger('UsernameRegisterView')
-                                    .i(model.usernameTech.text);
-                                model.updateUserDisplayName(
-                                    model.usernameTech.text, onError: () {
-                                  getLogger('UsernameRegisterView')
-                                      .i('Error Occurred.');
-                                  // ignore: todo
-                                  //TODO: Define an alert dialog for error or something.
-                                }, onComplete: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (context) =>
-                                          const ChatListView(),
+                      onPressed: !model.usernameEmpty
+                          ? () async {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              if (model.key.currentState!.validate()) {
+                                //await model.singUp(email, password);
+                                Navigator.push(
+                                  context,
+                                  cupertinoTransition(
+                                    enterTo: PhoneAuthView(
+                                      email: email,
+                                      password: password,
+                                      username: model.usernameTech.text,
                                     ),
-                                  );
-                                });
+                                    exitFrom: UsernameRegisterView(
+                                      email: email,
+                                      password: password,
+                                    ),
+                                  ),
+                                );
                               }
-                            },
+                            }
+                          : null,
                     ),
                   ),
                   verticalSpaceLarge,
@@ -144,6 +155,17 @@ class UsernameRegisterView extends StatelessWidget {
         ),
       ),
       viewModelBuilder: () => UsernameRegisterViewModel(),
+    );
+  }
+}
+
+class LowerCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toLowerCase(),
+      selection: newValue.selection,
     );
   }
 }

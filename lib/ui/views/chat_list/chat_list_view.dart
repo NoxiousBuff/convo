@@ -280,20 +280,20 @@ class _ChatListViewState extends State<ChatListView>
                   shrinkWrap: true,
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection(usersFirestoreKey)
-                            .get()
-                            .then((querysnapshot) {
-                          for (var document in querysnapshot.docs) {
-                            document.reference.set({'blockedUsers': <String>[]},
-                                SetOptions(merge: true));
-                          }
-                        });
-                      },
-                      child: const Text('BlockedUsers'),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     FirebaseFirestore.instance
+                    //         .collection(usersFirestoreKey)
+                    //         .get()
+                    //         .then((querysnapshot) {
+                    //       for (var document in querysnapshot.docs) {
+                    //         document.reference.set({'blockedUsers': <String>[]},
+                    //             SetOptions(merge: true));
+                    //       }
+                    //     });
+                    //   },
+                    //   child: const Text('BlockedUsers'),
+                    // ),
                     buildUserContact(model),
                   ],
                 ),

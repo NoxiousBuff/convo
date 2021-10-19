@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/register/username/username_register_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'password_register_viewmodel.dart';
@@ -173,11 +172,11 @@ class PasswordRegisterView extends StatelessWidget {
                                   if (model.passwordFormKey.currentState!
                                       .validate()) {
                                     model.signUpUser();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const UsernameRegisterView()));
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             const UsernameRegisterView()));
                                   }
                                 },
                         ),
