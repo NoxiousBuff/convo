@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/verify_phone/verify_phone.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_viewmodel.dart';
@@ -116,7 +117,7 @@ class PhoneAuthView extends StatelessWidget {
                     var phoneNumber =
                         '+${model.countryCode} ${model.phoneTech.text}';
                     log.wtf('phoneNumber:$phoneNumber');
-                    model.signUpWithPhone(phoneNumber);
+                    AuthService().signUpWithPhone(phoneNumber, context);
                     Navigator.push(
                       context,
                       cupertinoTransition(
@@ -131,7 +132,7 @@ class PhoneAuthView extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  'Verify phone number',
+                  'verify phone number',
                   style: Theme.of(context)
                       .textTheme
                       .bodyText2!

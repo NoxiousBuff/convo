@@ -246,10 +246,12 @@ class _ChatListViewState extends State<ChatListView>
                 leading: TextButton(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        cupertinoTransition(
-                            enterTo: DistantView(fireUser: model.fireUser),
-                            exitFrom: const ChatListView()));
+                      context,
+                      cupertinoTransition(
+                        enterTo: DistantView(fireUser: model.fireUser),
+                        exitFrom: const ChatListView(),
+                      ),
+                    );
                   },
                   child: Text(
                     'All',

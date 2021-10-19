@@ -19,51 +19,38 @@ class EmailRegisterView extends StatefulWidget {
 
 class _EmailRegisterViewState extends State<EmailRegisterView> {
   Widget emailTextFormField(EmailRegisterViewModel model) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
-          child: Text(
-            'You will be asked to verify.',
-            style: Theme.of(context).textTheme.caption,
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'email address is mandatory to fill';
+        } else if (!isEmail(value)) {
+          return 'provide a valid email address';
+        } else if (value.length < 8) {
+          return 'must be at least 8 characters';
+        } else {
+          return null;
+        }
+      },
+      cursorColor: Colors.blue,
+      controller: model.emailTech,
+      onChanged: (val) => val.toLowerCase(),
+      textCapitalization: TextCapitalization.none,
+      decoration: InputDecoration(
+        fillColor: CupertinoColors.extraLightBackgroundGray,
+        filled: true,
+        isDense: true,
+        hintText: 'Email',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(
+            color: CupertinoColors.lightBackgroundGray,
           ),
         ),
-        TextFormField(
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'email address is mandatory to fill';
-            } else if (!isEmail(value)) {
-              return 'provide a valid email address';
-            } else if (value.length < 8) {
-              return 'must be at least 8 characters';
-            } else {
-              return null;
-            }
-          },
-          cursorColor: Colors.blue,
-          controller: model.emailTech,
-          onChanged: (val) => val.toLowerCase(),
-          textCapitalization: TextCapitalization.none,
-          decoration: InputDecoration(
-            fillColor: CupertinoColors.extraLightBackgroundGray,
-            filled: true,
-            isDense: true,
-            hintText: 'Email',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(
-                color: CupertinoColors.lightBackgroundGray,
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -198,6 +185,16 @@ class _EmailRegisterViewState extends State<EmailRegisterView> {
                             fontWeight: FontWeight.w600),
                       ),
                     ],
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+                      child: Text(
+                        'You will be ask to verify your email',
+                        style: Theme.of(context).textTheme.bodyText2,
+                      ),
+                    ),
                   ),
                   verticalSpaceSmall,
                   emailTextFormField(model),

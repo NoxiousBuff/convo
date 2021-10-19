@@ -1,10 +1,15 @@
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/pods/genral_code.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:otp_autofill/otp_autofill.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/register/verify_phone/verifyphone_viewmodel.dart';
 
 class VerifyPhoneView extends StatefulWidget {
@@ -15,6 +20,7 @@ class VerifyPhoneView extends StatefulWidget {
 }
 
 class _VerifyPhoneViewState extends State<VerifyPhoneView> {
+  final log = getLogger('VerifyCode');
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
       border: Border.all(color: Colors.deepPurpleAccent),
@@ -33,15 +39,22 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
         //ignore: avoid_print
         .then((value) => print('signature - $value'));
     controller = OTPTextEditController(
-      codeLength: 5,
+      codeLength: 6,
       //ignore: avoid_print
-      onCodeReceive: (code) => print('Your Application receive code - $code'),
+      onCodeReceive: (code) => log.wtf('Your Application receive code - $code'),
     )..startListenUserConsent(
         (code) {
-          final exp = RegExp(r'(\d{5})');
+          final exp = RegExp(r'(\d{6})');
           return exp.stringMatch(code ?? '') ?? '';
         },
       );
+  }
+
+
+@override
+  Future<void> dispose() async {
+    await controller.stopListen();
+    super.dispose();
   }
 
   @override
@@ -73,7 +86,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                   margin: const EdgeInsets.all(20.0),
                   padding: const EdgeInsets.all(20.0),
                   child: PinPut(
-                    fieldsCount: 5,
+                    fieldsCount: 6,
                     validator: (value) {
                       if (value!.length < 6) {
                         return 'code length must be 6';
@@ -112,7 +125,19 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
               CupertinoButton(
                 color: activeBlue,
                 onPressed: () {
-                  if (model.formKey.currentState!.validate()) {}
+                  if (model.formKey.currentState!.validate()) {
+                    final pod = context.read(codeProvider);
+                    if (controller.text == pod.optCode) {
+                      log.wtf('code verfied successfully');
+                      Navigator.push(
+                        context,
+                        cupertinoTransition(
+                          enterTo: const ChatListView(),
+                          exitFrom: const VerifyPhoneView(),
+                        ),
+                      );
+                    }
+                  }
                 },
                 child: Text(
                   'Next',

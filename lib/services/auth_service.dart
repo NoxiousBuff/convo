@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/pods/genral_code.dart';
+
+String verificationCode = '';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -115,13 +119,18 @@ class AuthService {
     });
   }
 
-  Future<void> signUpWithPhone(String phoneNumber) async {
+  Future<void> signUpWithPhone(String phoneNumber, BuildContext context) async {
     return FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {
         log.wtf('Verification Completed Successfuly.');
-
+        final pod = context.read(codeProvider);
+        final localSmsCode = credential.smsCode;
+        if (localSmsCode != null) pod.getCode(localSmsCode);
+        log.wtf('credential.smsCode : $localSmsCode');
         log.w('Phone Auth Credential: $credential');
+        FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential);
+        getLogger('Authservice').wtf(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
@@ -133,6 +142,8 @@ class AuthService {
       codeSent: (String verificationId, int? resendToken) async {
         // Update the UI - wait for the user to enter the SMS code
         //String smsCode = '7591';
+        getLogger('AuthService')
+            .wtf('Id:$verificationId, recendToken : $resendToken');
 
         // Create a PhoneAuthCredential with the code
         PhoneAuthCredential credential = PhoneAuthProvider.credential(

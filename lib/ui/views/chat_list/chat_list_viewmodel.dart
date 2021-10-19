@@ -9,28 +9,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatListViewModel extends FutureViewModel<QuerySnapshot> {
+  late FireUser fireUser;
   final bool _scrollIsOnTop = true;
+  ScrollController? scrollController;
   bool get scrollIsOnTop => _scrollIsOnTop;
   AuthService authService = AuthService();
   ChatService chatService = ChatService();
-  late FireUser fireUser;
-  ScrollController? scrollController;
-
-  final _currentUser = FirebaseAuth.instance.currentUser;
+  final log = getLogger('ChatListViewModel');
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection(usersFirestoreKey);
 
   Future<void> currentUserDoc() async {
-    if (_currentUser != null) {
-      final user = await FirebaseFirestore.instance
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      final user = await _firestore
           .collection(usersFirestoreKey)
-          .doc(_currentUser!.uid)
+          .doc(currentUser.uid)
           .get();
       fireUser = FireUser.fromFirestore(user);
       notifyListeners();
     } else {
-      getLogger('ChatListViewModel').wtf("user is currently logged out");
+      log.wtf("user is currently logged out");
     }
   }
 

@@ -126,7 +126,7 @@ class UsernameRegisterView extends StatelessWidget {
                           ? () async {
                               FocusScope.of(context).requestFocus(FocusNode());
                               if (model.key.currentState!.validate()) {
-                                //await model.singUp(email, password);
+                                await model.singUp(email, password);
                                 Navigator.push(
                                   context,
                                   cupertinoTransition(
