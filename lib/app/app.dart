@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/prototypes/phone/phone_auth_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(),
         home: FirebaseAuth.instance.currentUser != null
             ?  ChatListView()
-            : const EmailRegisterView(),
+            : const PhoneAuthView(),
       );
   }
 }
