@@ -10,6 +10,7 @@ class FireUser {
   final String? photoUrl;
   final Timestamp lastSeen;
   final Timestamp userCreated;
+  final List<dynamic> interests;
   final List<dynamic> blockedUsers;
 
   FireUser({
@@ -21,9 +22,9 @@ class FireUser {
     required this.status,
     required this.lastSeen,
     required this.username,
+    required this.interests,
     required this.userCreated,
     required this.blockedUsers,
-    //  this.timestamp,
   });
 
   //deserializing the user document
@@ -37,8 +38,9 @@ class FireUser {
       photoUrl: doc['photoUrl'],
       username: doc['username'],
       lastSeen: doc['lastSeen'],
+      interests: doc['interests'],
       userCreated: doc['userCreated'],
-      blockedUsers: doc ['blockedUsers']
+      blockedUsers: doc['blockedUsers'],
     );
   }
 }

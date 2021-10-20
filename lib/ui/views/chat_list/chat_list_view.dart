@@ -1,17 +1,16 @@
 import 'dart:math';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/app/app_logger.dart';
-
 import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/login/login_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
@@ -193,7 +192,11 @@ class _ChatListViewState extends State<ChatListView>
           FireUser fireUser = FireUser.fromFirestore(document);
           UserItem userResult = UserItem(
             fireUser: fireUser,
-            model: model,
+            onTap: () {
+              // model.chatService
+              //     .startConversation(context, fireUser, randomColor);
+              // log.i('Add A start conversation method');
+            },
           );
           userResults.add(userResult);
         }

@@ -7,7 +7,6 @@ import 'package:hint/pods/genral_code.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:otp_autofill/otp_autofill.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,8 +51,12 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
         .then((value) => print('signature - $value'));
     controller = OTPTextEditController(
       codeLength: 6,
-      //ignore: avoid_print
-      onCodeReceive: (code) => log.wtf('Your Application receive code - $code'),
+      onCodeReceive: (code) {
+        log.wtf('Your Application receive code - $code');
+        setState(() {
+          controller.text = code;
+        });
+      },
     )..startListenUserConsent(
         (code) {
           final exp = RegExp(r'(\d{6})');
@@ -123,17 +126,19 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Resend Code',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(color: activeBlue),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Resend Code',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText2!
+                          .copyWith(color: activeBlue),
+                    ),
                   ),
                 ),
               ),
@@ -141,38 +146,29 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
               CupertinoButton(
                 color: activeBlue,
                 onPressed: () async {
-                  log.d('username:${widget.username}');
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
-                    const photoURL = AuthService.kDefaultPhotoUrl;
                     if (createdUser != null) {
                       final credential = pod.phoneAuthCredential;
-                      await createdUser.updateDisplayName(widget.username);
-                      log.wtf('DisplayName:${createdUser.displayName}');
-                      await createdUser.updatePhotoURL(photoURL);
-                      log.wtf('PhotoURL:${createdUser.photoURL}');
                       if (credential != null) {
-                        await createdUser.updatePhoneNumber(credential);
-                        log.wtf('phoneNumber:${createdUser.phoneNumber}');
-                        log.wtf('email:${createdUser.email}');
+                        Navigator.push(
+                          context,
+                          cupertinoTransition(
+                            enterTo: InterestsView(
+                              email: widget.email,
+                              username: widget.username,
+                              createdUser: widget.createdUser,
+                              phoneNumber: widget.phoneNumber,
+                            ),
+                            exitFrom: VerifyPhoneView(
+                              email: widget.email,
+                              username: widget.username,
+                              createdUser: widget.createdUser,
+                              phoneNumber: widget.phoneNumber,
+                            ),
+                          ),
+                        );
                       }
-                      Navigator.push(
-                        context,
-                        cupertinoTransition(
-                          enterTo: InterestsView(
-                            email: widget.email,
-                            username: widget.username,
-                            createdUser: widget.createdUser,
-                            phoneNumber: widget.phoneNumber,
-                          ),
-                          exitFrom: VerifyPhoneView(
-                            email: widget.email,
-                            username: widget.username,
-                            createdUser: widget.createdUser,
-                            phoneNumber: widget.phoneNumber,
-                          ),
-                        ),
-                      );
                     }
                   }
                 },

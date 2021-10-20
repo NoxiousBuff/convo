@@ -1,20 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 FirestoreApi firestoreApi = FirestoreApi();
 
 class FirestoreApi {
   final log = getLogger('FirestoreApi');
-
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth auth = FirebaseAuth.instance;
   static final String liveUserUid = auth.currentUser!.uid;
-
-  static const String kDefaultPhotoUrl =
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static const url =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+  static const String kDefaultPhotoUrl = url;
+
   CollectionReference usersCollection =
       _firestore.collection(usersFirestoreKey);
 
@@ -34,22 +34,24 @@ class FirestoreApi {
   }
 
   Future<void> createUserInFirebase({
-    String? userName,
+    String? username,
     Function? onError,
     required User user,
     String? phoneNumber,
+    required List<String> interests,
   }) async {
     try {
       await usersCollection.doc(user.uid).set({
-        'id': user.uid,
-        'username': userName,
-        'photoUrl': kDefaultPhotoUrl,
-        'email': user.email,
         'bio': '',
-        'status': '',
-        'userCreated': Timestamp.now(),
+        'email': user.email,
+        'id': user.uid,
+        'interests': interests,
         'lastSeen': null,
-        'phone': null
+        'phone': phoneNumber,
+        'photoUrl': kDefaultPhotoUrl,
+        'status': 'Online',
+        'username': username,
+        'userCreated': Timestamp.now(),
       });
       log.i('User has been successfully created with details $user');
     } catch (e) {

@@ -3,19 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
-  final ChatListViewModel model;
-  UserItem({Key? key, required this.fireUser, required this.model})
+  final void Function()? onTap;
+  UserItem({Key? key, required this.fireUser, required this.onTap})
       : super(key: key);
 
   final Color randomColor = Color.fromARGB(Random().nextInt(256),
@@ -104,10 +102,7 @@ class UserItem extends StatelessWidget {
       builder: (context, box, child) {
         bool darkMode = box.get(darkModeKey);
         return ListTile(
-          onTap: () {
-            model.chatService.startConversation(context, fireUser, randomColor);
-            getLogger('UserItem').i('Add A start conversation method');
-          },
+          onTap: onTap,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),

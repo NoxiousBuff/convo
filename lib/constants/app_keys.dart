@@ -1,14 +1,16 @@
 ///This is a space to keys regarding any particular services like firebase or hive or etc..
 
+const String subsFirestoreKey = 'subs';
+const String chatsFirestoreKey = 'Chat';
 const String usersFirestoreKey = 'users';
 const String convoFirestorekey = 'convo';
-const String chatsFirestoreKey = 'Chat';
+const String recentFirestoreKey = 'recentsChats';
 
 const String defaultImagesFolder = 'Images/Samples';
 
 const String appName = 'Convo';
 
-const String pdfType = "pdf"; 
+const String pdfType = "pdf";
 const String urlType = 'URL';
 const String textType = 'text';
 const String emojiType = 'emoji';

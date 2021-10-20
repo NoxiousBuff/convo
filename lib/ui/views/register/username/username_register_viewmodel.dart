@@ -1,6 +1,6 @@
+import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
-import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,6 +39,7 @@ class UsernameRegisterViewModel extends BaseViewModel {
     });
     final user = userCredential.user;
     if (user != null && user.emailVerified) {
+      await user.updatePhotoURL(AuthService.kDefaultPhotoUrl);
       user.sendEmailVerification().catchError((e) {
         log.e('sendVerificationEmail:$e');
       }).then((value) => log.wtf('verification email is sended successfully'));

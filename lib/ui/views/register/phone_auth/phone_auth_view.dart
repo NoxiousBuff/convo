@@ -13,13 +13,11 @@ import 'package:hint/ui/views/register/phone_auth/phone_auth_viewmodel.dart';
 
 class PhoneAuthView extends StatelessWidget {
   final String email;
-  final String password;
   final String username;
   final User? createdUser;
   const PhoneAuthView({
     Key? key,
     required this.email,
-    required this.password,
     required this.username,
     required this.createdUser,
   }) : super(key: key);
@@ -80,7 +78,7 @@ class PhoneAuthView extends StatelessWidget {
                           if (value!.isEmpty) {
                             return 'This field is mandatory to fill';
                           }
-                          if (value.length < 5) {
+                          if (value.length < 6) {
                             return 'enter a valid phone number';
                           } else {
                             return null;
@@ -120,7 +118,7 @@ class PhoneAuthView extends StatelessWidget {
                     var phoneNumber =
                         '+${model.countryCode}${model.phoneTech.text}';
                     log.wtf('phoneNumber:$phoneNumber');
-                    AuthService().signUpWithPhone(phoneNumber, context);
+                    authService.signUpWithPhone(phoneNumber, context);
                     Navigator.push(
                       context,
                       cupertinoTransition(
@@ -132,7 +130,6 @@ class PhoneAuthView extends StatelessWidget {
                         ),
                         exitFrom: PhoneAuthView(
                           email: email,
-                          password: password,
                           username: username,
                           createdUser: createdUser,
                         ),

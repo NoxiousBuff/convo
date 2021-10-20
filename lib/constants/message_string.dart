@@ -52,5 +52,6 @@ class ChatRoomField {
 
 class UserField {
   static const lastSeen = 'lastSeen';
+  static const username = 'username';
   static const blockedUsers = 'blockedUsers';
 }

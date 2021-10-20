@@ -48,153 +48,158 @@ class ChatView extends StatelessWidget {
     final lastSeenStyle =
         Theme.of(context).textTheme.bodyText2!.copyWith(color: inactiveGray);
     return ViewModelBuilder<ChatViewModel>.reactive(
-      viewModelBuilder: () =>
-          ChatViewModel(conversationId: conversationId, fireUser: fireUser),
-      onModelReady: (model) async {
-        model.scrollController = ScrollController();
-        await model.iBlockThisUserCkecker(
-            firestoreApi.getCurrentUser()!.uid, fireUser.id);
-        log.wtf('iBlockThisUser:${model.iBlockThisUser}');
-        await model.userBlockMeChecker(
-            fireUser.id, firestoreApi.getCurrentUser()!.uid);
-        log.wtf('userBlockMe:${model.userBlockMe}');
-      },
-      onDispose: (model) async {
-        if (urlDataHiveBox(conversationId).isOpen) {
-          await urlDataHiveBox(conversationId).close();
-        } else if (imagesMemoryHiveBox(conversationId).isOpen) {
-          await imagesMemoryHiveBox(conversationId).close();
-        } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
-          await chatRoomMediaHiveBox(conversationId).close();
-        } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
-          await thumbnailsPathHiveBox(conversationId).close();
-        } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
-          await videoThumbnailsHiveBox(conversationId).close();
-        }
-      },
-      builder: (context, model, child) => OfflineBuilder(
-        child: const Text("Yah Baby !!"),
-        connectivityBuilder: (context, connectivity, child) {
-          bool connected = connectivity != ConnectivityResult.none;
-
-          if (connected) {
-            model.seeMsg();
-          }
-          return GestureDetector(
-            onTap: () {
-              MediaQuery.of(context).viewInsets.bottom == 0
-                  ? model.focusNode.unfocus()
-                  : const Text('');
-            },
-            dragStartBehavior: DragStartBehavior.start,
-            onVerticalDragStart: (drag) {
-              MediaQuery.of(context).viewInsets.bottom == 0
-                  ? model.focusNode.unfocus()
-                  : const Text('');
-            },
-            child: Scaffold(
-              appBar: AppBar(
-                elevation: 0.0,
-                centerTitle: true,
-                toolbarHeight: 80.0,
-                automaticallyImplyLeading: true,
-                backgroundColor: randomColor.withAlpha(60),
-                leading: StreamBuilder<DocumentSnapshot>(
-                    stream: model.statusStream(fireUser.id),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        String status = snapshot.data!['status'];
-                        bool isOnline = snapshot.data!['status'] == 'Online';
-                        var timestamp = snapshot.data!['lastSeen'] as Timestamp;
-                        var lastSeen =
-                            time.format(timestamp.toDate(), allowFromNow: true);
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                cupertinoTransition(
-                                  enterTo: ProfileView(
-                                      model: model,
-                                      fireUser: fireUser,
-                                      conversationId: conversationId,
-                                      iBlockThisUser: model.iBlockThisUser),
-                                  exitFrom: ChatView(
-                                      fireUser: fireUser,
-                                      randomColor: randomColor,
-                                      conversationId: conversationId),
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 2,
-                                      color:
-                                          isOnline ? activeGreen : transparent,
-                                    ),
-                                  ),
-                                  child: ExtendedImage(
-                                    height: 50,
-                                    width: 50,
-                                    enableLoadState: true,
-                                    handleLoadingProgress: true,
-                                    image: NetworkImage(
-                                      fireUser.photoUrl ?? 'images/img2.jpg',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            verticalSpaceTiny,
-                            isOnline
-                                ? Text(status, style: statusStyle)
-                                : Text(lastSeen, style: lastSeenStyle)
-                          ],
-                        );
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    }),
-                title: Text(
-                  fireUser.username,
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-              ),
-              body: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Flexible(
-                    child: ChatMessages(
-                      model: model,
-                      fireuser: fireUser,
-                      receiverUid: fireUser.id,
-                      conversationId: conversationId,
-                    ),
-                  ),
-                  hintTextField(
-                    model: model,
-                    context: context,
-                    child: HintTextField(
-                      fireUser: fireUser,
-                      chatViewModel: model,
-                      randomColor: randomColor,
-                      receiverUid: fireUser.id,
-                      focusNode: model.focusNode,
-                      conversationId: conversationId,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+        viewModelBuilder: () =>
+            ChatViewModel(conversationId: conversationId, fireUser: fireUser),
+        onModelReady: (model) async {
+          model.scrollController = ScrollController();
+          await model.iBlockThisUserCkecker(
+              firestoreApi.getCurrentUser()!.uid, fireUser.id);
+          log.wtf('iBlockThisUser:${model.iBlockThisUser}');
+          await model.userBlockMeChecker(
+              fireUser.id, firestoreApi.getCurrentUser()!.uid);
+          log.wtf('userBlockMe:${model.userBlockMe}');
         },
-      ),
-    );
+        onDispose: (model) async {
+          if (urlDataHiveBox(conversationId).isOpen) {
+            await urlDataHiveBox(conversationId).close();
+          } else if (imagesMemoryHiveBox(conversationId).isOpen) {
+            await imagesMemoryHiveBox(conversationId).close();
+          } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
+            await chatRoomMediaHiveBox(conversationId).close();
+          } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
+            await thumbnailsPathHiveBox(conversationId).close();
+          } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
+            await videoThumbnailsHiveBox(conversationId).close();
+          }
+        },
+        builder: (context, model, child) {
+          return OfflineBuilder(
+            child: const Text("Yah Baby !!"),
+            connectivityBuilder: (context, connectivity, child) {
+              bool connected = connectivity != ConnectivityResult.none;
+
+              if (connected) {
+                model.seeMsg();
+              }
+              return GestureDetector(
+                onTap: () {
+                  MediaQuery.of(context).viewInsets.bottom == 0
+                      ? model.focusNode.unfocus()
+                      : const Text('');
+                },
+                dragStartBehavior: DragStartBehavior.start,
+                onVerticalDragStart: (drag) {
+                  MediaQuery.of(context).viewInsets.bottom == 0
+                      ? model.focusNode.unfocus()
+                      : const Text('');
+                },
+                child: Scaffold(
+                  appBar: AppBar(
+                    elevation: 0.0,
+                    centerTitle: true,
+                    toolbarHeight: 80.0,
+                    automaticallyImplyLeading: true,
+                    backgroundColor: randomColor.withAlpha(60),
+                    leading: StreamBuilder<DocumentSnapshot>(
+                        stream: model.statusStream(fireUser.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            String status = snapshot.data!['status'];
+                            bool isOnline =
+                                snapshot.data!['status'] == 'Online';
+                            var timestamp =
+                                snapshot.data!['lastSeen'] as Timestamp;
+                            var lastSeen = time.format(timestamp.toDate(),
+                                allowFromNow: true);
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    cupertinoTransition(
+                                      enterTo: ProfileView(
+                                          model: model,
+                                          fireUser: fireUser,
+                                          conversationId: conversationId,
+                                          iBlockThisUser: model.iBlockThisUser),
+                                      exitFrom: ChatView(
+                                          fireUser: fireUser,
+                                          randomColor: randomColor,
+                                          conversationId: conversationId),
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 2,
+                                          color: isOnline
+                                              ? activeGreen
+                                              : transparent,
+                                        ),
+                                      ),
+                                      child: ExtendedImage(
+                                        height: 50,
+                                        width: 50,
+                                        enableLoadState: true,
+                                        handleLoadingProgress: true,
+                                        image: NetworkImage(
+                                          fireUser.photoUrl ??
+                                              'images/img2.jpg',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                verticalSpaceTiny,
+                                isOnline
+                                    ? Text(status, style: statusStyle)
+                                    : Text(lastSeen, style: lastSeenStyle)
+                              ],
+                            );
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        }),
+                    title: Text(
+                      fireUser.username,
+                      style: Theme.of(context).textTheme.bodyText2,
+                    ),
+                  ),
+                  body: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: ChatMessages(
+                          model: model,
+                          fireuser: fireUser,
+                          receiverUid: fireUser.id,
+                          conversationId: conversationId,
+                        ),
+                      ),
+                      hintTextField(
+                        model: model,
+                        context: context,
+                        child: HintTextField(
+                          fireUser: fireUser,
+                          chatViewModel: model,
+                          randomColor: randomColor,
+                          receiverUid: fireUser.id,
+                          focusNode: model.focusNode,
+                          conversationId: conversationId,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        });
   }
 
   Widget hintTextField(

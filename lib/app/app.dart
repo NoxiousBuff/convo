@@ -6,7 +6,7 @@ import 'package:hint/api/hive_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 class MyApp extends StatelessWidget {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           home: FirebaseAuth.instance.currentUser != null
-              ? const ChatListView()
+              ? const RecentChats()
               : const EmailRegisterView(),
           themeMode: darkTheme ? ThemeMode.dark : ThemeMode.light,
           darkTheme: ThemeData(

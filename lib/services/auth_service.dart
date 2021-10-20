@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/pods/genral_code.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 String verificationCode = '';
 
@@ -17,6 +17,8 @@ class AuthService {
   final log = getLogger('AuthService');
 
   final FirestoreApi _firestoreApi = FirestoreApi();
+
+ static  User? liveUser = FirebaseAuth.instance.currentUser;
 
   signUp(
       {required String email,
@@ -38,7 +40,7 @@ class AuthService {
           .catchError((e) => getLogger('AuthService').e(e));
       await _firestoreApi
           .createUserInFirebase(
-              user: userCredential.user!, onError: randomError)
+              user: userCredential.user!, interests: [], onError: randomError)
           .then((value) => onComplete);
       await userCredential.user!.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
@@ -130,8 +132,8 @@ class AuthService {
         if (localSmsCode != null) pod.getCode(localSmsCode);
         pod.getPhoneCredentials(credential);
         log.wtf('credential.smsCode : $localSmsCode');
-        log.wtf('Phone Auth Credential: $credential');
         log.wtf('Verification Completed Successfuly.');
+        log.wtf('Phone Auth Credential: ${pod.phoneAuthCredential}');
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
@@ -141,10 +143,6 @@ class AuthService {
         }
       },
       codeSent: (String verificationId, int? resendToken) async {
-        // Update the UI - wait for the user to enter the SMS code
-        //String smsCode = '7591';
-        log.v('Id:$verificationId, recendToken : $resendToken');
-
         // Create a PhoneAuthCredential with the code
         PhoneAuthCredential credential = PhoneAuthProvider.credential(
             verificationId: verificationId, smsCode: resendToken.toString());

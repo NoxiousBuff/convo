@@ -126,15 +126,13 @@ class UsernameRegisterView extends StatelessWidget {
                           ? () async {
                               FocusScope.of(context).requestFocus(FocusNode());
                               if (model.key.currentState!.validate()) {
-                                final user =
-                                    await model.singUp(email, password);
+                                var user = await model.singUp(email, password);
                                 Navigator.push(
                                   context,
                                   cupertinoTransition(
                                     enterTo: PhoneAuthView(
                                       email: email,
                                       createdUser: user,
-                                      password: password,
                                       username: model.usernameTech.text,
                                     ),
                                     exitFrom: UsernameRegisterView(
