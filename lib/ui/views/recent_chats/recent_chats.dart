@@ -1,7 +1,6 @@
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +15,6 @@ class RecentChats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final log = getLogger('RecentChats');
     const padding = EdgeInsets.symmetric(horizontal: 24, vertical: 8);
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
