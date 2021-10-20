@@ -11,12 +11,13 @@ class FireUser {
   final Timestamp lastSeen;
   final Timestamp userCreated;
   final List<dynamic> interests;
-  final List<dynamic> blockedUsers;
+  final List<dynamic>? blockedUsers;
 
   FireUser({
     this.bio,
     this.phone,
     this.photoUrl,
+    this.blockedUsers,
     required this.id,
     required this.email,
     required this.status,
@@ -24,7 +25,6 @@ class FireUser {
     required this.username,
     required this.interests,
     required this.userCreated,
-    required this.blockedUsers,
   });
 
   //deserializing the user document

@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchViewModel extends BaseViewModel {
   final ChatService _chatService = ChatService();
-
+  final _firestore = FirebaseFirestore.instance;
   Future<QuerySnapshot>? _searchResultFuture;
   Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
 
@@ -25,5 +25,9 @@ class SearchViewModel extends BaseViewModel {
 
   void onUserItemTap(BuildContext context, FireUser fireUser) {
     _chatService.startConversation(context, fireUser, Colors.blue.shade50);
+  }
+
+  Future<QuerySnapshot> allUsers() {
+    return _firestore.collection(usersFirestoreKey).get();
   }
 }

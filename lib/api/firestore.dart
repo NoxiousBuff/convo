@@ -44,9 +44,10 @@ class FirestoreApi {
       await usersCollection.doc(user.uid).set({
         'bio': '',
         'email': user.email,
+        'blockedUsers':[],
         'id': user.uid,
         'interests': interests,
-        'lastSeen': null,
+        'lastSeen': Timestamp.now(),
         'phone': phoneNumber,
         'photoUrl': kDefaultPhotoUrl,
         'status': 'Online',

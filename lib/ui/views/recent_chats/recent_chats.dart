@@ -1,26 +1,47 @@
+import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+//import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+//import 'package:hint/ui/views/contacts/contacts.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 import 'package:hint/ui/views/recent_chats/recentchats_viewmodel.dart';
 
 class RecentChats extends StatelessWidget {
   const RecentChats({Key? key}) : super(key: key);
 
+  Widget buttonWidget({
+    IconData? icon,
+    required String text,
+    void Function()? onPressed,
+    required BuildContext context,
+  }) {
+    return CupertinoButton(
+      color: activeBlue,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      onPressed: onPressed,
+      child: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1!
+            .copyWith(color: systemBackground),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const padding = EdgeInsets.symmetric(horizontal: 24, vertical: 8);
+    final log = getLogger('RecentChats');
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
       builder: (context, box, child) {
-        //log.wtf('username:${AuthService.liveUser!.displayName}');
-        //log.wtf('username:${AuthService.liveUser!.phoneNumber}');
         bool darkMode = box.get(darkModeKey, defaultValue: false);
         return ViewModelBuilder<RecentChatsViewModel>.reactive(
           viewModelBuilder: () => RecentChatsViewModel(),
@@ -82,30 +103,53 @@ class RecentChats extends StatelessWidget {
               ),
               body: documents.isEmpty
                   ? Center(
-                      child: CupertinoButton(
-                        padding: padding,
-                        color: activeBlue,
-                        onPressed: () => Navigator.push(
-                          context,
-                          cupertinoTransition(
-                            enterTo: const SearchView(),
-                            exitFrom: const RecentChats(),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      child: SizedBox(
+                        height: 200,
+                        child: Column(
                           children: [
-                            Text(
-                              'Find Friends',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(color: systemBackground),
+                            buttonWidget(
+                              context: context,
+                              text: 'find you close friend',
+                              onPressed: () async {
+                                log.i('');
+                                // final users = await FirebaseFirestore.instance
+                                //     .collection(usersFirestoreKey)
+                                //     .get();
+                                // for (var document in users.docs) {
+                                //   FirebaseFirestore.instance
+                                //       .collection(usersFirestoreKey)
+                                //       .doc(document.id)
+                                //       .set({
+                                //     'id': null,
+                                //     'bio': null,
+                                //     'email': null,
+                                //     'phone': '+911234567890',
+                                //     'status': 'Offline',
+                                //     'photoUrl': AuthService.kDefaultPhotoUrl,
+                                //     'username':
+                                //         'username${Random().nextInt(100)}',
+                                //     'lastSeen': DateTime.now(),
+                                //     'interests': null,
+                                //     'userCreated': DateTime.now().weekday,
+                                //     'blockedUsers': null,
+                                //   }, SetOptions(merge: true));
+                                // }
+                              },
                             ),
-                            const Icon(
-                              Icons.search_outlined,
-                              color: systemBackground,
-                              size: 40,
+                            const SizedBox(height: 10),
+                            buttonWidget(
+                              text: 'search your friend',
+                              context: context,
+                              icon: Icons.search,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  cupertinoTransition(
+                                    enterTo: const SearchView(),
+                                    exitFrom: const RecentChats(),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

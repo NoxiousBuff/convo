@@ -71,10 +71,10 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
 
     final firestoreUser = FireUser.fromFirestore(query);
 
-    _iBlockThisUser = firestoreUser.blockedUsers.contains(fireUserId);
+    _iBlockThisUser = firestoreUser.blockedUsers!.contains(fireUserId);
     notifyListeners();
 
-    return firestoreUser.blockedUsers.contains(fireUserId);
+    return firestoreUser.blockedUsers!.contains(fireUserId);
   }
 
   Future<bool> userBlockMeChecker(
@@ -86,9 +86,9 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
 
     final firestoreUser = FireUser.fromFirestore(query);
 
-    _userBlockMe = firestoreUser.blockedUsers.contains(currentUserId);
+    _userBlockMe = firestoreUser.blockedUsers!.contains(currentUserId);
     notifyListeners();
-    return firestoreUser.blockedUsers.contains(currentUserId);
+    return firestoreUser.blockedUsers!.contains(currentUserId);
   }
 
   Stream<QuerySnapshot> getChats(String conversationId) {

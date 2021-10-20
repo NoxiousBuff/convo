@@ -2,7 +2,9 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:hint/ui/views/search_view/search_viewmodel.dart';
@@ -49,63 +51,98 @@ class SearchView extends StatelessWidget {
     );
   }
 
-  Widget buildSearchContent(BuildContext context, SearchViewModel model) {
+  Widget allUsersList(BuildContext context, SearchViewModel model) {
+    final searchFuture =
+        FirebaseFirestore.instance.collection(usersFirestoreKey).get();
     return FutureBuilder<QuerySnapshot>(
-      future: model.searchResultFuture,
+      future: searchFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CupertinoActivityIndicator());
         }
-        final searchResults = snapshot.data!.docs;
-        return searchResults.isNotEmpty
-            ? ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: searchResults.length,
-                itemBuilder: (context, i) {
-                  final data = snapshot.data;
-                  if (data != null) {
+        final data = snapshot.data;
+        if (data != null) {
+          final searchResults = data.docs;
+
+          return searchResults.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, i) {
                     FireUser localFireUser =
                         FireUser.fromFirestore(data.docs[i]);
                     return UserItem(
                       fireUser: localFireUser,
                       onTap: () => model.onUserItemTap(context, localFireUser),
                     );
-                  } else {
-                    return const Center(
-                      child: Text('Data is null now !!')
+                  },
+                )
+              : buildEmptySearch();
+        } else {
+          return buildEmptySearch();
+        }
+      },
+    );
+  }
+
+  Widget searchedUser(BuildContext context, SearchViewModel model) {
+    return FutureBuilder<QuerySnapshot>(
+      future: model.searchResultFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+        final data = snapshot.data;
+        if (data != null) {
+          final searchResults = data.docs;
+
+          return searchResults.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, i) {
+                    FireUser localFireUser =
+                        FireUser.fromFirestore(data.docs[i]);
+                    return UserItem(
+                      fireUser: localFireUser,
+                      onTap: () => model.onUserItemTap(context, localFireUser),
                     );
-                  }
-                },
-              )
-            : buildEmptySearch();
+                  },
+                )
+              : buildEmptySearch();
+        } else {
+          return buildEmptySearch();
+        }
       },
     );
   }
 
   Widget buildEmptySearch() {
-    return Container(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Icon(
-              Icons.icecream,
-              size: 128.0,
-              color: CupertinoColors.inactiveGray,
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Icon(
+                Icons.icecream,
+                size: 128.0,
+                color: CupertinoColors.inactiveGray,
+              ),
             ),
-          ),
-          Text(
-            'Sorry, nothing found.\nMay be we can interest you in \nIceCream.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.black54,
-                fontWeight: FontWeight.w300,
-                fontSize: 24.0),
-          )
-        ],
+            Text(
+              'Sorry, nothing found.\nMay be we can interest you in \nIceCream.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w300,
+                  fontSize: 24.0),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -142,11 +179,46 @@ class SearchView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<SearchViewModel>.reactive(
       viewModelBuilder: () => SearchViewModel(),
-      builder: (context, model, child) => Scaffold(
-          appBar: buildSearchHeader(context, model),
+      builder: (context, model, child) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blue,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(kTextTabBarHeight + 20),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 1),
+                child: CupertinoTextField(
+                  placeholder: 'Search Friends',
+                  cursorColor: systemBackground,
+                  onChanged: (val) {
+                    model.handleSearch(val);
+                  },
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2!
+                      .copyWith(color: systemBackground),
+                  placeholderStyle: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: systemBackground),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: grey),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           body: model.searchResultFuture != null
-              ? buildSearchContent(context, model)
-              : Container()),
+              ? searchedUser(context, model)
+              : allUsersList(context, model),
+        );
+      },
     );
   }
 }
+
+//  model.searchResultFuture != null
+//               ? buildSearchContent(context, model)
+//               : Container()
