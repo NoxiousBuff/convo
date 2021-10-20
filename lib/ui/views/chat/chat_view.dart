@@ -71,6 +71,9 @@ class ChatView extends StatelessWidget {
           } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
             await videoThumbnailsHiveBox(conversationId).close();
           }
+          if (!await model.hasNotContain(conversationId)) {
+                
+          }
         },
         builder: (context, model, child) {
           return OfflineBuilder(

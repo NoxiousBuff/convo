@@ -51,7 +51,15 @@ class ChatRoomField {
 }
 
 class UserField {
+  static const id = 'id';
+  static const bio = 'bio';
+  static const email = 'email';
+  static const phone = 'phone';
+  static const status = 'status';
   static const lastSeen = 'lastSeen';
+  static const photoUrl = 'photoUrl';
   static const username = 'username';
+  static const interests = 'interests';
+  static const userCreated = 'userCreated';
   static const blockedUsers = 'blockedUsers';
 }

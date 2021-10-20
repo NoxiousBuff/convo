@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:animations/animations.dart';
 import 'package:hint/models/user_model.dart';
@@ -14,9 +15,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 final ChatService chatService = ChatService();
 
 class ChatService {
+  static final log = getLogger('ChatService');
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
+  static final CollectionReference _userCollection =
+      _firestore.collection(usersFirestoreKey);
   static final CollectionReference _conversationCollection =
       _firestore.collection(convoFirestorekey);
 
@@ -59,6 +63,69 @@ class ChatService {
       // ignore: unnecessary_string_escapes
       return '$a\_$b';
     }
+  }
+
+  _addToRecentListForSender(FireUser fireUser) async {
+    final recentUser = await _userCollection
+        .doc(liveUserUid)
+        .collection(recentFirestoreKey)
+        .doc(fireUser.id)
+        .get();
+    if (!recentUser.exists) {
+      _userCollection
+          .doc(liveUserUid)
+          .collection(recentFirestoreKey)
+          .doc(fireUser.id)
+          .set({
+        UserField.bio: fireUser.bio,
+        UserField.email: fireUser.email,
+        UserField.blockedUsers: fireUser.blockedUsers,
+        UserField.id: fireUser.id,
+        UserField.interests: fireUser.interests,
+        UserField.lastSeen: fireUser.lastSeen,
+        UserField.phone: fireUser.phone,
+        UserField.photoUrl: fireUser.photoUrl,
+        UserField.status: fireUser.status,
+        UserField.username: fireUser.username,
+        UserField.userCreated: fireUser.userCreated,
+      });
+    } else {
+      log.wtf('SenderRecentUser already exists : ${fireUser.email}');
+    }
+  }
+
+  _addTORecentListForReceiver(FireUser fireUser) async {
+    final recentUser = await _userCollection
+        .doc(fireUser.id)
+        .collection(recentFirestoreKey)
+        .doc(liveUserUid)
+        .get();
+    if (!recentUser.exists) {
+      _userCollection
+          .doc(fireUser.id)
+          .collection(recentFirestoreKey)
+          .doc(liveUserUid)
+          .set({
+        UserField.bio: fireUser.bio,
+        UserField.email: fireUser.email,
+        UserField.blockedUsers: fireUser.blockedUsers,
+        UserField.id: fireUser.id,
+        UserField.interests: fireUser.interests,
+        UserField.lastSeen: fireUser.lastSeen,
+        UserField.phone: fireUser.phone,
+        UserField.photoUrl: fireUser.photoUrl,
+        UserField.status: fireUser.status,
+        UserField.username: fireUser.username,
+        UserField.userCreated: fireUser.userCreated,
+      });
+    } else {
+      log.wtf('ReceiverRecentUser:${fireUser.email}');
+    }
+  }
+
+  void addTorecentsChat(FireUser fireUser) {
+    _addTORecentListForReceiver(fireUser);
+    _addToRecentListForSender(fireUser);
   }
 
   addFirestoreMessage({
