@@ -65,67 +65,79 @@ class ChatService {
     }
   }
 
-  _addToRecentListForSender(FireUser fireUser) async {
-    final recentUser = await _userCollection
+
+
+
+  _addToRecentListForSender(String receiverUid) async {
+    final doc = await _userCollection
         .doc(liveUserUid)
         .collection(recentFirestoreKey)
-        .doc(fireUser.id)
+        .doc(receiverUid)
         .get();
-    if (!recentUser.exists) {
+    if (doc.exists) {
       _userCollection
           .doc(liveUserUid)
           .collection(recentFirestoreKey)
-          .doc(fireUser.id)
-          .set({
-        UserField.bio: fireUser.bio,
-        UserField.email: fireUser.email,
-        UserField.blockedUsers: fireUser.blockedUsers,
-        UserField.id: fireUser.id,
-        UserField.interests: fireUser.interests,
-        UserField.lastSeen: fireUser.lastSeen,
-        UserField.phone: fireUser.phone,
-        UserField.photoUrl: fireUser.photoUrl,
-        UserField.status: fireUser.status,
-        UserField.username: fireUser.username,
-        UserField.userCreated: fireUser.userCreated,
-      });
+          .doc(receiverUid)
+          .update({'timestamp': Timestamp.now()})
+          .then((value) => log.wtf(
+              'timestamp for receiverUid : $receiverUid has been updated to timestamp : ${Timestamp.now()}'))
+          .catchError((e) => log
+              .e('timestamp : ${Timestamp.now()}receiverUid : $receiverUid'));
     } else {
-      log.wtf('SenderRecentUser already exists : ${fireUser.email}');
+      _userCollection
+          .doc(liveUserUid)
+          .collection(recentFirestoreKey)
+          .doc(receiverUid)
+          .set({'userUid': receiverUid, 'timestamp': Timestamp.now()})
+          .then((value) => log.wtf(
+              'recieverUid : $receiverUid has been add to the user with id : $liveUserUid'))
+          .catchError((e) => log.e(
+              'There has been error in adding recieverUid : $receiverUid to user with id : $liveUserUid'));
     }
   }
 
-  _addTORecentListForReceiver(FireUser fireUser) async {
-    final recentUser = await _userCollection
-        .doc(fireUser.id)
+  _addTORecentListForReceiver(String receiverUid) async {
+    final doc = await _userCollection
+        .doc(receiverUid)
         .collection(recentFirestoreKey)
         .doc(liveUserUid)
         .get();
-    if (!recentUser.exists) {
+    if (doc.exists) {
       _userCollection
-          .doc(fireUser.id)
+          .doc(receiverUid)
           .collection(recentFirestoreKey)
           .doc(liveUserUid)
-          .set({
-        UserField.bio: fireUser.bio,
-        UserField.email: fireUser.email,
-        UserField.blockedUsers: fireUser.blockedUsers,
-        UserField.id: fireUser.id,
-        UserField.interests: fireUser.interests,
-        UserField.lastSeen: fireUser.lastSeen,
-        UserField.phone: fireUser.phone,
-        UserField.photoUrl: fireUser.photoUrl,
-        UserField.status: fireUser.status,
-        UserField.username: fireUser.username,
-        UserField.userCreated: fireUser.userCreated,
-      });
+          .update({'timestamp': Timestamp.now()})
+          .then((value) => log.wtf(
+              'timestamp for user with id : $liveUserUid has been updated to timestamp : ${Timestamp.now()}'))
+          .catchError((e) => log.e(
+              'There has been error in updating timestamp for user with id : $liveUserUid'));
     } else {
-      log.wtf('ReceiverRecentUser:${fireUser.email}');
+      _userCollection
+          .doc(receiverUid)
+          .collection(recentFirestoreKey)
+          .doc(liveUserUid)
+          .set({'userUid': liveUserUid, 'timestamp': Timestamp.now()})
+          .then((value) => log.wtf(
+              'user with id : $liveUserUid has been add to the recieverUid : $receiverUid'))
+          .catchError((e) => log.e(
+              'There has been error in adding user with id : $liveUserUid to recieverUid : $receiverUid'));
     }
   }
 
-  void addTorecentsChat(FireUser fireUser) {
-    _addTORecentListForReceiver(fireUser);
-    _addToRecentListForSender(fireUser);
+  Future<void> addToRecentList(String receiverUid) async {
+    _addToRecentListForSender(receiverUid);
+    _addTORecentListForReceiver(receiverUid);
+  }
+
+  Stream<QuerySnapshot> getRecentChatList() {
+    return _firestore
+        .collection(usersFirestoreKey)
+        .doc(liveUserUid)
+        .collection(recentFirestoreKey)
+        .orderBy(DocumentField.timestamp, descending: true)
+        .snapshots();
   }
 
   addFirestoreMessage({

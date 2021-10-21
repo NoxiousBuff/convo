@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+
 import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -186,12 +188,14 @@ class _ChatListViewState extends State<ChatListView>
             child: Text('Model has Error'),
           );
         }
+       
 
         List<UserItem> userResults = [];
         for (var document in model.data!.docs) {
           FireUser fireUser = FireUser.fromFirestore(document);
           UserItem userResult = UserItem(
             fireUser: fireUser,
+            randomColor: randomColor,
             onTap: () {
               // model.chatService
               //     .startConversation(context, fireUser, randomColor);

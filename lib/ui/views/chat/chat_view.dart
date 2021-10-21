@@ -12,12 +12,13 @@ import 'package:hint/models/user_model.dart';
 import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:extended_image/extended_image.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
 
@@ -43,10 +44,14 @@ class ChatView extends StatelessWidget {
   @override
   build(BuildContext context) {
     final log = getLogger('ChatView');
-    final statusStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(color: activeGreen);
-    final lastSeenStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(color: inactiveGray);
+    final statusStyle = Theme.of(context)
+        .textTheme
+        .bodyText2!
+        .copyWith(color: activeGreen, fontSize: 10);
+    final lastSeenStyle = Theme.of(context)
+        .textTheme
+        .bodyText2!
+        .copyWith(color: inactiveGray, fontSize: 10);
     return ViewModelBuilder<ChatViewModel>.reactive(
         viewModelBuilder: () =>
             ChatViewModel(conversationId: conversationId, fireUser: fireUser),
@@ -71,11 +76,12 @@ class ChatView extends StatelessWidget {
           } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
             await videoThumbnailsHiveBox(conversationId).close();
           }
-          if (!await model.hasNotContain(conversationId)) {
-                
+          if (await model.hasMessage(conversationId)) {
+            await chatService.addToRecentList(fireUser.id);
           }
         },
         builder: (context, model, child) {
+          final url = fireUser.photoUrl ?? 'images/img2.jpg';
           return OfflineBuilder(
             child: const Text("Yah Baby !!"),
             connectivityBuilder: (context, connectivity, child) {
@@ -100,10 +106,55 @@ class ChatView extends StatelessWidget {
                   appBar: AppBar(
                     elevation: 0.0,
                     centerTitle: true,
-                    toolbarHeight: 80.0,
+                    toolbarHeight: 100.0,
+                    leadingWidth: 130,
                     automaticallyImplyLeading: true,
                     backgroundColor: randomColor.withAlpha(60),
-                    leading: StreamBuilder<DocumentSnapshot>(
+                    leading: SizedBox(
+                      width: 56,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: const Icon(Icons.arrow_back, size: 20)),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              cupertinoTransition(
+                                enterTo: ProfileView(
+                                    model: model,
+                                    fireUser: fireUser,
+                                    iBlockThisUser: model.iBlockThisUser,
+                                    conversationId: conversationId),
+                                exitFrom: ChatView(
+                                  fireUser: fireUser,
+                                  randomColor: randomColor,
+                                  conversationId: conversationId,
+                                ),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  image: DecorationImage(
+                                    image: CachedNetworkImageProvider(url),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    title: StreamBuilder<DocumentSnapshot>(
                         stream: model.statusStream(fireUser.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
@@ -115,47 +166,11 @@ class ChatView extends StatelessWidget {
                             var lastSeen = time.format(timestamp.toDate(),
                                 allowFromNow: true);
                             return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    cupertinoTransition(
-                                      enterTo: ProfileView(
-                                          model: model,
-                                          fireUser: fireUser,
-                                          conversationId: conversationId,
-                                          iBlockThisUser: model.iBlockThisUser),
-                                      exitFrom: ChatView(
-                                          fireUser: fireUser,
-                                          randomColor: randomColor,
-                                          conversationId: conversationId),
-                                    ),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 2,
-                                          color: isOnline
-                                              ? activeGreen
-                                              : transparent,
-                                        ),
-                                      ),
-                                      child: ExtendedImage(
-                                        height: 50,
-                                        width: 50,
-                                        enableLoadState: true,
-                                        handleLoadingProgress: true,
-                                        image: NetworkImage(
-                                          fireUser.photoUrl ??
-                                              'images/img2.jpg',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  fireUser.username,
+                                  style: Theme.of(context).textTheme.bodyText2,
                                 ),
                                 verticalSpaceTiny,
                                 isOnline
@@ -167,10 +182,6 @@ class ChatView extends StatelessWidget {
                             return const SizedBox.shrink();
                           }
                         }),
-                    title: Text(
-                      fireUser.username,
-                      style: Theme.of(context).textTheme.bodyText2,
-                    ),
                   ),
                   body: Column(
                     mainAxisSize: MainAxisSize.max,

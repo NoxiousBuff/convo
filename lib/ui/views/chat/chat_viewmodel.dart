@@ -51,13 +51,13 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
 
- // For checking this conversation collection is empty or not.
-  Future<bool> hasNotContain(String conversationId) async {
+  // For checking this conversation collection is empty or not.
+  Future<bool> hasMessage(String conversationId) async {
     final snapshot = await conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
         .get();
-    return snapshot.docs.isEmpty;
+    return snapshot.docs.isNotEmpty;
   }
 
   void iBlockThisUserValue(bool block) {

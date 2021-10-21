@@ -1,4 +1,3 @@
-import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //import 'package:hint/ui/views/contacts/contacts.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/search_view/search_view.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 import 'package:hint/ui/views/recent_chats/recentchats_viewmodel.dart';
 
@@ -36,6 +37,82 @@ class RecentChats extends StatelessWidget {
     );
   }
 
+  Widget buildUserContact(RecentChatsViewModel model) {
+    return Builder(
+      builder: (context) {
+        if (!model.dataReady) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+
+        if (model.hasError) {
+          return const Center(
+            child: Text('Model has Error'),
+          );
+        }
+
+        List<UserListItem> userResults = [];
+
+        for (var document in model.data!.docs) {
+          UserListItem userListItem =
+              UserListItem(userUid: document.get('userUid'));
+          userResults.add(userListItem);
+        }
+
+        return userResults.isNotEmpty
+            ? ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(left: 5),
+                physics: const BouncingScrollPhysics(),
+                children: userResults,
+              )
+            : Center(
+                child: SizedBox(
+                  height: 200,
+                  child: Column(
+                    children: [
+                      buttonWidget(
+                        context: context,
+                        text: 'find you close friend',
+                        onPressed: () async {},
+                      ),
+                      const SizedBox(height: 10),
+                      buttonWidget(
+                        text: 'search your friend',
+                        context: context,
+                        icon: Icons.search,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            cupertinoTransition(
+                              enterTo: const SearchView(),
+                              exitFrom: const RecentChats(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+
+        // return userResults.isNotEmpty
+        //     ? ImplicitlyAnimatedReorderableList<UserListItem>(
+        //         items: userResults,
+        //         itemBuilder: (context, animationIndex, animation, index) {},
+        //         areItemsTheSame: (a, b) => a.userUid == b.userUid,
+        //         onReorderFinished: (a, x, y, userResultsList) {
+        //           return ;
+        //         },
+        //       )
+        //     : const Center(
+        //         child: Text('fbdjskfbjfdsbjxdbnvfbhsdjvkb'),
+        //       );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final log = getLogger('RecentChats');
@@ -56,8 +133,6 @@ class RecentChats extends StatelessWidget {
                 child: Text('Model has Error'),
               );
             }
-
-            List documents = model.data.docs;
 
             return Scaffold(
               appBar: CupertinoNavigationBar(
@@ -101,61 +176,7 @@ class RecentChats extends StatelessWidget {
                   ),
                 ),
               ),
-              body: documents.isEmpty
-                  ? Center(
-                      child: SizedBox(
-                        height: 200,
-                        child: Column(
-                          children: [
-                            buttonWidget(
-                              context: context,
-                              text: 'find you close friend',
-                              onPressed: () async {
-                                log.i('');
-                                // final users = await FirebaseFirestore.instance
-                                //     .collection(usersFirestoreKey)
-                                //     .get();
-                                // for (var document in users.docs) {
-                                //   FirebaseFirestore.instance
-                                //       .collection(usersFirestoreKey)
-                                //       .doc(document.id)
-                                //       .set({
-                                //     'id': null,
-                                //     'bio': null,
-                                //     'email': null,
-                                //     'phone': '+911234567890',
-                                //     'status': 'Offline',
-                                //     'photoUrl': AuthService.kDefaultPhotoUrl,
-                                //     'username':
-                                //         'username${Random().nextInt(100)}',
-                                //     'lastSeen': DateTime.now(),
-                                //     'interests': null,
-                                //     'userCreated': DateTime.now().weekday,
-                                //     'blockedUsers': null,
-                                //   }, SetOptions(merge: true));
-                                // }
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            buttonWidget(
-                              text: 'search your friend',
-                              context: context,
-                              icon: Icons.search,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  cupertinoTransition(
-                                    enterTo: const SearchView(),
-                                    exitFrom: const RecentChats(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : const CircularProgressIndicator(),
+              body: buildUserContact(model),
             );
           },
         );

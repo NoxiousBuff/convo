@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
@@ -12,12 +11,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
+  final Color randomColor;
   final void Function()? onTap;
-  UserItem({Key? key, required this.fireUser, required this.onTap})
+  const UserItem(
+      {Key? key,
+      required this.fireUser,
+      required this.onTap,
+      required this.randomColor})
       : super(key: key);
-
-  final Color randomColor = Color.fromARGB(Random().nextInt(256),
-      Random().nextInt(256), Random().nextInt(256), Random().nextInt(256));
 
   buildChatListItemPopup({required FireUser fireUser}) {
     return Material(
@@ -134,7 +135,7 @@ class UserItem extends StatelessWidget {
                 width: 56.0,
                 child: Text(
                   fireUser.username[0].toUpperCase(),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: darkMode ? systemBackground : black,
                     fontWeight: FontWeight.w600,
                     fontSize: 22,

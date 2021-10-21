@@ -1,6 +1,4 @@
 import 'dart:math';
-import 'package:hint/pods/genral_code.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:tcard/tcard.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/pods/genral_code.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

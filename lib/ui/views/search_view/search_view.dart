@@ -1,3 +1,4 @@
+
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:hint/ui/views/search_view/search_viewmodel.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 
 class SearchView extends StatelessWidget {
   const SearchView({Key? key}) : super(key: key);
@@ -72,6 +74,7 @@ class SearchView extends StatelessWidget {
                     FireUser localFireUser =
                         FireUser.fromFirestore(data.docs[i]);
                     return UserItem(
+                      randomColor: randomColor,
                       fireUser: localFireUser,
                       onTap: () => model.onUserItemTap(context, localFireUser),
                     );
@@ -104,6 +107,7 @@ class SearchView extends StatelessWidget {
                     FireUser localFireUser =
                         FireUser.fromFirestore(data.docs[i]);
                     return UserItem(
+                      randomColor: randomColor,
                       fireUser: localFireUser,
                       onTap: () => model.onUserItemTap(context, localFireUser),
                     );

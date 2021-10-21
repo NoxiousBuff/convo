@@ -1,10 +1,9 @@
 ///This is a space to keys regarding any particular services like firebase or hive or etc..
 
-const String subsFirestoreKey = 'subs';
 const String chatsFirestoreKey = 'Chat';
 const String usersFirestoreKey = 'users';
 const String convoFirestorekey = 'convo';
-const String recentFirestoreKey = 'recentsChats';
+const String recentFirestoreKey = 'recentChats';
 
 const String defaultImagesFolder = 'Images/Samples';
 
