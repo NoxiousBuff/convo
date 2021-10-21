@@ -2,16 +2,16 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 //import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/services/auth_service.dart';
 //import 'package:hint/ui/views/contacts/contacts.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
+import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
-import 'package:hint/ui/views/register/email/email_register_view.dart';
 import 'package:hint/ui/views/recent_chats/recentchats_viewmodel.dart';
 
 class RecentChats extends StatelessWidget {
@@ -63,37 +63,15 @@ class RecentChats extends StatelessWidget {
         return userResults.isNotEmpty
             ? ListView(
                 shrinkWrap: true,
+                children: userResults,
                 padding: const EdgeInsets.only(left: 5),
                 physics: const BouncingScrollPhysics(),
-                children: userResults,
               )
             : Center(
-                child: SizedBox(
-                  height: 200,
-                  child: Column(
-                    children: [
-                      buttonWidget(
-                        context: context,
-                        text: 'find you close friend',
-                        onPressed: () async {},
-                      ),
-                      const SizedBox(height: 10),
-                      buttonWidget(
-                        text: 'search your friend',
-                        context: context,
-                        icon: Icons.search,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            cupertinoTransition(
-                              enterTo: const SearchView(),
-                              exitFrom: const RecentChats(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                child: buttonWidget(
+                  context: context,
+                  text: 'Find you close friends',
+                  onPressed: () async {},
                 ),
               );
 
@@ -115,7 +93,6 @@ class RecentChats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final log = getLogger('RecentChats');
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
       builder: (context, box, child) {
@@ -152,25 +129,33 @@ class RecentChats extends StatelessWidget {
                       color: darkMode ? systemBackground : black54),
                 ),
                 leading: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      cupertinoTransition(
+                        enterTo:
+                            DistantView(liveUserUid: AuthService.liveUser!.uid),
+                        exitFrom: const RecentChats(),
+                      ),
+                    );
+                  },
                   child: Text(
                     'All',
                     style: Theme.of(context).textTheme.bodyText2,
                   ),
                 ),
                 trailing: IconButton(
-                  onPressed: () async {
-                    model.signOut(context);
+                  onPressed: () {
                     Navigator.push(
                       context,
                       cupertinoTransition(
-                        enterTo: const EmailRegisterView(),
+                        enterTo: const SearchView(),
                         exitFrom: const RecentChats(),
                       ),
                     );
                   },
                   icon: Icon(
-                    Icons.logout_rounded,
+                    Icons.search,
                     color: darkMode ? systemBackground : activeBlue,
                     size: 24.0,
                   ),

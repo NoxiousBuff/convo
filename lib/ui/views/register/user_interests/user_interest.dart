@@ -23,12 +23,14 @@ class InterestsView extends StatefulWidget {
   final String username;
   final String phoneNumber;
   final User? createdUser;
+  final String countryPhoneCode;
   const InterestsView({
     Key? key,
     required this.email,
     required this.username,
     required this.phoneNumber,
     required this.createdUser,
+    required this.countryPhoneCode,
   }) : super(key: key);
 
   @override
@@ -124,7 +126,8 @@ class _InterestsViewState extends State<InterestsView> {
                             user: widget.createdUser!,
                             username: widget.username,
                             phoneNumber: widget.phoneNumber,
-                            interests: model.selectedInterests)
+                            interests: model.selectedInterests,
+                            countryPhoneCode: widget.countryPhoneCode)
                         .then((value) => log.wtf('user created in firestore'));
                     Navigator.push(
                       context,
@@ -135,6 +138,7 @@ class _InterestsViewState extends State<InterestsView> {
                           username: widget.username,
                           phoneNumber: widget.phoneNumber,
                           createdUser: widget.createdUser,
+                          countryPhoneCode: widget.countryPhoneCode,
                         ),
                       ),
                     );

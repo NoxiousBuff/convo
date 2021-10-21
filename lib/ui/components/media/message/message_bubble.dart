@@ -196,7 +196,7 @@ class MessageBubble extends StatelessWidget {
                                     conversationId: conversationId),
                               )
                             : const SizedBox.shrink(),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 5),
                         SwipeTo(
                           onRightSwipe: () {
                             replyRiverPod.showReplyBool(true);
@@ -221,7 +221,7 @@ class MessageBubble extends StatelessWidget {
                           ),
                         ),
                       ],
-                    )
+                    ),
             ],
           ),
         );

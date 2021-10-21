@@ -34,17 +34,19 @@ class FirestoreApi {
   }
 
   Future<void> createUserInFirebase({
-    String? username,
+    required String username,
     Function? onError,
     required User user,
-    String? phoneNumber,
+    required String phoneNumber,
+    required String countryPhoneCode, 
     required List<String> interests,
   }) async {
     try {
       await usersCollection.doc(user.uid).set({
         'bio': '',
-        'email': user.email,
         'blockedUsers':[],
+        'countryPhoneCode' :countryPhoneCode,
+        'email': user.email,
         'id': user.uid,
         'interests': interests,
         'lastSeen': Timestamp.now(),

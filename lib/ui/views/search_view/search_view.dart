@@ -1,4 +1,3 @@
-
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:hint/ui/views/search_view/search_viewmodel.dart';
@@ -73,11 +73,14 @@ class SearchView extends StatelessWidget {
                   itemBuilder: (context, i) {
                     FireUser localFireUser =
                         FireUser.fromFirestore(data.docs[i]);
-                    return UserItem(
-                      randomColor: randomColor,
-                      fireUser: localFireUser,
-                      onTap: () => model.onUserItemTap(context, localFireUser),
-                    );
+                    return localFireUser.id != AuthService.liveUser!.uid
+                        ? UserItem(
+                            randomColor: randomColor,
+                            fireUser: localFireUser,
+                            onTap: () =>
+                                model.onUserItemTap(context, localFireUser),
+                          )
+                        : const SizedBox.shrink();
                   },
                 )
               : buildEmptySearch();

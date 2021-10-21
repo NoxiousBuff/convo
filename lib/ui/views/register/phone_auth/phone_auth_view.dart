@@ -41,7 +41,7 @@ class PhoneAuthView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Text(
-                  'Enter the phone number that you want you want to verify',
+                  'we send a verification link to provided email make sure you verify it.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context)
                       .textTheme
@@ -125,8 +125,9 @@ class PhoneAuthView extends StatelessWidget {
                         enterTo: VerifyPhoneView(
                           email: email,
                           username: username,
-                          phoneNumber: phoneNumber,
                           createdUser: createdUser,
+                          phoneNumber: model.phoneTech.text,
+                          countryPhoneCode: '+${model.countryCode}',
                         ),
                         exitFrom: PhoneAuthView(
                           email: email,

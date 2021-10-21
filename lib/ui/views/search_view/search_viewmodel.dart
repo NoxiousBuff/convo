@@ -12,11 +12,11 @@ class SearchViewModel extends BaseViewModel {
   Future<QuerySnapshot>? _searchResultFuture;
   Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
 
-  static final CollectionReference subsCollection =
+  static final CollectionReference userCollection =
       FirebaseFirestore.instance.collection(usersFirestoreKey);
 
   void handleSearch(String query) {
-    Future<QuerySnapshot>? searchResults = subsCollection
+    Future<QuerySnapshot>? searchResults = userCollection
         .where(UserField.username, isGreaterThanOrEqualTo: query)
         .get();
     _searchResultFuture = searchResults;

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 
 import 'chat_list_viewmodel.dart';
@@ -188,7 +189,6 @@ class _ChatListViewState extends State<ChatListView>
             child: Text('Model has Error'),
           );
         }
-       
 
         List<UserItem> userResults = [];
         for (var document in model.data!.docs) {
@@ -255,7 +255,8 @@ class _ChatListViewState extends State<ChatListView>
                     Navigator.push(
                       context,
                       cupertinoTransition(
-                        enterTo: DistantView(fireUser: model.fireUser),
+                        enterTo:
+                            DistantView(liveUserUid: AuthService.liveUser!.uid),
                         exitFrom: const ChatListView(),
                       ),
                     );
@@ -267,7 +268,7 @@ class _ChatListViewState extends State<ChatListView>
                 ),
                 trailing: IconButton(
                   onPressed: () {
-                    model.signOut(context);
+                   
                     Navigator.push(
                       context,
                       cupertinoTransition(

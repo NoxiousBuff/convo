@@ -1,11 +1,11 @@
-import 'package:hint/ui/views/distant_view/distantview_viewmodel.dart';
+import 'package:hint/app/app.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/help_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,10 +15,12 @@ import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/views/privacy/privacy.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/user_account/account_view.dart';
+import 'package:hint/ui/views/distant_view/distantview_viewmodel.dart';
 
 class DistantView extends StatelessWidget {
-  final FireUser fireUser;
-  const DistantView({Key? key, required this.fireUser}) : super(key: key);
+  final String liveUserUid;
+  const DistantView({Key? key, required this.liveUserUid}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final log = getLogger('DistantView');
@@ -107,7 +109,11 @@ class DistantView extends StatelessWidget {
 
     return ViewModelBuilder<DistantViewViewModel>.reactive(
       viewModelBuilder: () => DistantViewViewModel(),
+      onModelReady: (model) async {
+        await model.getCurrentFireUser(liveUserUid);
+      },
       builder: (context, model, child) {
+        final exitFrom = DistantView(liveUserUid: liveUserUid);
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -128,7 +134,7 @@ class DistantView extends StatelessWidget {
                       height: 200,
                       enableLoadState: true,
                       handleLoadingProgress: true,
-                      image: NetworkImage(fireUser.photoUrl!),
+                      image: NetworkImage(model.fireUser.photoUrl!),
                     ),
                   ),
                 ),
@@ -146,8 +152,8 @@ class DistantView extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 cupertinoTransition(
-                                  enterTo: Account(fireUser: fireUser),
-                                  exitFrom: DistantView(fireUser: fireUser),
+                                  enterTo: Account(fireUser: model.fireUser),
+                                  exitFrom: exitFrom,
                                 ),
                               );
                             }),
@@ -159,7 +165,7 @@ class DistantView extends StatelessWidget {
                             context,
                             cupertinoTransition(
                               enterTo: const Privacy(),
-                              exitFrom: DistantView(fireUser: fireUser),
+                              exitFrom: exitFrom,
                             ),
                           ),
                         ),
@@ -177,7 +183,7 @@ class DistantView extends StatelessWidget {
                             context,
                             cupertinoTransition(
                               enterTo: const Help(),
-                              exitFrom: DistantView(fireUser: fireUser),
+                              exitFrom: exitFrom,
                             ),
                           ),
                         ),
@@ -189,7 +195,7 @@ class DistantView extends StatelessWidget {
                             context,
                             cupertinoTransition(
                               enterTo: const StorageMedia(),
-                              exitFrom: DistantView(fireUser: fireUser),
+                              exitFrom: exitFrom,
                             ),
                           ),
                         ),
@@ -202,18 +208,30 @@ class DistantView extends StatelessWidget {
                         ValueListenableBuilder<Box>(
                           valueListenable: appSettings.listenable(),
                           builder: (context, box, child) {
-                            var darkMode = box.get(darkModeKey);
+                            const key = darkModeKey;
+                            var value = box.get(key, defaultValue: false);
                             return optionTile(
                               context: context,
-                              text: darkMode ? 'Light Theme' : 'Dark Theme',
+                              text: isDarkTheme ? 'Light Theme' : 'Dark Theme',
                               icon: CupertinoIcons.person,
                               trailing: CupertinoSwitch(
-                                value: box.get(darkModeKey),
+                                value: value,
                                 onChanged: (bool val) {
                                   box.put(darkModeKey, val);
+                                  model.themeChanger(val);
                                 },
                               ),
                             );
+                          },
+                        ),
+                        optionTile(
+                          context: context,
+                          text: 'Logout',
+                          icon: Icons.logout_outlined,
+                          onTap: () async {
+                            await authService.signOut(context).catchError((e) {
+                              log.e('signOutError:$e');
+                            });
                           },
                         ),
                       ],
@@ -235,28 +253,22 @@ class DistantView extends StatelessWidget {
     Function? onTap,
     Widget? trailing,
   }) {
-    return ValueListenableBuilder<Box>(
-      valueListenable: appSettings.listenable(),
-      builder: (context, box, child) {
-        bool darkMode = box.get(darkModeKey);
-        return Container(
-          color: darkMode ? darkModeColor : systemBackground,
-          child: Column(
-            children: [
-              InkWell(
-                onTap: onTap as void Function()?,
-                child: ListTile(
-                  trailing: trailing,
-                  title:
-                      Text(text, style: Theme.of(context).textTheme.bodyText2),
-                  leading: Icon(icon, color: darkMode ? dirtyWhite : inactiveGray),
-                ),
-              ),
-              const Divider(height: 0.0),
-            ],
+    return Container(
+      color: isDarkTheme ? darkModeColor : systemBackground,
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onTap as void Function()?,
+            child: ListTile(
+              trailing: trailing,
+              title: Text(text, style: Theme.of(context).textTheme.bodyText2),
+              leading:
+                  Icon(icon, color: isDarkTheme ? dirtyWhite : inactiveGray),
+            ),
           ),
-        );
-      },
+          const Divider(height: 0.0),
+        ],
+      ),
     );
   }
 }

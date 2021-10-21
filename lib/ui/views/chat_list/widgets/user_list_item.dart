@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -39,8 +38,8 @@ class UserListItem extends StatelessWidget {
             );
             child = LastMessage(
               fireUser: fireUser,
-              randomColor: randomColor,
               conversationId: id,
+              randomColor: randomColor,
             );
             // child = UserItem(
             //     fireUser: fireUser,

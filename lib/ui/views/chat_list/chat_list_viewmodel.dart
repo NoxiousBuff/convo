@@ -36,10 +36,6 @@ class ChatListViewModel extends FutureViewModel<QuerySnapshot> {
     }
   }
 
-  void signOut(BuildContext context) =>
-      authService.signOut(context, onSignOut: () {
-        getLogger('AuthService').wtf('User has been loggeed out.');
-      });
 
   @override
   Future<QuerySnapshot> futureToRun() => usersCollection.get();

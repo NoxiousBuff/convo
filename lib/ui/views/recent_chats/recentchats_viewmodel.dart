@@ -1,7 +1,6 @@
+import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,10 +11,7 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
   final log = getLogger('RecentChatsViewModel');
   final liveUserUid = FirebaseAuth.instance.currentUser!.uid;
 
-  void signOut(BuildContext context) =>
-      authService.signOut(context, onSignOut: () {
-        getLogger('AuthService').wtf('User has been loggeed out.');
-      });
+  late final FireUser currentFireUsser;
 
   Future<bool> _requestContactsPermission() async {
     final permission = Permission.contacts;

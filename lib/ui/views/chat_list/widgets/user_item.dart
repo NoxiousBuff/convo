@@ -101,7 +101,7 @@ class UserItem extends StatelessWidget {
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
       builder: (context, box, child) {
-        bool darkMode = box.get(darkModeKey);
+        bool darkMode = box.get(darkModeKey,defaultValue: false);
         return ListTile(
           onTap: onTap,
           shape: const RoundedRectangleBorder(

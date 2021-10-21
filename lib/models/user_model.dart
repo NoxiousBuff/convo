@@ -3,28 +3,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FireUser {
   final String id;
   final String? bio;
+  final String phone;
   final String email;
   final String status;
-  final String? phone;
   final String username;
   final String? photoUrl;
   final Timestamp lastSeen;
   final Timestamp userCreated;
+  final String countryPhoneCode;
   final List<dynamic> interests;
   final List<dynamic>? blockedUsers;
 
   FireUser({
     this.bio,
-    this.phone,
     this.photoUrl,
     this.blockedUsers,
     required this.id,
     required this.email,
+    required this.phone,
     required this.status,
     required this.lastSeen,
     required this.username,
     required this.interests,
     required this.userCreated,
+    required this.countryPhoneCode,
   });
 
   //deserializing the user document
@@ -41,6 +43,7 @@ class FireUser {
       interests: doc['interests'],
       userCreated: doc['userCreated'],
       blockedUsers: doc['blockedUsers'],
+      countryPhoneCode: doc['countryPhoneCode'],
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/pods/genral_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 String verificationCode = '';
 
@@ -16,51 +16,49 @@ class AuthService {
 
   final log = getLogger('AuthService');
 
-  final FirestoreApi _firestoreApi = FirestoreApi();
+  static User? liveUser = FirebaseAuth.instance.currentUser;
 
- static  User? liveUser = FirebaseAuth.instance.currentUser;
+  // signUp(
+  //     {required String email,
+  //     required String password,
+  //     required Function onComplete,
+  //     Function? accountExists,
+  //     Function? weakPassword,
+  //     Function? randomError}) async {
+  //   try {
+  //     UserCredential userCredential =
+  //         await _auth.createUserWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
 
-  signUp(
-      {required String email,
-      required String password,
-      required Function onComplete,
-      Function? accountExists,
-      Function? weakPassword,
-      Function? randomError}) async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      log.i('User has been created in the firebase authentication.');
-      await userCredential.user!
-          .updatePhotoURL(kDefaultPhotoUrl)
-          .catchError((e) => getLogger('AuthService').e(e));
-      await _firestoreApi
-          .createUserInFirebase(
-              user: userCredential.user!, interests: [], onError: randomError)
-          .then((value) => onComplete);
-      await userCredential.user!.sendEmailVerification();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        getLogger('FirebaseAuthException from SignUp')
-            .w('The password provided is too weak.');
-        if (weakPassword != null) weakPassword();
-      } else if (e.code == 'email-already-in-use') {
-        getLogger('FirebaseAuthException')
-            .w('The account already exists for that email.');
-        if (accountExists != null) accountExists();
-      } else {
-        getLogger('FirebaseAuthException').w(
-            'Some error prevented the registration. Please try again later.');
-        if (randomError != null) randomError();
-      }
-    } catch (e) {
-      getLogger('AuthService').e(e);
-    }
-  }
+  //     log.i('User has been created in the firebase authentication.');
+  //     await userCredential.user!
+  //         .updatePhotoURL(kDefaultPhotoUrl)
+  //         .catchError((e) => getLogger('AuthService').e(e));
+  //     await _firestoreApi
+  //         .createUserInFirebase(
+  //             user: userCredential.user!, interests: [], onError: randomError)
+  //         .then((value) => onComplete);
+  //     await userCredential.user!.sendEmailVerification();
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'weak-password') {
+  //       getLogger('FirebaseAuthException from SignUp')
+  //           .w('The password provided is too weak.');
+  //       if (weakPassword != null) weakPassword();
+  //     } else if (e.code == 'email-already-in-use') {
+  //       getLogger('FirebaseAuthException')
+  //           .w('The account already exists for that email.');
+  //       if (accountExists != null) accountExists();
+  //     } else {
+  //       getLogger('FirebaseAuthException').w(
+  //           'Some error prevented the registration. Please try again later.');
+  //       if (randomError != null) randomError();
+  //     }
+  //   } catch (e) {
+  //     getLogger('AuthService').e(e);
+  //   }
+  // }
 
   logIn({
     required String email,
@@ -90,12 +88,15 @@ class AuthService {
     }
   }
 
-  signOut(BuildContext context, {required Function onSignOut}) async {
+  Future<void> signOut(BuildContext context) async {
     await _auth.signOut();
     getLogger('AuthMethod').i('The user has been signed out successfully.');
-    onSignOut();
-    // Navigator.push(
-    //     context, MaterialPageRoute(builder: (context) => EmailRegisterView()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmailRegisterView(),
+      ),
+    );
   }
 
   Future<void> forgotPassword(String email,

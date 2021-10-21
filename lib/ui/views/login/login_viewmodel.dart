@@ -1,6 +1,6 @@
+import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/services/auth_service.dart';
-import 'package:stacked/stacked.dart';
 
 class LoginViewModel extends BaseViewModel {
   bool emailEmpty = true;

@@ -1,15 +1,15 @@
 // ignore_for_file: avoid_print
 import 'dart:collection';
-import 'package:hint/api/hive_helper.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/ui/components/media/chat_bubble/chat_bubble_border.dart';
-import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/api/hive_helper.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble_type.dart';
+import 'package:hint/ui/components/media/chat_bubble/chat_bubble_border.dart';
 
 class ReplyMedia extends StatelessWidget {
   final bool isMe;
@@ -36,7 +36,8 @@ class ReplyMedia extends StatelessWidget {
     //const crossAxisStart = CrossAxisAlignment.start;
     //final userReply = '${fireUser.username} replied to you';
     //final maxWidth = screenWidthPercentage(context, percentage: 0.7);
-    final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
+    //final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
+    const bubbleType = BubbleType.receiverBubble;
     final textStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -257,6 +258,8 @@ class ReplyMedia extends StatelessWidget {
     // }
 
     Widget replyWidget() {
+      const padding = EdgeInsets.fromLTRB(30, 10, 10, 10);
+      const mediaPadding = EdgeInsets.fromLTRB(30, 4, 10, 4);
       switch (replyMessage[ReplyField.replyType]) {
         case MediaType.text:
           {
@@ -266,16 +269,15 @@ class ReplyMedia extends StatelessWidget {
                 maxWidth: screenWidthPercentage(context, percentage: 0.6),
               ),
               child: CustomPaint(
-                painter:
-                    ChatBubbleBorder(color: lightBlue, type: bubbleType),
+                painter: ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
+                  padding: padding,
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
                     maxLines: 2,
                     softWrap: false,
-                    overflow: TextOverflow.ellipsis,
                     style: textStyle,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -289,10 +291,9 @@ class ReplyMedia extends StatelessWidget {
                 maxWidth: screenWidthPercentage(context, percentage: 0.6),
               ),
               child: CustomPaint(
-                painter:
-                    ChatBubbleBorder(color: lightBlue, type: bubbleType),
+                painter: ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 30, 10),
+                  padding: padding,
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
                     maxLines: 2,
@@ -317,7 +318,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  padding: mediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -361,7 +362,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  padding: mediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -409,7 +410,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  padding: mediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -458,7 +459,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  padding: mediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -499,7 +500,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 30, 4),
+                  padding: mediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

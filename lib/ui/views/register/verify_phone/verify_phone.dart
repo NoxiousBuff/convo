@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/pods/genral_code.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/views/register/user_interests/user_interest.dart';
 import 'package:hint/ui/views/register/verify_phone/verifyphone_viewmodel.dart';
 
@@ -18,12 +16,14 @@ class VerifyPhoneView extends StatefulWidget {
   final String username;
   final User? createdUser;
   final String phoneNumber;
+  final String countryPhoneCode;
   const VerifyPhoneView({
     Key? key,
     required this.email,
     required this.username,
     required this.createdUser,
     required this.phoneNumber,
+    required this.countryPhoneCode,
   }) : super(key: key);
 
   @override
@@ -31,6 +31,7 @@ class VerifyPhoneView extends StatefulWidget {
 }
 
 class _VerifyPhoneViewState extends State<VerifyPhoneView> {
+  String getCode = '';
   final log = getLogger('VerifyCode');
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
@@ -55,6 +56,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
         log.wtf('Your Application receive code - $code');
         setState(() {
           controller.text = code;
+          getCode = code;
         });
       },
     )..startListenUserConsent(
@@ -74,7 +76,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
   @override
   Widget build(BuildContext context) {
     final createdUser = widget.createdUser;
-    final pod = context.read(codeProvider);
+    
     final log = getLogger('VerifyPhoneView');
     return ViewModelBuilder<VerifyPhone>.reactive(
       viewModelBuilder: () => VerifyPhone(),
@@ -107,7 +109,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                     validator: (value) {
                       if (value!.length < 6) {
                         return 'code length must be 6';
-                      } else if (value != pod.optCode) {
+                      } else if (value != getCode) {
                         return 'code didn\'t matched';
                       }
                     },
@@ -120,7 +122,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                     followingFieldDecoration: _pinPutDecoration.copyWith(
                       borderRadius: BorderRadius.circular(5.0),
                       border: Border.all(
-                        color: Colors.deepPurpleAccent.withOpacity(.5),
+                        color: deepPurpleAccent.withOpacity(.5),
                       ),
                     ),
                   ),
@@ -131,7 +133,11 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final number =
+                          widget.countryPhoneCode + widget.phoneNumber;
+                      await model.resend(number, context);
+                    },
                     child: Text(
                       'Resend Code',
                       style: Theme.of(context)
@@ -149,26 +155,25 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
                     if (createdUser != null) {
-                      final credential = pod.phoneAuthCredential;
-                      if (credential != null) {
-                        Navigator.push(
-                          context,
-                          cupertinoTransition(
-                            enterTo: InterestsView(
-                              email: widget.email,
-                              username: widget.username,
-                              createdUser: widget.createdUser,
-                              phoneNumber: widget.phoneNumber,
-                            ),
-                            exitFrom: VerifyPhoneView(
-                              email: widget.email,
-                              username: widget.username,
-                              createdUser: widget.createdUser,
-                              phoneNumber: widget.phoneNumber,
-                            ),
+                      Navigator.push(
+                        context,
+                        cupertinoTransition(
+                          enterTo: InterestsView(
+                            email: widget.email,
+                            username: widget.username,
+                            createdUser: widget.createdUser,
+                            phoneNumber: widget.phoneNumber,
+                            countryPhoneCode: widget.countryPhoneCode,
                           ),
-                        );
-                      }
+                          exitFrom: VerifyPhoneView(
+                            email: widget.email,
+                            username: widget.username,
+                            createdUser: widget.createdUser,
+                            phoneNumber: widget.phoneNumber,
+                            countryPhoneCode: widget.countryPhoneCode,
+                          ),
+                        ),
+                      );
                     }
                   }
                 },

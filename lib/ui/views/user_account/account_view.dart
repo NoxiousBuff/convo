@@ -88,6 +88,8 @@ class _AccountState extends State<Account> {
                   context: context,
                   text: 'Phone',
                   onTap: () {},
+                  trailingText:
+                      '${widget.fireUser.countryPhoneCode} ${widget.fireUser.phone}',
                 ),
                 optionWidget(
                   context: context,
