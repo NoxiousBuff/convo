@@ -131,10 +131,10 @@ class AuthService {
         final pod = context.read(codeProvider);
         final localSmsCode = credential.smsCode;
         if (localSmsCode != null) pod.getCode(localSmsCode);
-        pod.getPhoneCredentials(credential);
         log.wtf('credential.smsCode : $localSmsCode');
         log.wtf('Verification Completed Successfuly.');
         log.wtf('Phone Auth Credential: ${pod.phoneAuthCredential}');
+        pod.getPhoneCredentials(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {

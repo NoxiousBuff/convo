@@ -12,6 +12,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/models/message_model.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
@@ -154,6 +155,7 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isReply = message.isReply;
     final replyMessage = message.replyMessage;
     final messageDate = message.timestamp.toDate();
     final replyRiverPod = context.read(replyBackProvider);
@@ -172,7 +174,7 @@ class MessageBubble extends StatelessWidget {
           log.e('There is an error');
         }
         return Container(
-          margin: EdgeInsets.symmetric(vertical: message.isReply ? 8 : 0),
+          margin: EdgeInsets.symmetric(vertical: message.isReply ? 8 : 2),
           child: Column(
             mainAxisAlignment: mainAxis,
             crossAxisAlignment: crossAxis,
@@ -186,7 +188,8 @@ class MessageBubble extends StatelessWidget {
                       crossAxisAlignment: crossAxis,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        message.isReply
+                        replyTeller(isReply, isMe, context),
+                        isReply
                             ? Align(
                                 alignment: replyAlignment,
                                 child: ReplyMedia(
@@ -196,29 +199,44 @@ class MessageBubble extends StatelessWidget {
                                     conversationId: conversationId),
                               )
                             : const SizedBox.shrink(),
-                        const SizedBox(height: 5),
-                        SwipeTo(
-                          onRightSwipe: () {
-                            replyRiverPod.showReplyBool(true);
-                            log.wtf('showReply: ${replyRiverPod.showReply}');
-                            replyRiverPod.getSwipedValue(
-                              isMeBool: isMe,
-                              fireuser: fireUser,
-                              swipedReply: message.isReply,
-                              swipedMessage: message.message,
-                              swipedMessageType: message.type,
-                              swipedTimestamp: message.timestamp,
-                              swipedMessageUid: message.messageUid,
-                            );
-                            log.wtf('Message${replyRiverPod.message}');
-                          },
-                          child: mediaContent(
-                            isMe: isMe,
-                            model: model,
-                            isRead: message.isRead,
-                            messageType: message.type,
-                            messageUid: message.messageUid,
-                          ),
+                        Row(
+                          children: [
+                            SizedBox(width: isMe ? 28 : 0),
+                            isMe
+                                ? senderReplySign(context, isMe, isReply)
+                                : const SizedBox.shrink(),
+                            isMe ? const Spacer() : const SizedBox.shrink(),
+                            SwipeTo(
+                              onRightSwipe: () {
+                                replyRiverPod.showReplyBool(true);
+                                log.wtf(
+                                    'showReply: ${replyRiverPod.showReply}');
+                                replyRiverPod.getSwipedValue(
+                                  isMeBool: isMe,
+                                  fireuser: fireUser,
+                                  swipedReply: message.isReply,
+                                  swipedMessage: message.message,
+                                  swipedMessageType: message.type,
+                                  swipedTimestamp: message.timestamp,
+                                  swipedMessageUid: message.messageUid,
+                                  swipedMessageSenderID: message.senderUid,
+                                );
+                                log.wtf('Message${replyRiverPod.message}');
+                              },
+                              child: mediaContent(
+                                isMe: isMe,
+                                model: model,
+                                isRead: message.isRead,
+                                messageType: message.type,
+                                messageUid: message.messageUid,
+                              ),
+                            ),
+                            !isMe ? const Spacer() : Container(),
+                            !isMe
+                                ? receiverReplySing(context, isMe, isReply)
+                                : const SizedBox.shrink(),
+                            SizedBox(width: isMe ? 0 : 30),
+                          ],
                         ),
                       ],
                     ),
@@ -227,6 +245,79 @@ class MessageBubble extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget replyTeller(bool isReply, bool isMe, BuildContext context) {
+    final username = fireUser.username;
+    final replyTextAlign = isMe ? Alignment.centerLeft : Alignment.centerRight;
+    if (isReply) {
+      String replySenderID = message.replyMessage![ReplyField.replySenderUid];
+      bool iSend = replySenderID == ChatService.liveUserUid;
+      var senderText =
+          iSend ? 'you replied to yourself' : 'you replied to $username';
+
+      var receiverText =
+          !iSend ? '$username replied himself' : '$username replied to you';
+
+      return Align(
+        alignment: replyTextAlign,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 5, right: 10, left: 10),
+          child: Text(
+            isMe ? senderText : receiverText,
+            style: Theme.of(context).textTheme.caption,
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
+  Widget senderReplySign(BuildContext context, isMe, isReply) {
+    return isMe
+        ? isReply
+            ? Column(
+                children: [
+                  Container(
+                      height: 30,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          left: BorderSide(color: inactiveGray),
+                          bottom: BorderSide(
+                              color: inactiveGray, style: BorderStyle.solid),
+                        ),
+                      ),
+                      width: screenWidthPercentage(context, percentage: 0.14)),
+                  const SizedBox(height: 20),
+                ],
+              )
+            : const SizedBox.shrink()
+        : const SizedBox.shrink();
+  }
+
+  Widget receiverReplySing(BuildContext context, isMe, isReply) {
+    if (isMe) {
+      return const SizedBox.shrink();
+    } else {
+      return isReply
+          ? Column(
+              children: [
+                Container(
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        right: BorderSide(color: inactiveGray),
+                        bottom: BorderSide(
+                            color: inactiveGray, style: BorderStyle.solid),
+                      ),
+                    ),
+                    width: screenWidthPercentage(context, percentage: 0.13)),
+                const SizedBox(height: 20),
+              ],
+            )
+          : const SizedBox.shrink();
+    }
   }
 
   Widget messageRead(String read) {

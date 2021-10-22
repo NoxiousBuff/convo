@@ -37,6 +37,7 @@ class ChatService {
       'backgroundImage': null,
       'liveUserUid': liveUserUid,
       'receiverUid': fireUser.id,
+      'chatRoomId': conversationId,
     };
 
     createChatRoom(conversationId, chatRoomMap);
@@ -64,9 +65,6 @@ class ChatService {
       return '$a\_$b';
     }
   }
-
-
-
 
   _addToRecentListForSender(String receiverUid) async {
     final doc = await _userCollection
@@ -160,6 +158,7 @@ class ChatService {
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
     if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
+    
 
     switch (type) {
       case MediaType.image:

@@ -6,18 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/login/login_view.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:hint/ui/views/register/username/username_register_view.dart';
 
-class EmailRegisterView extends StatefulWidget {
+class EmailRegisterView extends StatelessWidget {
   const EmailRegisterView({Key? key}) : super(key: key);
 
-  @override
-  State<EmailRegisterView> createState() => _EmailRegisterViewState();
-}
-
-class _EmailRegisterViewState extends State<EmailRegisterView> {
   Widget emailTextFormField(EmailRegisterViewModel model) {
     return TextFormField(
       validator: (value) {
@@ -28,6 +24,7 @@ class _EmailRegisterViewState extends State<EmailRegisterView> {
         } else if (value.length < 8) {
           return 'must be at least 8 characters';
         } else {
+          FirebaseAuth.instance.fetchSignInMethodsForEmail(value);
           return null;
         }
       },
@@ -114,8 +111,6 @@ class _EmailRegisterViewState extends State<EmailRegisterView> {
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
-          // ignore: todo
-          //TODO: Apply for dark theme
           statusBarIconBrightness: Brightness.dark,
           systemNavigationBarColor: Colors.white,
           systemNavigationBarIconBrightness: Brightness.dark,
@@ -210,23 +205,54 @@ class _EmailRegisterViewState extends State<EmailRegisterView> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child: const Text(
-                        'Next',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: !model.isBusy
+                          ? const Text(
+                              'Next',
+                              style: TextStyle(color: Colors.white),
+                            )
+                          : const SizedBox(
+                              height: 17,
+                              width: 17,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
                       onPressed: !isEmpty(model)
                           ? null
-                          : () {
-                              if (model.emailFormKey.currentState!.validate()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UsernameRegisterView(
-                                      email: model.emailTech.text,
-                                      password: model.passwordController.text,
+                          : () async {
+                              final email = model.emailTech.text;
+                              final password = model.passwordController.text;
+                              final formState = model.emailFormKey.currentState;
+                              final validate = formState!.validate();
+                              if (await model.checkIsEmailExists(email)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: extraLightBackgroundGray,
+                                    content: Text(
+                                      'This email is already in use choose another',
+                                      style:
+                                          Theme.of(context).textTheme.bodyText2,
                                     ),
                                   ),
                                 );
+                              } else {
+                                if (validate) {
+                                  var user =
+                                      await model.singUp(email, password);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          UsernameRegisterView(
+                                        fireuser: user,
+                                        email: model.emailTech.text,
+                                        password: model.passwordController.text,
+                                      ),
+                                    ),
+                                  );
+                                }
                               }
                             },
                     ),

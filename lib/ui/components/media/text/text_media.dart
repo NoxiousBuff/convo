@@ -24,26 +24,28 @@ class TextMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     if (messageText != null) {
       int length = messageText!.length;
-      return ChatBubble(
-        radius: length > 3 ? 20 : 20,
-        bubbleType: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble,
-        bubbleColor: isMe
-            ? isRead
-                ? activeBlue
-                : lightBlue
-            : inactiveGray,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.7,
-              minWidth: MediaQuery.of(context).size.width * 0.1),
-          child: RichText(
-            text: TextSpan(
-              text: messageText!,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(color: systemBackground),
+      return Container(
+        constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.7,
+            minWidth: MediaQuery.of(context).size.width * 0.1),
+        child: ChatBubble(
+          radius: length > 3 ? 20 : 20,
+          bubbleType: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble,
+          bubbleColor: isMe
+              ? isRead
+                  ? activeBlue
+                  : lightBlue
+              : inactiveGray,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            child: RichText(
+              text: TextSpan(
+                text: messageText!,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText2!
+                    .copyWith(color: systemBackground),
+              ),
             ),
           ),
         ),

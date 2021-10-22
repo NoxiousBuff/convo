@@ -5,15 +5,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
 import 'package:hint/ui/views/register/username/username_register_viewmodel.dart';
 
 class UsernameRegisterView extends StatelessWidget {
   final String email;
+  final User? fireuser;
   final String password;
   const UsernameRegisterView(
-      {Key? key, required this.email, required this.password})
+      {Key? key,
+      required this.email,
+      required this.password,
+      required this.fireuser})
       : super(key: key);
 
   @override
@@ -118,29 +123,53 @@ class UsernameRegisterView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: model.isBusy
+                          ? const SizedBox(
+                              height: 17,
+                              width: 17,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Done',
+                              style: TextStyle(color: Colors.white),
+                            ),
                       onPressed: !model.usernameEmpty
                           ? () async {
+                              final username = model.usernameTech.text;
                               FocusScope.of(context).requestFocus(FocusNode());
-                              if (model.key.currentState!.validate()) {
-                                var user = await model.singUp(email, password);
-                                Navigator.push(
-                                  context,
-                                  cupertinoTransition(
-                                    enterTo: PhoneAuthView(
-                                      email: email,
-                                      createdUser: user,
-                                      username: model.usernameTech.text,
-                                    ),
-                                    exitFrom: UsernameRegisterView(
-                                      email: email,
-                                      password: password,
+                              if (await model.checkIsUsernameExists(username)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: extraLightBackgroundGray,
+                                    content: Text(
+                                      'This username is not available',
+                                      style:
+                                          Theme.of(context).textTheme.bodyText2,
                                     ),
                                   ),
                                 );
+                              } else {
+                                if (model.key.currentState!.validate()) {
+                                  Navigator.push(
+                                    context,
+                                    cupertinoTransition(
+                                      enterTo: PhoneAuthView(
+                                        email: email,
+                                        createdUser: fireuser,
+                                        username: model.usernameTech.text,
+                                      ),
+                                      exitFrom: UsernameRegisterView(
+                                        email: email,
+                                        fireuser: fireuser,
+                                        password: password,
+                                      ),
+                                    ),
+                                  );
+                                }
                               }
                             }
                           : null,

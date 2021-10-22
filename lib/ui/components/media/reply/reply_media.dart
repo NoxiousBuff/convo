@@ -36,8 +36,9 @@ class ReplyMedia extends StatelessWidget {
     //const crossAxisStart = CrossAxisAlignment.start;
     //final userReply = '${fireUser.username} replied to you';
     //final maxWidth = screenWidthPercentage(context, percentage: 0.7);
-    //final bubbleType = isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
-    const bubbleType = BubbleType.receiverBubble;
+    final bubbleType =
+        !isMe ? BubbleType.sendBubble : BubbleType.receiverBubble;
+
     final textStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -258,8 +259,10 @@ class ReplyMedia extends StatelessWidget {
     // }
 
     Widget replyWidget() {
-      const padding = EdgeInsets.fromLTRB(30, 10, 10, 10);
-      const mediaPadding = EdgeInsets.fromLTRB(30, 4, 10, 4);
+      const senderPadding = EdgeInsets.fromLTRB(20, 10, 10, 10);
+      const senderMediaPadding = EdgeInsets.fromLTRB(20, 4, 10, 4);
+      const receiverPadding = EdgeInsets.fromLTRB(10, 10, 20, 10);
+      const receiverMediaPadding = EdgeInsets.fromLTRB(10, 4, 20, 4);
       switch (replyMessage[ReplyField.replyType]) {
         case MediaType.text:
           {
@@ -271,10 +274,10 @@ class ReplyMedia extends StatelessWidget {
               child: CustomPaint(
                 painter: ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
-                  padding: padding,
+                  padding: isMe ? senderPadding : receiverPadding,
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
-                    maxLines: 2,
+                    maxLines: 1,
                     softWrap: false,
                     style: textStyle,
                     overflow: TextOverflow.ellipsis,
@@ -293,7 +296,7 @@ class ReplyMedia extends StatelessWidget {
               child: CustomPaint(
                 painter: ChatBubbleBorder(color: lightBlue, type: bubbleType),
                 child: Padding(
-                  padding: padding,
+                  padding: isMe ? senderPadding : receiverPadding,
                   child: Text(
                     replyMessage[ReplyField.replyMessageText],
                     maxLines: 2,
@@ -318,7 +321,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: mediaPadding,
+                  padding: isMe ? senderMediaPadding : receiverMediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -362,7 +365,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: mediaPadding,
+                  padding: isMe ? senderMediaPadding : receiverMediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -410,7 +413,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: mediaPadding,
+                  padding: isMe ? senderMediaPadding : receiverMediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -459,7 +462,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: mediaPadding,
+                  padding: isMe ? senderMediaPadding : receiverMediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -500,7 +503,7 @@ class ReplyMedia extends StatelessWidget {
                 painter: ChatBubbleBorder(
                     color: lightBlue, type: bubbleType, radius: 15),
                 child: Padding(
-                  padding: mediaPadding,
+                  padding: isMe ? senderMediaPadding : receiverMediaPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

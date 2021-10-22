@@ -13,6 +13,9 @@ class ReplyBackViewModel extends ChangeNotifier {
   bool _showReply = false;
   bool get showReply => _showReply;
 
+  String? _replySenderID;
+  String? get replySenderID => _replySenderID;
+
   FireUser? _fireUser;
   FireUser? get fireUser => _fireUser;
 
@@ -44,6 +47,7 @@ class ReplyBackViewModel extends ChangeNotifier {
     required String swipedMessageUid,
     required Timestamp swipedTimestamp,
     required String swipedMessageType,
+    required String swipedMessageSenderID,
   }) {
     _isMe = isMeBool;
     _fireUser = fireuser;
@@ -52,6 +56,7 @@ class ReplyBackViewModel extends ChangeNotifier {
     _timestamp = swipedTimestamp;
     _messageUid = swipedMessageUid;
     _messageType = swipedMessageType;
+    _replySenderID = swipedMessageSenderID;
     notifyListeners();
   }
 

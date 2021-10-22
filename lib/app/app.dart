@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
           loggedIn = true;
         });
         getLogger('MyApp').wtf('user is not null LoggedIn:$loggedIn');
+        //getLogger('MyApp').wtf('email:${AuthService.liveUser!.email}');
       } else {
         setState(() {
           loggedIn = false;

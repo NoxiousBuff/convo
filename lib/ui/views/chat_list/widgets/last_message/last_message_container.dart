@@ -326,7 +326,7 @@ class LastMessage extends StatelessWidget {
         final data = model.data;
 
         if (data != null) {
-          final lastDocument = data.docs.last;
+          final lastDocument = data.docs.first;
           final lastMessage = Message.fromFirestore(lastDocument);
           final dateRead = DateFormat('yMMMMd')
               .format(lastMessage.timestamp.toDate())
@@ -393,9 +393,7 @@ class LastMessage extends StatelessWidget {
                         .copyWith(color: lightBlue),
                   ),
                   const Spacer(),
-                  model.unreadMessage == 0
-                      ? const SizedBox.shrink()
-                      : Container(
+                   Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 2),
                           decoration: BoxDecoration(

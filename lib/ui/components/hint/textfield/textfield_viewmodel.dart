@@ -131,6 +131,7 @@ class TextFieldViewModel extends BaseViewModel {
              replyMessage: {
                ReplyField.replyType: replyPod.messageType,
                ReplyField.replyMessageUid: replyPod.messageUid,
+               ReplyField.replySenderUid: replyPod.replySenderID,
                ReplyField.replyMediaUrl: replyMsg != null
                    ? replyMsg[MessageField.mediaURL]
                    : null,
