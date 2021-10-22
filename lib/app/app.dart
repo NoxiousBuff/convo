@@ -15,21 +15,24 @@ class MyApp extends StatelessWidget {
         statusBarColor: Colors.transparent));
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      restorationScopeId: appName,
-      title: appName,
-      theme: ThemeData(),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.userChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            FirebaseAuth.instance.currentUser!.reload();
-            return ChatListView(); 
-          } else {
-            return const EmailRegisterView();
-          }
-        },
-      ),
-    );
+        debugShowCheckedModeBanner: false,
+        restorationScopeId: appName,
+        title: appName,
+        theme: ThemeData(),
+        home: FirebaseAuth.instance.currentUser != null
+            ? ChatListView()
+            : const EmailRegisterView()
+        // home: StreamBuilder<User?>(
+        //   stream: FirebaseAuth.instance.userChanges(),
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       FirebaseAuth.instance.currentUser!.reload();
+        //       return ChatListView();
+        //     } else {
+        //       return const EmailRegisterView();
+        //     }0
+        //   },
+        // ),
+        );
   }
 }
