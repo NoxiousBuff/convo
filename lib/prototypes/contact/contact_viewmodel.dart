@@ -27,7 +27,7 @@ class ContactsViewModel extends FutureViewModel {
   Future<void> getContacts() async {
     if (await _requestContactsPermission()) {
       final Iterable<Contact> localContacts =
-          await ContactsService.getContacts();
+          await ContactsService.getContacts(withThumbnails: false, photoHighResolution: false);
       updateContacts(localContacts);
     }
   }
