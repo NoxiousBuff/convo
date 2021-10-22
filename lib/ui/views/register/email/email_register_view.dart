@@ -1,14 +1,14 @@
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/login/login_view.dart';
-import 'package:email_validator/email_validator.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/ui/views/register/password/password_register_view.dart';
-import 'package:stacked/stacked.dart';
 import 'email_register_viewmodel.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/ui/views/login/login_view.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:hint/ui/views/register/password/password_register_view.dart';
 
 class EmailRegisterView extends StatelessWidget {
   const EmailRegisterView({Key? key}) : super(key: key);
@@ -42,7 +42,7 @@ class EmailRegisterView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                     const  Text(
+                      const Text(
                         'Already Have An Account.',
                       ),
                       CupertinoButton(
@@ -85,8 +85,8 @@ class EmailRegisterView extends StatelessWidget {
                       Text(
                         'Provide An Email',
                         style: GoogleFonts.openSans(
-                            color: CupertinoColors.black,
                             fontSize: 28.0,
+                            color: CupertinoColors.black,
                             fontWeight: FontWeight.w600),
                       ),
                     ],
@@ -158,11 +158,13 @@ class EmailRegisterView extends StatelessWidget {
                           : () {
                               if (model.emailFormKey.currentState!.validate()) {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PasswordRegisterView(
-                                                email: model.emailTech.text)));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PasswordRegisterView(
+                                      email: model.emailTech.text,
+                                    ),
+                                  ),
+                                );
                               }
                             },
                     ),

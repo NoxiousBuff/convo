@@ -1,16 +1,16 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/models/new_message_model.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/ui/components/hint/textfield/textfield.dart';
-import 'package:hint/ui/components/media/message/message_bubble.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat/chat_viewmodel.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:stacked/stacked.dart';
+import 'package:hint/models/new_message_model.dart';
+import 'package:hint/ui/views/chat/chat_viewmodel.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hint/ui/components/hint/textfield/textfield.dart';
+import 'package:hint/ui/components/media/message/message_bubble.dart';
 
 class ChatView extends StatelessWidget {
   final FireUser fireUser;

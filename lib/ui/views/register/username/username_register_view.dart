@@ -1,13 +1,13 @@
-import 'package:flutter/cupertino.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/register/username/username_register_viewmodel.dart';
-import 'package:stacked/stacked.dart';
 
 class UsernameRegisterView extends StatelessWidget {
   const UsernameRegisterView({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class UsernameRegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<UsernameRegisterViewModel>.reactive(
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-       value: const SystemUiOverlayStyle(
+        value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
           // ignore: todo
           //TODO: Apply for dark theme
@@ -77,6 +77,10 @@ class UsernameRegisterView extends StatelessWidget {
                     },
                     controller: model.firstNameTech,
                     onChanged: (value) => model.updateFirstNameEmpty(),
+                    inputFormatters: [
+                      // is able to enter lowercase letters
+                      FilteringTextInputFormatter.allow(RegExp("[a-z]")),
+                    ],
                     cursorColor: Colors.blue,
                     decoration: InputDecoration(
                       fillColor: CupertinoColors.extraLightBackgroundGray,
@@ -108,6 +112,9 @@ class UsernameRegisterView extends StatelessWidget {
                         return null;
                       }
                     },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp("[a-z]")),
+                    ],
                     controller: model.lastNameTech,
                     onChanged: (value) => model.updateSecondNameEmpty(),
                     cursorColor: Colors.blue,
@@ -138,7 +145,7 @@ class UsernameRegisterView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: CupertinoButton(
-                      child:const  Text(
+                      child: const Text(
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -148,7 +155,8 @@ class UsernameRegisterView extends StatelessWidget {
                               if (model.usernameFormKey.currentState!
                                   .validate()) {
                                 model.updateUserDisplayName(
-                                    '${model.firstNameTech.text} ${model.lastNameTech.text}', onError: () {
+                                    '${model.firstNameTech.text} ${model.lastNameTech.text}',
+                                    onError: () {
                                   getLogger('UsernameRegisterView')
                                       .i('Error Occurred.');
                                   // ignore: todo
@@ -158,7 +166,7 @@ class UsernameRegisterView extends StatelessWidget {
                                       context,
                                       CupertinoPageRoute(
                                           builder: (context) =>
-                                               ChatListView()));
+                                              ChatListView()));
                                 });
                               }
                             },

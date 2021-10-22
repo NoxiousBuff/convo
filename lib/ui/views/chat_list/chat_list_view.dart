@@ -1,15 +1,15 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
+import 'chat_list_viewmodel.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/prototypes/contact/contact_view.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
-import 'package:hint/ui/views/distant/distant_view.dart';
 import 'package:hint/ui/views/search/search_view.dart';
-import 'package:stacked/stacked.dart';
-import 'chat_list_viewmodel.dart';
+import 'package:hint/ui/views/distant/distant_view.dart';
+import 'package:hint/prototypes/contact/contact_view.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 
 class ChatListView extends StatelessWidget {
   ChatListView({Key? key}) : super(key: key);
