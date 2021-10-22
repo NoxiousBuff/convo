@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/prototypes/contact/contact_view.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/register/avatar/avatar_register_view.dart';
@@ -66,7 +67,10 @@ class DistantView extends StatelessWidget {
                   ),
                   const Divider(height: 0.0),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      navService.materialPageRoute(
+                          context, const ContactsView());
+                    },
                     child: const ListTile(
                       title: Text('Contacts'),
                       leading: Icon(CupertinoIcons.doc),
@@ -108,7 +112,8 @@ class DistantView extends StatelessWidget {
                   const Divider(height: 0.0),
                   InkWell(
                     onTap: () {
-                      navService.materialPageRoute(context, const AvatarRegisterView());
+                      navService.materialPageRoute(
+                          context, const AvatarRegisterView());
                     },
                     child: const ListTile(
                       title: Text('Avatar View'),
