@@ -1,3 +1,4 @@
+import 'package:hint/api/appwrite_api.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,6 +50,10 @@ class ChatService {
       ),
       transitionType: SharedAxisTransitionType.scaled,
     );
+    AppWriteApi.instance.addMessage(
+        liveUserUid: liveUserUid,
+        receiverUid: fireUser.id,
+        chatRoomId: conversationId);
     Navigator.of(context, rootNavigator: true).push(route);
   }
 
@@ -158,7 +163,6 @@ class ChatService {
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
     if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
-    
 
     switch (type) {
       case MediaType.image:

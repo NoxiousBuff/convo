@@ -1,6 +1,7 @@
-import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,6 +39,17 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
         log.wtf('PhoneNumber: ${phones!.first.value.toString()}');
       }
     }
+  }
+
+  Future<FireUser> getCurrentFireUser(String liveUserUid) async {
+    final firestoreUser = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(liveUserUid)
+        .get();
+    final _fireUser = FireUser.fromFirestore(firestoreUser);
+    currentFireUsser = _fireUser;
+    notifyListeners();
+    return _fireUser;
   }
 
   @override

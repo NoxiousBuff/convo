@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hint/ui/views/social/social_view.dart';
-import '../main/main_view.dart';
+import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -38,11 +38,11 @@ class _HomeViewState extends State<HomeView> {
             case 0:
               return const MainView();
             case 1:
-              return const ChatListView();
+              return const RecentChats();
             case 2:
               return const SocialView();
             default:
-              return const ChatListView();
+              return const RecentChats();
           }
         },
       ),

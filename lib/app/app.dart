@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/constants/message_string.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
@@ -20,6 +25,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool loggedIn = false;
+  final log = getLogger('MyApp');
   @override
   void initState() {
     bool darkMode = appSettings.get(darkModeKey, defaultValue: false);
@@ -36,8 +42,8 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           loggedIn = true;
         });
-        getLogger('MyApp').wtf('user is not null LoggedIn:$loggedIn');
-        //getLogger('MyApp').wtf('email:${AuthService.liveUser!.email}');
+        log.wtf('user is not null LoggedIn:$loggedIn');
+        log.wtf('email:${AuthService.liveUser!.email}');
       } else {
         setState(() {
           loggedIn = false;
@@ -48,13 +54,31 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
   }
 
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus(status: "Online");
+    } else {
+      setStatus(status: "Offline");
+    }
+  }
+
+  Future<void> setStatus({required String status}) async {
+    await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(FirestoreApi.liveUserUid)
+        .update({
+      UserField.status: status,
+      UserField.lastSeen: Timestamp.now(),
+    }).catchError((e) {
+      log.e(e);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.transparent,
         statusBarColor: Colors.transparent));
-    //final currentUser = FirebaseAuth.instance.currentUser;
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

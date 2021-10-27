@@ -8,6 +8,7 @@ import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
+import 'package:hint/ui/views/chat/unread_messages.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/views/chat_list/widgets/last_message/lastmessage_viewmodel.dart';
@@ -160,8 +161,8 @@ class LastMessage extends StatelessWidget {
   String messageDate(String dateRead, DateTime lastMessageDate) {
     final dateTime = DateTime.now();
     final yesterDay = DateTime.now().subtract(const Duration(days: 1));
-    final todayDate = DateFormat('yMMMMd').format(dateTime).toString();
-    final yesterDayDate = DateFormat('yMMMMd').format(yesterDay).toString();
+    final todayDate = DateFormat('yMd').format(dateTime).toString();
+    final yesterDayDate = DateFormat('yMd').format(yesterDay).toString();
     String date() {
       if (dateRead == todayDate) {
         return DateFormat('h:mm a').format(lastMessageDate).toString();
@@ -175,9 +176,8 @@ class LastMessage extends StatelessWidget {
     return date();
   }
 
-  Widget messageDecider(
-      String type, Message lastMessage, BuildContext context) {
-    switch (type) {
+  Widget messageDecider(Message lastMessage, BuildContext context) {
+    switch (lastMessage.type) {
       case MediaType.text:
         {
           return Text(
@@ -301,9 +301,10 @@ class LastMessage extends StatelessWidget {
             ],
           );
         }
-      default: {
-        return const SizedBox.shrink();
-      }
+      default:
+        {
+          return const SizedBox.shrink();
+        }
     }
   }
 
@@ -311,9 +312,6 @@ class LastMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<LastMessageViewModel>.reactive(
       viewModelBuilder: () => LastMessageViewModel(conversationId),
-      onModelReady: (model) {
-        model.unreadMessageLength(fireUser.id);
-      },
       builder: (context, model, child) {
         if (!model.dataReady) {
           return const Center(child: CircularProgressIndicator());
@@ -326,14 +324,15 @@ class LastMessage extends StatelessWidget {
         final data = model.data;
 
         if (data != null) {
-          final lastDocument = data.docs.first;
+          final lastDocument = data.docs.last;
           final lastMessage = Message.fromFirestore(lastDocument);
-          final dateRead = DateFormat('yMMMMd')
+          final dateRead = DateFormat('yMd')
               .format(lastMessage.timestamp.toDate())
               .toString();
           return ListTile(
-            onTap: () =>
-                chatService.startConversation(context, fireUser, randomColor),
+            onTap: () {
+              chatService.startConversation(context, fireUser, randomColor);
+            },
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
@@ -380,33 +379,25 @@ class LastMessage extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
-            subtitle: messageDecider(lastMessage.type, lastMessage, context),
+            subtitle: messageDecider(lastMessage, context),
             trailing: SizedBox(
-              height: 45,
+              height: 44,
+              width: 80,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    messageDate(dateRead, lastMessage.timestamp.toDate()),
-                    style: Theme.of(context)
-                        .textTheme
-                        .caption!
-                        .copyWith(color: lightBlue),
+                  Flexible(
+                    child: Text(
+                      messageDate(dateRead, lastMessage.timestamp.toDate()),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption!
+                          .copyWith(color: lightBlue),
+                    ),
                   ),
                   const Spacer(),
-                   Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 2),
-                          decoration: BoxDecoration(
-                              color: activeGreen,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text(
-                            model.unreadMessage.toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .caption!
-                                .copyWith(color: systemBackground),
-                          ),
-                        )
+                  UnReadMessages(
+                      fireUserID: fireUser.id, conversationId: conversationId)
                 ],
               ),
             ),

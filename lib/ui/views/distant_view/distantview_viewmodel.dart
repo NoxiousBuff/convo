@@ -5,18 +5,14 @@ import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DistantViewViewModel extends BaseViewModel {
   final log = getLogger('DistantViewModel');
 
-  late final FireUser fireUser;
 
   final bool _isUploading = false;
   bool get isUploading => _isUploading;
@@ -39,19 +35,6 @@ class DistantViewViewModel extends BaseViewModel {
     isDarkTheme = value;
     notifyListeners();
   }
-
-  Future<FireUser> getCurrentFireUser(String liveUserUid) async {
-    final firestoreUser = await FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .doc(liveUserUid)
-        .get();
-    final _fireUser = FireUser.fromFirestore(firestoreUser);
-    fireUser = _fireUser;
-    notifyListeners();
-    return _fireUser;
-  }
-
-
 
   /// uploading a single file into the firebase storage and get progress
   Future<String> uploadFile({

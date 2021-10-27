@@ -20,7 +20,7 @@ Future<void> main() async {
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
   HiveHelper().initialiseHive();
-  await Hive.openBox(appSettingsBoxName).whenComplete(() => print('open hive box'));
-
+  await Hive.openBox(appSettingsBoxName)
+      .whenComplete(() => print('open hive box'));
   runApp(const ProviderScope(child: MyApp()));
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/pods/genral_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
@@ -71,8 +73,7 @@ class AuthService {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        getLogger('AuthService from Login')
-            .i('The User with email : $email has been successfully logged In');
+        log.i('The User with email : $email has been successfully logged In');
         onComplete();
       });
     } on FirebaseAuthException catch (e) {
@@ -89,8 +90,15 @@ class AuthService {
   }
 
   Future<void> signOut(BuildContext context) async {
-    await _auth.signOut();
-    getLogger('AuthMethod').i('The user has been signed out successfully.');
+    await _auth.signOut().catchError((e) {
+      log.e('Firestore Signout:$e');
+    });
+    await firestoreApi.updateUser(
+      uid: FirestoreApi.liveUserUid,
+      property: UserField.status,
+      updateProperty: 'Offline',
+    );
+    log.i('The user has been signed out successfully.');
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -115,8 +123,7 @@ class AuthService {
   Future<void> changeUserDisplayName(String value, {Function? onError}) async {
     getLogger('AuthService').i('Initiating Changing User Display Name');
     await _auth.currentUser!.updateDisplayName(value).then((e) {
-      getLogger('Auth Service')
-          .i('User Display Name is successfully changed to : $value');
+      log.i('User Display Name is successfully changed to : $value');
     }).catchError((err) {
       if (onError != null) onError();
       getLogger('Auth Service')

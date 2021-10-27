@@ -1,8 +1,11 @@
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PhoneAuthViewModel extends BaseViewModel {
   final log = getLogger('PhoneAuth');
@@ -20,6 +23,17 @@ class PhoneAuthViewModel extends BaseViewModel {
   void getCode(String code) {
     _countryCode = code;
     notifyListeners();
+  }
+
+  Future<bool> isPhoneNumberExists(String phoneNumber) async {
+    return FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .where(UserField.phone, isEqualTo: phoneNumber)
+        .get()
+        .then((value) => value.size > 0 ? true : false)
+        .catchError((e) {
+      log.e('isPhoneNumberExists Error:$e');
+    });
   }
 
   Future pickedCountryCode(BuildContext context) async {

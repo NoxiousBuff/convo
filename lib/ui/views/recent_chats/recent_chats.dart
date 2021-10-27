@@ -1,21 +1,55 @@
+import 'package:hint/app/app.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-//import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/api/hive_helper.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/services/auth_service.dart';
-//import 'package:hint/ui/views/contacts/contacts.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/recent_chats/recentchats_viewmodel.dart';
 
-class RecentChats extends StatelessWidget {
+class RecentChats extends StatefulWidget {
   const RecentChats({Key? key}) : super(key: key);
+
+  @override
+  State<RecentChats> createState() => _RecentChatsState();
+}
+
+class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
+  final log = getLogger('RecentChats');
+
+  @override
+  void initState() {
+    super.initState();
+    setStatus(status: 'Online');
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  Future<void> setStatus({required String status}) async {
+    await firestoreApi
+        .updateUser(
+            uid: FirestoreApi.liveUserUid,
+            updateProperty: status,
+            property: UserField.status)
+        .catchError((e) {
+      log.e('setStatus:$e');
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus(status: "Online");
+    } else {
+      setStatus(status: "Offline");
+    }
+  }
 
   Widget buttonWidget({
     IconData? icon,
@@ -52,28 +86,31 @@ class RecentChats extends StatelessWidget {
           );
         }
 
-        List<UserListItem> userResults = [];
+        final data = model.data;
 
-        for (var document in model.data!.docs) {
-          UserListItem userListItem =
-              UserListItem(userUid: document.get('userUid'));
-          userResults.add(userListItem);
+        if (data != null) {
+          return data.docs.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: data.docs.length,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(left: 5),
+                  itemBuilder: (context, index) {
+                    final user = data.docs[index];
+                    final userUid = user.get('userUid');
+                    return UserListItem(userUid: userUid);
+                  },
+                )
+              : Center(
+                  child: buttonWidget(
+                    context: context,
+                    text: 'Find you close friends',
+                    onPressed: () {},
+                  ),
+                );
+        } else {
+          return const CircularProgressIndicator();
         }
-
-        return userResults.isNotEmpty
-            ? ListView(
-                shrinkWrap: true,
-                children: userResults,
-                padding: const EdgeInsets.only(left: 5),
-                physics: const BouncingScrollPhysics(),
-              )
-            : Center(
-                child: buttonWidget(
-                  context: context,
-                  text: 'Find you close friends',
-                  onPressed: () async {},
-                ),
-              );
 
         // return userResults.isNotEmpty
         //     ? ImplicitlyAnimatedReorderableList<UserListItem>(
@@ -93,77 +130,77 @@ class RecentChats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Box>(
-      valueListenable: appSettings.listenable(),
-      builder: (context, box, child) {
-        bool darkMode = box.get(darkModeKey, defaultValue: false);
-        return ViewModelBuilder<RecentChatsViewModel>.reactive(
-          viewModelBuilder: () => RecentChatsViewModel(),
-          builder: (context, model, child) {
-            if (!model.dataReady) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (model.hasError) {
-              return const Center(
-                child: Text('Model has Error'),
-              );
-            }
+    //final log = getLogger('RecentChats');
+    return ViewModelBuilder<RecentChatsViewModel>.reactive(
+      viewModelBuilder: () => RecentChatsViewModel(),
+      onModelReady: (model) async {
+        await AuthService.liveUser!.reload();
+        await firestoreApi.updateUser(
+          uid: FirestoreApi.liveUserUid,
+          property: UserField.status,
+          updateProperty: 'Online',
+        );
+        await model.getCurrentFireUser(ChatService.liveUserUid);
+      },
+      builder: (context, model, child) {
+        if (!model.dataReady) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (model.hasError) {
+          return const Center(
+            child: Text('Model has Error'),
+          );
+        }
 
-            return Scaffold(
-              appBar: CupertinoNavigationBar(
-                border: const Border(
-                  bottom: BorderSide(
-                    width: 1.0, // One physical pixel.
-                    color: Colors.transparent,
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                transitionBetweenRoutes: true,
-                backgroundColor: darkMode ? black54 : systemBackground,
-                middle: Text(
-                  'Messages',
-                  style: GoogleFonts.poppins(
-                      fontSize: 18.0,
-                      color: darkMode ? systemBackground : black54),
-                ),
-                leading: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      cupertinoTransition(
-                        enterTo:
-                            DistantView(liveUserUid: AuthService.liveUser!.uid),
-                        exitFrom: const RecentChats(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'All',
-                    style: Theme.of(context).textTheme.bodyText2,
-                  ),
-                ),
-                trailing: IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      cupertinoTransition(
-                        enterTo: const SearchView(),
-                        exitFrom: const RecentChats(),
-                      ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.search,
-                    color: darkMode ? systemBackground : activeBlue,
-                    size: 24.0,
-                  ),
-                ),
+        return Scaffold(
+          appBar: CupertinoNavigationBar(
+            border: const Border(
+              bottom: BorderSide(
+                width: 1.0, // One physical pixel.
+                color: Colors.transparent,
+                style: BorderStyle.solid,
               ),
-              body: buildUserContact(model),
-            );
-          },
+            ),
+            transitionBetweenRoutes: true,
+            backgroundColor: isDarkTheme ? black54 : systemBackground,
+            middle: Text(
+              'Messages',
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            leading: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  cupertinoTransition(
+                    enterTo: DistantView(fireUser: model.currentFireUsser),
+                    exitFrom: const RecentChats(),
+                  ),
+                );
+              },
+              child: Text(
+                'All',
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  cupertinoTransition(
+                    enterTo: const SearchView(),
+                    exitFrom: const RecentChats(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.search,
+                size: 24.0,
+              ),
+            ),
+          ),
+          body: buildUserContact(model),
         );
       },
     );

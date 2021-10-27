@@ -1,25 +1,28 @@
 import 'package:hint/app/app.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/appwrite_api.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/help_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/views/storage_media.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/views/privacy/privacy.dart';
+import 'package:hint/ui/views/contacts/contacts.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/user_account/account_view.dart';
 import 'package:hint/ui/views/distant_view/distantview_viewmodel.dart';
 
 class DistantView extends StatelessWidget {
-  final String liveUserUid;
-  const DistantView({Key? key, required this.liveUserUid}) : super(key: key);
+  final FireUser fireUser;
+  const DistantView({Key? key, required this.fireUser}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -109,11 +112,8 @@ class DistantView extends StatelessWidget {
 
     return ViewModelBuilder<DistantViewViewModel>.reactive(
       viewModelBuilder: () => DistantViewViewModel(),
-      onModelReady: (model) async {
-        await model.getCurrentFireUser(liveUserUid);
-      },
       builder: (context, model, child) {
-        final exitFrom = DistantView(liveUserUid: liveUserUid);
+        final exitFrom = DistantView(fireUser: fireUser);
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -134,7 +134,7 @@ class DistantView extends StatelessWidget {
                       height: 200,
                       enableLoadState: true,
                       handleLoadingProgress: true,
-                      image: NetworkImage(model.fireUser.photoUrl!),
+                      image: NetworkImage(fireUser.photoUrl!),
                     ),
                   ),
                 ),
@@ -145,18 +145,33 @@ class DistantView extends StatelessWidget {
                     child: Column(
                       children: [
                         optionTile(
-                            context: context,
-                            text: 'Account',
-                            icon: CupertinoIcons.person,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                cupertinoTransition(
-                                  enterTo: Account(fireUser: model.fireUser),
-                                  exitFrom: exitFrom,
-                                ),
-                              );
-                            }),
+                          context: context,
+                          text: 'Account',
+                          icon: CupertinoIcons.person,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              cupertinoTransition(
+                                enterTo: Account(fireUser: fireUser),
+                                exitFrom: exitFrom,
+                              ),
+                            );
+                          },
+                        ),
+                        optionTile(
+                          context: context,
+                          text: 'Contact',
+                          icon: CupertinoIcons.person,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              cupertinoTransition(
+                                enterTo: const ContactsView(),
+                                exitFrom: exitFrom,
+                              ),
+                            );
+                          },
+                        ),
                         optionTile(
                           context: context,
                           text: 'Privacy & Safety',
@@ -229,6 +244,7 @@ class DistantView extends StatelessWidget {
                           text: 'Logout',
                           icon: Icons.logout_outlined,
                           onTap: () async {
+                            await AppWriteApi.instance.logout();
                             await authService.signOut(context).catchError((e) {
                               log.e('signOutError:$e');
                             });

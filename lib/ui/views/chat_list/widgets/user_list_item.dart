@@ -1,13 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/constants/app_keys.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/last_message/last_message_container.dart';
-
+import 'package:hint/ui/views/chat_list/widgets/last_message/last_message.dart';
 
 class UserListItem extends StatelessWidget {
   UserListItem({Key? key, required this.userUid}) : super(key: key);
@@ -17,43 +15,35 @@ class UserListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection(usersFirestoreKey)
-            .doc(userUid)
-            .get(),
-        builder: (context, snapshot) {
-          Widget child;
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('It has Error'),
-            );
-          }
-          if (!snapshot.hasData) {
-            child = loadingUserListItem(context);
-          } else {
-            FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
-            final id = chatService.getConversationId(
-              fireUser.id,
-              AuthService.liveUser!.uid,
-            );
-            child = LastMessage(
-              fireUser: fireUser,
-              conversationId: id,
-              randomColor: randomColor,
-            );
-            // child = UserItem(
-            //     fireUser: fireUser,
-            //     randomColor: randomColor,
-            //     onTap: () {
-            //       chatService.startConversation(context, fireUser, randomColor);
-            //     });
-          }
-
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: child,
+      future: firestoreApi.getUserDetailsByID(userUid),
+      builder: (context, snapshot) {
+        Widget child;
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text('It has Error'),
           );
-        });
+        }
+        if (!snapshot.hasData) {
+          child = loadingUserListItem(context);
+        } else {
+          FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
+          final id = chatService.getConversationId(
+            fireUser.id,
+            ChatService.liveUserUid,
+          );
+          child = LastMessage(
+            fireUser: fireUser,
+            conversationId: id,
+            randomColor: randomColor,
+          );
+        }
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: child,
+        );
+      },
+    );
   }
 
   Widget loadingUserListItem(BuildContext context) {

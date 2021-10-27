@@ -13,7 +13,7 @@ import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
 List<String> get activityNames => _activityNames;
@@ -132,7 +132,7 @@ class _InterestsViewState extends State<InterestsView> {
                     Navigator.push(
                       context,
                       cupertinoTransition(
-                        enterTo: const ChatListView(),
+                        enterTo: const RecentChats(),
                         exitFrom: InterestsView(
                           email: widget.email,
                           username: widget.username,

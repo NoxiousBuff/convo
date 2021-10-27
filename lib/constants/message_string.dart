@@ -14,6 +14,7 @@ class MessageField {
   static const String uploaded = 'uploaded';
   static const String location = 'location';
   static const String mediaURL = 'mediaURL';
+  static const String senderUid = 'senderUid';
   static const String timestamp = 'timestamp';
   static const String messageText = 'messageText';
 }
@@ -47,6 +48,9 @@ class MsgRead {
 }
 
 class ChatRoomField {
+  static const String liveUserUid = 'liveUserUid';
+  static const String chatRoomId = 'chatRoomId';
+  static const String receiverUid = 'receiverUid';
   static const String backgroungImage = 'backgroundImage';
 }
 

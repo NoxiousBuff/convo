@@ -53,7 +53,6 @@ class EmailRegisterView extends StatelessWidget {
 
   Widget passwordTextFormField(EmailRegisterViewModel model) {
     return TextFormField(
-      autofocus: true,
       obscureText: !model.isPasswordShown,
       validator: (value) {
         if (value!.isEmpty) {

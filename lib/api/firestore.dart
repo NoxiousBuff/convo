@@ -20,10 +20,19 @@ class FirestoreApi {
 
   User? getCurrentUser() => auth.currentUser;
 
-  Future<void> updateUser(
-      {required String uid,
-      required String updateProperty,
-      required String property}) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetailsByID(
+      String userID) async {
+    return FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(userID)
+        .get();
+  }
+
+  Future<void> updateUser({
+    required String uid,
+    required String property,
+    required String updateProperty,
+  }) {
     return usersCollection
         .doc(uid)
         .update({property: updateProperty})
@@ -38,14 +47,14 @@ class FirestoreApi {
     Function? onError,
     required User user,
     required String phoneNumber,
-    required String countryPhoneCode, 
+    required String countryPhoneCode,
     required List<String> interests,
   }) async {
     try {
       await usersCollection.doc(user.uid).set({
         'bio': '',
-        'blockedUsers':[],
-        'countryPhoneCode' :countryPhoneCode,
+        'blockedUsers': [],
+        'countryPhoneCode': countryPhoneCode,
         'email': user.email,
         'id': user.uid,
         'interests': interests,

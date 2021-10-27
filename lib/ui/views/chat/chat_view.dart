@@ -53,167 +53,168 @@ class ChatView extends StatelessWidget {
         .bodyText2!
         .copyWith(color: inactiveGray, fontSize: 10);
     return ViewModelBuilder<ChatViewModel>.reactive(
-        viewModelBuilder: () =>
-            ChatViewModel(conversationId: conversationId, fireUser: fireUser),
-        onModelReady: (model) async {
-          model.scrollController = ScrollController();
-          await model.iBlockThisUserCkecker(
-              firestoreApi.getCurrentUser()!.uid, fireUser.id);
-          log.wtf('iBlockThisUser:${model.iBlockThisUser}');
-          await model.userBlockMeChecker(
-              fireUser.id, firestoreApi.getCurrentUser()!.uid);
-          log.wtf('userBlockMe:${model.userBlockMe}');
-        },
-        onDispose: (model) async {
-          if (urlDataHiveBox(conversationId).isOpen) {
-            await urlDataHiveBox(conversationId).close();
-          } else if (imagesMemoryHiveBox(conversationId).isOpen) {
-            await imagesMemoryHiveBox(conversationId).close();
-          } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
-            await chatRoomMediaHiveBox(conversationId).close();
-          } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
-            await thumbnailsPathHiveBox(conversationId).close();
-          } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
-            await videoThumbnailsHiveBox(conversationId).close();
-          }
-          if (await model.hasMessage(conversationId)) {
-            await chatService.addToRecentList(fireUser.id);
-          }
-        },
-        builder: (context, model, child) {
-          final url = fireUser.photoUrl ?? 'images/img2.jpg';
-          return OfflineBuilder(
-            child: const Text("Yah Baby !!"),
-            connectivityBuilder: (context, connectivity, child) {
-              bool connected = connectivity != ConnectivityResult.none;
+      viewModelBuilder: () =>
+          ChatViewModel(conversationId: conversationId, fireUser: fireUser),
+      onModelReady: (model) async {
+        model.scrollController = ScrollController();
+        await model.iBlockThisUserCkecker(
+            firestoreApi.getCurrentUser()!.uid, fireUser.id);
+        log.wtf('iBlockThisUser:${model.iBlockThisUser}');
+        await model.userBlockMeChecker(
+            fireUser.id, firestoreApi.getCurrentUser()!.uid);
+        log.wtf('userBlockMe:${model.userBlockMe}');
+      },
+      onDispose: (model) async {
+        if (urlDataHiveBox(conversationId).isOpen) {
+          await urlDataHiveBox(conversationId).close();
+        } else if (imagesMemoryHiveBox(conversationId).isOpen) {
+          await imagesMemoryHiveBox(conversationId).close();
+        } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
+          await chatRoomMediaHiveBox(conversationId).close();
+        } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
+          await thumbnailsPathHiveBox(conversationId).close();
+        } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
+          await videoThumbnailsHiveBox(conversationId).close();
+        }
+        if (await model.hasMessage(conversationId)) {
+          await chatService.addToRecentList(fireUser.id);
+        }
+      },
+      builder: (context, model, child) {
+        final url = fireUser.photoUrl ?? 'images/img2.jpg';
+        return OfflineBuilder(
+          child: const Text("Yah Baby !!"),
+          connectivityBuilder: (context, connectivity, child) {
+            bool connected = connectivity != ConnectivityResult.none;
 
-              if (connected) {
-                model.seeMsg();
-              }
-              return GestureDetector(
-                onTap: () {
-                  MediaQuery.of(context).viewInsets.bottom == 0
-                      ? model.focusNode.unfocus()
-                      : const Text('');
-                },
-                dragStartBehavior: DragStartBehavior.start,
-                onVerticalDragStart: (drag) {
-                  MediaQuery.of(context).viewInsets.bottom == 0
-                      ? model.focusNode.unfocus()
-                      : const Text('');
-                },
-                child: Scaffold(
-                  appBar: AppBar(
-                    elevation: 0.0,
-                    centerTitle: true,
-                    toolbarHeight: 100.0,
-                    leadingWidth: 130,
-                    automaticallyImplyLeading: true,
-                    backgroundColor: randomColor.withAlpha(60),
-                    leading: SizedBox(
-                      width: 56,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back, size: 20)),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              cupertinoTransition(
-                                enterTo: ProfileView(
-                                    model: model,
-                                    fireUser: fireUser,
-                                    iBlockThisUser: model.iBlockThisUser,
-                                    conversationId: conversationId),
-                                exitFrom: ChatView(
+            if (connected) {
+              model.seeMsg();
+            }
+            return GestureDetector(
+              onTap: () {
+                MediaQuery.of(context).viewInsets.bottom == 0
+                    ? model.focusNode.unfocus()
+                    : const Text('');
+              },
+              dragStartBehavior: DragStartBehavior.start,
+              onVerticalDragStart: (drag) {
+                MediaQuery.of(context).viewInsets.bottom == 0
+                    ? model.focusNode.unfocus()
+                    : const Text('');
+              },
+              child: Scaffold(
+                appBar: AppBar(
+                  elevation: 0.0,
+                  centerTitle: true,
+                  toolbarHeight: 100.0,
+                  leadingWidth: 130,
+                  automaticallyImplyLeading: true,
+                  backgroundColor: randomColor.withAlpha(60),
+                  leading: SizedBox(
+                    width: 56,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(Icons.arrow_back, size: 20)),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            cupertinoTransition(
+                              enterTo: ProfileView(
+                                  model: model,
                                   fireUser: fireUser,
-                                  randomColor: randomColor,
-                                  conversationId: conversationId,
-                                ),
+                                  iBlockThisUser: model.iBlockThisUser,
+                                  conversationId: conversationId),
+                              exitFrom: ChatView(
+                                fireUser: fireUser,
+                                randomColor: randomColor,
+                                conversationId: conversationId,
                               ),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: Container(
-                                height: 60,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(url),
-                                  ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                image: DecorationImage(
+                                  image: CachedNetworkImageProvider(url),
                                 ),
                               ),
                             ),
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  title: StreamBuilder<DocumentSnapshot>(
+                      stream: model.statusStream(fireUser.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String status = snapshot.data!['status'];
+                          bool isOnline = snapshot.data!['status'] == 'Online';
+                          var timestamp =
+                              snapshot.data!['lastSeen'] as Timestamp;
+                          var lastSeen = time.format(timestamp.toDate(),
+                              allowFromNow: true);
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              Text(
+                                fireUser.username,
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              verticalSpaceTiny,
+                              isOnline
+                                  ? Text(status, style: statusStyle)
+                                  : Text(lastSeen, style: lastSeenStyle)
+                            ],
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      }),
+                ),
+                body: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: ChatMessages(
+                        model: model,
+                        fireuser: fireUser,
+                        receiverUid: fireUser.id,
+                        conversationId: conversationId,
                       ),
                     ),
-                    title: StreamBuilder<DocumentSnapshot>(
-                        stream: model.statusStream(fireUser.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            String status = snapshot.data!['status'];
-                            bool isOnline =
-                                snapshot.data!['status'] == 'Online';
-                            var timestamp =
-                                snapshot.data!['lastSeen'] as Timestamp;
-                            var lastSeen = time.format(timestamp.toDate(),
-                                allowFromNow: true);
-                            return Column(
-                              children: [
-                                const SizedBox(height: 10),
-                                Text(
-                                  fireUser.username,
-                                  style: Theme.of(context).textTheme.bodyText2,
-                                ),
-                                verticalSpaceTiny,
-                                isOnline
-                                    ? Text(status, style: statusStyle)
-                                    : Text(lastSeen, style: lastSeenStyle)
-                              ],
-                            );
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }),
-                  ),
-                  body: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: ChatMessages(
-                          model: model,
-                          fireuser: fireUser,
-                          receiverUid: fireUser.id,
-                          conversationId: conversationId,
-                        ),
+                    hintTextField(
+                      model: model,
+                      context: context,
+                      child: HintTextField(
+                        fireUser: fireUser,
+                        chatViewModel: model,
+                        randomColor: randomColor,
+                        receiverUid: fireUser.id,
+                        focusNode: model.focusNode,
+                        conversationId: conversationId,
                       ),
-                      hintTextField(
-                        model: model,
-                        context: context,
-                        child: HintTextField(
-                          fireUser: fireUser,
-                          chatViewModel: model,
-                          randomColor: randomColor,
-                          receiverUid: fireUser.id,
-                          focusNode: model.focusNode,
-                          conversationId: conversationId,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          );
-        });
+              ),
+            );
+          },
+        );
+      },
+      
+    );
   }
 
   Widget hintTextField(
