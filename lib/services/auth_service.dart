@@ -90,14 +90,15 @@ class AuthService {
   }
 
   Future<void> signOut(BuildContext context) async {
-    await _auth.signOut().catchError((e) {
-      log.e('Firestore Signout:$e');
-    });
     await firestoreApi.updateUser(
       uid: FirestoreApi.liveUserUid,
       property: UserField.status,
       updateProperty: 'Offline',
     );
+    await _auth.signOut().catchError((e) {
+      log.e('Firestore Signout:$e');
+    });
+
     log.i('The user has been signed out successfully.');
     Navigator.push(
       context,
