@@ -1,4 +1,4 @@
-import 'package:hint/api/appwrite_api.dart';
+
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,10 +50,7 @@ class ChatService {
       ),
       transitionType: SharedAxisTransitionType.scaled,
     );
-    AppWriteApi.instance.addMessage(
-        liveUserUid: liveUserUid,
-        receiverUid: fireUser.id,
-        chatRoomId: conversationId);
+
     Navigator.of(context, rootNavigator: true).push(route);
   }
 

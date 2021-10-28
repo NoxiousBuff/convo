@@ -1,5 +1,5 @@
+import 'package:hint/api/dart_appwrite.dart';
 import 'package:hint/app/app.dart';
-import 'package:hint/constants/dart_appwrite.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,8 +29,6 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     setStatus(status: 'Online');
-    WidgetsBinding.instance!.addObserver(this);
-    DartAppWriteApi.instance.createCollection();
   }
 
   Future<void> setStatus({required String status}) async {
@@ -202,7 +200,17 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body: buildUserContact(model),
+          body: Column(
+            children: [
+              TextButton(
+                onPressed: () async {
+                  await DartAppWriteApi.instance.createCollection();
+                },
+                child: const Text('Create Collection'),
+              ),
+              buildUserContact(model),
+            ],
+          ),
         );
       },
     );

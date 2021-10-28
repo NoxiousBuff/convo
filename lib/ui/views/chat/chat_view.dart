@@ -7,16 +7,20 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/appwrite_api.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/api/dart_appwrite.dart';
 import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
+import 'package:hint/ui/views/live_chat/live_chat.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
@@ -181,6 +185,51 @@ class ChatView extends StatelessWidget {
                           return const SizedBox.shrink();
                         }
                       }),
+                  actions: [
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(0, 0, 20, 20),
+                      child: TextButton(
+                        onPressed: () async {
+                          String id = conversationId;
+                          final liveUserUid = FirestoreApi.liveUserUid;
+                          final dartAppwrite = DartAppWriteApi.instance;
+                          var isExists = dartAppwrite.isLiveChatRoomExists(id);
+                          if (await isExists) {
+                            log.wtf('Live Chat Room already created');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LiveChat(),
+                              ),
+                            );
+                          } else {
+                            log.wtf('adding live chat room documents');
+                            await AppWriteApi.instance.createLiveChatRoom(id);
+                            await AppWriteApi.instance.addLiveChatDocuments(
+                              data: {
+                                LiveChatField.firstUserId: liveUserUid,
+                                LiveChatField.firstUserMessage: '',
+                              },
+                            );
+                            await AppWriteApi.instance.addLiveChatDocuments(
+                              data: {
+                                LiveChatField.firstUserId: fireUser.id,
+                                LiveChatField.secondUserMessage: '',
+                              },
+                            );
+                          }
+                          // await AppWriteApi.instance.addLiveChatDocuments(
+                          //   userUid: FirestoreApi.liveUserUid,
+                          //   message: '',
+                          // );
+                        },
+                        child: Text(
+                          'Live Chat',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
                 body: Column(
                   mainAxisSize: MainAxisSize.max,
@@ -213,7 +262,6 @@ class ChatView extends StatelessWidget {
           },
         );
       },
-      
     );
   }
 

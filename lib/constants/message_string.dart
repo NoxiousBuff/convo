@@ -67,3 +67,11 @@ class UserField {
   static const userCreated = 'userCreated';
   static const blockedUsers = 'blockedUsers';
 }
+
+class LiveChatField {
+  static const liveChatRoom = 'liveChatRoom';
+  static const firstUserId = 'firstUserId';
+  static const secondUserId = 'secondUserId';
+  static const firstUserMessage = 'firstUserMessage';
+  static const secondUserMessage = 'secondUserMessage';
+}
