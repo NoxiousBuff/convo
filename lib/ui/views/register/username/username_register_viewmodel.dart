@@ -4,7 +4,6 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
