@@ -1,68 +1,69 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/constants/model_string.dart';
 import 'package:stacked/stacked.dart';
-
 import 'contact_viewmodel.dart';
 
 class ContactsView extends StatelessWidget {
   const ContactsView({Key? key}) : super(key: key);
 
+  final countryCodePattern =
+      r'\+(?:998|996|995|994|993|992|977|976|975|974|973|972|971|970|968|967|966|965|964|963|962|961|960|886|880|856|855|853|852|850|692|691|690|689|688|687|686|685|683|682|681|680|679|678|677|676|675|674|673|672|670|599|598|597|595|593|592|591|590|509|508|507|506|505|504|503|502|501|500|423|421|420|389|387|386|385|383|382|381|380|379|378|377|376|375|374|373|372|371|370|359|358|357|356|355|354|353|352|351|350|299|298|297|291|290|269|268|267|266|265|264|263|262|261|260|258|257|256|255|254|253|252|251|250|249|248|246|245|244|243|242|241|240|239|238|237|236|235|234|233|232|231|230|229|228|227|226|225|224|223|222|221|220|218|216|213|212|211|98|95|94|93|92|91|90|86|84|82|81|66|65|64|63|62|61|60|58|57|56|55|54|53|52|51|49|48|47|46|45|44\D?1624|44\D?1534|44\D?1481|44|43|41|40|39|36|34|33|32|31|30|27|20|7|1\D?939|1\D?876|1\D?869|1\D?868|1\D?849|1\D?829|1\D?809|1\D?787|1\D?784|1\D?767|1\D?758|1\D?721|1\D?684|1\D?671|1\D?670|1\D?664|1\D?649|1\D?473|1\D?441|1\D?345|1\D?340|1\D?284|1\D?268|1\D?264|1\D?246|1\D?242|1)\D?';
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ContactsViewModel>.reactive(
-        onModelReady: (model) {
-          model.getContacts();
-        },
-        builder: (context, model, child) => Scaffold(
-              body: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                slivers: [
-                  const CupertinoSliverNavigationBar(
-                    largeTitle: Text('Contacts'),
-                  ),
-                  SliverList(
-                      delegate: SliverChildListDelegate([
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      child: Row(
-                        children: const [
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              'Contact name',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+      onModelReady: (model) => model.getContacts(),
+      builder: (context, model, child) => Scaffold(
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          shrinkWrap: true,
+          slivers: [
+            const CupertinoSliverNavigationBar(
+              largeTitle: Text('Contacts'),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: Row(
+                      children: const [
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            'Contact name',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              'Phone Number',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            'Phone Number',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              'User Status',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            'User Status',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    _buildContactsView(model),
-                  ]))
+                  ),
+                  _buildContactsView(model),
                 ],
               ),
             ),
-        viewModelBuilder: () => ContactsViewModel());
+          ],
+        ),
+      ),
+      viewModelBuilder: () => ContactsViewModel(),
+    );
   }
 
   Widget _buildContactsView(ContactsViewModel model) {
@@ -77,6 +78,7 @@ class ContactsView extends StatelessWidget {
               final contact = model.contacts!.elementAt(i);
               final phones = contact.phones;
               if (contact.phones!.isNotEmpty && phones != null) {
+              final phone = model.numberFormatter(phones.first.value.toString());
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 8.0),
@@ -84,22 +86,26 @@ class ContactsView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Expanded(
-                          flex: 1,
-                          child: Text(contact.displayName ?? 'No Name')),
+                        flex: 1,
+                        child: Text(contact.displayName ?? 'No Name'),
+                      ),
                       Expanded(
-                          flex: 1,
-                          child: Text(contact.phones!.first.value
+                        flex: 1,
+                        child: Text(
+                          contact.phones!.first.value
                               .toString()
-                              .replaceAll(RegExp(r"\s+"), ""))),
+                              .replaceAll(RegExp(r"\s+"), ""),
+                        ),
+                      ),
                       Flexible(
                         flex: 1,
                         child: FutureBuilder<QuerySnapshot>(
                           future: FirebaseFirestore.instance
                               .collection(subsFirestoreKey)
-                              .where('phone',
-                                  isEqualTo: phones.first.value
-                                      .toString()
-                                      .replaceAll(RegExp(r"\s+"), ""))
+                              .where(
+                                'phone',
+                                isEqualTo: phone,
+                              )
                               .get(),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
@@ -145,11 +151,14 @@ class ContactsView extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                        flex: 1, child: Text(contact.displayName ?? 'No Name')),
+                      flex: 1,
+                      child: Text(contact.displayName ?? 'No Name'),
+                    ),
                     const Expanded(
-                        flex: 1,
-                        child:
-                            Text('You don\'t have a \nnumber for this \ncontact.')),
+                      flex: 1,
+                      child: Text(
+                          'You don\'t have a \nnumber for this \ncontact.'),
+                    ),
                     const Expanded(
                       flex: 1,
                       child: Text(
@@ -162,116 +171,8 @@ class ContactsView extends StatelessWidget {
             },
             itemCount: model.contacts!.length,
           )
-        : const Center(child: CircularProgressIndicator());
-  }
-}
-
-class ContactListItem extends StatefulWidget {
-  const ContactListItem({
-    Key? key,
-    required this.contact,
-    required this.randomColor,
-  }) : super(key: key);
-
-  final Contact contact;
-  final Color randomColor;
-
-  @override
-  State<ContactListItem> createState() => _ContactListItemState();
-}
-
-class _ContactListItemState extends State<ContactListItem> {
-  @override
-  Widget build(BuildContext context) {
-    final phoneList = widget.contact.phones;
-    return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance
-          .collection(subsFirestoreKey)
-          .where(FireUserStrings.phone,
-              isEqualTo:
-                  phoneList != null ? phoneList.first.value : '1234567890')
-          .get(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return listItemUi('Error');
-        }
-        if (!snapshot.hasError &&
-            snapshot.connectionState == ConnectionState.done) {
-          return listItemUi('Done');
-        }
-        return listItemUi('Checking..');
-      },
-    );
-  }
-
-  ListTile listItemUi(String text) {
-    return ListTile(
-      onTap: () {},
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
-        ),
-      ),
-      leading: GestureDetector(
-        onTap: () {},
-        child: ClipOval(
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  Color.alphaBlend(
-                      widget.randomColor.withAlpha(30), Colors.white),
-                  Color.alphaBlend(
-                      widget.randomColor.withAlpha(50), Colors.white),
-                ],
-                focal: Alignment.topLeft,
-                radius: 0.8,
-              ),
-            ),
-            height: 56.0,
-            width: 56.0,
-            child: widget.contact.avatar!.isNotEmpty
-                ? Image.memory(widget.contact.avatar!)
-                : Text(
-                    widget.contact.displayName![0],
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-          ),
-        ),
-      ),
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5.0),
-        child: Text(
-          widget.contact.displayName ?? 'Contacts',
-          style: GoogleFonts.roboto(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      trailing: Text(text),
-      subtitle: SizedBox(
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemCount: widget.contact.phones!.length,
-          itemBuilder: (context, i) {
-            Item item = widget.contact.phones!.elementAt(i);
-            return Text(
-              item.value ?? 'Empty',
-              style:
-                  const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
-            );
-          },
-        ),
-      ),
-    );
+        : const Center(
+            child: CircularProgressIndicator(),
+          );
   }
 }

@@ -6,16 +6,23 @@ import 'package:hint/services/chat_service.dart';
 import 'package:stacked/stacked.dart';
 
 class SearchViewModel extends BaseViewModel {
-
   final ChatService _chatService = ChatService();
 
   Future<QuerySnapshot>? _searchResultFuture;
-  Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture; 
+  Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
 
-  static final CollectionReference subsCollection = FirebaseFirestore.instance.collection(subsFirestoreKey);
+  static final CollectionReference subsCollection =
+      FirebaseFirestore.instance.collection(subsFirestoreKey);
 
   void handleSearch(String query) {
-    Future<QuerySnapshot>? searchResults = subsCollection.where('username', isGreaterThanOrEqualTo: query).get();
+    Future<QuerySnapshot>? searchResults = subsCollection
+        .where(
+          'username',
+          isGreaterThanOrEqualTo: query,
+          isLessThan: query.substring(0, query.length - 1) +
+              String.fromCharCode(query.codeUnitAt(query.length - 1) + 1),
+        )
+        .get();
     _searchResultFuture = searchResults;
     notifyListeners();
   }
@@ -23,5 +30,4 @@ class SearchViewModel extends BaseViewModel {
   void onUserItemTap(BuildContext context, FireUser fireUser) {
     _chatService.startConversation(context, fireUser, Colors.blue.shade50);
   }
-
 }
