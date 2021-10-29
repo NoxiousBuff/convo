@@ -89,4 +89,11 @@ class DartAppWriteApi {
       return true;
     }
   }
+
+  Future<Response<dynamic>> getListDocuments(String conversationId) async {
+    return database.listDocuments(
+      search: conversationId,
+      collectionId: AppWriteConstants.liveChatscollectionID,
+    );
+  }
 }

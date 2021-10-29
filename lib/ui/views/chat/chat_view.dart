@@ -1,3 +1,4 @@
+import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -7,7 +8,6 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/api/dart_appwrite.dart';
@@ -15,7 +15,6 @@ import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
@@ -191,37 +190,29 @@ class ChatView extends StatelessWidget {
                       child: TextButton(
                         onPressed: () async {
                           String id = conversationId;
-                          final liveUserUid = FirestoreApi.liveUserUid;
                           final dartAppwrite = DartAppWriteApi.instance;
-                          var isExists = dartAppwrite.isLiveChatRoomExists(id);
-                          if (await isExists) {
+                          var docs = await dartAppwrite.getListDocuments(id);
+                          final list = GetDocumentsList.fromJson(docs);
+                          if (list.documents.isNotEmpty) {
+                            log.wtf('Docs:$docs');
                             log.wtf('Live Chat Room already created');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const LiveChat(),
+                                builder: (context) => LiveChat(
+                                  fireUser: fireUser,
+                                  documentsList: list,
+                                  conversationId: conversationId,
+                                ),
                               ),
                             );
                           } else {
-                            log.wtf('adding live chat room documents');
-                            await AppWriteApi.instance.createLiveChatRoom(id);
-                            await AppWriteApi.instance.addLiveChatDocuments(
-                              data: {
-                                LiveChatField.firstUserId: liveUserUid,
-                                LiveChatField.firstUserMessage: '',
-                              },
-                            );
-                            await AppWriteApi.instance.addLiveChatDocuments(
-                              data: {
-                                LiveChatField.firstUserId: fireUser.id,
-                                LiveChatField.secondUserMessage: '',
-                              },
+                            await model.createLiveChatRoom(
+                              context: context,
+                              fireUser: fireUser,
+                              conversationId: conversationId,
                             );
                           }
-                          // await AppWriteApi.instance.addLiveChatDocuments(
-                          //   userUid: FirestoreApi.liveUserUid,
-                          //   message: '',
-                          // );
                         },
                         child: Text(
                           'Live Chat',

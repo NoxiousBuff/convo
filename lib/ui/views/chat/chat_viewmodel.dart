@@ -1,15 +1,21 @@
 // ignore_for_file: avoid_print
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/appwrite_api.dart';
+import 'package:hint/api/dart_appwrite.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/live_chat/live_chat.dart';
+import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ChatViewModel extends StreamViewModel<QuerySnapshot> {
+  final log = getLogger('ChatViewModel');
   final TextEditingController _messageTech = TextEditingController();
   TextEditingController get messageTech => _messageTech;
   ChatService chatService = ChatService();
@@ -50,6 +56,43 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
 
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
+
+  // creating live chat room and its messages
+  Future createLiveChatRoom({
+    required FireUser fireUser,
+    required BuildContext context,
+    required String conversationId,
+  }) async {
+    log.wtf('Creating Live ChatRoom and Messages');
+    await AppWriteApi.instance.createLiveChatRoom(conversationId, fireUser);
+    await AppWriteApi.instance.addLiveChatDocuments(
+      data: {
+        LiveChatField.liveChatRoom: conversationId,
+        LiveChatField.firstUserId: FirestoreApi.liveUserUid,
+        LiveChatField.firstUserMessage: ' ',
+      },
+    );
+    await AppWriteApi.instance.addLiveChatDocuments(
+      data: {
+        LiveChatField.liveChatRoom: conversationId,
+        LiveChatField.secondUserId: fireUser.id,
+        LiveChatField.secondUserMessage: ' ',
+      },
+    );
+    var docs = await DartAppWriteApi.instance.getListDocuments(conversationId);
+    final list = GetDocumentsList.fromJson(docs);
+    log.wtf('List:$list');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LiveChat(
+          documentsList: list,
+          fireUser: fireUser,
+          conversationId: conversationId,
+        ),
+      ),
+    );
+  }
 
   // For checking this conversation collection is empty or not.
   Future<bool> hasMessage(String conversationId) async {

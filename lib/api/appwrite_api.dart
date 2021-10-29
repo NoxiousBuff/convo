@@ -1,8 +1,10 @@
 import 'package:appwrite/models.dart';
 import 'package:appwrite/appwrite.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/constants/appwrite_constants.dart';
+import 'package:hint/models/user_model.dart';
 
 class AppWriteApi {
   late Database db;
@@ -90,15 +92,17 @@ class AppWriteApi {
     return realtime.subscribe(channel);
   }
 
-  Future createLiveChatRoom(String chatRoomId) async {
+  Future createLiveChatRoom(String chatRoomId, FireUser fireUser) async {
     try {
       await db.createDocument(
         collectionId: AppWriteConstants.liveChatscollectionID,
         data: {
-         LiveChatField.liveChatRoom: chatRoomId,
+          LiveChatField.liveChatRoom: chatRoomId,
+          LiveChatField.firstUserId: FirestoreApi.liveUserUid,
+          LiveChatField.secondUserId: fireUser.id,
         },
         read: ["*"],
-        write: ['*'],
+        write: ["*"],
       ).then((value) => log.wtf('document created in appwrite'));
     } on AppwriteException catch (e) {
       log.e(e.message);
@@ -114,10 +118,26 @@ class AppWriteApi {
         parentDocument: LiveChatField.liveChatRoom,
         data: data,
         read: ["*"],
-        write: ['*'],
+        write: ["*"],
       ).then((value) => log.wtf('Live Chat document created in appwrite'));
     } on AppwriteException catch (e) {
       log.e(e.message);
+    }
+  }
+
+  Future updateMessage({
+    required String documentId,
+    required String collectionId,
+    required Map<dynamic, dynamic> data,
+  }) async {
+    try {
+      await db.updateDocument(
+        collectionId: collectionId,
+        documentId: documentId,
+        data: data,
+      );
+    } on AppwriteException catch (e) {
+      log.e('updateDocument:$e');
     }
   }
 
