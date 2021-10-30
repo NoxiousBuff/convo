@@ -1,10 +1,11 @@
-import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/appwrite_api.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
 
@@ -24,20 +25,56 @@ class LiveChat extends StatefulWidget {
 }
 
 class _LiveChatState extends State<LiveChat> {
+  RealtimeSubscription? subscription;
   final log = getLogger('LiveChat');
+  Map<String, dynamic> payload = {};
   TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    stream();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget != widget) stream();
+  }
+
+  stream() {
+    var data;
+    subscription = AppWriteApi.instance.subscribe(['documents.617c19de213b5']);
+    subscription?.stream.listen(
+      (event) {
+        setState(() {
+          data = event;
+          payload = event.payload;
+        });
+        log.wtf('subscriptionEvent: ${event.event}');
+      },
+      onError: (e) {
+        log.e('OnError:$e');
+      },
+      onDone: () {
+        log.wtf('OnDone: subscription done');
+      },
+    );
+    log.wtf('subscriptionData: $data');
+  }
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<LiveChatViewModel>.reactive(
       viewModelBuilder: () => LiveChatViewModel(),
       onModelReady: (model) {
-        final document = model.document(widget.documentsList);
-        bool isMe = document.firstUserID == FirestoreApi.liveUserUid;
-        log.wtf('is first user me: $isMe');
-        log.wtf('documentID:${document.documentID}');
+        model.document(widget.documentsList);
+      },
+      onDispose: (model) {
+        subscription?.close;
       },
       builder: (context, model, child) {
+        log.wtf('Payload:$payload');
         return Scaffold(
           backgroundColor: Colors.white,
           body: Column(

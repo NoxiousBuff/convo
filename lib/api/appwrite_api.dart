@@ -2,9 +2,9 @@ import 'package:appwrite/models.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/constants/appwrite_constants.dart';
-import 'package:hint/models/user_model.dart';
 
 class AppWriteApi {
   late Database db;
