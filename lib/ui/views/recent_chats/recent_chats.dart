@@ -199,13 +199,18 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body: buildUserContact(model),
-          // TextButton(
-          //       onPressed: () async {
-          //         await DartAppWriteApi.instance.createCollection();
-          //       },
-          //       child: const Text('Create Collection'),
-          //     ),
+          body: Column(
+            children: [
+              // TextButton(
+              //   onPressed: () async {
+              //     await DartAppWriteApi.instance.createCollection();
+              //   },
+              //   child: const Text('Create Collection'),
+              // ),
+              buildUserContact(model),
+            ],
+          ),
+          
         );
       },
     );

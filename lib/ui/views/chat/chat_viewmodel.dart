@@ -57,29 +57,19 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
 
-  // creating live chat room and its messages
-  Future createLiveChatRoom({
-    required FireUser fireUser,
+  // creating live chat user
+  Future createLiveChatUser({
     required BuildContext context,
     required String conversationId,
   }) async {
-    log.wtf('Creating Live ChatRoom and Messages');
-    await AppWriteApi.instance.createLiveChatRoom(conversationId, fireUser);
-    await AppWriteApi.instance.addLiveChatDocuments(
-      data: {
-        LiveChatField.liveChatRoom: conversationId,
-        LiveChatField.firstUserId: FirestoreApi.liveUserUid,
-        LiveChatField.firstUserMessage: ' ',
-      },
+    log.wtf('Creating Live ChatRoom User');
+    await AppWriteApi.instance.createLiveChatUser(
+      userUid: FirestoreApi.liveUserUid,
+      conversationId: conversationId,
     );
-    await AppWriteApi.instance.addLiveChatDocuments(
-      data: {
-        LiveChatField.liveChatRoom: conversationId,
-        LiveChatField.secondUserId: fireUser.id,
-        LiveChatField.secondUserMessage: ' ',
-      },
-    );
-    var docs = await DartAppWriteApi.instance.getListDocuments(conversationId);
+
+    final docs = await DartAppWriteApi.instance
+        .getListDocuments(FirestoreApi.liveUserUid);
     final list = GetDocumentsList.fromJson(docs);
     log.wtf('List:$list');
     Navigator.push(

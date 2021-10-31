@@ -1,4 +1,3 @@
-import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -20,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hint/ui/views/live_chat/live_chat.dart';
+import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
@@ -189,27 +189,26 @@ class ChatView extends StatelessWidget {
                       margin: const EdgeInsets.fromLTRB(0, 0, 20, 20),
                       child: TextButton(
                         onPressed: () async {
-                          String id = conversationId;
+                          String id = fireUser.id;
                           final dartAppwrite = DartAppWriteApi.instance;
-                          var docs = await dartAppwrite.getListDocuments(id);
-                          final list = GetDocumentsList.fromJson(docs);
-                          if (list.documents.isNotEmpty) {
-                            log.wtf('Docs:$docs');
-                            log.wtf('Live Chat Room already created');
+                          var chats = await dartAppwrite.getListDocuments(id);
+                          var liveChatsList = GetDocumentsList.fromJson(chats);
+                          if (liveChatsList.documents.isNotEmpty) {
+                            log.wtf('UsersLiveChat:$chats');
+                            log.wtf('User already created first chat');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => LiveChat(
                                   fireUser: fireUser,
-                                  documentsList: list,
+                                  documentsList: liveChatsList,
                                   conversationId: conversationId,
                                 ),
                               ),
                             );
                           } else {
-                            await model.createLiveChatRoom(
+                            await model.createLiveChatUser(
                               context: context,
-                              fireUser: fireUser,
                               conversationId: conversationId,
                             );
                           }

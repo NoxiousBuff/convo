@@ -1,8 +1,6 @@
 import 'package:appwrite/models.dart';
 import 'package:appwrite/appwrite.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/constants/appwrite_constants.dart';
 
@@ -92,33 +90,20 @@ class AppWriteApi {
     return realtime.subscribe(channel);
   }
 
-  Future createLiveChatRoom(String chatRoomId, FireUser fireUser) async {
-    try {
-      await db.createDocument(
-        collectionId: AppWriteConstants.liveChatscollectionID,
-        data: {
-          LiveChatField.liveChatRoom: chatRoomId,
-          LiveChatField.firstUserId: FirestoreApi.liveUserUid,
-          LiveChatField.secondUserId: fireUser.id,
-        },
-        read: ["*"],
-        write: ["*"],
-      ).then((value) => log.wtf('document created in appwrite'));
-    } on AppwriteException catch (e) {
-      log.e(e.message);
-    }
-  }
-
-  Future addLiveChatDocuments({
-    required Map<dynamic, dynamic> data,
+  Future createLiveChatUser({
+    required String userUid,
+    required String conversationId,
   }) async {
     try {
       await db.createDocument(
         collectionId: AppWriteConstants.liveChatscollectionID,
-        parentDocument: LiveChatField.liveChatRoom,
-        data: data,
-        read: ["*"],
-        write: ["*"],
+        data: {
+          LiveChatField.userUid: userUid,
+          LiveChatField.liveChatRoom: conversationId,
+          LiveChatField.userMessage: ' ',
+        },
+        read: ['role:member'],
+        write: ['role:member'],
       ).then((value) => log.wtf('Live Chat document created in appwrite'));
     } on AppwriteException catch (e) {
       log.e(e.message);

@@ -1,36 +1,31 @@
 import 'package:hint/constants/message_string.dart';
 
-class AppwriteDocument {
+class LiveChatUser {
   final String documentID;
   final String collectionID;
   final dynamic permissions;
   final String liveChatRoomID;
-  final String firstUserID;
-  final String secondUserID;
-  final String? firstUserMessage;
-  final String? secondUserMessage;
+  final String userUid;
+  final String userMessage;
 
-  AppwriteDocument({
+  LiveChatUser({
     required this.documentID,
     required this.collectionID,
     required this.permissions,
     required this.liveChatRoomID,
-    required this.firstUserID,
-    required this.secondUserID,
-    this.firstUserMessage,
-    this.secondUserMessage,
+    required this.userUid,
+    required this.userMessage,
+    
   });
 
-  factory AppwriteDocument.fromJson(Map<String, dynamic> json) {
-    return AppwriteDocument(
+  factory LiveChatUser.fromJson(Map<String, dynamic> json) {
+    return LiveChatUser(
       documentID: json['\$id'],
       collectionID: json['\$collection'],
       permissions: json['\$permissions'],
-      liveChatRoomID: json['liveChatRoom'],
-      firstUserID: json[LiveChatField.firstUserId],
-      secondUserID: json[LiveChatField.secondUserId],
-      firstUserMessage: json[LiveChatField.firstUserMessage],
-      secondUserMessage: json[LiveChatField.secondUserMessage],
+      liveChatRoomID: json[LiveChatField.liveChatRoom],
+      userUid: json[LiveChatField.userUid],
+      userMessage: json[LiveChatField.userMessage],
     );
   }
 }

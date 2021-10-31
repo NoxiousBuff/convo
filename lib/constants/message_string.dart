@@ -69,9 +69,7 @@ class UserField {
 }
 
 class LiveChatField {
-  static const liveChatRoom = 'liveChatRoom';
-  static const firstUserId = 'firstUserId';
-  static const secondUserId = 'secondUserId';
-  static const firstUserMessage = 'firstUserMessage';
-  static const secondUserMessage = 'secondUserMessage';
+  static const userUid = 'userUid';
+  static const userMessage = 'userMessage';
+  static const liveChatRoom = 'liveChatRoomId';
 }

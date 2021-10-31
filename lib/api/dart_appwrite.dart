@@ -1,11 +1,10 @@
-import 'package:hint/constants/message_string.dart';
-import 'package:hint/models/appwrite_list_documents.dart';
-import 'package:logger/logger.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/constants/appwrite_constants.dart';
 
 class DartAppWriteApi {
-  final log = Logger();
+  final log = getLogger('DartAppWriteApi');
 
   Client client = Client();
   late Database database;
@@ -26,12 +25,12 @@ class DartAppWriteApi {
 
   Future<Response<dynamic>> createCollection() {
     return database.createCollection(
-      name: 'Live Chats',
-      read: ['*'],
-      write: ['*'],
+      name: 'Users Live Chat',
+      read: ['role:member'],
+      write: ['role:member'],
       rules: [
         {
-          "label": "LiveChatRoomID",
+          "label": 'LiveChatRoomID',
           "key": LiveChatField.liveChatRoom,
           "type": "text",
           "default": "Empty Name",
@@ -39,32 +38,16 @@ class DartAppWriteApi {
           "array": false
         },
         {
-          "label": "FirstUserID",
-          "key": LiveChatField.firstUserId,
+          "label": 'UserUid',
+          "key": LiveChatField.userUid,
           "type": "text",
           "default": "Empty Name",
           "required": true,
           "array": false
         },
         {
-          "label": "FirstUserMessage",
-          "key": LiveChatField.firstUserMessage,
-          "type": "text",
-          "default": "Empty Name",
-          "required": true,
-          "array": false
-        },
-        {
-          "label": "secondUserID",
-          "key": LiveChatField.secondUserId,
-          "type": "text",
-          "default": "Empty Name",
-          "required": true,
-          "array": false
-        },
-        {
-          "label": "SecondUserMessage",
-          "key": LiveChatField.secondUserMessage,
+          "label": 'UserMessage',
+          "key": LiveChatField.userMessage,
           "type": "text",
           "default": "Empty Name",
           "required": true,
@@ -76,23 +59,11 @@ class DartAppWriteApi {
     }).whenComplete(() => log.wtf('collection created'));
   }
 
-  Future<bool> isLiveChatRoomExists(String liveChatRoom) async {
-    final appWriteDocuments = await database.listDocuments(
-      limit: 1,
-      search: liveChatRoom,
-      collectionId: AppWriteConstants.liveChatscollectionID,
-    );
-    final documentsList = GetDocumentsList.fromJson(appWriteDocuments);
-    if (documentsList.documents.isEmpty) {
-      return false;
-    } else {
-      return true;
-    }
-  }
 
-  Future<Response<dynamic>> getListDocuments(String conversationId) async {
+
+  Future<Response<dynamic>> getListDocuments(String userUid) async {
     return database.listDocuments(
-      search: conversationId,
+      search: userUid,
       collectionId: AppWriteConstants.liveChatscollectionID,
     );
   }
