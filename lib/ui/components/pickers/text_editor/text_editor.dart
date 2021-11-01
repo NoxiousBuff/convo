@@ -1,4 +1,3 @@
-
 import 'package:fast_color_picker/fast_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/fonts.dart';
-import 'package:hint/ui/shared/text_editor/view_model.dart';
+import 'package:hint/ui/components/pickers/text_editor/view_model.dart';
 
 class TextEditor extends StatefulWidget {
   const TextEditor({Key? key}) : super(key: key);

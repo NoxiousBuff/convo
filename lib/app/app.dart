@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/ui/views/recent_chats/recent_chats.dart';
+import 'package:hint/ui/views/home/home_view.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 bool isDarkTheme = false;
@@ -36,6 +34,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           loggedIn = true;
         });
+        user.reload();
         getLogger('MyApp').wtf('user is not null LoggedIn:$loggedIn');
         //getLogger('MyApp').wtf('email:${AuthService.liveUser!.email}');
       } else {
@@ -53,86 +52,13 @@ class _MyAppState extends State<MyApp> {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.transparent,
         statusBarColor: Colors.transparent));
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     //final currentUser = FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: loggedIn ? const RecentChats() : const EmailRegisterView(),
-      themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-      darkTheme: ThemeData(
-        scaffoldBackgroundColor: black,
-        dialogBackgroundColor: darkModeColor,
-        iconTheme: const IconThemeData(color: systemBackground),
-        appBarTheme: const AppBarTheme(
-          iconTheme: IconThemeData(color: systemBackground),
-        ),
-        dialogTheme: DialogTheme(
-            backgroundColor: darkModeColor,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16))),
-        textTheme: TextTheme(
-          headline5: GoogleFonts.roboto(
-            fontSize: 20,
-            color: systemBackground,
-          ),
-          headline6: GoogleFonts.roboto(
-            fontSize: 18,
-            color: systemBackground,
-            fontWeight: FontWeight.bold,
-          ),
-          bodyText1: GoogleFonts.roboto(
-            fontSize: 16,
-            color: systemBackground,
-          ),
-          bodyText2: GoogleFonts.roboto(
-            fontSize: 14,
-            color: systemBackground,
-          ),
-          caption: GoogleFonts.roboto(
-            fontSize: 12,
-            color: inactiveGray,
-          ),
-        ),
-      ),
-      theme: ThemeData(
-        scaffoldBackgroundColor: systemBackground,
-        iconTheme: const IconThemeData(color: black54),
-        dialogBackgroundColor: extraLightBackgroundGray,
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          iconTheme: IconThemeData(color: black54),
-        ),
-        dialogTheme: DialogTheme(
-            backgroundColor: extraLightBackgroundGray,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16))),
-        textTheme: TextTheme(
-          headline5: GoogleFonts.roboto(
-            fontSize: 20,
-            color: darkModeColor,
-          ),
-          headline6: GoogleFonts.roboto(
-            fontSize: 18,
-            color: darkModeColor,
-            fontWeight: FontWeight.bold,
-          ),
-          bodyText1: GoogleFonts.roboto(
-            fontSize: 16,
-            color: darkModeColor,
-          ),
-          bodyText2: GoogleFonts.roboto(
-            fontSize: 14,
-            height: 1.2,
-            color: darkModeColor,
-          ),
-          caption: GoogleFonts.roboto(
-            fontSize: 12,
-            color: inactiveGray,
-          ),
-        ),
-      ),
+      home: loggedIn ? const HomeView() : const EmailRegisterView(),
     );
   }
 }

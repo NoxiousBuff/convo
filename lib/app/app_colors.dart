@@ -46,3 +46,34 @@ List<Color> colors = [
   systemBackground,
   extraLightBackgroundGray,
 ];
+
+class LightAppColors {
+
+  static const Color primary = Color(0xff6750A4);
+  static const Color primaryContainer = Color(0xffEADDFF);
+  static const Color secondary = Color(0xff625B71);
+  static const Color secondaryContainer = Color(0xffE8DEF8);
+  static const Color tertiary = Color(0xff7D5260);
+  static const Color tertiaryContainer = Color(0xffFFD8E4);
+  static const Color surface = Color(0xffFFFBFE);
+  static const Color surfaceVariant = Color(0xffE7E0EC);
+  static const Color background = Color(0xffFFFBFE);
+  static const Color error = Color(0xffB3261E);
+  static const Color errorContainer = Color(0xffF9DEDC);
+  static const Color onPrimary = Color(0xffFFFFFF);
+  static const Color onPrimaryContainer = Color(0xff21005E);
+  static const Color onSecondary = Color(0xffFFFFFF);
+  static const Color onSecondaryContainer = Color(0xff1E192B);
+  static const Color onTertiary = Color(0xffFFFFFF);
+  static const Color onTertiaryContainer = Color(0xff370B1E);
+  static const Color onSurafce = Color(0xff1C1B1F);
+  static const Color onSurfaceVariant = Color(0xff49454E);
+  static const Color onBackground = Color(0xff1C1B1F);
+  static const Color onError = Color(0xffFFFFFF);
+  static const Color onErrorContainer = Color(0xff370B1E);
+  static const Color outline = Color(0xff79747E);
+  static const Color shadow = Color(0xff000000);
+  static const Color inverseSurface = Color(0xff313033);
+  static const Color inverseOnSurface = Color(0xffF4EFF4);
+  static const Color inversePrimary = Color(0xffD0BCFF);
+}

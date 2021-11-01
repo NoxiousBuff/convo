@@ -8,7 +8,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/ui/shared/canvas_painter.dart';
+import 'package:hint/ui/components/pickers/canvas_painter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fast_color_picker/fast_color_picker.dart';
 

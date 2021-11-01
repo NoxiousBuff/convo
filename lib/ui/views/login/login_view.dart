@@ -5,8 +5,8 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/forgot_password/forgot_password_view.dart';
+import 'package:hint/ui/views/home/home_view.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 import 'package:stacked/stacked.dart';
 import 'login_viewmodel.dart';
@@ -101,6 +101,7 @@ class LoginView extends StatelessWidget {
                 },
                 controller: model.emailTech,
                 cursorColor: Colors.blue,
+                autofillHints: const [AutofillHints.email],
                 decoration: InputDecoration(
                   fillColor: CupertinoColors.extraLightBackgroundGray,
                   filled: true,
@@ -126,6 +127,7 @@ class LoginView extends StatelessWidget {
                 },
                 controller: model.passwordTech,
                 cursorColor: Colors.blue,
+                autofillHints: const [AutofillHints.password],
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
                     icon: Icon(model.isPasswordShown
@@ -139,6 +141,7 @@ class LoginView extends StatelessWidget {
                   filled: true,
                   isDense: true,
                   hintText: 'Password',
+                  
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide.none,
@@ -186,7 +189,7 @@ class LoginView extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const ChatListView()));
+                                          const HomeView()));
                             },
                           );
                         },

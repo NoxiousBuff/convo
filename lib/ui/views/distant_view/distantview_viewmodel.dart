@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
@@ -14,9 +16,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DistantViewViewModel extends BaseViewModel {
+
   final log = getLogger('DistantViewModel');
 
-  late final FireUser fireUser;
+  final AuthService _authService = AuthService();
 
   final bool _isUploading = false;
   bool get isUploading => _isUploading;
@@ -46,7 +49,6 @@ class DistantViewViewModel extends BaseViewModel {
         .doc(liveUserUid)
         .get();
     final _fireUser = FireUser.fromFirestore(firestoreUser);
-    fireUser = _fireUser;
     notifyListeners();
     return _fireUser;
   }
@@ -182,4 +184,10 @@ class DistantViewViewModel extends BaseViewModel {
     }
     return false;
   }
+
+  void signOut(BuildContext context) {
+    log.wtf('Signing out');
+    _authService.signOut(context);
+  }
+
 }

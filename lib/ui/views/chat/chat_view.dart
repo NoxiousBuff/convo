@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -22,28 +23,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
 
-// const systemUiOverlays = SystemUiOverlayStyle(
-//   statusBarBrightness: dark,
-//   statusBarIconBrightness: dark,
-//   systemNavigationBarDividerColor: black,
-//   systemNavigationBarColor: Colors.transparent,
-// );
-// getLogger('$systemUiOverlays');
-
 class ChatView extends StatelessWidget {
   final FireUser fireUser;
   final Color randomColor;
   final String conversationId;
-  const ChatView({
+  ChatView({
     Key? key,
     required this.fireUser,
     required this.randomColor,
     required this.conversationId,
   }) : super(key: key);
 
+  final Logger log = getLogger('ChatView');
+
   @override
   build(BuildContext context) {
-    final log = getLogger('ChatView');
     final statusStyle = Theme.of(context)
         .textTheme
         .bodyText2!

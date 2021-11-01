@@ -32,6 +32,7 @@ class EmailRegisterView extends StatelessWidget {
       controller: model.emailTech,
       onChanged: (val) => val.toLowerCase(),
       textCapitalization: TextCapitalization.none,
+      autofillHints: const [AutofillHints.email],
       decoration: InputDecoration(
         fillColor: CupertinoColors.extraLightBackgroundGray,
         filled: true,

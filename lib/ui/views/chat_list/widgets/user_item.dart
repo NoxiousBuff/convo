@@ -11,13 +11,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
-  final Color randomColor;
+  final Widget? trailing;
+  final Widget? subtitle;
   final void Function()? onTap;
   const UserItem(
       {Key? key,
       required this.fireUser,
       required this.onTap,
-      required this.randomColor})
+      this.trailing,
+      this.subtitle
+      })
       : super(key: key);
 
   buildChatListItemPopup({required FireUser fireUser}) {
@@ -110,6 +113,7 @@ class UserItem extends StatelessWidget {
               bottomLeft: Radius.circular(20),
             ),
           ),
+          trailing: trailing ?? const SizedBox.shrink(),
           leading: GestureDetector(
             onTap: () {
               showCupertinoModalBottomSheet(
@@ -122,14 +126,7 @@ class UserItem extends StatelessWidget {
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      randomColor.withAlpha(30),
-                      randomColor.withAlpha(50),
-                    ],
-                    focal: Alignment.topLeft,
-                    radius: 0.8,
-                  ),
+                  color: Colors.blue.shade100,  
                 ),
                 height: 56.0,
                 width: 56.0,
@@ -155,7 +152,7 @@ class UserItem extends StatelessWidget {
               ),
             ),
           ),
-          subtitle: Text(
+          subtitle: subtitle ?? Text(
             fireUser.email,
             style: TextStyle(
               color: darkMode ? systemBackground : black,

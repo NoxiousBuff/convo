@@ -4,18 +4,21 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-FirestoreApi firestoreApi = FirestoreApi();
+final FirestoreApi firestoreApi = FirestoreApi();
 
 class FirestoreApi {
   final log = getLogger('FirestoreApi');
+
   static final FirebaseAuth auth = FirebaseAuth.instance;
-  static final String liveUserUid = auth.currentUser!.uid;
+
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   static const url =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+
   static const String kDefaultPhotoUrl = url;
 
-  CollectionReference usersCollection =
+  final CollectionReference usersCollection =
       _firestore.collection(usersFirestoreKey);
 
   User? getCurrentUser() => auth.currentUser;

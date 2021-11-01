@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:dio/dio.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -15,7 +13,7 @@ class DioApi {
         .download(mediaUrl, savePath, deleteOnError: true,
             onReceiveProgress: (downloaded, total) {
           final progress = ((downloaded / total) * 100).toInt();
-          print('Downloading Media Progress $progress');
+          log.i('Downloading Media Progress $progress');
           
         })
         .then((value) => getLogger('DioApi').i(

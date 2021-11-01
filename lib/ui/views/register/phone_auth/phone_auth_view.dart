@@ -87,6 +87,7 @@ class PhoneAuthView extends StatelessWidget {
                         cursorColor: Colors.blue,
                         controller: model.phoneTech,
                         keyboardType: TextInputType.number,
+                        autofillHints: const [AutofillHints.telephoneNumber],
                         decoration: InputDecoration(
                           fillColor: CupertinoColors.extraLightBackgroundGray,
                           filled: true,

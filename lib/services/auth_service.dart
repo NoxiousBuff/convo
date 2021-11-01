@@ -88,16 +88,19 @@ class AuthService {
     }
   }
 
-  Future<void> signOut(BuildContext context) async {
+  signOut(BuildContext context,{ Function? onSignOut }) async {
     await _auth.signOut();
     getLogger('AuthMethod').i('The user has been signed out successfully.');
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const EmailRegisterView(),
-      ),
-    );
-  }
+    if(onSignOut != null) {
+      onSignOut();
+    } else {
+      getLogger('AuthService').wtf('User has been loggeed out.');
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute<void>(
+                builder: (BuildContext context) => const EmailRegisterView()),
+            (route) => false);
+  }}
 
   Future<void> forgotPassword(String email,
       {Function? onComplete, Function? onError}) async {

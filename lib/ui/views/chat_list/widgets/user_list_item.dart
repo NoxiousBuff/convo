@@ -8,7 +8,6 @@ import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/last_message/last_message_container.dart';
 
-
 class UserListItem extends StatelessWidget {
   UserListItem({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
@@ -41,12 +40,6 @@ class UserListItem extends StatelessWidget {
               conversationId: id,
               randomColor: randomColor,
             );
-            // child = UserItem(
-            //     fireUser: fireUser,
-            //     randomColor: randomColor,
-            //     onTap: () {
-            //       chatService.startConversation(context, fireUser, randomColor);
-            //     });
           }
 
           return AnimatedSwitcher(

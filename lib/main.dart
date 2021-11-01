@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
@@ -12,6 +10,8 @@ import 'package:hive/hive.dart';
 import 'app/app.dart';
 import 'dart:io';
 
+import 'app/app_logger.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.initialize();
@@ -20,7 +20,7 @@ Future<void> main() async {
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
   HiveHelper().initialiseHive();
-  await Hive.openBox(appSettingsBoxName).whenComplete(() => print('open hive box'));
+  await Hive.openBox(appSettingsBoxName).whenComplete(() => getLogger('main').wtf('open hive box'));
 
   runApp(const ProviderScope(child: MyApp()));
 }

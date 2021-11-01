@@ -16,7 +16,7 @@ class LastMessageViewModel extends StreamViewModel<QuerySnapshot> {
     return FirebaseFirestore.instance
         .collection(convoFirestorekey)
         .doc(conversationId)
-        .collection(chatsFirestoreKey)
+        .collection(chatsFirestoreKey).orderBy(MessageField.timestamp, descending: true)
         .snapshots();
   }
 
