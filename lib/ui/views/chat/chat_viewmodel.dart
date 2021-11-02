@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_print
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
@@ -7,6 +6,7 @@ import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/dart_appwrite.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/models/live_chatroom.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -60,7 +60,7 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   // creating live chat user
   Future createLiveChatUser({
     required BuildContext context,
-    required String conversationId,
+    required GetDocumentsList receiverUserDocs,
   }) async {
     log.wtf('Creating Live ChatRoom User');
     await AppWriteApi.instance.createLiveChatUser(
@@ -71,17 +71,57 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
     final docs = await DartAppWriteApi.instance
         .getListDocuments(FirestoreApi.liveUserUid);
     final list = GetDocumentsList.fromJson(docs);
-    log.wtf('List:$list');
+    log.wtf('List:${list.documents.first}');
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => LiveChat(
-          documentsList: list,
+          liverUserDocs: list,
           fireUser: fireUser,
-          conversationId: conversationId,
+          receiverUserDocs: receiverUserDocs,
         ),
       ),
     );
+  }
+
+  Future enterInLiverChat(BuildContext context) async {
+    setBusy(true);
+    String liveUserId = FirestoreApi.liveUserUid;
+    final dartAppwrite = DartAppWriteApi.instance;
+    final liveUserDocs = await dartAppwrite.getListDocuments(liveUserId);
+    final receiverUserDocs = await dartAppwrite.getListDocuments(fireUser.id);
+    final liveUserList = GetDocumentsList.fromJson(liveUserDocs);
+    final receiverUserList = GetDocumentsList.fromJson(receiverUserDocs);
+
+    bool isLiveUserEmpty = liveUserList.documents.isEmpty;
+
+    if (!isLiveUserEmpty) {
+      log.wtf(' LiveChatUser Already Created First Live Chat');
+      final liveUSerDoc = liveUserList.documents.first;
+      final liveChatUserDoc = liveUSerDoc.cast<String, dynamic>();
+      log.wtf('LiveUserDoc:${LiveChatUser.fromJson(liveChatUserDoc)}');
+
+      final receiverUserDoc = receiverUserList.documents.first;
+      final receiverDoc = receiverUserDoc.cast<String, dynamic>();
+      log.wtf('ReceiverUserDoc:${LiveChatUser.fromJson(receiverDoc)}');
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LiveChat(
+            fireUser: fireUser,
+            liverUserDocs: liveUserList,
+            receiverUserDocs: receiverUserList,
+          ),
+        ),
+      );
+    } else {
+      await createLiveChatUser(
+        context: context,
+        receiverUserDocs: receiverUserList,
+      );
+    }
+    setBusy(false);
   }
 
   // For checking this conversation collection is empty or not.

@@ -40,22 +40,21 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
     );
   }
 
-  late OTPTextEditController controller;
+  late OTPTextEditController controller = OTPTextEditController(codeLength: 6);
 
   final scaffoldKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+
     OTPInteractor.getAppSignature()
-        //ignore: avoid_print
-        .then((value) => print('signature - $value'));
+        .then((value) => log.wtf('signature - $value'));
     controller = OTPTextEditController(
       codeLength: 6,
       onCodeReceive: (code) {
         log.wtf('Your Application receive code - $code');
         setState(() {
-          controller.text = code;
           getCode = code;
         });
       },
@@ -68,6 +67,17 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
   }
 
   @override
+  void didChangeDependencies() {
+    controller.addListener(() {
+      setState(() {
+        controller.text = getCode;
+      });
+    });
+
+    super.didChangeDependencies();
+  }
+
+  @override
   Future<void> dispose() async {
     await controller.stopListen();
     super.dispose();
@@ -76,7 +86,7 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
   @override
   Widget build(BuildContext context) {
     final createdUser = widget.createdUser;
-    
+
     final log = getLogger('VerifyPhoneView');
     return ViewModelBuilder<VerifyPhone>.reactive(
       viewModelBuilder: () => VerifyPhone(),

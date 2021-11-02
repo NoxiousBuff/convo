@@ -37,13 +37,21 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void didChangeDependencies() {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user != null) {
-        setState(() {
-          loggedIn = true;
-        });
-        log.wtf('user is not null LoggedIn:$loggedIn');
-        log.wtf('email:${AuthService.liveUser!.email}');
+        final firestoreUser = await FirebaseFirestore.instance
+            .collection(usersFirestoreKey)
+            .doc(user.uid)
+            .get();
+        if (firestoreUser.exists) {
+          setState(() {
+            loggedIn = true;
+          });
+          log.wtf('user is not null LoggedIn:$loggedIn');
+          log.wtf('email:${AuthService.liveUser!.email}');
+        } else {
+          log.w('User is not created in firestore');
+        }
       } else {
         setState(() {
           loggedIn = false;
@@ -81,7 +89,6 @@ class _MyAppState extends State<MyApp> {
         statusBarColor: Colors.transparent));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       home: loggedIn ? const RecentChats() : const EmailRegisterView(),
       themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       darkTheme: ThemeData(

@@ -36,6 +36,7 @@ class EmailRegisterViewModel extends BaseViewModel {
       log.e(e);
     });
     final user = userCredential.user;
+    if (user != null && !user.emailVerified) await user.sendEmailVerification();
     if (user != null && user.emailVerified) {
       await user.updatePhotoURL(AuthService.kDefaultPhotoUrl);
       user.sendEmailVerification().catchError((e) {

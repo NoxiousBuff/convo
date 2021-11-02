@@ -27,15 +27,16 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
   }
 
   Future<void> setStatus({required String status}) async {
     await firestoreApi
         .updateUser(
-            uid: FirestoreApi.liveUserUid,
             updateProperty: status,
-            property: UserField.status)
+            property: UserField.status,
+            uid: FirestoreApi.liveUserUid)
         .catchError((e) {
       log.e('setStatus:$e');
     });
@@ -45,9 +46,16 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       setStatus(status: "Online");
+      log.wtf('status: Online');
     } else {
       setStatus(status: "Offline");
+      log.wtf('status: Offline');
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Widget buttonWidget({
@@ -110,26 +118,12 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
         } else {
           return const CircularProgressIndicator();
         }
-
-        // return userResults.isNotEmpty
-        //     ? ImplicitlyAnimatedReorderableList<UserListItem>(
-        //         items: userResults,
-        //         itemBuilder: (context, animationIndex, animation, index) {},
-        //         areItemsTheSame: (a, b) => a.userUid == b.userUid,
-        //         onReorderFinished: (a, x, y, userResultsList) {
-        //           return ;
-        //         },
-        //       )
-        //     : const Center(
-        //         child: Text('fbdjskfbjfdsbjxdbnvfbhsdjvkb'),
-        //       );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    //final log = getLogger('RecentChats');
     return ViewModelBuilder<RecentChatsViewModel>.reactive(
       viewModelBuilder: () => RecentChatsViewModel(),
       onModelReady: (model) async {
@@ -201,16 +195,19 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
           ),
           body: Column(
             children: [
-              // TextButton(
-              //   onPressed: () async {
-              //     await DartAppWriteApi.instance.createCollection();
-              //   },
-              //   child: const Text('Create Collection'),
-              // ),
+              TextButton(
+                  onPressed: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const MediaPickerDemo(),
+                    //   ),
+                    // );
+                  },
+                  child: const Text('Media Picker Demo')),
               buildUserContact(model),
             ],
           ),
-          
         );
       },
     );

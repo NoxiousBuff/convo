@@ -1,3 +1,4 @@
+import 'package:hint/app/app_logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +11,45 @@ import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
 import 'package:hint/ui/views/register/username/username_register_viewmodel.dart';
 
-class UsernameRegisterView extends StatelessWidget {
+class UsernameRegisterView extends StatefulWidget {
   final String email;
-  final User? fireuser;
+  final User? fireUser;
   final String password;
   const UsernameRegisterView(
       {Key? key,
       required this.email,
       required this.password,
-      required this.fireuser})
+      required this.fireUser})
       : super(key: key);
+
+  @override
+  State<UsernameRegisterView> createState() => _UsernameRegisterViewState();
+}
+
+class _UsernameRegisterViewState extends State<UsernameRegisterView>
+    with WidgetsBindingObserver {
+  bool isEmailVerfied = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addObserver(this);
+    super.initState();
+  }
+
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     final user = widget.fireUser;
+  //     if (user != null && user.emailVerified) {
+  //       setState(() {
+  //         isEmailVerfied = user.emailVerified;
+  //       });
+  //     }
+  //     getLogger('UsernameRegistrationView')
+  //         .wtf('isEmailVerfied:$isEmailVerfied');
+  //   } else {
+  //     getLogger('App is not resumed');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +61,6 @@ class UsernameRegisterView extends StatelessWidget {
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: systemBackground,
-          // ignore: todo
-          //TODO: Apply for dark theme
           statusBarIconBrightness: Brightness.dark,
           systemNavigationBarColor: Colors.white,
           systemNavigationBarIconBrightness: Brightness.dark,
@@ -66,12 +94,16 @@ class UsernameRegisterView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'choose a username name for you.',
-                        style: GoogleFonts.openSans(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w600),
+                      SizedBox(
+                        width: screenWidthPercentage(context, percentage: 0.6),
+                        child: Text(
+                          'we send a verification link to you provided email, you must verify it',
+                          maxLines: 2,
+                          style: GoogleFonts.openSans(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ),
@@ -154,21 +186,32 @@ class UsernameRegisterView extends StatelessWidget {
                                 );
                               } else {
                                 if (model.key.currentState!.validate()) {
-                                  Navigator.push(
-                                    context,
-                                    cupertinoTransition(
-                                      enterTo: PhoneAuthView(
-                                        email: email,
-                                        createdUser: fireuser,
-                                        username: model.usernameTech.text,
+                                  final user = widget.fireUser;
+
+                                  if (user != null) {
+                                    getLogger('usernameview')
+                                        .wtf(user.emailVerified);
+                                    model.createAppWriteUser(
+                                      context,
+                                      username: username,
+                                      email: widget.email,
+                                      password: widget.password,
+                                      fireUser: widget.fireUser,
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor:
+                                            extraLightBackgroundGray,
+                                        content: Text(
+                                          'You didn\'t verify your email',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2,
+                                        ),
                                       ),
-                                      exitFrom: UsernameRegisterView(
-                                        email: email,
-                                        fireuser: fireuser,
-                                        password: password,
-                                      ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
                               }
                             }

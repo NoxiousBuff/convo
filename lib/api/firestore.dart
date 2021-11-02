@@ -36,10 +36,8 @@ class FirestoreApi {
     return usersCollection
         .doc(uid)
         .update({property: updateProperty})
-        .then((value) => getLogger('FirestoreApi')
-            .wtf("$property is updated to $updateProperty"))
-        .catchError((error) =>
-            getLogger('FirestoreApi').e("Failed to update user: $error"));
+        .then((value) => log.wtf("$property is updated to $updateProperty"))
+        .catchError((error) => log.e("Failed to update user: $error"));
   }
 
   Future<void> createUserInFirebase({

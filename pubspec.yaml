@@ -66,15 +66,12 @@ dependencies:
   sensors_plus: ^1.0.1
   path_provider: ^2.0.2
   metadata_fetch: ^0.4.1
-  image_picker: ^0.8.4+3
+  image_picker: ^0.8.4+4
   flutter_offline: ^2.0.0
-  json_annotation: ^4.1.0
   string_validator: ^0.3.0
   contacts_service: ^0.6.1
   shared_preferences: ^2.0.6
   permission_handler: ^8.0.0+2
-  flutter_libphonenumber: ^1.2.1
-  intl_phone_number_input: ^0.7.0+2
   
 
 

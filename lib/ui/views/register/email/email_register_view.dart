@@ -245,7 +245,7 @@ class EmailRegisterView extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           UsernameRegisterView(
-                                        fireuser: user,
+                                        fireUser: user,
                                         email: model.emailTech.text,
                                         password: model.passwordController.text,
                                       ),

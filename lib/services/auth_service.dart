@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/pods/genral_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/constants/message_string.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 String verificationCode = '';
 
@@ -89,26 +86,7 @@ class AuthService {
     }
   }
 
-  Future<void> signOut(BuildContext context) async {
-    await firestoreApi.updateUser(
-      uid: FirestoreApi.liveUserUid,
-      property: UserField.status,
-      updateProperty: 'Offline',
-    );
-    await _auth.signOut().catchError((e) {
-      log.e('Firestore Signout:$e');
-    });
-
-    log.i('The user has been signed out successfully.');
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const EmailRegisterView(),
-      ),
-    );
-  }
-
-  Future<void> forgotPassword(String email,
+   Future<void> forgotPassword(String email,
       {Function? onComplete, Function? onError}) async {
     await _auth.sendPasswordResetEmail(email: email).then((value) {
       if (onComplete != null) onComplete();

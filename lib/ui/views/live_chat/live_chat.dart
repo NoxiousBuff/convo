@@ -1,27 +1,27 @@
-import 'package:hint/api/dart_appwrite.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/models/live_chatroom.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
 
 class LiveChat extends StatefulWidget {
   final FireUser fireUser;
-  final String conversationId;
-  final GetDocumentsList documentsList;
+  final GetDocumentsList liverUserDocs;
+  final GetDocumentsList receiverUserDocs;
   const LiveChat({
     Key? key,
-    required this.documentsList,
-    required this.conversationId,
     required this.fireUser,
+    required this.liverUserDocs,
+    required this.receiverUserDocs,
   }) : super(key: key);
 
   @override
@@ -29,58 +29,86 @@ class LiveChat extends StatefulWidget {
 }
 
 class _LiveChatState extends State<LiveChat> {
-  late LiveChatUser _receiverLiveChatUser;
+  late LiveChatUser _liveUser;
+  LiveChatUser? _receiverUser;
   final log = getLogger('LiveChat');
+  bool isLiveChatRoomIdMatched = false;
   late RealtimeSubscription subscription;
   TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
-    getReceiverLiveChatUser(widget.documentsList);
-    setState(() {
-      subscription = AppWriteApi.instance
-          .subscribe(['documents.${_receiverLiveChatUser.documentID}']);
-    });
+    getReceiverUser();
+    getLiveUser();
+    final receiverUser = _receiverUser;
+    if (receiverUser != null) {
+      setState(() {
+        subscription = AppWriteApi.instance
+            .subscribe(['documents.${receiverUser.documentID}']);
+      });
+    } else {
+      log.wtf('receiver user is null now !!');
+    }
     super.initState();
   }
 
-  LiveChatUser getReceiverLiveChatUser(GetDocumentsList docs) {
-    final document = docs.documents.first;
+  LiveChatUser getLiveUser() {
+    final document = widget.liverUserDocs.documents.first;
     final doc = document.cast<String, dynamic>();
     final user = LiveChatUser.fromJson(doc);
 
     setState(() {
-      _receiverLiveChatUser = user;
+      _liveUser = user;
     });
-    return _receiverLiveChatUser;
+    return _liveUser;
   }
 
-  Future getSenderLiveChatUser(GetDocumentsList list) async {
-    final liverUserId = FirestoreApi.kDefaultPhotoUrl;
-    final dartAppwrite = DartAppWriteApi.instance;
-    var chats = await dartAppwrite.getListDocuments(liverUserId);
-    var liveChatsList = GetDocumentsList.fromJson(chats);
+  Future getReceiverUser() async {
+    final document = widget.receiverUserDocs.documents.first;
+    final doc = document.cast<String, dynamic>();
+    final receiverUser = LiveChatUser.fromJson(doc);
+
+    setState(() {
+      _receiverUser = receiverUser;
+    });
+
+    // String fireUserID = widget.fireUser.id;
+    // final dartAppwrite = DartAppWriteApi.instance;
+    // final documentsList = await dartAppwrite.getListDocuments(fireUserID);
+    // final fromJsonList = GetDocumentsList.fromJson(documentsList);
+    // if (fromJsonList.documents.isNotEmpty) {
+    //   final receiverDocument = fromJsonList.documents.first;
+    //   final mapData = receiverDocument.cast<String, dynamic>();
+    //   final receiverUser = LiveChatUser.fromJson(mapData);
+
+    //   setState(() {
+    //     _receiverUser = receiverUser;
+    //   });
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<LiveChatViewModel>.reactive(
       viewModelBuilder: () => LiveChatViewModel(),
-      onModelReady: (model) {
-        model.updateMessage(
-            documentId: _receiverLiveChatUser.documentID,
-            collectionId: _receiverLiveChatUser.collectionID,
+      onModelReady: (model) async {
+        String fireUserId = widget.fireUser.id;
+        String liveUserId = FirestoreApi.liveUserUid;
+        final liveChatId =
+            chatService.getConversationId(fireUserId, liveUserId);
+        await model.updateMessage(
+            documentId: _liveUser.documentID,
+            collectionId: _liveUser.collectionID,
             data: {
               LiveChatField.userMessage: ' ',
-              LiveChatField.liveChatRoom: widget.conversationId,
+              LiveChatField.liveChatRoom: liveChatId,
             });
-        model.getSenderLiveChatUser(widget.documentsList);
       },
       onDispose: (model) {
         subscription.close;
         model.updateMessage(
-            documentId: _receiverLiveChatUser.documentID,
-            collectionId: _receiverLiveChatUser.collectionID,
+            documentId: _liveUser.documentID,
+            collectionId: _liveUser.collectionID,
             data: {
               LiveChatField.userMessage: ' ',
               LiveChatField.liveChatRoom: 'null',
@@ -148,8 +176,8 @@ class _LiveChatState extends State<LiveChat> {
                       controller: controller,
                       onChanged: (val) {
                         model.updateMessage(
-                            documentId: _receiverLiveChatUser.documentID,
-                            collectionId: _receiverLiveChatUser.collectionID,
+                            documentId: _liveUser.documentID,
+                            collectionId: _liveUser.collectionID,
                             data: {
                               LiveChatField.userMessage: val,
                             });

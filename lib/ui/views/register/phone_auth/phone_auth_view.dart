@@ -41,7 +41,7 @@ class PhoneAuthView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Text(
-                  'we send a verification link to provided email make sure you verify it.',
+                  'provide a valid phone number that you want to register',
                   textAlign: TextAlign.center,
                   style: Theme.of(context)
                       .textTheme

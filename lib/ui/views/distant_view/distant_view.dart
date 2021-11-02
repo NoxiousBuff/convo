@@ -5,13 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/help_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/views/storage_media.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/views/privacy/privacy.dart';
@@ -243,12 +241,36 @@ class DistantView extends StatelessWidget {
                           context: context,
                           text: 'Logout',
                           icon: Icons.logout_outlined,
-                          onTap: () async {
-                            await AppWriteApi.instance.logout();
-                            await authService.signOut(context).catchError((e) {
-                              log.e('signOutError:$e');
-                            });
+                          onTap: () {
+                            model
+                                .signOut(context)
+                                .catchError((e) => log.e('signOutError:$e'))
+                                .onError(
+                                  (error, stackTrace) =>
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                    SnackBar(
+                                      elevation: 8.0,
+                                      backgroundColor: inactiveGray,
+                                      content: Text(
+                                        'Unable To Log Out',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2,
+                                      ),
+                                    ),
+                                  ),
+                                );
                           },
+                          trailing: model.isBusy
+                              ? const SizedBox(
+                                  height: 17,
+                                  width: 17,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 1.7,
+                                      valueColor:
+                                          AlwaysStoppedAnimation(activeBlue)))
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     ),

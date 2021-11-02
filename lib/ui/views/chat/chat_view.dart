@@ -9,7 +9,6 @@ import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/api/dart_appwrite.dart';
 import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -18,8 +17,6 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
-import 'package:hint/ui/views/live_chat/live_chat.dart';
-import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
@@ -188,35 +185,22 @@ class ChatView extends StatelessWidget {
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 20, 20),
                       child: TextButton(
-                        onPressed: () async {
-                          String id = fireUser.id;
-                          final dartAppwrite = DartAppWriteApi.instance;
-                          var chats = await dartAppwrite.getListDocuments(id);
-                          var liveChatsList = GetDocumentsList.fromJson(chats);
-                          if (liveChatsList.documents.isNotEmpty) {
-                            log.wtf('UsersLiveChat:$chats');
-                            log.wtf('User already created first chat');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LiveChat(
-                                  fireUser: fireUser,
-                                  documentsList: liveChatsList,
-                                  conversationId: conversationId,
-                                ),
-                              ),
-                            );
-                          } else {
-                            await model.createLiveChatUser(
-                              context: context,
-                              conversationId: conversationId,
-                            );
-                          }
+                        onPressed: () {
+                          model.enterInLiverChat(context);
                         },
-                        child: Text(
-                          'Live Chat',
-                          style: Theme.of(context).textTheme.caption,
-                        ),
+                        child: model.isBusy
+                            ? const SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 1.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        activeBlue)),
+                              )
+                            : Text(
+                                'Live Chat',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
                       ),
                     )
                   ],

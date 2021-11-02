@@ -3,19 +3,24 @@ import 'package:hint/api/dio.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/appwrite_api.dart';
+import 'package:hint/ui/views/login_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DistantViewViewModel extends BaseViewModel {
-  final log = getLogger('DistantViewModel');
-
-
   final bool _isUploading = false;
+  final _auth = FirebaseAuth.instance;
   bool get isUploading => _isUploading;
+  final log = getLogger('DistantViewModel');
 
   /// Clicking Image from camera
   Future<File?> pickImage(ImageSource imageSource) async {
@@ -34,6 +39,22 @@ class DistantViewViewModel extends BaseViewModel {
   void themeChanger(bool value) {
     isDarkTheme = value;
     notifyListeners();
+  }
+
+  Future<void> signOut(BuildContext context) async {
+    setBusy(true);
+    await firestoreApi.updateUser(
+      updateProperty: 'Offline',
+      property: UserField.status,
+      uid: FirestoreApi.liveUserUid,
+    );
+    await AppWriteApi.instance.logout();
+
+    await _auth.signOut().catchError((e) => log.e('Firestore Signout:$e'));
+    setBusy(false);
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const LoginView()));
   }
 
   /// uploading a single file into the firebase storage and get progress

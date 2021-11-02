@@ -3,7 +3,6 @@ import 'package:tcard/tcard.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/pods/genral_code.dart';
@@ -11,9 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
 List<String> get activityNames => _activityNames;
@@ -51,11 +48,23 @@ class _InterestsViewState extends State<InterestsView> {
     final createdUser = widget.createdUser;
     if (createdUser != null) {
       await createdUser.updateDisplayName(username);
-      log.wtf('username:${AuthService.liveUser!.displayName}');
       await createdUser.updatePhoneNumber(pod.phoneAuthCredential!);
-      log.wtf('phoneNumber:${AuthService.liveUser!.phoneNumber}');
-      log.wtf('photoURL:${AuthService.liveUser!.photoURL}');
     }
+  }
+
+  @override
+  void didChangeDependencies() async {
+    await updateCurrentUser();
+    final liveUser = AuthService.liveUser;
+    if (liveUser != null) {
+      log.wtf('username:${liveUser.displayName}');
+      log.wtf('phoneNumber:${liveUser.phoneNumber}');
+      log.wtf('photoURL:${liveUser.photoURL}');
+    } else {
+      log.w('Live User is null now !!');
+    }
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -119,26 +128,24 @@ class _InterestsViewState extends State<InterestsView> {
               verticalSpaceLarge,
               CupertinoButton(
                 color: activeBlue,
-                onPressed: () async {
+                onPressed: () {
                   if (model.length() > 5) {
-                    await firestoreApi
-                        .createUserInFirebase(
-                            user: widget.createdUser!,
-                            username: widget.username,
-                            phoneNumber: widget.phoneNumber,
-                            interests: model.selectedInterests,
-                            countryPhoneCode: widget.countryPhoneCode)
-                        .then((value) => log.wtf('user created in firestore'));
-                    Navigator.push(
+                    model.createUserInDataBase(
                       context,
-                      cupertinoTransition(
-                        enterTo: const RecentChats(),
-                        exitFrom: InterestsView(
-                          email: widget.email,
-                          username: widget.username,
-                          phoneNumber: widget.phoneNumber,
-                          createdUser: widget.createdUser,
-                          countryPhoneCode: widget.countryPhoneCode,
+                      email: widget.email,
+                      username: widget.username,
+                      createdUser: widget.createdUser,
+                      phoneNumber: widget.phoneNumber,
+                      countryPhoneCode: widget.countryPhoneCode,
+                      selectedInterests: model.selectedInterests,
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: extraLightBackgroundGray,
+                        content: Text(
+                          'You must choose at least 5 interests',
+                          style: Theme.of(context).textTheme.bodyText2,
                         ),
                       ),
                     );
