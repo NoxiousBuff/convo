@@ -2,8 +2,8 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/message_string.dart';
@@ -311,7 +311,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.image:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = imagesMemoryHiveBox(conversationId);
+            final hiveBox = hiveApi.imagesMemoryHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -355,7 +355,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.video:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = videoThumbnailsHiveBox(conversationId);
+            final hiveBox = hiveApi.videoThumbnailsHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -403,7 +403,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.meme:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = videoThumbnailsHiveBox(conversationId);
+            final hiveBox = hiveApi.videoThumbnailsHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -452,7 +452,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.canvasImage:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = imagesMemoryHiveBox(conversationId);
+            final hiveBox = hiveApi.imagesMemoryHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(
@@ -493,7 +493,7 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.pixaBayImage:
           {
             final messageUid = replyMessage[ReplyField.replyMessageUid];
-            final hiveBox = imagesMemoryHiveBox(conversationId);
+            final hiveBox = hiveApi.imagesMemoryHiveBox(conversationId);
             return Container(
               margin: const EdgeInsets.only(bottom: 4),
               constraints: BoxConstraints(

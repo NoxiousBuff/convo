@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:hint/api/hive_helper.dart';
-import 'package:hint/app/app_widget.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/ui/components/media/media_bubble/media_bubble.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +99,7 @@ class CanvasImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final log = getLogger('CanvasImage');
     final messageUid = message.messageUid;
-    var hiveBox = chatRoomMediaHiveBox(conversationId);
+    var hiveBox = hiveApi.chatRoomMediaHiveBox(conversationId);
     return ViewModelBuilder<CanvasImageViewModel>.reactive(
       viewModelBuilder: () => CanvasImageViewModel(),
       onModelReady: (model) async {

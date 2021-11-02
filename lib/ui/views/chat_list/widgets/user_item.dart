@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -102,9 +102,9 @@ class UserItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Box>(
-      valueListenable: appSettings.listenable(),
+      valueListenable: hiveApi.appSettings.listenable(),
       builder: (context, box, child) {
-        bool darkMode = box.get(darkModeKey,defaultValue: false);
+        bool darkMode = box.get(HiveApi.darkModeKey,defaultValue: false);
         return ListTile(
           onTap: onTap,
           shape: const RoundedRectangleBorder(

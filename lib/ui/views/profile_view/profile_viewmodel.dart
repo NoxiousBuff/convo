@@ -37,7 +37,7 @@ class ProfileViewModel extends BaseViewModel {
         .get()
         .then((query) {
       query.reference.update({
-        UserField.blockedUsers: FieldValue.arrayRemove(fireUserId),
+        FireUserField.blockedUsers: FieldValue.arrayRemove(fireUserId),
       });
     });
   }
@@ -51,17 +51,17 @@ class ProfileViewModel extends BaseViewModel {
         .doc(currentUserID);
 
     final docSnap = await usercollection.get();
-    List queue = docSnap.get(UserField.blockedUsers);
+    List queue = docSnap.get(FireUserField.blockedUsers);
 
     if (queue.contains(fireUserId) == true) {
       usercollection.update({
-        UserField.blockedUsers: FieldValue.arrayRemove([fireUserId])
+        FireUserField.blockedUsers: FieldValue.arrayRemove([fireUserId])
       });
       chatViewModel.iBlockThisUserValue(false);
       log.wtf('User is unblock now !!');
     } else {
       usercollection.update({
-        UserField.blockedUsers: FieldValue.arrayUnion([fireUserId])
+        FireUserField.blockedUsers: FieldValue.arrayUnion([fireUserId])
       });
       chatViewModel.iBlockThisUserValue(true);
       log.wtf('This contact is block now !!');

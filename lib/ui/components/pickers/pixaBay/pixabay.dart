@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
@@ -159,7 +159,7 @@ class PixaBay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final log = getLogger('PixaBay');
-    final imagesBox = imagesMemoryHiveBox(conversationId);
+    final imagesBox = hiveApi.imagesMemoryHiveBox(conversationId);
 
     const margin = EdgeInsets.fromLTRB(8, 0, 8, 8);
     final height = screenHeightPercentage(context, percentage: 0.4);

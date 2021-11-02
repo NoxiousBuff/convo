@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:hint/app/app_logger.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,7 +34,6 @@ class _HintVideoState extends State<HintVideo> {
   bool hiveContainsPath = false;
   late Uint8List videoThumbnail;
   PathHelper pathHelper = PathHelper();
-  HiveHelper hiveHelper = HiveHelper();
   DioApi dioApi = DioApi();
   late VideoPlayerController _playerController;
   Future<void>? _initialiseVideoPlayer;

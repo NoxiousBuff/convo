@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/api/path.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
@@ -38,7 +37,6 @@ class _HintImageState extends State<HintImage> {
   DioApi dioApi = DioApi();
   bool hiveContainsPath = false;
   PathHelper pathHelper = PathHelper();
-  HiveHelper hiveHelper = HiveHelper();
 
   @override
   void initState() {

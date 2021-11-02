@@ -2,13 +2,13 @@
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:hint/api/hive.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
@@ -165,8 +165,8 @@ class TextFieldViewModel extends BaseViewModel {
           final mime = lookupMimeType(path);
           final type = mime!.split('/').first;
 
-          final videoBox = videoThumbnailsHiveBox(boxId);
-          final imagesBox = imagesMemoryHiveBox(boxId);
+          final videoBox = hiveApi.videoThumbnailsHiveBox(boxId);
+          final imagesBox = hiveApi.imagesMemoryHiveBox(boxId);
           if (type == videoType) {
             Uint8List? thumbnail = await VideoThumbnail.thumbnailData(
               video: path,

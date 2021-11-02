@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'meme_viewmodel.dart';
@@ -112,7 +112,7 @@ class Memes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final log = getLogger('MemeView');
-    final hiveBox = videoThumbnailsHiveBox(conversationId);
+    final hiveBox = hiveApi.videoThumbnailsHiveBox(conversationId);
     final height = screenHeightPercentage(context, percentage: 0.05);
     const margin = EdgeInsets.symmetric(vertical: 10, horizontal: 20);
     final gifHeight = screenHeightPercentage(context, percentage: 0.4);

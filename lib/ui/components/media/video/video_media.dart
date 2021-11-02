@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_widget.dart';
+import 'package:hint/ui/components/media/media_bubble/media_bubble.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -105,7 +105,7 @@ class VideoMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hiveBox = thumbnailsPathHiveBox(conversationId);
+    final hiveBox = hiveApi.thumbnailsPathHiveBox(conversationId);
     return ViewModelBuilder<VideoViewModel>.reactive(
       viewModelBuilder: () => VideoViewModel(),
       onModelReady: (model) async {

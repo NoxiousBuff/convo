@@ -1,3 +1,4 @@
+import 'package:hint/api/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:timeago/timeago.dart' as time;
@@ -59,16 +59,16 @@ class ChatView extends StatelessWidget {
           log.wtf('userBlockMe:${model.userBlockMe}');
         },
         onDispose: (model) async {
-          if (urlDataHiveBox(conversationId).isOpen) {
-            await urlDataHiveBox(conversationId).close();
-          } else if (imagesMemoryHiveBox(conversationId).isOpen) {
-            await imagesMemoryHiveBox(conversationId).close();
-          } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
-            await chatRoomMediaHiveBox(conversationId).close();
-          } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
-            await thumbnailsPathHiveBox(conversationId).close();
-          } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
-            await videoThumbnailsHiveBox(conversationId).close();
+          if (hiveApi.urlDataHiveBox(conversationId).isOpen) {
+            await hiveApi.urlDataHiveBox(conversationId).close();
+          } else if (hiveApi.imagesMemoryHiveBox(conversationId).isOpen) {
+            await hiveApi.imagesMemoryHiveBox(conversationId).close();
+          } else if (hiveApi.chatRoomMediaHiveBox(conversationId).isOpen) {
+            await hiveApi.chatRoomMediaHiveBox(conversationId).close();
+          } else if (hiveApi.thumbnailsPathHiveBox(conversationId).isOpen) {
+            await hiveApi.thumbnailsPathHiveBox(conversationId).close();
+          } else if (hiveApi.videoThumbnailsHiveBox(conversationId).isOpen) {
+            await hiveApi.videoThumbnailsHiveBox(conversationId).close();
           }
           if (await model.hasMessage(conversationId)) {
             await chatService.addToRecentList(fireUser.id);

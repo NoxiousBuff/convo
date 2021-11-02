@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
@@ -18,14 +17,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool loggedIn = false;
-  @override
-  void initState() {
-    bool darkMode = appSettings.get(darkModeKey, defaultValue: false);
-    setState(() {
-      isDarkTheme = darkMode;
-    });
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/pods/genral_code.dart';
+import 'package:hint/pods/verification_pod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';

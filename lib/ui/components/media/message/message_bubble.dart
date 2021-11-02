@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:hint/api/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
@@ -6,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
-import 'package:hint/widgets/swipe_to.dart';
+import 'package:hint/ui/shared/swipe_to.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -61,7 +61,7 @@ class MessageBubble extends StatelessWidget {
     switch (messageType) {
       case MediaType.image:
         {
-          final hiveBox = imagesMemoryHiveBox(conversationId);
+          final hiveBox = hiveApi.imagesMemoryHiveBox(conversationId);
           Uint8List memeoryImage = hiveBox.get(message.messageUid);
           return ImageMedia(
             message: message,
@@ -74,7 +74,7 @@ class MessageBubble extends StatelessWidget {
         }
       case MediaType.video:
         {
-          final hiveBox = videoThumbnailsHiveBox(conversationId);
+          final hiveBox = hiveApi.videoThumbnailsHiveBox(conversationId);
           final thumbnail = hiveBox.get(message.messageUid);
           if (thumbnail != null) {
             return VideoMedia(
@@ -125,7 +125,7 @@ class MessageBubble extends StatelessWidget {
         }
       case MediaType.canvasImage:
         {
-          final hiveBox = imagesMemoryHiveBox(conversationId);
+          final hiveBox = hiveApi.imagesMemoryHiveBox(conversationId);
           final data = hiveBox.get(message.messageUid);
           final imageData = data.cast<int>().toList();
           return CanvasImage(

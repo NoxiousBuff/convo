@@ -18,7 +18,7 @@ class EmojiesView extends StatelessWidget {
       : super(key: key);
 
   final ChatService chatService = ChatService();
-  final hiveBoxName = HiveHelper.hiveBoxEmojies;
+  final hiveBoxName = HiveApi.hiveBoxEmojies;
   final delegate =
       const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4);
 

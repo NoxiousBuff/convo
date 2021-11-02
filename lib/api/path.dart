@@ -11,7 +11,7 @@ class PathHelper {
 
   DioApi dioApi = DioApi();
   Directory? globalDirectory;
-  HiveHelper hiveHelper = HiveHelper();
+  HiveApi hiveApi = HiveApi();
 
   Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {

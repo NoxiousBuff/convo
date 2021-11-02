@@ -50,7 +50,7 @@ class ChatRoomField {
   static const String backgroungImage = 'backgroundImage';
 }
 
-class UserField {
+class FireUserField {
   static const id = 'id';
   static const bio = 'bio';
   static const email = 'email';

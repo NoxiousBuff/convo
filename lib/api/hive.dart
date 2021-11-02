@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'package:hint/api/hive_helper.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hive/hive.dart';
 
-final hiveApi = HiveHelper();
+final hiveApi = HiveApi();
 
-class HiveHelper {
+class HiveApi {
   final log = getLogger('HiveApi');
   static const String retryMessages = 'retryMessages';
   static const String hiveBoxImages = 'ImagesHiveBox';
@@ -17,6 +16,12 @@ class HiveHelper {
   static const String hiveBoxLinkData = 'LinkDataHiveBox';
   static const String hiveBoxMultiMedia = 'MultiMediaHiveBox';
   static const String hiveBoxEmojies = 'EmojiesHiveBox';
+
+  static const String appSettingsBoxName = 'AppSettings';
+  static const String darkModeKey = 'darkMode';
+  static const String blockedUsersKey = 'blockedUsers';
+  static const String chatBackgroundKey = 'chatBackgroundImage';
+
   Future<void> initialiseHive() async {
     await Hive.openBox(appSettingsBoxName);
     await Hive.openBox(retryMessages);
@@ -30,6 +35,36 @@ class HiveHelper {
     await Hive.openBox(hiveBoxMultiMedia);
     await Hive.openBox(hiveBoxEmojies);
   }
+
+  Box urlDataHiveBox(String conversationId) =>
+    Hive.box('URLData[$conversationId]');
+
+  Box imagesMemoryHiveBox(String conversationId) =>
+    Hive.box('ImagesMemory[$conversationId]');
+
+  Box chatRoomMediaHiveBox(String conversationId) =>
+    Hive.box('ChatRoomMedia[$conversationId]');
+
+  Box thumbnailsPathHiveBox(String conversationId) =>
+    Hive.box('ThumbnailsPath[$conversationId]');
+
+  Box videoThumbnailsHiveBox(String conversationId) =>
+    Hive.box('VideoThumbnails[$conversationId]');
+
+  Box appSettings = Hive.box('AppSettings');
+
+// -----------------------------------------------------------------------------
+  String urlData(String conversationId) => 'URLData[$conversationId]';
+
+  String imagesMemory(String conversationId) => 'ImagesMemory[$conversationId]';
+
+  String chatRoomMedia(String conversationId) => 'ChatRoomMedia[$conversationId]';
+
+  String thumbnailsPath(String conversationId) =>
+    'ThumbnailsPath[$conversationId]';
+
+  String videoThumbnails(String conversationId) =>
+    'VideoThumbnails[$conversationId]';
 
   Future<dynamic> getFromHive(String hiveBoxName, dynamic key) async {
     bool doesBoxExist = await Hive.boxExists(hiveBoxName);
@@ -129,4 +164,8 @@ class HiveHelper {
           'Error in opening hive box: $hiveBoxName.This is the following error : $err');
     }
   }
+
+  
+
+
 }

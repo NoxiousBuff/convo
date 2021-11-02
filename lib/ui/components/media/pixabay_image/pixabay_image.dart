@@ -1,9 +1,9 @@
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_widget.dart';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/ui/components/media/media_bubble/media_bubble.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';
@@ -26,7 +26,7 @@ class PixaBayImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final log = getLogger('PixaBayImage');
     final networkImage = message.message[MessageField.mediaURL];
-    var hiveBox = chatRoomMediaHiveBox(conversationId);
+    var hiveBox = hiveApi.chatRoomMediaHiveBox(conversationId);
     return ViewModelBuilder<PixaBayImageViewModel>.reactive(
       viewModelBuilder: () => PixaBayImageViewModel(),
       onModelReady: (model) async {
@@ -45,7 +45,7 @@ class PixaBayImage extends StatelessWidget {
         return mediaBubble(
           context: context,
           isRead: isRead,
-          child: !imagesMemoryHiveBox(conversationId).containsKey(messageUid)
+          child: !hiveApi.imagesMemoryHiveBox(conversationId).containsKey(messageUid)
               ? ExtendedImage(image: NetworkImage(networkImage))
               : ExtendedImage(image: FileImage(File(hiveBox.get(messageUid)))),
         );

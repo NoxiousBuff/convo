@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hint/api/hive.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -285,9 +285,9 @@ class ProfileView extends StatelessWidget {
       void Function()? onTap,
     }) =>
         ValueListenableBuilder<Box>(
-          valueListenable: appSettings.listenable(),
+          valueListenable: hiveApi.appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(HiveApi.darkModeKey);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -317,9 +317,9 @@ class ProfileView extends StatelessWidget {
       void Function()? onTap,
     }) =>
         ValueListenableBuilder<Box>(
-          valueListenable: appSettings.listenable(),
+          valueListenable: hiveApi.appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(HiveApi.darkModeKey);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -354,9 +354,9 @@ class ProfileView extends StatelessWidget {
       void Function()? onTap,
     }) =>
         ValueListenableBuilder<Box>(
-          valueListenable: appSettings.listenable(),
+          valueListenable: hiveApi.appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(HiveApi.darkModeKey);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -404,11 +404,11 @@ class ProfileView extends StatelessWidget {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
       onModelReady: (model) async {
-        await Hive.openBox(urlData(conversationId));
-        await Hive.openBox(imagesMemory(conversationId));
-        await Hive.openBox(chatRoomMedia(conversationId));
-        await Hive.openBox(thumbnailsPath(conversationId));
-        await Hive.openBox(videoThumbnails(conversationId));
+        await Hive.openBox(hiveApi.urlData(conversationId));
+        await Hive.openBox(hiveApi.imagesMemory(conversationId));
+        await Hive.openBox(hiveApi.chatRoomMedia(conversationId));
+        await Hive.openBox(hiveApi.thumbnailsPath(conversationId));
+        await Hive.openBox(hiveApi.videoThumbnails(conversationId));
       },
       builder: (_, viewModel, child) {
         return Scaffold(

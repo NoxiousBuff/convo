@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:hint/api/hive_helper.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
@@ -14,7 +13,6 @@ class ImageViewModel extends BaseViewModel {
 
   DioApi dioApi = DioApi();
   Directory? globalDirectory;
-  HiveHelper hiveHelper = HiveHelper();
 
   Future<void> uploadAndSave(
       {required String filePath,
@@ -52,7 +50,7 @@ class ImageViewModel extends BaseViewModel {
       messageUid: messageUid,
       mediaName: 'IMG-$mediaName.jpeg',
       folderPath: 'Media/Hint Images',
-      hiveBoxName: chatRoomMedia(conversationId),
+      hiveBoxName: hiveApi.chatRoomMedia(conversationId),
     );
   }
 

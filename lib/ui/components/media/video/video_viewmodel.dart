@@ -3,7 +3,6 @@ import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,7 +13,6 @@ class VideoViewModel extends BaseViewModel {
 
   DioApi dioApi = DioApi();
   Directory? globalDirectory;
-  HiveHelper hiveHelper = HiveHelper();
 
   Future<void> uploadAndSave({
     required String filePath,
@@ -85,7 +83,7 @@ class VideoViewModel extends BaseViewModel {
       if (thumbnail != null) {
         final thumbnailPath =
             await File(savePath).writeAsBytes(thumbnail.toList());
-        final hiveBox = thumbnailsPathHiveBox(conversationId);
+        final hiveBox = hiveApi.thumbnailsPathHiveBox(conversationId);
         await hiveBox.put(messageUid, thumbnailPath.path);
         log.wtf('videoThumbnailPath: ${hiveBox.get(messageUid)}');
       }
@@ -159,7 +157,7 @@ class VideoViewModel extends BaseViewModel {
       }
 
       if (await directory.exists()) {
-        final hiveBox = chatRoomMediaHiveBox(conversationId);
+        final hiveBox = hiveApi.chatRoomMediaHiveBox(conversationId);
         await dioApi.downloadMediaFromUrl(
             mediaUrl: mediaUrl, savePath: savePath);
         await hiveBox.put(messageUid, savePath);

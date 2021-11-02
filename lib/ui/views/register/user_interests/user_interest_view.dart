@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/pods/genral_code.dart';
+import 'package:hint/pods/verification_pod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/auth_service.dart';

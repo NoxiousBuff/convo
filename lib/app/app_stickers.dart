@@ -42,6 +42,7 @@ List<String> creativity = [
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fcreativity%2Fsticker%20(40).png?alt=media&token=8afaee78-2cfc-4827-ac1f-ad884a22292b',
 ];
 
+//letters
 List<String> letters = [
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fletters%2Fword%20(01).png?alt=media&token=f133e85e-1ee0-4da0-89b4-016930be9801',
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fletters%2Fword%20(02).png?alt=media&token=5feafa4d-a8b1-4650-b738-21f3c782991c',
@@ -228,6 +229,7 @@ List<String> sloth = [
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fsloth%2Fsloth%20(35).png?alt=media&token=20bbb47c-3820-42e1-8945-482ef8b4cdd8',
 ];
 
+//Caveman
 List<String> caveMan = [
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fcaveman%2Fsticker%20(01).png?alt=media&token=6e66f154-4821-4184-bc86-f60d266b12a7',
   'https://firebasestorage.googleapis.com/v0/b/octa-chat-223d4.appspot.com/o/stickers%2Fcaveman%2Fsticker%20(02).png?alt=media&token=684993a5-602c-42df-af12-c94aba7b6d74',

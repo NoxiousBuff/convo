@@ -1,8 +1,8 @@
+import 'package:hint/api/hive.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:animations/animations.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -27,11 +27,11 @@ class ChatService {
   startConversation(
       BuildContext context, FireUser fireUser, Color randomColor) async {
     String conversationId = getConversationId(fireUser.id, liveUserUid);
-    await Hive.openBox(urlData(conversationId));
-    await Hive.openBox(imagesMemory(conversationId));
-    await Hive.openBox(chatRoomMedia(conversationId));
-    await Hive.openBox(thumbnailsPath(conversationId));
-    await Hive.openBox(videoThumbnails(conversationId));
+    await Hive.openBox(hiveApi.urlData(conversationId));
+    await Hive.openBox(hiveApi.imagesMemory(conversationId));
+    await Hive.openBox(hiveApi.chatRoomMedia(conversationId));
+    await Hive.openBox(hiveApi.thumbnailsPath(conversationId));
+    await Hive.openBox(hiveApi.videoThumbnails(conversationId));
     Map<String, dynamic> chatRoomMap = {
       'nearMe': false,
       'backgroundImage': null,

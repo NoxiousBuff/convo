@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
-import 'package:hint/ui/views/contacts/contacts.dart';
+import 'package:hint/ui/views/contacts/contacts_view.dart';
 
 class DistantView extends StatelessWidget {
   const DistantView({Key? key}) : super(key: key);

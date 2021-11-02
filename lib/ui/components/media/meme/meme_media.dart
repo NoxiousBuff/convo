@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_widget.dart';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/ui/components/media/media_bubble/media_bubble.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/constants/message_string.dart';
@@ -28,7 +28,7 @@ class MemeMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final networkImage = message.message[MessageField.mediaURL];
-    final hiveBox = chatRoomMediaHiveBox(conversationId);
+    final hiveBox = hiveApi.chatRoomMediaHiveBox(conversationId);
     return ViewModelBuilder<MemeMediaViewModel>.reactive(
       viewModelBuilder: () => MemeMediaViewModel(),
       onModelReady: (model) async {
@@ -50,7 +50,7 @@ class MemeMedia extends StatelessWidget {
             return mediaBubble(
               context: context,
               isRead: isRead,
-              child: !videoThumbnailsHiveBox(conversationId)
+              child: !hiveApi.videoThumbnailsHiveBox(conversationId)
                       .containsKey(messageUid)
                   ? ExtendedImage(
                       enableLoadState: true,
@@ -59,7 +59,7 @@ class MemeMedia extends StatelessWidget {
                   : ExtendedImage(
                       enableLoadState: true,
                       enableMemoryCache: true,
-                      image: MemoryImage(videoThumbnailsHiveBox(conversationId).get(messageUid))),
+                      image: MemoryImage(hiveApi.videoThumbnailsHiveBox(conversationId).get(messageUid))),
             );
           },
         );

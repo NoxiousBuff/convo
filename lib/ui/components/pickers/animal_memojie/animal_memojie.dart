@@ -16,7 +16,7 @@ class AnimalMemoji extends StatelessWidget {
 
   AnimalMemoji({Key? key, }) : super(key: key);
 
-  final hiveBox = HiveHelper.hiveBoxEmojies;
+  final hiveBox = HiveApi.hiveBoxEmojies;
   final ChatService chatService = ChatService();
   final delegate = const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4);
 

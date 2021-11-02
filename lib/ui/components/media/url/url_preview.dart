@@ -1,4 +1,4 @@
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,7 @@ class URLPreview extends StatelessWidget {
     return OfflineBuilder(
       child: const Text(''),
       connectivityBuilder: (context, connectivity, child) {
-        final hiveBox = urlDataHiveBox(conversationId);
+        final hiveBox = hiveApi.urlDataHiveBox(conversationId);
         bool connected = connectivity != ConnectivityResult.none;
         return ViewModelBuilder<URLPreviewViewModel>.reactive(
           viewModelBuilder: () => URLPreviewViewModel(),

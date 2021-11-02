@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -34,7 +34,7 @@ class PixaBayImageViewModel extends BaseViewModel {
       messageUid: messageUid,
       folderPath: 'Media/Hint Images',
       mediaName: 'IMG-$mediaName.jpeg',
-      hiveBoxName: chatRoomMedia(conversationId),
+      hiveBoxName: hiveApi.chatRoomMedia(conversationId),
     );
   }
 

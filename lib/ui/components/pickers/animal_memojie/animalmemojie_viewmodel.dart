@@ -11,7 +11,7 @@ import 'package:native_admob_flutter/native_admob_flutter.dart';
 final memojiProvider = ChangeNotifierProvider((ref) => MemojiViewModel());
 
 class MemojiViewModel extends BaseViewModel {
-  final hiveboxName = HiveHelper.hiveBoxEmojies;
+  final hiveboxName = HiveApi.hiveBoxEmojies;
 
   bool _unlockMemoji = false;
   bool get unlockMemoji => _unlockMemoji;
@@ -112,7 +112,7 @@ class MemojiViewModel extends BaseViewModel {
     }
     _isPandaDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _pandaList);
+    HiveApi().saveInHive(hiveboxName, key, _pandaList);
     getLogger('MemojieViewModel').i('All Pandas Downloaded Successfully');
   }
 
@@ -169,7 +169,7 @@ class MemojiViewModel extends BaseViewModel {
     }
     _isMonkeyDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _monkeyList);
+    HiveApi().saveInHive(hiveboxName, key, _monkeyList);
     getLogger('MemojieViewModel').i('All Monkeys Downloaded Successfully');
   }
 
@@ -226,7 +226,7 @@ class MemojiViewModel extends BaseViewModel {
     }
     _isBoarDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _boarList);
+    HiveApi().saveInHive(hiveboxName, key, _boarList);
     getLogger('MemojieViewModel').i('All Boar Downloaded Successfully');
   }
 
@@ -283,7 +283,7 @@ class MemojiViewModel extends BaseViewModel {
     }
     _isUnicornDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _unicornList);
+    HiveApi().saveInHive(hiveboxName, key, _unicornList);
     getLogger('MemojieViewModel').i('All Unicorn Downloaded Successfully');
   }
 }

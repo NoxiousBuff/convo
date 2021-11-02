@@ -7,7 +7,7 @@ import 'package:hint/app/app_logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class EmojieViewModel extends BaseViewModel {
-  final hiveboxName = HiveHelper.hiveBoxEmojies;
+  final hiveboxName = HiveApi.hiveBoxEmojies;
 
   bool _containRecent = false;
   bool get containRecent => _containRecent;
@@ -87,7 +87,7 @@ class EmojieViewModel extends BaseViewModel {
     }
     _isBlackEmojiDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _blackEmojies);
+    HiveApi().saveInHive(hiveboxName, key, _blackEmojies);
     getLogger('EmojieViewModel').wtf('All BlackEmojies Downloaded Successfully');
   }
 
@@ -144,7 +144,7 @@ class EmojieViewModel extends BaseViewModel {
     }
     _isKolabangaDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _kolabangaEmojies);
+    HiveApi().saveInHive(hiveboxName, key, _kolabangaEmojies);
     getLogger('EmojieViewModel').i('All Kolabanga Download Successfully');
   }
 
@@ -201,7 +201,7 @@ class EmojieViewModel extends BaseViewModel {
     }
     _isWhiteDownloading = false;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _whiteEmojies);
+    HiveApi().saveInHive(hiveboxName, key, _whiteEmojies);
     getLogger('EmojieViewModel').i('All WhiteEmojies Download Successfully');
   }
 
@@ -258,7 +258,7 @@ class EmojieViewModel extends BaseViewModel {
     }
     _is3DEmojieDownloading = true;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _emojies3D);
+    HiveApi().saveInHive(hiveboxName, key, _emojies3D);
     getLogger('EmojieViewModel').i('All 3DEmojies Download Successfully');
   }
 
@@ -315,7 +315,7 @@ class EmojieViewModel extends BaseViewModel {
     }
     _isSmileyDownloading = true;
     notifyListeners();
-    HiveHelper().saveInHive(hiveboxName, key, _smilies);
+    HiveApi().saveInHive(hiveboxName, key, _smilies);
     getLogger('EmojieViewModel').i('All Smilies Download Successfully');
   }
 }

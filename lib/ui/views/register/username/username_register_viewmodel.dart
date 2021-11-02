@@ -35,7 +35,7 @@ class UsernameRegisterViewModel extends BaseViewModel {
   Future<bool> checkIsUsernameExists(username) async {
     return await FirebaseFirestore.instance
         .collection(usersFirestoreKey)
-        .where(UserField.username, isEqualTo: username)
+        .where(FireUserField.username, isEqualTo: username)
         .get()
         .then((value) => value.size > 0 ? true : false)
         .catchError((e) {
