@@ -1,5 +1,4 @@
 import 'package:hint/api/hive.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -12,8 +11,6 @@ import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
@@ -37,7 +34,7 @@ class ChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double bottomPaddingDouble = MediaQuery.of(context).padding.bottom;
+    
     final statusStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -168,6 +165,7 @@ class ChatView extends StatelessWidget {
                   appBar: AppBar(
                     elevation: 0.0,
                     toolbarHeight: 100.0,
+                    leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context), color: LightAppColors.onPrimaryContainer),
                     backgroundColor: LightAppColors.primaryContainer,
                     title: Column(
                       children: [
@@ -191,19 +189,18 @@ class ChatView extends StatelessWidget {
                           conversationId: conversationId,
                         ),
                       ),
-                      hintTextField(
-                        model: model,
-                        context: context,
-                        child: HintTextField(
-                          fireUser: fireUser,
-                          chatViewModel: model,
-                          randomColor: randomColor,
-                          receiverUid: fireUser.id,
-                          focusNode: model.focusNode,
-                          conversationId: conversationId,
-                        ),
-                      ),
-                      SizedBox(height: bottomPaddingDouble)
+                      // hintTextField(
+                      //   model: model,
+                      //   context: context,
+                      //   child: HintTextField(
+                      //     fireUser: fireUser,
+                      //     chatViewModel: model,
+                      //     randomColor: randomColor,
+                      //     receiverUid: fireUser.id,
+                      //     focusNode: model.focusNode,
+                      //     conversationId: conversationId,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -319,6 +316,7 @@ class ChatMessages extends StatelessWidget {
                     padding: padding,
                     itemCount: messages.length,
                     controller: model.scrollController,
+                    physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, i) {
                       final message = Message.fromFirestore(messages[i]);
                       return MessageBubble(

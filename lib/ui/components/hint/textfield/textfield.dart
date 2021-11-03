@@ -91,7 +91,7 @@ class _HintTextFieldState extends State<HintTextField> {
         margin: const EdgeInsets.symmetric(horizontal: 8),
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-            color: color ?? widget.randomColor.withAlpha(50),
+            color: LightAppColors.primary,
             borderRadius: BorderRadius.circular(20)),
       ),
     );
@@ -201,10 +201,10 @@ class _HintTextFieldState extends State<HintTextField> {
             maxLines: 6,
             controller: messageTech,
             placeholder: 'Text Message',
+            placeholderStyle: TextStyle(color: LightAppColors.onPrimaryContainer),
             focusNode: widget.focusNode,
             style: Theme.of(context).textTheme.bodyText2,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            placeholderStyle: Theme.of(context).textTheme.bodyText2,
             onChanged: (val) async {
               (val.isNotEmpty && val.trim() != "")
                   ? setWritingTo(true)
@@ -242,6 +242,7 @@ class _HintTextFieldState extends State<HintTextField> {
   @override
   Widget build(BuildContext context) {
     final height = screenHeightPercentage(context, percentage: 0.5);
+    final double bottomPaddingDouble = MediaQuery.of(context).padding.bottom;
     return ViewModelBuilder<TextFieldViewModel>.reactive(
       viewModelBuilder: () => TextFieldViewModel(),
       builder: (context, model, child) {
@@ -266,7 +267,8 @@ class _HintTextFieldState extends State<HintTextField> {
                 },
                 child: ClipRect(
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(4, 0, 2, 0),
+                    color: LightAppColors.primaryContainer,
+                    padding: EdgeInsets.fromLTRB(4, 0, 0, bottomPaddingDouble),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[

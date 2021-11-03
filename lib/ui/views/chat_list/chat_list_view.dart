@@ -1,5 +1,4 @@
 import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';

@@ -440,12 +440,20 @@ class MessageBubble extends StatelessWidget {
     return isTimestampMatched
         ? Align(
             alignment: Alignment.center,
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              child: Text(
-                date(),
-                style: Theme.of(context).textTheme.bodyText2,
-              ),
+            child: Row(
+              children: [
+                const Expanded(child: Divider(color: inactiveGray)),
+                const SizedBox(width: 10),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    date(),
+                    style: Theme.of(context).textTheme.bodyText2,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(child: Divider(color: inactiveGray)),
+              ],
             ),
           )
         : const SizedBox.shrink();
