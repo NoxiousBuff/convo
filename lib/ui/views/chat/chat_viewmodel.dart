@@ -57,6 +57,7 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
 
+
   // creating live chat user
   Future createLiveChatUser({
     required BuildContext context,

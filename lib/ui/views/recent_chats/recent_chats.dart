@@ -193,21 +193,8 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body: Column(
-            children: [
-              TextButton(
-                  onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => const MediaPickerDemo(),
-                    //   ),
-                    // );
-                  },
-                  child: const Text('Media Picker Demo')),
-              buildUserContact(model),
-            ],
-          ),
+          body:               buildUserContact(model),
+
         );
       },
     );

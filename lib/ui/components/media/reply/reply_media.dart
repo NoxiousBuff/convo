@@ -39,14 +39,14 @@ class ReplyMedia extends StatelessWidget {
         case MediaType.text:
           {
             return Container(
-              margin: const EdgeInsets.only(bottom: 4),
+              margin: const EdgeInsets.only(bottom: 5),
               constraints: BoxConstraints(maxWidth: maxWidth),
               decoration: decoration,
               child: Padding(
                 padding: padding,
                 child: Text(
                   replyMessage[ReplyField.replyMessageText],
-                  maxLines: 2,
+                  maxLines: 1,
                   softWrap: false,
                   style: textStyle,
                   overflow: TextOverflow.ellipsis,

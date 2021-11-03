@@ -27,6 +27,7 @@ import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 import 'package:hint/ui/components/media/canvas_image/canvas_image.dart';
 import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 import 'package:hint/ui/components/media/pixabay_image/pixabay_image.dart';
+import 'package:custom_rounded_rectangle_border/custom_rounded_rectangle_border.dart';
 
 class MessageBubble extends StatelessWidget {
   final int index;
@@ -156,7 +157,6 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isReply = message.isReply;
-    final replyMessage = message.replyMessage;
     final messageDate = message.timestamp.toDate();
     final replyRiverPod = context.read(replyBackProvider);
     bool isMe = MessageBubble.liveUserUid == message.senderUid;
@@ -187,23 +187,7 @@ class MessageBubble extends StatelessWidget {
                       crossAxisAlignment: crossAxis,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        replyTeller(isReply, isMe, context),
-                        isReply
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(width: !isMe ? 25 : 0),
-                                  receiverReplySing(context, isMe, isReply),
-                                  ReplyMedia(
-                                      isMe: isMe,
-                                      fireUser: fireUser,
-                                      replyMessage: replyMessage!,
-                                      conversationId: conversationId),
-                                  senderReplySign(context, isMe, isReply),
-                                  SizedBox(width: isMe ? 25 : 0),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
+                       replyMessage(context, isMe, isReply),
                         SwipeTo(
                           onRightSwipe: () {
                             replyRiverPod.showReplyBool(true);
@@ -237,26 +221,66 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget replyTeller(bool isReply, bool isMe, BuildContext context) {
-    final username = fireUser.username;
+  Widget replyMessage(BuildContext context, isMe, isReply) {
+    if (isMe) {
+      return senderReplySign(context, isMe, isReply);
+    } else {
+      return receiverReplySing(context, isMe, isReply);
+    }
+  }
+
+  Widget senderReplySign(BuildContext context, isMe, isReply) {
     if (isReply) {
+      const radius = Radius.circular(5);
+      final username = fireUser.username;
+      final replyMessage = message.replyMessage;
+      const borderSide = BorderSide(color: inactiveGray, width: 2);
       String replySenderID = message.replyMessage![ReplyField.replySenderUid];
       bool iSend = replySenderID == ChatService.liveUserUid;
       var senderText =
           iSend ? 'you replied to yourself' : 'you replied to $username';
-
-      var receiverText =
-          !iSend ? '$username replied himself' : '$username replied to you';
-
       return Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: isMe ? screenWidthPercentage(context, percentage: 0.53) : 25,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: Text(senderText,
+                    style: Theme.of(context).textTheme.caption),
+              ),
+              ReplyMedia(
+                  isMe: isMe,
+                  fireUser: fireUser,
+                  replyMessage: replyMessage!,
+                  conversationId: conversationId),
+            ],
           ),
-          Text(
-            isMe ? senderText : receiverText,
-            style: Theme.of(context).textTheme.caption,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const SizedBox(height: 25),
+              Container(
+                height: 30,
+                margin: const EdgeInsets.fromLTRB(2, 0, 0, 2),
+                width: screenWidthPercentage(context, percentage: 0.08),
+                decoration: const ShapeDecoration(
+                  shape: CustomRoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topRight: radius),
+                    topSide: borderSide,
+                    rightSide: borderSide,
+                    topRightCornerSide: borderSide,
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(width: 12),
         ],
       );
     } else {
@@ -264,52 +288,63 @@ class MessageBubble extends StatelessWidget {
     }
   }
 
-  Widget senderReplySign(BuildContext context, isMe, isReply) {
-    return isMe
-        ? isReply
-            ? Column(
-                children: [
-                  const SizedBox(height: 20),
-                  Container(
-                    height: 30,
-                    margin: const EdgeInsets.fromLTRB(2, 0, 0, 2),
-                    width: screenWidthPercentage(context, percentage: 0.14),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: inactiveGray),
-                        left: BorderSide(color: transparent),
-                        bottom: BorderSide(color: transparent),
-                        right: BorderSide(color: inactiveGray),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : const SizedBox.shrink()
-        : const SizedBox.shrink();
-  }
-
   Widget receiverReplySing(BuildContext context, isMe, isReply) {
-    if (isMe) {
-      return const SizedBox.shrink();
+    if (isReply) {
+      const radius = Radius.circular(5);
+      final username = fireUser.username;
+      final replyMessage = message.replyMessage;
+      const borderSide = BorderSide(color: inactiveGray, width: 2);
+      String replySenderID = message.replyMessage![ReplyField.replySenderUid];
+      bool iSend = replySenderID == ChatService.liveUserUid;
+
+      var receiverText =
+          !iSend ? '$username replied himself' : '$username replied to you';
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(width: 12),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 25),
+              Container(
+                height: 30,
+                margin: const EdgeInsets.fromLTRB(2, 0, 0, 2),
+                width: screenWidthPercentage(context, percentage: 0.08),
+                decoration: const ShapeDecoration(
+                  shape: CustomRoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topRight: radius),
+                    topSide: borderSide,
+                    leftSide: borderSide,
+                    topLeftCornerSide: borderSide,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                child: Text(receiverText,
+                    style: Theme.of(context).textTheme.caption),
+              ),
+              ReplyMedia(
+                  isMe: isMe,
+                  fireUser: fireUser,
+                  replyMessage: replyMessage!,
+                  conversationId: conversationId),
+            ],
+          ),
+        ],
+      );
     } else {
-      return isReply
-          ? Column(
-              children: [
-                const SizedBox(height: 20),
-                Container(
-                    height: 30,
-                    margin: const EdgeInsets.fromLTRB(0, 0, 2, 0),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        left: BorderSide(color: inactiveGray),
-                        top: BorderSide(color: inactiveGray),
-                      ),
-                    ),
-                    width: screenWidthPercentage(context, percentage: 0.13)),
-              ],
-            )
-          : const SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 
