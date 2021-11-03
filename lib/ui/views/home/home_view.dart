@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/explore/explore_view.dart';
 import 'package:hint/ui/views/interest/interest_view.dart';
@@ -20,7 +21,7 @@ class _HomeViewState extends State<HomeView> {
         tabBar: CupertinoTabBar(
           activeColor: CupertinoColors.black,
           iconSize: 25.0,
-          backgroundColor: Colors.white,
+          backgroundColor: LightAppColors.surface,
           items: const  [
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.scribble),

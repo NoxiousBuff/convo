@@ -9,8 +9,6 @@ import 'package:hive/hive.dart';
 import 'app/app.dart';
 import 'dart:io';
 
-import 'app/app_logger.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.initialize();
@@ -18,8 +16,7 @@ Future<void> main() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
-  HiveApi().initialiseHive();
-  await Hive.openBox(HiveApi.appSettingsBoxName).whenComplete(() => getLogger('main').wtf('open hive box'));
+  hiveApi.initialiseHive();
 
   runApp(const ProviderScope(child: MyApp()));
 }

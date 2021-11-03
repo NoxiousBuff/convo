@@ -1,11 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -101,11 +99,7 @@ class UserItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Box>(
-      valueListenable: hiveApi.appSettings.listenable(),
-      builder: (context, box, child) {
-        bool darkMode = box.get(HiveApi.darkModeKey,defaultValue: false);
-        return ListTile(
+    return ListTile(
           onTap: onTap,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -132,8 +126,8 @@ class UserItem extends StatelessWidget {
                 width: 56.0,
                 child: Text(
                   fireUser.username[0].toUpperCase(),
-                  style: TextStyle(
-                    color: darkMode ? systemBackground : black,
+                  style: const TextStyle(
+                    color: black,
                     fontWeight: FontWeight.w600,
                     fontSize: 22,
                   ),
@@ -147,19 +141,17 @@ class UserItem extends StatelessWidget {
               fireUser.username,
               style: GoogleFonts.roboto(
                 fontSize: 20,
-                color: darkMode ? systemBackground : black,
+                color: black,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
           subtitle: subtitle ?? Text(
             fireUser.email,
-            style: TextStyle(
-              color: darkMode ? systemBackground : black,
+            style: const TextStyle(
+              color: black,
             ),
           ),
         );
-      },
-    );
   }
 }

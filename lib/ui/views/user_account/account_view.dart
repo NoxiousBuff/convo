@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/user_account/profile_photo.dart';
 import 'package:hint/ui/views/user_account/update_user.dart';
 
@@ -54,35 +54,19 @@ class _AccountState extends State<Account> {
                   context: context,
                   text: 'Username',
                   trailingText: widget.fireUser.username,
-                  onTap: () => Navigator.push(
-                    context,
-                    cupertinoTransition(
-                      enterTo: UpdateUser(
+                  onTap: () => navService.materialPageRoute(context, UpdateUser(
                         fireUser: widget.fireUser,
                         property: 'username',
-                      ),
-                      exitFrom: Account(
-                        fireUser: widget.fireUser,
-                      ),
-                    ),
-                  ),
+                      )),
                 ),
                 optionWidget(
                   context: context,
                   text: 'Email',
                   trailingText: widget.fireUser.email,
-                  onTap: () => Navigator.push(
-                    context,
-                    cupertinoTransition(
-                      enterTo: UpdateUser(
+                  onTap: () => navService.materialPageRoute(context, UpdateUser(
                         fireUser: widget.fireUser,
-                        property: 'email',
-                      ),
-                      exitFrom: Account(
-                        fireUser: widget.fireUser,
-                      ),
-                    ),
-                  ),
+                        property: 'username',
+                      )),
                 ),
                 optionWidget(
                   context: context,

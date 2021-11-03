@@ -1,4 +1,5 @@
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
@@ -39,7 +40,8 @@ class ChatListView extends StatelessWidget {
 
         return userResults.isNotEmpty
             ? ListView(
-                physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(0),
+                physics: const AlwaysScrollableScrollPhysics(),
                 shrinkWrap: true,
                 children: userResults,
               )
@@ -66,13 +68,13 @@ class ChatListView extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           slivers: [
             CupertinoSliverNavigationBar(
+              backgroundColor: Colors.white,
               trailing: IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () {
                   navService.materialPageRoute(context, const DistantView());
                 },),
               stretch: true,
-              backgroundColor: Colors.white,
               largeTitle: const Text('Messages'),
               border: Border.all(width: 0.0, color: Colors.transparent),
             ),
@@ -100,7 +102,7 @@ class ChatListView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  buildUserContact(model),
+                  buildUserContact(model), 
                 ],
               ),
             ),

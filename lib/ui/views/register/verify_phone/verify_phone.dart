@@ -1,3 +1,4 @@
+import 'package:hint/services/nav_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,7 +8,6 @@ import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/user_interests/user_interest_view.dart';
 import 'package:hint/ui/views/register/verify_phone/verifyphone_viewmodel.dart';
 
@@ -155,25 +155,13 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
                     if (createdUser != null) {
-                      Navigator.push(
-                        context,
-                        cupertinoTransition(
-                          enterTo: InterestsView(
+                      navService.materialPageRoute(context, InterestsView(
                             email: widget.email,
                             username: widget.username,
                             createdUser: widget.createdUser,
                             phoneNumber: widget.phoneNumber,
                             countryPhoneCode: widget.countryPhoneCode,
-                          ),
-                          exitFrom: VerifyPhoneView(
-                            email: widget.email,
-                            username: widget.username,
-                            createdUser: widget.createdUser,
-                            phoneNumber: widget.phoneNumber,
-                            countryPhoneCode: widget.countryPhoneCode,
-                          ),
-                        ),
-                      );
+                          ));
                     }
                   }
                 },

@@ -36,22 +36,7 @@ class HiveApi {
     await Hive.openBox(hiveBoxEmojies);
   }
 
-  Box urlDataHiveBox(String conversationId) =>
-    Hive.box('URLData[$conversationId]');
-
-  Box imagesMemoryHiveBox(String conversationId) =>
-    Hive.box('ImagesMemory[$conversationId]');
-
-  Box chatRoomMediaHiveBox(String conversationId) =>
-    Hive.box('ChatRoomMedia[$conversationId]');
-
-  Box thumbnailsPathHiveBox(String conversationId) =>
-    Hive.box('ThumbnailsPath[$conversationId]');
-
-  Box videoThumbnailsHiveBox(String conversationId) =>
-    Hive.box('VideoThumbnails[$conversationId]');
-
-  Box appSettings = Hive.box('AppSettings');
+  
 
 // -----------------------------------------------------------------------------
   String urlData(String conversationId) => 'URLData[$conversationId]';
@@ -165,7 +150,22 @@ class HiveApi {
     }
   }
 
-  
+  Box urlDataHiveBox(String conversationId) =>
+    Hive.box('URLData[$conversationId]');
+
+  Box imagesMemoryHiveBox(String conversationId) =>
+    Hive.box('ImagesMemory[$conversationId]');
+
+  Box chatRoomMediaHiveBox(String conversationId) =>
+    Hive.box('ChatRoomMedia[$conversationId]');
+
+  Box thumbnailsPathHiveBox(String conversationId) =>
+    Hive.box('ThumbnailsPath[$conversationId]');
+
+  Box videoThumbnailsHiveBox(String conversationId) =>
+    Hive.box('VideoThumbnails[$conversationId]');
+
+  // Box appSettings = Hive.box('AppSettings');
 
 
 }

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:hint/ui/views/home/home_view.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:tcard/tcard.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
@@ -129,19 +128,13 @@ class _InterestsViewState extends State<InterestsView> {
                             interests: model.selectedInterests,
                             countryPhoneCode: widget.countryPhoneCode)
                         .then((value) => log.wtf('user created in firestore'));
-                    Navigator.push(
-                      context,
-                      cupertinoTransition(
-                        enterTo: const HomeView(),
-                        exitFrom: InterestsView(
+                    navService.materialPageRoute(context, InterestsView(
                           email: widget.email,
                           username: widget.username,
                           phoneNumber: widget.phoneNumber,
                           createdUser: widget.createdUser,
                           countryPhoneCode: widget.countryPhoneCode,
-                        ),
-                      ),
-                    );
+                        ));
                   }
                 },
                 child: Text(

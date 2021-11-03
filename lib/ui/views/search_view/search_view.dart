@@ -31,6 +31,7 @@ class SearchView extends StatelessWidget {
         child: Hero(
           tag: 'search',
           child: CupertinoTextField.borderless(
+            textInputAction: TextInputAction.search,
             controller: searchTech,
             padding: const EdgeInsets.all(8.0),
             placeholder: 'Search for someone',

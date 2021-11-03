@@ -284,22 +284,15 @@ class ProfileView extends StatelessWidget {
       required String title,
       void Function()? onTap,
     }) =>
-        ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.appSettings.listenable(),
-          builder: (context, box, child) {
-            bool darkTheme = box.get(HiveApi.darkModeKey);
-            return ListTileTheme(
-              tileColor: darkTheme ? darkModeColor : null,
-              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+        ListTileTheme(
+              tileColor: null,
+              iconColor: darkModeColor,
               child: ListTile(
                 onTap: onTap,
                 trailing: Icon(icon, size: 20),
                 title:
                     Text(title, style: Theme.of(context).textTheme.bodyText2),
-              ),
-            );
-          },
-        );
+              ));
 
     return Column(
       children: [
@@ -316,13 +309,9 @@ class ProfileView extends StatelessWidget {
       required String title,
       void Function()? onTap,
     }) =>
-        ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.appSettings.listenable(),
-          builder: (context, box, child) {
-            bool darkTheme = box.get(HiveApi.darkModeKey);
-            return ListTileTheme(
-              tileColor: darkTheme ? darkModeColor : null,
-              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+        ListTileTheme(
+              tileColor: null,
+              iconColor: darkModeColor,
               child: ListTile(
                 onTap: onTap,
                 trailing: Icon(icon, size: 20),
@@ -330,8 +319,7 @@ class ProfileView extends StatelessWidget {
                     Text(title, style: Theme.of(context).textTheme.bodyText2),
               ),
             );
-          },
-        );
+          
 
     return Column(
       children: [
@@ -353,13 +341,9 @@ class ProfileView extends StatelessWidget {
       required String title,
       void Function()? onTap,
     }) =>
-        ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.appSettings.listenable(),
-          builder: (context, box, child) {
-            bool darkTheme = box.get(HiveApi.darkModeKey);
-            return ListTileTheme(
-              tileColor: darkTheme ? darkModeColor : null,
-              iconColor: darkTheme ? dirtyWhite : darkModeColor,
+        ListTileTheme(
+              tileColor: null,
+              iconColor: darkModeColor,
               child: ListTile(
                 onTap: onTap,
                 subtitle: subtitle,
@@ -368,8 +352,7 @@ class ProfileView extends StatelessWidget {
                     Text(title, style: Theme.of(context).textTheme.bodyText2),
               ),
             );
-          },
-        );
+          
 
     return Column(
       children: [

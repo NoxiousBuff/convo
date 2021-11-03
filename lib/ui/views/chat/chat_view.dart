@@ -1,6 +1,6 @@
 import 'package:hint/api/hive.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,6 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -34,10 +33,11 @@ class ChatView extends StatelessWidget {
     required this.conversationId,
   }) : super(key: key);
 
-  final Logger log = getLogger('ChatView');
+  final log = getLogger('ChatView');
 
   @override
-  build(BuildContext context) {
+  Widget build(BuildContext context) {
+    final double bottomPaddingDouble = MediaQuery.of(context).padding.bottom;
     final statusStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -70,9 +70,6 @@ class ChatView extends StatelessWidget {
           } else if (hiveApi.videoThumbnailsHiveBox(conversationId).isOpen) {
             await hiveApi.videoThumbnailsHiveBox(conversationId).close();
           }
-          if (await model.hasMessage(conversationId)) {
-            await chatService.addToRecentList(fireUser.id);
-          }
         },
         builder: (context, model, child) {
           final url = fireUser.photoUrl ?? 'images/img2.jpg';
@@ -97,85 +94,90 @@ class ChatView extends StatelessWidget {
                       : const Text('');
                 },
                 child: Scaffold(
+                  // appBar: AppBar(
+
+                  //   elevation: 0.0,
+                  //   centerTitle: true,
+                  //   toolbarHeight: 100.0,
+                  //   leadingWidth: 130,
+                  //   automaticallyImplyLeading: true,
+                  //   backgroundColor: randomColor.withAlpha(60),
+                  //   leading: SizedBox(
+                  //     width: 56,
+                  //     child: Row(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       mainAxisAlignment: MainAxisAlignment.start,
+                  //       children: [
+                  //         const SizedBox(width: 8),
+                  //         GestureDetector(
+                  //             onTap: () => Navigator.pop(context),
+                  //             child: const Icon(Icons.arrow_back, size: 20)),
+                  //         const SizedBox(width: 8),
+                  //         GestureDetector(
+                  //           onTap: () => navService.materialPageRoute(context, ProfileView(
+                  //                   model: model,
+                  //                   fireUser: fireUser,
+                  //                   iBlockThisUser: model.iBlockThisUser,
+                  //                   conversationId: conversationId)),
+                  //           child: ClipRRect(
+                  //             borderRadius: BorderRadius.circular(30),
+                  //             child: Container(
+                  //               height: 60,
+                  //               width: 60,
+                  //               decoration: BoxDecoration(
+                  //                 borderRadius: BorderRadius.circular(30),
+                  //                 image: DecorationImage(
+                  //                   image: CachedNetworkImageProvider(url),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  //   title: StreamBuilder<DocumentSnapshot>(
+                  //       stream: model.statusStream(fireUser.id),
+                  //       builder: (context, snapshot) {
+                  //         if (snapshot.hasData) {
+                  //           String status = snapshot.data!['status'];
+                  //           bool isOnline =
+                  //               snapshot.data!['status'] == 'Online';
+                  //           var timestamp =
+                  //               snapshot.data!['lastSeen'] as Timestamp;
+                  //           var lastSeen = time.format(timestamp.toDate(),
+                  //               allowFromNow: true);
+                  //           return Column(
+                  //             children: [
+                  //               const SizedBox(height: 10),
+                  //               Text(
+                  //                 fireUser.username,
+                  //                 style: Theme.of(context).textTheme.bodyText2,
+                  //               ),
+                  //               verticalSpaceTiny,
+                  //               isOnline
+                  //                   ? Text(status, style: statusStyle)
+                  //                   : Text(lastSeen, style: lastSeenStyle)
+                  //             ],
+                  //           );
+                  //         } else {
+                  //           return const SizedBox.shrink();
+                  //         }
+                  //       }),
+                  // ),
                   appBar: AppBar(
                     elevation: 0.0,
-                    centerTitle: true,
                     toolbarHeight: 100.0,
-                    leadingWidth: 130,
-                    automaticallyImplyLeading: true,
-                    backgroundColor: randomColor.withAlpha(60),
-                    leading: SizedBox(
-                      width: 56,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back, size: 20)),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              cupertinoTransition(
-                                enterTo: ProfileView(
-                                    model: model,
-                                    fireUser: fireUser,
-                                    iBlockThisUser: model.iBlockThisUser,
-                                    conversationId: conversationId),
-                                exitFrom: ChatView(
-                                  fireUser: fireUser,
-                                  randomColor: randomColor,
-                                  conversationId: conversationId,
-                                ),
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: Container(
-                                height: 60,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(url),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    backgroundColor: LightAppColors.primaryContainer,
+                    title: Column(
+                      children: [
+                        CircleAvatar(backgroundImage: NetworkImage(fireUser.photoUrl ?? 'images/img2.jpg')),
+                        const SizedBox(height: 10),
+                        Text(fireUser.username, style: TextStyle(color: LightAppColors.onPrimaryContainer, fontSize: 14),),
+                      ],
                     ),
-                    title: StreamBuilder<DocumentSnapshot>(
-                        stream: model.statusStream(fireUser.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            String status = snapshot.data!['status'];
-                            bool isOnline =
-                                snapshot.data!['status'] == 'Online';
-                            var timestamp =
-                                snapshot.data!['lastSeen'] as Timestamp;
-                            var lastSeen = time.format(timestamp.toDate(),
-                                allowFromNow: true);
-                            return Column(
-                              children: [
-                                const SizedBox(height: 10),
-                                Text(
-                                  fireUser.username,
-                                  style: Theme.of(context).textTheme.bodyText2,
-                                ),
-                                verticalSpaceTiny,
-                                isOnline
-                                    ? Text(status, style: statusStyle)
-                                    : Text(lastSeen, style: lastSeenStyle)
-                              ],
-                            );
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }),
+                    centerTitle: true,
+
                   ),
                   body: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -201,6 +203,7 @@ class ChatView extends StatelessWidget {
                           conversationId: conversationId,
                         ),
                       ),
+                      SizedBox(height: bottomPaddingDouble)
                     ],
                   ),
                 ),

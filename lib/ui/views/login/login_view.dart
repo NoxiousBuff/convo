@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/forgot_password/forgot_password_view.dart';
 import 'package:hint/ui/views/home/home_view.dart';
-import 'package:hint/ui/views/register/email/email_register_view.dart';
 import 'package:stacked/stacked.dart';
 import 'login_viewmodel.dart';
 
@@ -39,12 +38,7 @@ class LoginView extends StatelessWidget {
                       'Don\'t Have An Account.',
                     ),
                     CupertinoButton(
-                      onPressed: () => Navigator.push(
-                          context,
-                          cupertinoTransition(
-                            enterTo: const EmailRegisterView(),
-                            exitFrom: const LoginView(),
-                          )),
+                      onPressed: () => navService.materialPageRoute(context, const LoginView()),
                       padding: EdgeInsets.zero,
                       child: Text(
                         'Register',

@@ -164,8 +164,8 @@ class DistantViewViewModel extends BaseViewModel {
       if (await directory.exists()) {
         await dioApi.downloadMediaFromUrl(
             mediaUrl: mediaUrl, savePath: savePath);
-        await hiveApi.appSettings.put(HiveApi.chatBackgroundKey, savePath);
-        log.wtf('HiveSavedPath:${hiveApi.appSettings.get(HiveApi.chatBackgroundKey)}');
+        // await hiveApi.appSettings.put(HiveApi.chatBackgroundKey, savePath);
+        // log.wtf('HiveSavedPath:${hiveApi.appSettings.get(HiveApi.chatBackgroundKey)}');
       }
     } catch (err) {
       log.e('Error comes in creating the folder : $err');

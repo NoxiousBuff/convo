@@ -1,3 +1,4 @@
+import 'package:hint/services/nav_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:hint/app/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
 import 'package:hint/ui/views/register/username/username_register_viewmodel.dart';
 
@@ -154,21 +154,11 @@ class UsernameRegisterView extends StatelessWidget {
                                 );
                               } else {
                                 if (model.key.currentState!.validate()) {
-                                  Navigator.push(
-                                    context,
-                                    cupertinoTransition(
-                                      enterTo: PhoneAuthView(
+                                  navService.materialPageRoute(context, PhoneAuthView(
                                         email: email,
                                         createdUser: fireuser,
                                         username: model.usernameTech.text,
-                                      ),
-                                      exitFrom: UsernameRegisterView(
-                                        email: email,
-                                        fireuser: fireuser,
-                                        password: password,
-                                      ),
-                                    ),
-                                  );
+                                      ));
                                 }
                               }
                             }

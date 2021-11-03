@@ -20,7 +20,7 @@ Widget mediaBubble(
           borderRadius: BorderRadius.circular(16),
           child: child,
         ),
-      ),
+      ), 
       isRead
           ? const SizedBox.shrink()
           : Padding(
