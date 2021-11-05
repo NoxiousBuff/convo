@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/login/login_view.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:hint/ui/views/register/username/username_register_view.dart';
 
 class EmailRegisterView extends StatelessWidget {
   const EmailRegisterView({Key? key}) : super(key: key);
@@ -220,39 +219,43 @@ class EmailRegisterView extends StatelessWidget {
                             ),
                       onPressed: !isEmpty(model)
                           ? null
-                          : () async {
+                          : ()  {
                               final email = model.emailTech.text;
                               final password = model.passwordController.text;
                               final formState = model.emailFormKey.currentState;
                               final validate = formState!.validate();
-                              if (await model.checkIsEmailExists(email)) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: extraLightBackgroundGray,
-                                    content: Text(
-                                      'This email is already in use choose another',
-                                      style:
-                                          Theme.of(context).textTheme.bodyText2,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                if (validate) {
-                                  var user =
-                                      await model.singUp(email, password);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          UsernameRegisterView(
-                                        fireUser: user,
-                                        email: model.emailTech.text,
-                                        password: model.passwordController.text,
-                                      ),
-                                    ),
-                                  );
-                                }
+                              if (validate) {
+                                 model.signUpInFirebase(
+                                    email, password, context);
                               }
+                              // if (await model.checkIsEmailExists(email)) {
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     SnackBar(
+                              //       backgroundColor: extraLightBackgroundGray,
+                              //       content: Text(
+                              //         'This email is already in use choose another',
+                              //         style:
+                              //             Theme.of(context).textTheme.bodyText2,
+                              //       ),
+                              //     ),
+                              //   );
+                              // } else {
+                              //   if (validate) {
+                              //     var user =
+                              //         await model.singUp(email, password);
+                              //     Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //         builder: (context) =>
+                              //             UsernameRegisterView(
+                              //           fireUser: user,
+                              //           email: model.emailTech.text,
+                              //           password: model.passwordController.text,
+                              //         ),
+                              //       ),
+                              //     );
+                              //   }
+                              // }
                             },
                     ),
                   ),

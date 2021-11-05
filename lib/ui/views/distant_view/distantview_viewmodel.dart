@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/ui/views/login_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -48,7 +47,6 @@ class DistantViewViewModel extends BaseViewModel {
       property: UserField.status,
       uid: FirestoreApi.liveUserUid,
     );
-    await AppWriteApi.instance.logout();
 
     await _auth.signOut().catchError((e) => log.e('Firestore Signout:$e'));
     setBusy(false);

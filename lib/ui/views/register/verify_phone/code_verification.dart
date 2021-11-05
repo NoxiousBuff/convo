@@ -5,19 +5,16 @@ import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:otp_autofill/otp_autofill.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:hint/ui/views/register/user_interests/user_interest.dart';
-import 'package:hint/ui/views/register/verify_phone/verifyphone_viewmodel.dart';
+import 'package:hint/ui/views/register/verify_phone/code_verification_viewmodel.dart';
 
-class VerifyPhoneView extends StatefulWidget {
+class CodeVerificationView extends StatefulWidget {
   final String email;
   final String username;
   final User? createdUser;
   final String phoneNumber;
   final String countryPhoneCode;
-  const VerifyPhoneView({
+  const CodeVerificationView({
     Key? key,
     required this.email,
     required this.username,
@@ -27,12 +24,14 @@ class VerifyPhoneView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<VerifyPhoneView> createState() => _VerifyPhoneViewState();
+  State<CodeVerificationView> createState() => _CodeVerificationViewState();
 }
 
-class _VerifyPhoneViewState extends State<VerifyPhoneView> {
-  String getCode = '';
-  final log = getLogger('VerifyCode');
+class _CodeVerificationViewState extends State<CodeVerificationView> {
+  String? getCode;
+  String _phoneVerificationId = '';
+  final log = getLogger('CodeVerificationView');
+  TextEditingController verificationCodeController = TextEditingController();
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
       border: Border.all(color: Colors.deepPurpleAccent),
@@ -40,56 +39,42 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
     );
   }
 
-  late OTPTextEditController controller = OTPTextEditController(codeLength: 6);
-
-  final scaffoldKey = GlobalKey();
-
   @override
   void initState() {
     super.initState();
+    signUpWithPhone(widget.phoneNumber);
+  }
 
-    OTPInteractor.getAppSignature()
-        .then((value) => log.wtf('signature - $value'));
-    controller = OTPTextEditController(
-      codeLength: 6,
-      onCodeReceive: (code) {
-        log.wtf('Your Application receive code - $code');
-        setState(() {
-          getCode = code;
-        });
+  Future<void> signUpWithPhone(String phoneNumber) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) {},
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          log.e('The provided phone number is not valid.');
+        } else {
+          log.e('This was the error in creating phone auth credential : $e');
+        }
       },
-    )..startListenUserConsent(
-        (code) {
-          final exp = RegExp(r'(\d{6})');
-          return exp.stringMatch(code ?? '') ?? '';
-        },
-      );
-  }
-
-  @override
-  void didChangeDependencies() {
-    controller.addListener(() {
-      setState(() {
-        controller.text = getCode;
-      });
-    });
-
-    super.didChangeDependencies();
-  }
-
-  @override
-  Future<void> dispose() async {
-    await controller.stopListen();
-    super.dispose();
+      codeSent: (String verificationId, int? resendToken) async {
+        // Create a PhoneAuthCredential with the code
+        setState(() {
+          _phoneVerificationId = verificationId;
+        });
+        log.wtf('VerificationId:$_phoneVerificationId');
+      },
+      timeout: const Duration(seconds: 60),
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Auto-resolution timed out...
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final createdUser = widget.createdUser;
-
-    final log = getLogger('VerifyPhoneView');
-    return ViewModelBuilder<VerifyPhone>.reactive(
-      viewModelBuilder: () => VerifyPhone(),
+    return ViewModelBuilder<CodeVerificationViewModel>.reactive(
+      viewModelBuilder: () => CodeVerificationViewModel(),
       builder: (context, model, child) => Scaffold(
         appBar: const CupertinoNavigationBar(
           middle: Text('VerifyPhone'),
@@ -119,11 +104,10 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                     validator: (value) {
                       if (value!.length < 6) {
                         return 'code length must be 6';
-                      } else if (value != getCode) {
-                        return 'code didn\'t matched';
                       }
                     },
-                    controller: controller,
+                    autofocus: true,
+                    controller: verificationCodeController,
                     focusNode: model.pinPutFocusNode,
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
                       borderRadius: BorderRadius.circular(20.0),
@@ -165,35 +149,35 @@ class _VerifyPhoneViewState extends State<VerifyPhoneView> {
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
                     if (createdUser != null) {
-                      Navigator.push(
+                      await model.verifyCode(
                         context,
-                        cupertinoTransition(
-                          enterTo: InterestsView(
-                            email: widget.email,
-                            username: widget.username,
-                            createdUser: widget.createdUser,
-                            phoneNumber: widget.phoneNumber,
-                            countryPhoneCode: widget.countryPhoneCode,
-                          ),
-                          exitFrom: VerifyPhoneView(
-                            email: widget.email,
-                            username: widget.username,
-                            createdUser: widget.createdUser,
-                            phoneNumber: widget.phoneNumber,
-                            countryPhoneCode: widget.countryPhoneCode,
-                          ),
-                        ),
+                        email: widget.email,
+                        createdUser: createdUser,
+                        username: widget.username,
+                        phoneNumber: widget.phoneNumber,
+                        verificationId: _phoneVerificationId,
+                        smsCode: verificationCodeController.text,
+                        countryPhoneCode: widget.countryPhoneCode,
                       );
                     }
                   }
                 },
-                child: Text(
-                  'Next',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(color: systemBackground),
-                ),
+                child: model.isBusy
+                    ? const SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          valueColor: AlwaysStoppedAnimation(systemBackground),
+                        ),
+                      )
+                    : Text(
+                        'Next',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(color: systemBackground),
+                      ),
               ),
             ],
           ),

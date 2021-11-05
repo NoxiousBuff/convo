@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/ui/views/register/username/username_register_view.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:stacked/stacked.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EmailRegisterViewModel extends BaseViewModel {
   final log = getLogger('EmailRegisterViewModel');
@@ -30,6 +31,7 @@ class EmailRegisterViewModel extends BaseViewModel {
   }
 
   Future<User?> singUp(String email, String password) async {
+    setBusy(true);
     UserCredential userCredential = await _auth
         .createUserWithEmailAndPassword(email: email, password: password)
         .catchError((e) {
@@ -37,24 +39,68 @@ class EmailRegisterViewModel extends BaseViewModel {
     });
     final user = userCredential.user;
     if (user != null && !user.emailVerified) await user.sendEmailVerification();
-    if (user != null && user.emailVerified) {
-      await user.updatePhotoURL(AuthService.kDefaultPhotoUrl);
-      user.sendEmailVerification().catchError((e) {
-        log.e('sendVerificationEmail:$e');
-      }).then((value) => log.wtf('verification email is sended successfully'));
-    }
+
+    setBusy(false);
     return userCredential.user;
   }
 
   Future<bool> checkIsEmailExists(String email) async {
-    setBusy(true);
     final list = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
     if (list.isEmpty) {
-      setBusy(false);
       return false;
     } else {
-      setBusy(false);
       return true;
     }
+  }
+
+  Future<void> signUpInFirebase(
+      String email, String password, BuildContext context) async {
+    try {
+      setBusy(true);
+      bool emailExists = await checkIsEmailExists(email);
+      if (!emailExists) {
+        UserCredential userCredential = await _auth
+            .createUserWithEmailAndPassword(email: email, password: password);
+
+        final user = userCredential.user;
+        if (user != null && !user.emailVerified) {
+          await user.sendEmailVerification();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UsernameRegisterView(
+                fireUser: user,
+                email: email,
+                password: password,
+              ),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: systemRed,
+            content: Text(
+              'This email is already in use choose another',
+              style: Theme.of(context).textTheme.bodyText2,
+            ),
+          ),
+        );
+      }
+    } on FirebaseAuthException {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: systemRed,
+          content: Text(
+            'Unable to sign up',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2!
+                .copyWith(color: systemBackground),
+          ),
+        ),
+      );
+    }
+    setBusy(false);
   }
 }

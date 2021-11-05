@@ -1,11 +1,15 @@
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
+import 'package:hint/ui/views/register/verify_phone/code_verification.dart';
 
 class PhoneAuthViewModel extends BaseViewModel {
   final log = getLogger('PhoneAuth');
@@ -34,6 +38,63 @@ class PhoneAuthViewModel extends BaseViewModel {
         .catchError((e) {
       log.e('isPhoneNumberExists Error:$e');
     });
+  }
+
+  Future<void> getPhoneNumber(
+    BuildContext context, {
+    required String email,
+    required String username,
+    required User? createdUser,
+    required String countryCode,
+    required String phoneNumber,
+  }) async {
+    setBusy(true);
+    try {
+      bool isNumberExists = await isPhoneNumberExists(phoneNumber);
+      if (isNumberExists) {
+        Navigator.push(
+          context,
+          cupertinoTransition(
+            enterTo: CodeVerificationView(
+              email: email,
+              username: username,
+              createdUser: createdUser,
+              phoneNumber: phoneNumber,
+              countryPhoneCode: countryCode,
+            ),
+            exitFrom: PhoneAuthView(
+              email: email,
+              username: username,
+              createdUser: createdUser,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: systemRed,
+            content: Text(
+              'This phone Number is already in use choose another',
+              style: Theme.of(context).textTheme.bodyText2,
+            ),
+          ),
+        );
+      }
+    } on FirebaseAuthException {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: systemRed,
+          content: Text(
+            'Unable to sign up',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2!
+                .copyWith(color: systemBackground),
+          ),
+        ),
+      );
+    }
+    setBusy(false);
   }
 
   Future pickedCountryCode(BuildContext context) async {
@@ -68,5 +129,32 @@ class PhoneAuthViewModel extends BaseViewModel {
         ),
       ),
     );
+  }
+
+  Future<String> signUpWithPhone(String phoneNumber) async {
+    String _verificationId = '';
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) {},
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          log.e('The provided phone number is not valid.');
+        } else {
+          log.e('This was the error in creating phone auth credential : $e');
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        // Create a PhoneAuthCredential with the code
+        _verificationId = verificationId;
+        notifyListeners();
+        log.wtf('VerificationId:$verificationId');
+      },
+      timeout: const Duration(seconds: 60),
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Auto-resolution timed out...
+      },
+    );
+
+    return _verificationId;
   }
 }

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final codeProvider = ChangeNotifierProvider((ref) => VerificationCode());
 
 class VerificationCode extends ChangeNotifier {
-  String optCode = '';
+  String? optCode;
   PhoneAuthCredential? phoneAuthCredential;
 
   void getCode(String code) {

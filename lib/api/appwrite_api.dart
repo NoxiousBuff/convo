@@ -68,23 +68,6 @@ class AppWriteApi {
     }
   }
 
-  // Future<Channel?> addChannel(String title) async {
-  //   try {
-  //     final document = await db.createDocument(
-  //       collectionId: AppConstants.channelsCollection,
-  //       data: {
-  //         "title": title,
-  //       },
-  //       read: ['role:member'],
-  //       write: ['role:member'],
-  //     );
-  //     return document.convertTo<Channel>(
-  //         (data) => Channel.fromMap(Map<String, dynamic>.from(data)));
-  //   } on AppwriteException catch (e) {
-  //      log.e(e.message);
-  //     return null;
-  //   }
-  // }
 
   RealtimeSubscription subscribe(List<String> channel) {
     return realtime.subscribe(channel);
@@ -102,8 +85,8 @@ class AppWriteApi {
           LiveChatField.liveChatRoom: conversationId,
           LiveChatField.userMessage: ' ',
         },
-        read: ['role:member'],
-        write: ['role:member'],
+        read: ['*'],
+        write: ['*'],
       ).then((value) => log.wtf('Live Chat document created in appwrite'));
     } on AppwriteException catch (e) {
       log.e(e.message);
@@ -125,26 +108,4 @@ class AppWriteApi {
       log.e('updateDocument:$e');
     }
   }
-
-  // Future<List<Channel>> getChannels() async {
-  //   try {
-  //     final docList =
-  //         await db.listDocuments(collectionId: AppConstants.channelsCollection);
-  //     return docList.convertTo<Channel>(
-  //         (data) => Channel.fromMap(Map<String, dynamic>.from(data)));
-  //   } on AppwriteException catch (e) {
-  //      log.e(e.message);
-  //     return [];
-  //   }
-  // }
-
-  // Future<void> deleteChannel(Channel channel) async {
-  //   try {
-  //     await db.deleteDocument(
-  //         collectionId: AppConstants.channelsCollection,
-  //         documentId: channel.id);
-  //   } on AppwriteException catch (e) {
-  //      log.e(e.message);
-  //   }
-  // }
 }

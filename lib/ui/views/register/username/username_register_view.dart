@@ -2,7 +2,6 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -168,50 +167,13 @@ class _UsernameRegisterViewState extends State<UsernameRegisterView>
                               style: TextStyle(color: Colors.white),
                             ),
                       onPressed: !model.usernameEmpty
-                          ? () async {
+                          ? () {
                               final username = model.usernameTech.text;
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              if (await model.checkIsUsernameExists(username)) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: extraLightBackgroundGray,
-                                    content: Text(
-                                      'This username is not available',
-                                      style:
-                                          Theme.of(context).textTheme.bodyText2,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                if (model.key.currentState!.validate()) {
-                                  final user = widget.fireUser;
-
-                                  if (user != null) {
-                                    getLogger('usernameview')
-                                        .wtf(user.emailVerified);
-                                    model.createAppWriteUser(
-                                      context,
-                                      username: username,
-                                      email: widget.email,
-                                      password: widget.password,
-                                      fireUser: widget.fireUser,
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor:
-                                            extraLightBackgroundGray,
-                                        content: Text(
-                                          'You didn\'t verify your email',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
+                              model.usernameChecker(context,
+                                  username: username,
+                                  email: widget.email,
+                                  password: widget.password,
+                                  fireUser: widget.fireUser);
                             }
                           : null,
                     ),

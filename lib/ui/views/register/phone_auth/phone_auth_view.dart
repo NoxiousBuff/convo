@@ -5,13 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:hint/ui/views/register/verify_phone/verify_phone.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_viewmodel.dart';
 
-class PhoneAuthView extends StatelessWidget {
+class PhoneAuthView extends StatefulWidget {
   final String email;
   final String username;
   final User? createdUser;
@@ -22,6 +19,11 @@ class PhoneAuthView extends StatelessWidget {
     required this.createdUser,
   }) : super(key: key);
 
+  @override
+  State<PhoneAuthView> createState() => _PhoneAuthViewState();
+}
+
+class _PhoneAuthViewState extends State<PhoneAuthView> {
   @override
   Widget build(BuildContext context) {
     final log = getLogger('PhoneAuthView');
@@ -78,7 +80,7 @@ class PhoneAuthView extends StatelessWidget {
                           if (value!.isEmpty) {
                             return 'This field is mandatory to fill';
                           }
-                          if (value.length < 6) {
+                          if (value.length < 8) {
                             return 'enter a valid phone number';
                           } else {
                             return null;
@@ -114,50 +116,36 @@ class PhoneAuthView extends StatelessWidget {
                     ? activeBlue.withOpacity(0.5)
                     : activeBlue,
                 onPressed: () async {
-                  final phoneNumber = model.phoneTech.text;
-                  if (await model.isPhoneNumberExists(phoneNumber)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: extraLightBackgroundGray,
-                        content: Text(
-                          'This phone number is already in use',
-                          style: Theme.of(context).textTheme.bodyText2,
-                        ),
-                      ),
+                  if (model.formKey.currentState!.validate()) {
+                    var phoneNumber =
+                        '+${model.countryCode}${model.phoneTech.text}';
+                    log.wtf('phoneNumber:$phoneNumber');
+                    await model.getPhoneNumber(
+                      context,
+                      email: widget.email,
+                      phoneNumber: phoneNumber,
+                      username: widget.username,
+                      createdUser: widget.createdUser,
+                      countryCode: '+${model.countryCode}',
                     );
-                  } else {
-                    if (model.formKey.currentState!.validate()) {
-                      var phoneNumber =
-                          '+${model.countryCode}${model.phoneTech.text}';
-                      log.wtf('phoneNumber:$phoneNumber');
-                      authService.signUpWithPhone(phoneNumber, context);
-                      Navigator.push(
-                        context,
-                        cupertinoTransition(
-                          enterTo: VerifyPhoneView(
-                            email: email,
-                            username: username,
-                            createdUser: createdUser,
-                            phoneNumber: model.phoneTech.text,
-                            countryPhoneCode: '+${model.countryCode}',
-                          ),
-                          exitFrom: PhoneAuthView(
-                            email: email,
-                            username: username,
-                            createdUser: createdUser,
-                          ),
-                        ),
-                      );
-                    }
                   }
                 },
-                child: Text(
-                  'verify phone number',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(color: systemBackground),
-                ),
+                child: model.isBusy
+                    ? const SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          valueColor: AlwaysStoppedAnimation(systemBackground),
+                        ),
+                      )
+                    : Text(
+                        'Verify',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(color: systemBackground),
+                      ),
               ),
             ],
           ),

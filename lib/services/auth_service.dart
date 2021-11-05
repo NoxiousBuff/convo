@@ -86,7 +86,7 @@ class AuthService {
     }
   }
 
-   Future<void> forgotPassword(String email,
+  Future<void> forgotPassword(String email,
       {Function? onComplete, Function? onError}) async {
     await _auth.sendPasswordResetEmail(email: email).then((value) {
       if (onComplete != null) onComplete();
@@ -116,7 +116,11 @@ class AuthService {
       verificationCompleted: (PhoneAuthCredential credential) {
         final pod = context.read(codeProvider);
         final localSmsCode = credential.smsCode;
-        if (localSmsCode != null) pod.getCode(localSmsCode);
+        if (localSmsCode != null) {
+          pod.getCode(localSmsCode);
+        } else {
+          log.w('localSmsCode is null');
+        }
         log.wtf('credential.smsCode : $localSmsCode');
         log.wtf('Verification Completed Successfuly.');
         log.wtf('Phone Auth Credential: ${pod.phoneAuthCredential}');
