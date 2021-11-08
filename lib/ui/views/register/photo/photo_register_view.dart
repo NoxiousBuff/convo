@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/ui/views/home/home_view.dart';
+
 
 class PhotoRegisterView extends StatelessWidget {
   const PhotoRegisterView({Key? key}) : super(key: key);
@@ -73,10 +73,7 @@ class PhotoRegisterView extends StatelessWidget {
             child: const Text(
               'Skip',
             ),
-            onPressed: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (context) => const HomeView()));
-            },
+            onPressed: () {},
           ),
             const SizedBox(height: 100.0),
         ],

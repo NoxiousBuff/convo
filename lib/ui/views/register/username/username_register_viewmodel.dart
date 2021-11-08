@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
@@ -28,27 +29,33 @@ class UsernameRegisterViewModel extends BaseViewModel {
 
   Future<void> usernameChecker(
     BuildContext context, {
-    required String username,
     required String email,
     required String password,
-    required User? fireUser,
+    required String username,
+    required User? createdUser,
   }) async {
     try {
       setBusy(true);
+ 
       bool isUsernameExists = await checkIsUsernameExists(username);
       if (!isUsernameExists) {
+        await AppWriteApi.instance
+            .signup(name: username, email: email, password: password);
+        await AppWriteApi.instance.logIn(email: email, password: password);
+
+       
         Navigator.push(
           context,
           cupertinoTransition(
             enterTo: PhoneAuthView(
               email: email,
-              createdUser: fireUser,
               username: username,
+              createdUser: createdUser,
             ),
             exitFrom: UsernameRegisterView(
               email: email,
-              fireUser: fireUser,
               password: password,
+              createdUser: createdUser,
             ),
           ),
         );

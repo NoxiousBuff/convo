@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/pods/genral_code.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
 List<String> get activityNames => _activityNames;
@@ -39,16 +37,18 @@ class _InterestsViewState extends State<InterestsView> {
   @override
   void initState() {
     super.initState();
+
     updateCurrentUser();
   }
 
   Future<void> updateCurrentUser() async {
-    final pod = context.read(codeProvider);
     final username = widget.username;
     final createdUser = widget.createdUser;
+
     if (createdUser != null) {
+      await createdUser.reload();
       await createdUser.updateDisplayName(username);
-      await createdUser.updatePhoneNumber(pod.phoneAuthCredential!);
+      await createdUser.updatePhotoURL(AuthService.kDefaultPhotoUrl);
     }
   }
 
@@ -57,9 +57,8 @@ class _InterestsViewState extends State<InterestsView> {
     await updateCurrentUser();
     final liveUser = AuthService.liveUser;
     if (liveUser != null) {
-      log.wtf('username:${liveUser.displayName}');
-      log.wtf('phoneNumber:${liveUser.phoneNumber}');
       log.wtf('photoURL:${liveUser.photoURL}');
+      log.wtf('username:${liveUser.displayName}');
     } else {
       log.w('Live User is null now !!');
     }
@@ -69,7 +68,6 @@ class _InterestsViewState extends State<InterestsView> {
 
   @override
   Widget build(BuildContext context) {
-    final log = getLogger('InterestView');
     return ViewModelBuilder<InterestsViewModel>.reactive(
       viewModelBuilder: () => InterestsViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -87,7 +85,7 @@ class _InterestsViewState extends State<InterestsView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'What do you like,,',
+                    'What do you like,',
                     style: GoogleFonts.openSans(
                         color: CupertinoColors.black,
                         fontSize: 28.0,
@@ -128,9 +126,9 @@ class _InterestsViewState extends State<InterestsView> {
               verticalSpaceLarge,
               CupertinoButton(
                 color: activeBlue,
-                onPressed: () {
+                onPressed: () async {
                   if (model.length() > 5) {
-                    model.createUserInDataBase(
+                    await model.createUserInDataBase(
                       context,
                       email: widget.email,
                       username: widget.username,
@@ -142,22 +140,34 @@ class _InterestsViewState extends State<InterestsView> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        backgroundColor: extraLightBackgroundGray,
+                        backgroundColor: inactiveGray,
                         content: Text(
                           'You must choose at least 5 interests',
-                          style: Theme.of(context).textTheme.bodyText2,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText2!
+                              .copyWith(color: systemBackground),
                         ),
                       ),
                     );
                   }
                 },
-                child: Text(
-                  'Next',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(color: systemBackground),
-                ),
+                child: model.isBusy
+                    ? const SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          valueColor: AlwaysStoppedAnimation(systemBackground),
+                        ),
+                      )
+                    : Text(
+                        'Next',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2!
+                            .copyWith(color: systemBackground),
+                      ),
               )
             ],
           ),
@@ -183,21 +193,21 @@ final List<Widget> _cards = List.generate(
 
 final List<String> _activityNames = [
   'Hobbies',
-  'School/Work',
+  'School Work',
   'Travel',
-  'Entertainment'
-      'Cooking',
-  'Past Experience'
-      'Create',
+  'Entertainment',
+  'Cooking',
+  'Past Experience',
+  'Inventions',
   'Future Plans',
-  'Human Relationships'
-      'Raise Money',
+  'Human Relationships',
+  'Raise Money',
   'Experiment',
   'Spread Love',
   'Groove',
-  'Group Up',
   'Relax',
   'Party',
+  'Group Up',
   'Plan Ahead',
   'Play',
   'Do Nothing',

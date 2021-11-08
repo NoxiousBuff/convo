@@ -69,8 +69,8 @@ class EmailRegisterViewModel extends BaseViewModel {
             context,
             MaterialPageRoute(
               builder: (context) => UsernameRegisterView(
-                fireUser: user,
                 email: email,
+                createdUser: user,
                 password: password,
               ),
             ),

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
@@ -28,10 +28,8 @@ class CodeVerificationViewModel extends BaseViewModel {
   }) async {
     setBusy(true);
     try {
-      final authCredential =
-          await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
-
-      if (authCredential.user != null) {
+      
+      if (createdUser != null) {
         Navigator.push(
           context,
           cupertinoTransition(
@@ -116,7 +114,6 @@ class CodeVerificationViewModel extends BaseViewModel {
     required String verificationId,
     required String countryPhoneCode,
   }) async {
-    setBusy(true);
     PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: smsCode);
 
@@ -130,7 +127,5 @@ class CodeVerificationViewModel extends BaseViewModel {
       countryPhoneCode: countryPhoneCode,
       phoneAuthCredential: phoneAuthCredential,
     );
-
-    setBusy(false);
   }
 }

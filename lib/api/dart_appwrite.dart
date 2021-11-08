@@ -26,8 +26,8 @@ class DartAppWriteApi {
   Future<Response<dynamic>> createCollection() {
     return database.createCollection(
       name: 'Users Live Chat',
-      read: ['role:member'],
-      write: ['role:member'],
+      read: ['*'],
+      write: ['*'],
       rules: [
         {
           "label": 'LiveChatRoomID',
@@ -59,11 +59,12 @@ class DartAppWriteApi {
     }).whenComplete(() => log.wtf('collection created'));
   }
 
-
-
   Future<Response<dynamic>> getListDocuments(String userUid) async {
     return database.listDocuments(
       search: userUid,
+      filters: [
+        'userUid=$userUid'
+      ],
       collectionId: AppWriteConstants.liveChatscollectionID,
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
@@ -27,6 +28,7 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    getAppWriteCurrentUser();
     WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
   }
@@ -40,6 +42,12 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
         .catchError((e) {
       log.e('setStatus:$e');
     });
+  }
+
+  Future getAppWriteCurrentUser() async {
+    final currentUser = await AppWriteApi.instance.account.get();
+    log.wtf('Appwrite email: ${currentUser.email}');
+    log.wtf('Appwrite ID:${currentUser.$id}');
   }
 
   @override
@@ -193,8 +201,7 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body:               buildUserContact(model),
-
+          body: buildUserContact(model),
         );
       },
     );

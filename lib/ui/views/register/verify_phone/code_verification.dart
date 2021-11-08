@@ -28,7 +28,7 @@ class CodeVerificationView extends StatefulWidget {
 }
 
 class _CodeVerificationViewState extends State<CodeVerificationView> {
-  String? getCode;
+  String _smsCode = '592000';
   String _phoneVerificationId = '';
   final log = getLogger('CodeVerificationView');
   TextEditingController verificationCodeController = TextEditingController();
@@ -47,14 +47,26 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
 
   Future<void> signUpWithPhone(String phoneNumber) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) {},
+      phoneNumber: widget.countryPhoneCode + widget.phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) {
+        setState(() {
+          _smsCode = credential.smsCode!;
+        });
+        widget.createdUser!.updatePhoneNumber(credential);
+      },
       verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          log.e('The provided phone number is not valid.');
-        } else {
-          log.e('This was the error in creating phone auth credential : $e');
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: systemRed,
+            content: Text(
+              e.message!,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText2!
+                  .copyWith(color: systemBackground),
+            ),
+          ),
+        );
       },
       codeSent: (String verificationId, int? resendToken) async {
         // Create a PhoneAuthCredential with the code
@@ -106,7 +118,6 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
                         return 'code length must be 6';
                       }
                     },
-                    autofocus: true,
                     controller: verificationCodeController,
                     focusNode: model.pinPutFocusNode,
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
@@ -148,7 +159,7 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
                 onPressed: () async {
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
-                    if (createdUser != null) {
+                    if (_smsCode == verificationCodeController.text) {
                       await model.verifyCode(
                         context,
                         email: widget.email,
@@ -158,6 +169,19 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
                         verificationId: _phoneVerificationId,
                         smsCode: verificationCodeController.text,
                         countryPhoneCode: widget.countryPhoneCode,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: systemRed,
+                          content: Text(
+                            'sms code didn\'t match',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: systemBackground),
+                          ),
+                        ),
                       );
                     }
                   }

@@ -51,7 +51,7 @@ class PhoneAuthViewModel extends BaseViewModel {
     setBusy(true);
     try {
       bool isNumberExists = await isPhoneNumberExists(phoneNumber);
-      if (!isNumberExists) {
+      if (isNumberExists) {
         Navigator.push(
           context,
           cupertinoTransition(

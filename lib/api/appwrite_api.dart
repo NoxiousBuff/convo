@@ -39,19 +39,20 @@ class AppWriteApi {
     }
   }
 
-  Future<bool> login({required String email, required String password}) async {
+  Future<bool> logIn({required String email, required String password}) async {
     try {
       await account.createSession(email: email, password: password);
+
       return true;
     } on AppwriteException catch (e) {
-      log.e(e.message);
+      log.e('AppWrite LogIn:${e.message}');
       return false;
     }
   }
 
   Future<bool> logout() async {
     try {
-      await account.deleteSessions();
+      await account.deleteSession(sessionId: 'current');
       return true;
     } on AppwriteException catch (e) {
       log.e(e.message);
@@ -68,32 +69,31 @@ class AppWriteApi {
     }
   }
 
-
   RealtimeSubscription subscribe(List<String> channel) {
     return realtime.subscribe(channel);
   }
 
-  Future createLiveChatUser({
-    required String userUid,
-    required String conversationId,
-  }) async {
+  Future createLiveChatUser(String userUid) async {
     try {
       await db.createDocument(
         collectionId: AppWriteConstants.liveChatscollectionID,
         data: {
+          LiveChatField.mediaURL: null,
+          LiveChatField.mediaType:null,
           LiveChatField.userUid: userUid,
-          LiveChatField.liveChatRoom: conversationId,
-          LiveChatField.userMessage: ' ',
+          LiveChatField.liveChatRoom: null,
+          LiveChatField.userMessage: 'Hint Live Chat',
         },
-        read: ['*'],
-        write: ['*'],
+        read: ['role:member'],
+        write: ['role:member'],
       ).then((value) => log.wtf('Live Chat document created in appwrite'));
     } on AppwriteException catch (e) {
-      log.e(e.message);
+      log.e('createLiveChatUser:${e.message}');
     }
   }
 
-  Future updateMessage({
+
+  Future updateDocument({
     required String documentId,
     required String collectionId,
     required Map<dynamic, dynamic> data,

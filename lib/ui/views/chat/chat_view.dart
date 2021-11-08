@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/hive_helper.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:timeago/timeago.dart' as time;
@@ -44,6 +43,7 @@ class ChatView extends StatelessWidget {
   @override
   build(BuildContext context) {
     final log = getLogger('ChatView');
+    const valueColor = AlwaysStoppedAnimation(activeBlue);
     final statusStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -65,17 +65,17 @@ class ChatView extends StatelessWidget {
         log.wtf('userBlockMe:${model.userBlockMe}');
       },
       onDispose: (model) async {
-        if (urlDataHiveBox(conversationId).isOpen) {
-          await urlDataHiveBox(conversationId).close();
-        } else if (imagesMemoryHiveBox(conversationId).isOpen) {
-          await imagesMemoryHiveBox(conversationId).close();
-        } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
-          await chatRoomMediaHiveBox(conversationId).close();
-        } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
-          await thumbnailsPathHiveBox(conversationId).close();
-        } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
-          await videoThumbnailsHiveBox(conversationId).close();
-        }
+        // if (urlDataHiveBox(conversationId).isOpen) {
+        //   await urlDataHiveBox(conversationId).close();
+        // } else if (imagesMemoryHiveBox(conversationId).isOpen) {
+        //   await imagesMemoryHiveBox(conversationId).close();
+        // } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
+        //   await chatRoomMediaHiveBox(conversationId).close();
+        // } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
+        //   await thumbnailsPathHiveBox(conversationId).close();
+        // } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
+        //   await videoThumbnailsHiveBox(conversationId).close();
+        // }
         if (await model.hasMessage(conversationId)) {
           await chatService.addToRecentList(fireUser.id);
         }
@@ -183,19 +183,21 @@ class ChatView extends StatelessWidget {
                       }),
                   actions: [
                     Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 20, 20),
-                      child: TextButton(
-                        onPressed: () {
+                      margin: const EdgeInsets.fromLTRB(0, 40, 20, 20),
+                      child: InkWell(
+                        onTap: () {
                           model.enterInLiverChat(context);
                         },
                         child: model.isBusy
-                            ? const SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: CircularProgressIndicator(
+                            ? const Center(
+                                child: SizedBox(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(
                                     strokeWidth: 1.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        activeBlue)),
+                                    valueColor: valueColor,
+                                  ),
+                                ),
                               )
                             : Text(
                                 'Live Chat',

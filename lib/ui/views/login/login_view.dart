@@ -163,8 +163,8 @@ class LoginView extends StatelessWidget {
                 child: CupertinoButton(
                   child: model.isBusy
                       ? const SizedBox(
-                          height: 17,
-                          width: 17,
+                          height: 15,
+                          width: 15,
                           child: CircularProgressIndicator(
                             strokeWidth: 1.5,
                             valueColor:
@@ -179,6 +179,7 @@ class LoginView extends StatelessWidget {
                       ? null
                       : () async {
                           model.logIn(
+                            context: context,
                             email: model.emailTech.text,
                             password: model.passwordTech.text,
                             onComplete: () {

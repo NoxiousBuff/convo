@@ -1,8 +1,8 @@
+import 'package:hint/api/appwrite_api.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/dart_appwrite.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -57,34 +57,6 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final CollectionReference conversationCollection =
       FirebaseFirestore.instance.collection(convoFirestorekey);
 
-
-  // creating live chat user
-  Future createLiveChatUser({
-    required BuildContext context,
-    required GetDocumentsList receiverUserDocs,
-  }) async {
-    log.wtf('Creating Live ChatRoom User');
-    await AppWriteApi.instance.createLiveChatUser(
-      userUid: FirestoreApi.liveUserUid,
-      conversationId: conversationId,
-    );
-
-    final docs = await DartAppWriteApi.instance
-        .getListDocuments(FirestoreApi.liveUserUid);
-    final list = GetDocumentsList.fromJson(docs);
-    log.wtf('List:${list.documents.first}');
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LiveChat(
-          liverUserDocs: list,
-          fireUser: fireUser,
-          receiverUserDocs: receiverUserDocs,
-        ),
-      ),
-    );
-  }
-
   Future enterInLiverChat(BuildContext context) async {
     setBusy(true);
     String liveUserId = FirestoreApi.liveUserUid;
@@ -94,9 +66,7 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
     final liveUserList = GetDocumentsList.fromJson(liveUserDocs);
     final receiverUserList = GetDocumentsList.fromJson(receiverUserDocs);
 
-    bool isLiveUserEmpty = liveUserList.documents.isEmpty;
-
-    if (!isLiveUserEmpty) {
+    if (liveUserList.documents.isNotEmpty) {
       log.wtf(' LiveChatUser Already Created First Live Chat');
       final liveUSerDoc = liveUserList.documents.first;
       final liveChatUserDoc = liveUSerDoc.cast<String, dynamic>();
@@ -117,10 +87,8 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
         ),
       );
     } else {
-      await createLiveChatUser(
-        context: context,
-        receiverUserDocs: receiverUserList,
-      );
+      log.wtf('LiveChat User Created');
+      await AppWriteApi.instance.createLiveChatUser(liveUserId);
     }
     setBusy(false);
   }

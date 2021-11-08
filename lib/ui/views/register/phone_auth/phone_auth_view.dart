@@ -123,9 +123,9 @@ class _PhoneAuthViewState extends State<PhoneAuthView> {
                     await model.getPhoneNumber(
                       context,
                       email: widget.email,
-                      phoneNumber: phoneNumber,
                       username: widget.username,
                       createdUser: widget.createdUser,
+                      phoneNumber: model.phoneTech.text,
                       countryCode: '+${model.countryCode}',
                     );
                   }

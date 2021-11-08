@@ -165,9 +165,7 @@ class MessageBubble extends StatelessWidget {
     final crossAxis = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     return ViewModelBuilder<MessageBubbleViewModel>.reactive(
       viewModelBuilder: () => MessageBubbleViewModel(),
-      onModelReady: (model) {
-        log.w('Index:$index MessageUid:${message.messageUid}');
-      },
+      onModelReady: (model) {},
       builder: (context, model, child) {
         if (model.hasError) {
           log.e('There is an error');

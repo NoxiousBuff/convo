@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +15,7 @@ import 'package:hint/ui/views/recent_chats/recent_chats.dart';
 import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 bool isDarkTheme = false;
+bool loggedIn = false;
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -24,7 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool loggedIn = false;
   final log = getLogger('MyApp');
   @override
   void initState() {
@@ -35,28 +35,40 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  Future<bool> getUser(String documentId) async {
+    final firebaseUser = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(documentId)
+        .get();
+    if (firebaseUser.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   void didChangeDependencies() {
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user != null) {
-        final firestoreUser = await FirebaseFirestore.instance
-            .collection(usersFirestoreKey)
-            .doc(user.uid)
-            .get();
-        if (firestoreUser.exists) {
-          setState(() {
-            loggedIn = true;
-          });
-          log.wtf('user is not null LoggedIn:$loggedIn');
-          log.wtf('email:${AuthService.liveUser!.email}');
-        } else {
-          log.w('User is not created in firestore');
+        bool userExists = await getUser(user.uid);
+        final appwriteUser = await AppWriteApi.instance.account.get();
+      
+        if (userExists) {
+          log.wtf('Status:${appwriteUser.status}');
+          if (appwriteUser.status == 0) {
+            setState(() {
+              loggedIn = true;
+            });
+          } else {
+            log.wtf('Status:${appwriteUser.status}');
+          }
         }
       } else {
+        log.wtf('user is null LoggedIn:$loggedIn');
         setState(() {
           loggedIn = false;
         });
-        getLogger('MyApp').wtf('user is null LoggedIn:$loggedIn');
       }
     });
     super.didChangeDependencies();

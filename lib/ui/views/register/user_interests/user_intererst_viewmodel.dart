@@ -1,3 +1,4 @@
+import 'package:hint/app/app.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
@@ -27,18 +28,20 @@ class InterestsViewModel extends BaseViewModel {
     required List<String> selectedInterests,
   }) async {
     setBusy(true);
+    await createdUser!.reload();
+    await AppWriteApi.instance.createLiveChatUser(createdUser.uid);
     await firestoreApi
         .createUserInFirebase(
-            user: createdUser!,
+            user: createdUser,
             username: username,
             phoneNumber: phoneNumber,
             interests: selectedInterests,
             countryPhoneCode: countryPhoneCode)
-        .then((value) => log.wtf('user created in firestore'));
-    await AppWriteApi.instance.createLiveChatUser(
-      userUid: FirestoreApi.liveUserUid,
-      conversationId: 'null',
-    );
+        .then((value) {
+      log.wtf('user created in firestore');
+      loggedIn = true;
+      notifyListeners();
+    });
     Navigator.push(
       context,
       cupertinoTransition(

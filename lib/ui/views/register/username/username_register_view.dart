@@ -10,13 +10,13 @@ import 'package:hint/ui/views/register/username/username_register_viewmodel.dart
 
 class UsernameRegisterView extends StatefulWidget {
   final String email;
-  final User? fireUser;
   final String password;
+  final User? createdUser;
   const UsernameRegisterView(
       {Key? key,
       required this.email,
       required this.password,
-      required this.fireUser})
+      required this.createdUser})
       : super(key: key);
 
   @override
@@ -33,20 +33,6 @@ class _UsernameRegisterViewState extends State<UsernameRegisterView>
     super.initState();
   }
 
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     final user = widget.fireUser;
-  //     if (user != null && user.emailVerified) {
-  //       setState(() {
-  //         isEmailVerfied = user.emailVerified;
-  //       });
-  //     }
-  //     getLogger('UsernameRegistrationView')
-  //         .wtf('isEmailVerfied:$isEmailVerfied');
-  //   } else {
-  //     getLogger('App is not resumed');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -169,11 +155,13 @@ class _UsernameRegisterViewState extends State<UsernameRegisterView>
                       onPressed: !model.usernameEmpty
                           ? () {
                               final username = model.usernameTech.text;
-                              model.usernameChecker(context,
-                                  username: username,
-                                  email: widget.email,
-                                  password: widget.password,
-                                  fireUser: widget.fireUser);
+                              model.usernameChecker(
+                                context,
+                                username: username,
+                                email: widget.email,
+                                password: widget.password,
+                                createdUser: widget.createdUser,
+                              );
                             }
                           : null,
                     ),

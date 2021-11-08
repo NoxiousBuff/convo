@@ -1,13 +1,14 @@
 import 'dart:io';
+import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/ui/views/login/login_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/ui/views/login_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,11 +49,18 @@ class DistantViewViewModel extends BaseViewModel {
       uid: FirestoreApi.liveUserUid,
     );
 
+    await AppWriteApi.instance.logout();
     await _auth.signOut().catchError((e) => log.e('Firestore Signout:$e'));
+    loggedIn = false;
+    notifyListeners();
     setBusy(false);
 
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const LoginView()));
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginView(),
+      ),
+    );
   }
 
   /// uploading a single file into the firebase storage and get progress

@@ -70,6 +70,14 @@ class UserField {
 
 class LiveChatField {
   static const userUid = 'userUid';
+  static const mediaURL = 'mediaURL';
+  static const mediaType = 'mediaType';
   static const userMessage = 'userMessage';
+  static const animationType = 'animationType';
   static const liveChatRoom = 'liveChatRoomId';
+}
+
+class AnimationType {
+  static const confetti = 'confetti';
+  static const spotlight = 'spotlight';
 }
