@@ -15,7 +15,8 @@ class AppWriteApi {
   AppWriteApi._internal() {
     client
         .setEndpoint(AppWriteConstants.apiEndPoint)
-        .setProject(AppWriteConstants.projectID);
+        .setProject(AppWriteConstants.projectID)
+        .setSelfSigned();
     account = Account(client);
     db = Database(client);
     realtime = Realtime(client);
@@ -60,13 +61,11 @@ class AppWriteApi {
     }
   }
 
-  Future<User?> getUser() async {
-    try {
-      return await account.get();
-    } on AppwriteException catch (e) {
-      log.e(e.message);
-      return null;
-    }
+  Future<User> getUser() async {
+    final user = await account.get().catchError((e) {
+      log.e('getUser:$e');
+    });
+    return user;
   }
 
   RealtimeSubscription subscribe(List<String> channel) {
@@ -79,7 +78,7 @@ class AppWriteApi {
         collectionId: AppWriteConstants.liveChatscollectionID,
         data: {
           LiveChatField.mediaURL: null,
-          LiveChatField.mediaType:null,
+          LiveChatField.mediaType: null,
           LiveChatField.userUid: userUid,
           LiveChatField.liveChatRoom: null,
           LiveChatField.userMessage: 'Hint Live Chat',
@@ -91,7 +90,6 @@ class AppWriteApi {
       log.e('createLiveChatUser:${e.message}');
     }
   }
-
 
   Future updateDocument({
     required String documentId,

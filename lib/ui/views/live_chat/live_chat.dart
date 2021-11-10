@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
@@ -17,13 +18,12 @@ import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:hint/constants/appwrite_constants.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
-import 'package:hint/ui/views/live_chat/live_chat_animations.dart';
 
 class LiveChat extends StatefulWidget {
   final FireUser fireUser;
@@ -42,14 +42,12 @@ class LiveChat extends StatefulWidget {
 
 class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
   int textLength = 0;
-  final radius = 0.0;
+  double radius = 0.0;
   bool lightOn = true;
   double x = 100, y = 100;
-  bool removeColors = true;
   late LiveChatUser _liveUser;
   late LiveChatUser _receiverUser;
   final log = getLogger('LiveChat');
-  bool isLiveChatRoomIdMatched = false;
   late RealtimeSubscription subscription;
   late ConfettiController confettiController;
   late AnimationController spotlightController;
@@ -68,6 +66,9 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
         ConfettiController(duration: const Duration(seconds: 3));
     spotlightController =
         AnimationController(vsync: this, duration: const Duration(seconds: 4));
+    spotlightController.addListener(() => setState(() {}));
+    confettiController.addListener(() => setState(() {}));
+
     super.initState();
   }
 
@@ -75,6 +76,7 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
   void dispose() {
     controller.dispose();
     confettiController.dispose();
+    spotlightController.removeListener(() {});
     spotlightController.dispose();
     super.dispose();
   }
@@ -103,29 +105,62 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
   Widget receiverMessage() {
     return StreamBuilder<RealtimeMessage>(
       stream: subscription.stream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Text('snapshot has no data');
-        }
-        final data = snapshot.data;
-        if (data != null) {
-          final liveChatUser = LiveChatUser.fromJson(data.payload);
-          String? mediaType = liveChatUser.mediaType;
-          if (isURL(liveChatUser.userMessage) && mediaType == imageType) {
-            return ExtendedImage.network(liveChatUser.userMessage);
+      builder: (context, AsyncSnapshot<RealtimeMessage> snapshot) {
+        if (snapshot.hasData) {
+          final data = snapshot.data;
+
+          if (data != null) {
+            final liveChatUser = LiveChatUser.fromJson(data.payload);
+            String? mediaType = liveChatUser.mediaType;
+
+            if (isURL(liveChatUser.userMessage) && mediaType == imageType) {
+              return ExtendedImage.network(liveChatUser.userMessage);
+            } else {
+              return Text(
+                liveChatUser.userMessage,
+                maxLines: liveChatUser.userMessage.length > 100 ? 6 : 2,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                ),
+              );
+            }
           } else {
-            return Text(
-              liveChatUser.userMessage,
-              maxLines: liveChatUser.userMessage.length > 100 ? 6 : 2,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
-              ),
-            );
+            return const Text('Data is null now');
           }
         } else {
-          return const Text('Data is null now');
+          return const Text('Let\'s Chat');
         }
+      },
+    );
+  }
+
+  StreamSubscription<RealtimeMessage> animationHandler() {
+    return subscription.stream.listen(
+      (data) {
+        final receiverUser = LiveChatUser.fromJson(data.payload);
+        switch (receiverUser.animationType) {
+          case AnimationType.confetti:
+            {
+              log.w('confetti controller :1');
+              confettiController.play();
+            }
+
+            break;
+          case AnimationType.spotlight:
+            {
+              log.w('spotlight controller :2');
+              spotlightController.forward();
+            }
+            break;
+          default:
+            {
+              log.wtf('User Message is not equal to any animation value');
+            }
+        }
+      },
+      onError: (e) {
+        log.e('AppwriteSubscription:$e');
       },
     );
   }
@@ -142,29 +177,7 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
         textLength = (150 - controller.text.length).toInt();
       });
     });
-    subscription.stream.listen((data) async {
-      final receiverUser = LiveChatUser.fromJson(data.payload);
-      String? animationType = receiverUser.animationType;
-      if (animationType != null) {
-        switch (animationType) {
-          case AnimationType.confetti:
-            {
-             return  confettiController.play();
-            }
-          case AnimationType.spotlight:
-            {
-             return await spotlightController.forward().whenComplete(() {
-                setState(() {
-                  removeColors = false;
-                });
-              });
-            }
-          default:
-        }
-      } else {
-        log.wtf('Receiver Did n\'t use any animation');
-      }
-    });
+
     super.didUpdateWidget(oldWidget);
   }
 
@@ -174,13 +187,13 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
     String? mediaURL = _receiverUser.mediaURL;
     String liveUserId = FirestoreApi.liveUserUid;
     const valueColor = AlwaysStoppedAnimation(activeGreen);
-    final statusStyle =
-        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 30);
+    String collectionId = AppWriteConstants.liveChatscollectionID;
+    var style = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 30);
+    animationHandler();
     return ViewModelBuilder<LiveChatViewModel>.reactive(
       viewModelBuilder: () => LiveChatViewModel(),
       onModelReady: (model) async {
-        final liveChatId =
-            chatService.getConversationId(fireUserId, liveUserId);
+        var liveChatId = chatService.getConversationId(fireUserId, liveUserId);
         await model.updateMessage(
             documentId: _liveUser.documentID,
             collectionId: _liveUser.collectionID,
@@ -190,7 +203,6 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
       },
       onDispose: (model) async {
         subscription.close;
-        controller.removeListener(() {});
         await model.updateMessage(
             documentId: _liveUser.documentID,
             collectionId: _liveUser.collectionID,
@@ -203,7 +215,6 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
         return Scaffold(
           extendBody: true,
           extendBodyBehindAppBar: true,
-          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             elevation: 0.0,
             centerTitle: true,
@@ -226,6 +237,7 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
             ],
           ),
           body: Stack(
+            fit: StackFit.expand,
             children: [
               Container(
                 margin: const EdgeInsets.only(top: 100),
@@ -246,13 +258,14 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                               child: StreamBuilder<DocumentSnapshot>(
                                 stream: model.statusStream(fireUserId),
                                 builder: (context, snapshot) {
+                                  if (!snapshot.hasData) const Text('');
                                   if (snapshot.hasData) {
                                     String status = snapshot.data!['status'];
                                     bool isOnline =
                                         snapshot.data!['status'] == 'Online';
 
                                     return isOnline
-                                        ? Text(status, style: statusStyle)
+                                        ? Text(status, style: style)
                                         : receiverMessage();
                                   } else {
                                     return const SizedBox.shrink();
@@ -282,6 +295,7 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                         child: Center(
                           child: CupertinoTextField(
                             maxLength: 150,
+                            autofocus: true,
                             showCursor: false,
                             textAlign: TextAlign.center,
                             maxLines: controller.text.length > 100 ? 6 : 2,
@@ -318,27 +332,151 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    verticalSpaceLarge,
+                    verticalSpaceTiny,
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              KeyboardVisibilityBuilder(
+                                  builder: (context, child, visible) {
+                                return IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    CupertinoIcons.keyboard,
+                                    color: visible ? activeBlue : inactiveGray,
+                                  ),
+                                );
+                              }),
+                              IconButton(
+                                onPressed: () {
+                                  model.cameraOptions(
+                                    context: context,
+                                    takePicture: () async {
+                                      await model.pickImage(context);
+                                    },
+                                    recordVideo: () async {
+                                      await model.pickVideo(context);
+                                    },
+                                  );
+                                },
+                                icon: const Icon(CupertinoIcons.camera),
+                              ),
+                              model.isBusy
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: model.state == TaskState.running
+                                          ? CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: valueColor,
+                                              backgroundColor: activeBlue,
+                                              value: model.uploadingProgress,
+                                            )
+                                          : const CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: valueColor,
+                                              backgroundColor: activeBlue,
+                                            ),
+                                    )
+                                  : IconButton(
+                                      onPressed: () async {
+                                        await model.pickFromGallery(
+                                            context, _liveUser.documentID);
+                                      },
+                                      icon: const Icon(CupertinoIcons.photo),
+                                    ),
+                              IconButton(
+                                onPressed: () async {
+                                  var animation = await model.getAnimationValue(
+                                      context: context,
+                                      fireUser: widget.fireUser,
+                                      liverUserDocs: widget.liverUserDocs,
+                                      receiverDocs: widget.receiverUserDocs);
+                                  String confetti = AnimationType.confetti;
+                                  String spotlight = AnimationType.spotlight;
+                                  if (animation == confetti) {
+                                    await model.updateMessage(
+                                      documentId: _liveUser.documentID,
+                                      collectionId: collectionId,
+                                      data: {
+                                        LiveChatField.animationType: confetti,
+                                      },
+                                    );
+                                    confettiController.play();
+                                    await model.updateMessage(
+                                      documentId: _liveUser.documentID,
+                                      collectionId: collectionId,
+                                      data: {
+                                        LiveChatField.animationType: null,
+                                      },
+                                    );
+                                  } else if (animation == spotlight) {
+                                    await model.updateMessage(
+                                      documentId: _liveUser.documentID,
+                                      collectionId: collectionId,
+                                      data: {
+                                        LiveChatField.animationType: spotlight,
+                                      },
+                                    );
+                                    await spotlightController
+                                        .forward()
+                                        .whenComplete(() {
+                                      model.updateMessage(
+                                        documentId: _liveUser.documentID,
+                                        collectionId: collectionId,
+                                        data: {
+                                          LiveChatField.animationType: null,
+                                        },
+                                      );
+                                    });
+                                  }
+                                },
+                                icon: const Icon(CupertinoIcons.wand_stars),
+                              ),
+                              const Spacer(),
+                              Text(textLength.toString(),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(
+                                          color: inactiveGray, fontSize: 18)),
+                              IconButton(
+                                onPressed: () {
+                                  controller.clear();
+                                },
+                                icon: const Icon(Icons.restart_alt_rounded),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              ClipPath(
-                clipper: LightClipper(x, y, radius: radius),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      radius: model.spotLightRadius(spotlightController).value,
-                      center: const Alignment(0, -0.5),
-                      colors: [
-                        removeColors ? Colors.transparent : Colors.black45,
-                        removeColors
-                            ? Colors.transparent
-                            : Colors.black.withOpacity(0.9),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              spotlightController.status == AnimationStatus.forward
+                  ? ClipPath(
+                      clipper: LightClipper(x, y, radius: radius),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            radius: model
+                                .spotLightRadius(spotlightController)
+                                .value,
+                            center: const Alignment(0, -0.4),
+                            colors: [
+                              transparent,
+                              black.withOpacity(0.9),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               Positioned(
                 top: -200,
                 left: 200,
@@ -359,98 +497,6 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                 ),
               ),
             ],
-          ),
-          bottomSheet: Container(
-            color: systemBackground,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      KeyboardVisibilityBuilder(
-                          builder: (context, child, visible) {
-                        return IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.keyboard,
-                            color: visible ? activeBlue : inactiveGray,
-                          ),
-                        );
-                      }),
-                      IconButton(
-                        onPressed: () {
-                          model.cameraOptions(
-                            context: context,
-                            takePicture: () async {
-                              await model.pickImage(context);
-                            },
-                            recordVideo: () async {
-                              await model.pickVideo(context);
-                            },
-                          );
-                        },
-                        icon: const Icon(CupertinoIcons.camera),
-                      ),
-                      model.isBusy
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: model.state == TaskState.running
-                                  ? CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: valueColor,
-                                      backgroundColor: activeBlue,
-                                      value: model.uploadingProgress,
-                                    )
-                                  : const CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: valueColor,
-                                      backgroundColor: activeBlue,
-                                    ),
-                            )
-                          : IconButton(
-                              onPressed: () async {
-                                await model.pickFromGallery(
-                                    context, _liveUser.documentID);
-                              },
-                              icon: const Icon(CupertinoIcons.photo),
-                            ),
-                      IconButton(
-                        onPressed: () async {
-                          final animation = await Navigator.push(
-                            context,
-                            cupertinoTransition(
-                              enterTo: const LiveChatAnimations(),
-                              exitFrom: LiveChat(
-                                  fireUser: widget.fireUser,
-                                  liverUserDocs: widget.liverUserDocs,
-                                  receiverUserDocs: widget.receiverUserDocs),
-                            ),
-                          );
-                          log.wtf('Animation Value:$animation');
-                        },
-                        icon: const Icon(CupertinoIcons.wand_stars),
-                      ),
-                      const Spacer(),
-                      Text(textLength.toString(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText2!
-                              .copyWith(color: inactiveGray, fontSize: 18)),
-                      IconButton(
-                        onPressed: () {
-                          controller.clear();
-                        },
-                        icon: const Icon(Icons.restart_alt_rounded),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       },

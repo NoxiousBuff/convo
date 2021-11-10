@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_background/animated_background.dart';
 
 class SpotLight extends StatefulWidget {
@@ -12,7 +13,7 @@ class SpotLight extends StatefulWidget {
 }
 
 class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
-  late AnimationController controller;
+  AnimationController? controller;
   CurveTween curveTween =
       CurveTween(curve: const Interval(0.0, 0.5, curve: Curves.ease));
   CurveTween curveTween2 =
@@ -28,12 +29,17 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
     controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 4000));
 
-    controller.repeat();
+    controller!.addListener(() {
+      setState(() {});
+    });
+
+    controller!.forward();
+    controller!.repeat();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    controller!.dispose();
     super.dispose();
   }
 
@@ -46,14 +52,14 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
         TweenSequenceItem(
             tween: Tween(begin: 0.5, end: 5.0).chain(curveTween2), weight: 50)
       ],
-    ).animate(controller);
+    ).animate(controller!);
   }
 
   ///  particles container height
   Animation<double> height() {
     final size = MediaQuery.of(context).size;
     double begin = size.height * 0.0;
-    double end = size.height * 0.4;
+    double end = size.height * 0.8;
     return TweenSequence(
       [
         TweenSequenceItem(
@@ -62,7 +68,7 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
             tween: Tween(begin: end, end: begin).chain(curveTween2),
             weight: 50),
       ],
-    ).animate(controller);
+    ).animate(controller!);
   }
 
   ///  Particles Container Width
@@ -70,18 +76,17 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
     return TweenSequence(
       [
         TweenSequenceItem(
-            tween: Tween(begin: 0.0, end: 400.0).chain(curveTween), weight: 50),
+            tween: Tween(begin: 0.0, end: 200.0).chain(curveTween), weight: 50),
         TweenSequenceItem(
-            tween: Tween(begin: 400.0, end: 0.0).chain(curveTween2),
+            tween: Tween(begin: 200.0, end: 0.0).chain(curveTween2),
             weight: 50),
       ],
-    ).animate(controller);
+    ).animate(controller!);
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     setState(() {
       lightOn = true;
       x = size.width * 0.785;
@@ -94,53 +99,15 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: extraLightBackgroundGray,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Center(
-                        child: Text(
-                          'Receiver Message',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: activeBlue,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Center(
-                        child: Text(
-                          'Sender Message',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(color: systemBackground),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             ClipPath(
               clipper: LightClipper(x, y, radius: radius),
               child: Container(
-                alignment: Alignment.topLeft,
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     radius: _radius().value,
-                    center: const Alignment(0, -0.5),
+                    center: const Alignment(0.8, 0.7),
                     colors: [
-                      Colors.black45,
+                      transparent,
                       Colors.black.withOpacity(0.9),
                     ],
                   ),
@@ -148,7 +115,8 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
               ),
             ),
             Positioned(
-              top: size.height * 0.01,
+              top: size.height * 0.05,
+              right: size.width * -0.2,
               child: Transform.rotate(
                 angle: 0.349066,
                 child: Stack(
@@ -157,7 +125,7 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
                       decoration: BoxDecoration(
                           gradient: RadialGradient(
                             radius: 1.0,
-                            center: const Alignment(0, -1),
+                            center: const Alignment(0.8, 0.6),
                             colors: [
                               Colors.white60.withOpacity(0),
                               Colors.black45.withOpacity(0),
@@ -183,6 +151,27 @@ class _SpotLightState extends State<SpotLight> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
+              ),
+            ),
+            Positioned(
+              top: size.height * 0.8,
+              right: size.width * 0.04,
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Consumer(
+                    builder: (_, watch, __) {
+                      return GestureDetector(
+                        onTap: () {},
+                        child: Text('Hint Message',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(color: activeBlue)),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ],

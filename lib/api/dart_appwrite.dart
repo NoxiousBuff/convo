@@ -14,7 +14,8 @@ class DartAppWriteApi {
     client
         .setEndpoint(AppWriteConstants.apiEndPoint)
         .setProject(AppWriteConstants.projectID)
-        .setKey(AppWriteConstants.setKey);
+        .setKey(AppWriteConstants.setKey)
+        .setSelfSigned();
     database = Database(client);
   }
 

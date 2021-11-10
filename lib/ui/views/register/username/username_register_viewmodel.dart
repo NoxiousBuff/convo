@@ -36,14 +36,13 @@ class UsernameRegisterViewModel extends BaseViewModel {
   }) async {
     try {
       setBusy(true);
- 
+
       bool isUsernameExists = await checkIsUsernameExists(username);
       if (!isUsernameExists) {
         await AppWriteApi.instance
             .signup(name: username, email: email, password: password);
         await AppWriteApi.instance.logIn(email: email, password: password);
 
-       
         Navigator.push(
           context,
           cupertinoTransition(

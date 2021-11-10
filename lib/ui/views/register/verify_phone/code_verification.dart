@@ -28,7 +28,6 @@ class CodeVerificationView extends StatefulWidget {
 }
 
 class _CodeVerificationViewState extends State<CodeVerificationView> {
-  String _smsCode = '592000';
   String _phoneVerificationId = '';
   final log = getLogger('CodeVerificationView');
   TextEditingController verificationCodeController = TextEditingController();
@@ -48,12 +47,7 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
   Future<void> signUpWithPhone(String phoneNumber) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: widget.countryPhoneCode + widget.phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) {
-        setState(() {
-          _smsCode = credential.smsCode!;
-        });
-        widget.createdUser!.updatePhoneNumber(credential);
-      },
+      verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -159,31 +153,31 @@ class _CodeVerificationViewState extends State<CodeVerificationView> {
                 onPressed: () async {
                   if (model.formKey.currentState!.validate()) {
                     log.wtf('code verfied successfully');
-                    if (_smsCode == verificationCodeController.text) {
-                      await model.verifyCode(
-                        context,
-                        email: widget.email,
-                        createdUser: createdUser,
-                        username: widget.username,
-                        phoneNumber: widget.phoneNumber,
-                        verificationId: _phoneVerificationId,
-                        smsCode: verificationCodeController.text,
-                        countryPhoneCode: widget.countryPhoneCode,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: systemRed,
-                          content: Text(
-                            'sms code didn\'t match',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText2!
-                                .copyWith(color: systemBackground),
-                          ),
-                        ),
-                      );
-                    }
+                    await model.verifyCode(
+                      context,
+                      email: widget.email,
+                      createdUser: createdUser,
+                      username: widget.username,
+                      phoneNumber: widget.phoneNumber,
+                      verificationId: _phoneVerificationId,
+                      smsCode: verificationCodeController.text,
+                      countryPhoneCode: widget.countryPhoneCode,
+                    );
+                    // if (_smsCode == verificationCodeController.text) {
+                    // } else {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       backgroundColor: systemRed,
+                    //       content: Text(
+                    //         'sms code didn\'t match',
+                    //         style: Theme.of(context)
+                    //             .textTheme
+                    //             .bodyText2!
+                    //             .copyWith(color: systemBackground),
+                    //       ),
+                    //     ),
+                    //   );
+                    // }
                   }
                 },
                 child: model.isBusy

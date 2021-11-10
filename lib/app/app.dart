@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user != null) {
         bool userExists = await getUser(user.uid);
-        final appwriteUser = await AppWriteApi.instance.account.get();
+        final appwriteUser = await AppWriteApi.instance.getUser();
       
         if (userExists) {
           log.wtf('Status:${appwriteUser.status}');

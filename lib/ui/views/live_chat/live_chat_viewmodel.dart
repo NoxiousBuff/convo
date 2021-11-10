@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,9 @@ import 'package:hint/constants/appwrite_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import 'live_chat.dart';
+import 'live_chat_animations.dart';
 
 class LiveChatViewModel extends BaseViewModel {
   final log = getLogger('LiveChatViewModel');
@@ -49,7 +54,6 @@ class LiveChatViewModel extends BaseViewModel {
       CurveTween(curve: const Interval(0.0, 0.5, curve: Curves.ease));
   CurveTween curveTween2 =
       CurveTween(curve: const Interval(0.5, 1.0, curve: Curves.ease));
-  
 
   /// Radius of Spotlight
   Animation<double> spotLightRadius(AnimationController controller) {
@@ -63,8 +67,9 @@ class LiveChatViewModel extends BaseViewModel {
     ).animate(controller);
   }
 
-    ///  particles container height
-  Animation<double> spotLightParticlesHeight(AnimationController controller, BuildContext context) {
+  ///  particles container height
+  Animation<double> spotLightParticlesHeight(
+      AnimationController controller, BuildContext context) {
     final size = MediaQuery.of(context).size;
     double begin = size.height * 0.0;
     double end = size.height * 0.4;
@@ -79,7 +84,7 @@ class LiveChatViewModel extends BaseViewModel {
     ).animate(controller);
   }
 
- ///  Particles Container Width
+  ///  Particles Container Width
   Animation<double> spotLightParticlesWidth(AnimationController controller) {
     return TweenSequence(
       [
@@ -187,6 +192,27 @@ class LiveChatViewModel extends BaseViewModel {
         );
       },
     );
+  }
+
+  // getting animation Value
+  Future<dynamic> getAnimationValue({
+    required FireUser fireUser,
+    required BuildContext context,
+    required GetDocumentsList liverUserDocs,
+    required GetDocumentsList receiverDocs,
+  }) async {
+    final animation = await Navigator.push(
+      context,
+      cupertinoTransition(
+        enterTo: const LiveChatAnimations(),
+        exitFrom: LiveChat(
+            fireUser: fireUser,
+            liverUserDocs: liverUserDocs,
+            receiverUserDocs: receiverDocs),
+      ),
+    );
+    log.wtf('Animation Value:$animation');
+    return animation;
   }
 
   /// Clicking Image from camera

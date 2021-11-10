@@ -70,11 +70,13 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
       log.wtf(' LiveChatUser Already Created First Live Chat');
       final liveUSerDoc = liveUserList.documents.first;
       final liveChatUserDoc = liveUSerDoc.cast<String, dynamic>();
-      log.wtf('LiveUserDoc:${LiveChatUser.fromJson(liveChatUserDoc)}');
+      final liveUser = LiveChatUser.fromJson(liveChatUserDoc);
+      log.wtf('LiveUserUid:${liveUser.userUid}');
 
       final receiverUserDoc = receiverUserList.documents.first;
       final receiverDoc = receiverUserDoc.cast<String, dynamic>();
-      log.wtf('ReceiverUserDoc:${LiveChatUser.fromJson(receiverDoc)}');
+      final receiver = LiveChatUser.fromJson(receiverDoc);
+      log.wtf('ReceiverUserUid:${receiver.userUid}');
 
       Navigator.push(
         context,

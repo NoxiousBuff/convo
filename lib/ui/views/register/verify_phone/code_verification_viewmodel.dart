@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/pods/genral_code.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,59 +16,6 @@ class CodeVerificationViewModel extends BaseViewModel {
   final formKey = GlobalKey<FormState>();
   final FocusNode pinPutFocusNode = FocusNode();
   final TextEditingController pinPutController = TextEditingController();
-
-  Future<void> signInWithPhoneAuthCredential(
-    BuildContext context, {
-    required PhoneAuthCredential phoneAuthCredential,
-    User? createdUser,
-    required String email,
-    required String username,
-    required String phoneNumber,
-    required String verificationId,
-    required String countryPhoneCode,
-  }) async {
-    setBusy(true);
-    try {
-      
-      if (createdUser != null) {
-        Navigator.push(
-          context,
-          cupertinoTransition(
-            enterTo: InterestsView(
-              email: email,
-              username: username,
-              createdUser: createdUser,
-              phoneNumber: phoneNumber,
-              countryPhoneCode: countryPhoneCode,
-            ),
-            exitFrom: CodeVerificationView(
-              email: email,
-              username: username,
-              createdUser: createdUser,
-              phoneNumber: phoneNumber,
-              countryPhoneCode: countryPhoneCode,
-            ),
-          ),
-        );
-      }
-    } on FirebaseAuthException {
-      setBusy(false);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: systemRed,
-          content: Text(
-            'Verification Failed',
-            style: Theme.of(context)
-                .textTheme
-                .bodyText2!
-                .copyWith(color: systemBackground),
-          ),
-        ),
-      );
-    }
-    setBusy(false);
-  }
 
   Future<void> resend(String phoneNumber, BuildContext context) async {
     return FirebaseAuth.instance.verifyPhoneNumber(
@@ -114,18 +62,49 @@ class CodeVerificationViewModel extends BaseViewModel {
     required String verificationId,
     required String countryPhoneCode,
   }) async {
-    PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
-        verificationId: verificationId, smsCode: smsCode);
+    setBusy(true);
 
-    await signInWithPhoneAuthCredential(
-      context,
-      email: email,
-      username: username,
-      phoneNumber: phoneNumber,
-      createdUser: createdUser,
-      verificationId: verificationId,
-      countryPhoneCode: countryPhoneCode,
-      phoneAuthCredential: phoneAuthCredential,
-    );
+    try {
+      PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
+          verificationId: verificationId, smsCode: smsCode);
+      await AuthService.liveUser!.updatePhoneNumber(phoneAuthCredential);
+      if (createdUser != null) {
+        Navigator.push(
+          context,
+          cupertinoTransition(
+            enterTo: InterestsView(
+              email: email,
+              username: username,
+              createdUser: createdUser,
+              phoneNumber: phoneNumber,
+              countryPhoneCode: countryPhoneCode,
+            ),
+            exitFrom: CodeVerificationView(
+              email: email,
+              username: username,
+              createdUser: createdUser,
+              phoneNumber: phoneNumber,
+              countryPhoneCode: countryPhoneCode,
+            ),
+          ),
+        );
+      }
+    } on FirebaseAuthException {
+      setBusy(false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: systemRed,
+          content: Text(
+            'Verification Failed',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2!
+                .copyWith(color: systemBackground),
+          ),
+        ),
+      );
+    }
+    setBusy(false);
   }
 }
