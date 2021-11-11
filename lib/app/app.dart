@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
@@ -58,8 +57,6 @@ class _MyAppState extends State<MyApp> {
             loggedIn = true;
           });
         }
-        final appwriteUser = await AppWriteApi.instance.getUser();
-        log.wtf('AppwriteUser:$appwriteUser');
       } else {
         log.wtf('user is null LoggedIn:$loggedIn');
         setState(() {

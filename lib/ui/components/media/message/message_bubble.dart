@@ -15,7 +15,6 @@ import 'package:hint/models/message_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
-import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/components/media/meme/meme_media.dart';
 import 'package:hint/ui/components/media/url/url_preview.dart';
@@ -36,14 +35,12 @@ class MessageBubble extends StatefulWidget {
   final String receiverUid;
   final String conversationId;
   final bool isTimestampMatched;
-  final ChatViewModel chatViewModel;
   const MessageBubble({
     Key? key,
     required this.index,
     required this.fireUser,
     required this.message,
     required this.receiverUid,
-    required this.chatViewModel,
     required this.conversationId,
     required this.isTimestampMatched,
   }) : super(key: key);

@@ -181,14 +181,7 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await model.clearChat();
-                    await Hive.box('UrlData[$conversationId]').clear();
-                    await Hive.box('ImagesMemory[$conversationId]').clear();
-                    await Hive.box("ChatRoomMedia[$conversationId]").clear();
-                    await Hive.box('VideoThumbnails[$conversationId]').clear();
-                  },
+                  onTap: () => Navigator.pop(context),
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Container(

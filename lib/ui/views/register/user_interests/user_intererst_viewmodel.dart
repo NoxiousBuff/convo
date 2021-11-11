@@ -3,7 +3,6 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/recent_chats/recent_chats.dart';
@@ -29,7 +28,6 @@ class InterestsViewModel extends BaseViewModel {
   }) async {
     setBusy(true);
     await createdUser!.reload();
-    await AppWriteApi.instance.createLiveChatUser(createdUser.uid);
     await firestoreApi
         .createUserInFirebase(
             user: createdUser,

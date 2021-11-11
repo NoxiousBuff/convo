@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/ui/views/login/login_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
@@ -13,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/message_string.dart';
+import 'package:hint/ui/views/login/login_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -49,7 +48,6 @@ class DistantViewViewModel extends BaseViewModel {
       uid: FirestoreApi.liveUserUid,
     );
 
-    await AppWriteApi.instance.logout();
     await _auth.signOut().catchError((e) => log.e('Firestore Signout:$e'));
     loggedIn = false;
     notifyListeners();
