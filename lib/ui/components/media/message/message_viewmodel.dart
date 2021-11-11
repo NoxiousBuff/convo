@@ -16,8 +16,6 @@ class MessageBubbleViewModel extends BaseViewModel {
   firebase_storage.TaskState? _taskState;
   firebase_storage.TaskState? get taskState => _taskState;
 
- 
-
   double _uploadingProgress = 0.0;
   double get uploadingProgress => _uploadingProgress;
 
@@ -33,10 +31,11 @@ class MessageBubbleViewModel extends BaseViewModel {
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
-  Future<void> updateMediaDocument(
-      {required String conversationId,
-      required String messageUid,
-      required String downloadURL}) async {
+  Future<void> updateMediaDocument({
+    required String messageUid,
+    required String downloadURL,
+    required String conversationId,
+  }) async {
     FirebaseFirestore.instance
         .collection(convoFirestorekey)
         .doc(conversationId)

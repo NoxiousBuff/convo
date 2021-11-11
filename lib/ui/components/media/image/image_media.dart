@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:hint/api/hive_helper.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,14 +16,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hint/ui/components/media/image/image_viewmodel.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';
 
-class ImageMedia extends StatelessWidget {
+class ImageMedia extends StatefulWidget {
   final bool isRead;
   final Message message;
   final String receiverUid;
   final String conversationId;
   final Uint8List memoryImage;
   final MessageBubbleViewModel messageBubbleModel;
-  ImageMedia({
+  const ImageMedia({
     Key? key,
     required this.isRead,
     required this.message,
@@ -33,8 +33,15 @@ class ImageMedia extends StatelessWidget {
     required this.messageBubbleModel,
   }) : super(key: key);
 
+  @override
+  State<ImageMedia> createState() => _ImageMediaState();
+}
+
+class _ImageMediaState extends State<ImageMedia> {
   final radius = BorderRadius.circular(16);
+
   final log = getLogger('ImageMedia');
+
   Widget retryButton() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
@@ -73,7 +80,7 @@ class ImageMedia extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            messageBubbleModel.taskState == TaskState.running
+            widget.messageBubbleModel.taskState == TaskState.running
                 ? CircularProgressIndicator(
                     value: model.uploadingProgress,
                     backgroundColor: systemBackground,
@@ -101,47 +108,56 @@ class ImageMedia extends StatelessWidget {
     );
   }
 
+ 
   @override
   Widget build(BuildContext context) {
-    var hiveBox = chatRoomMediaHiveBox(conversationId);
+    var hiveBox = Hive.box(HiveHelper.hiveBoxImages);
 
     return ViewModelBuilder<ImageViewModel>.reactive(
       viewModelBuilder: () => ImageViewModel(),
       onModelReady: (model) async {
-        if (!hiveBox.containsKey(message.messageUid)) {
-          log.w('uploaded is false for this message');
-          await model.uploadAndSave(
-            model: messageBubbleModel,
-            messageUid: message.messageUid,
-            conversationId: conversationId,
-            filePath: message.message[MessageField.mediaURL],
-          );
-        }
+        // final hivePod = context.read(imageViewModelProvider);
+
+        // bool containPath = hivePod.contains(widget.message.messageUid);
+        // if (!containPath) {
+        //   log.wtf(
+        //       'Hive not contain this path Uid: ${widget.message.messageUid}');
+        //   await model.uploadAndSave(
+        //     model: widget.messageBubbleModel,
+        //     messageUid: widget.message.messageUid,
+        //     conversationId: widget.conversationId,
+        //     filePath: widget.message.message[MessageField.mediaURL],
+        //   );
+        // } else {
+        //   log.wtf('Hive Contain this Path Uid: ${widget.message.messageUid}');
+        // }
       },
       builder: (context, model, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            mediaBubble(
-              context: context,
-              isRead: isRead,
-              child: !hiveBox.containsKey(message.messageUid)
-                  ? ExtendedImage(image: MemoryImage(memoryImage))
-                  : ExtendedImage.file(File(hiveBox.get(message.messageUid))),
-            ),
-            ValueListenableBuilder<Box>(
-              valueListenable: hiveBox.listenable(),
-              builder: (context, box, child) {
-                return !box.containsKey(message.messageUid)
-                    ? messageBubbleModel.isuploading
-                        ? uploadingProgress(messageBubbleModel)
-                        : message.message[MessageField.uploaded]
+        return ValueListenableBuilder<Box<dynamic>>(
+          valueListenable: Hive.box(HiveHelper.hiveBoxImages).listenable(),
+          builder: (context, box, child) {
+            bool containPath = box.containsKey(widget.message.messageUid);
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                mediaBubble(
+                  context: context,
+                  isRead: widget.isRead,
+                  child: !containPath
+                      ? ExtendedImage(image: MemoryImage(widget.memoryImage))
+                      : ExtendedImage.file(
+                          File(hiveBox.get(widget.message.messageUid))),
+                ),
+                !containPath
+                    ? widget.messageBubbleModel.isuploading
+                        ? uploadingProgress(widget.messageBubbleModel)
+                        : !widget.message.message[MessageField.uploaded]
                             ? retryButton()
                             : const SizedBox.shrink()
-                    : const SizedBox.shrink();
-              },
-            ),
-          ],
+                    : const SizedBox.shrink(),
+              ],
+            );
+          },
         );
       },
     );

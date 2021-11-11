@@ -15,14 +15,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class TextFieldViewModel extends BaseViewModel {
   final log = getLogger('TextFieldViewModel');
+
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
 
   /// If it is true then emojies will display,
   bool _blackEmojie = false;
@@ -94,125 +96,171 @@ class TextFieldViewModel extends BaseViewModel {
     if (selectedVideo != null) {
       return File(selectedVideo.path);
     } else {
-       log.wtf('pickVideo | Video was not recorded');
+      log.wtf('pickVideo | Video was not recorded');
     }
   }
 
   void Function() textFieldMessage({
-  required bool connected,
-  required String receiverUid,
-  required BuildContext context, 
-  required String conversationId,
-  required ChatViewModel chatViewModel,
-  required TextEditingController controller,
-   }) => ()async{
-     final timestamp = Timestamp.now();
-     final replyPod = context.read(replyBackProvider);
-     String messageUid = const Uuid().v1();
-     bool isUrl = isURL(controller.text);
-     var replyMsg = replyPod.message;
-     !replyPod.showReply
-         ? await chatService.addFirestoreMessage(
-             timestamp: timestamp,
-             messageUid: messageUid,
-             receiverUid: receiverUid,
-             messageText: controller.text,
-             type: isUrl ? urlType : textType,
-             userBlockMe: chatViewModel.userBlockMe,
-           )
-         : await chatService.addFirestoreMessage(
-             isReply: true,
-             timestamp: timestamp,
-             messageUid: messageUid,
-             receiverUid: receiverUid,
-             messageText: controller.text,
-             type: isUrl ? urlType : textType,
-             userBlockMe: chatViewModel.userBlockMe,
-             replyMessage: {
-               ReplyField.replyType: replyPod.messageType,
-               ReplyField.replyMessageUid: replyPod.messageUid,
-               ReplyField.replySenderUid: replyPod.replySenderID,
-               ReplyField.replyMediaUrl: replyMsg != null
-                   ? replyMsg[MessageField.mediaURL]
-                   : null,
-               ReplyField.replyMessageText: replyMsg != null
-                   ? replyMsg[MessageField.messageText]
-                   : null,
-             },
-           );
-  controller.clear();
-  replyPod.showReplyBool(false);
-    
-   };
+    required bool connected,
+    required String receiverUid,
+    required BuildContext context,
+    required String conversationId,
+    required ChatViewModel chatViewModel,
+    required TextEditingController controller,
+  }) =>
+      () async {
+        final timestamp = Timestamp.now();
+        final replyPod = context.read(replyBackProvider);
+        String messageUid = const Uuid().v1();
+        bool isUrl = isURL(controller.text);
+        var replyMsg = replyPod.message;
+        !replyPod.showReply
+            ? await chatService.addFirestoreMessage(
+                timestamp: timestamp,
+                messageUid: messageUid,
+                receiverUid: receiverUid,
+                messageText: controller.text,
+                type: isUrl ? urlType : textType,
+                userBlockMe: chatViewModel.userBlockMe,
+              )
+            : await chatService.addFirestoreMessage(
+                isReply: true,
+                timestamp: timestamp,
+                messageUid: messageUid,
+                receiverUid: receiverUid,
+                messageText: controller.text,
+                type: isUrl ? urlType : textType,
+                userBlockMe: chatViewModel.userBlockMe,
+                replyMessage: {
+                  ReplyField.replyType: replyPod.messageType,
+                  ReplyField.replyMessageUid: replyPod.messageUid,
+                  ReplyField.replySenderUid: replyPod.replySenderID,
+                  ReplyField.replyMediaUrl:
+                      replyMsg != null ? replyMsg[MessageField.mediaURL] : null,
+                  ReplyField.replyMessageText: replyMsg != null
+                      ? replyMsg[MessageField.messageText]
+                      : null,
+                },
+              );
+        controller.clear();
+        replyPod.showReplyBool(false);
+      };
 
+  Future addMessage(
+      String path, String boxId, String receiverUid, bool userBlockMe) async {
+    String messageUid = const Uuid().v1();
+    final mime = lookupMimeType(path);
+    final type = mime!.split('/').first;
 
+    final imagesBox = imagesMemoryHiveBox(boxId);
+    Uint8List bytes = await File(path).readAsBytes();
+    await imagesBox.put(messageUid, bytes);
+    var memoryImage = imagesBox.get(messageUid);
+    log.wtf('MemoryImage:$memoryImage');
+
+    return chatService.addFirestoreMessage(
+      type: type,
+      messageUid: messageUid,
+      receiverUid: receiverUid,
+      timestamp: Timestamp.now(),
+      userBlockMe: userBlockMe,
+    );
+  }
 
   Future<void> pickMedias({
-     required String boxId, 
-     required String receiverUid,
-     required BuildContext context,
-     required ChatViewModel chatViewModel,
-     }) async {
+    required String boxId,
+    required String receiverUid,
+    required BuildContext context,
+    required ChatViewModel chatViewModel,
+  }) async {
     const pickFile = FileType.media;
     final picker = FilePicker.platform;
     final result = await picker.pickFiles(type: pickFile, allowMultiple: true);
-    final replyPod = context.read(replyBackProvider);
+
     if (result != null) {
       for (var path in result.paths) {
         if (path != null) {
-          final uid = const Uuid().v1();
-          final timestamp = Timestamp.now();
+          String messageUid = const Uuid().v1();
           final mime = lookupMimeType(path);
           final type = mime!.split('/').first;
 
-          final videoBox = videoThumbnailsHiveBox(boxId);
           final imagesBox = imagesMemoryHiveBox(boxId);
-          if (type == videoType) {
-            Uint8List? thumbnail = await VideoThumbnail.thumbnailData(
-              video: path,
-              imageFormat: ImageFormat.PNG,
-            ).catchError((e){log.e('Thumbnail:$e')});
-            if (thumbnail != null) {
-              await videoBox.put(uid, thumbnail);
-              log.wtf('Thumbnail:${videoBox.get(uid)}');
-            } else {
-             log.e('Thumbnail is null now!!');
-            }
-          } else if (type == imageType) {
-            Uint8List bytes = await File(path).readAsBytes();
-            await imagesBox.put(uid, bytes);
-            var memoryImage = imagesBox.get(uid);
-            log.wtf('MemoryImage:$memoryImage');
-          }
-          final replyMsg =  replyPod.message;
-         !replyPod.showReply ? await chatService.addFirestoreMessage(
-            type: type,
-            mediaURL: path,
-            messageUid: uid,
-            timestamp: timestamp,
-            receiverUid: receiverUid,
-            userBlockMe: chatViewModel.userBlockMe,
-          ) :await chatService.addFirestoreMessage(
-            type: type,
-            isReply: true,
-            mediaURL: path,
-            messageUid: uid,
-            timestamp: timestamp,
-            receiverUid: receiverUid,
-            userBlockMe: chatViewModel.userBlockMe,
-            replyMessage: {
-              ReplyField.replyType: replyPod.messageType,
-              ReplyField.replyMessageUid:replyPod.messageUid,
-              ReplyField.replyMediaUrl: replyMsg != null ? replyMsg[MessageField.mediaURL] : null,
-              ReplyField.replyMessageText: replyMsg!= null ? replyMsg[MessageField.messageText]: null,
-            }
-          )  ;
-          
-        } 
+          Uint8List bytes = await File(path).readAsBytes();
+          await imagesBox.put(messageUid, bytes);
+          var memoryImage = imagesBox.get(messageUid);
+          log.wtf('MemoryImage:$memoryImage');
+
+          await chatService
+              .addFirestoreMessage(
+                  type: type,
+                  mediaURL: path,
+                  messageUid: messageUid,
+                  receiverUid: receiverUid,
+                  timestamp: Timestamp.now(),
+                  userBlockMe: chatViewModel.userBlockMe)
+              .catchError((e) {
+            log.e('PickMedias Error:$e');
+          }).then((value) => log.wtf('Message Added in Firestore'));
+        }
       }
-       replyPod.showReplyBool(false);
-    } else {
-      log.w('no media was selected');
     }
+
+    // if (result != null) {
+    //   for (var path in result.paths) {
+    //     if (path != null) {
+    //       final uid = const Uuid().v1();
+    //       final timestamp = Timestamp.now();
+    //       final mime = lookupMimeType(path);
+    //       final type = mime!.split('/').first;
+
+    //       final videoBox = videoThumbnailsHiveBox(boxId);
+    //       final imagesBox = imagesMemoryHiveBox(boxId);
+    //       if (type == videoType) {
+    //         Uint8List? thumbnail = await VideoThumbnail.thumbnailData(
+    //           video: path,
+    //           imageFormat: ImageFormat.PNG,
+    //         ).catchError((e){log.e('Thumbnail:$e')});
+    //         if (thumbnail != null) {
+    //           await videoBox.put(uid, thumbnail);
+    //           log.wtf('Thumbnail:${videoBox.get(uid)}');
+    //         } else {
+    //          log.e('Thumbnail is null now!!');
+    //         }
+    //       } else if (type == imageType) {
+    //         Uint8List bytes = await File(path).readAsBytes();
+    //         await imagesBox.put(uid, bytes);
+    //         var memoryImage = imagesBox.get(uid);
+    //         log.wtf('MemoryImage:$memoryImage');
+    //       }
+    //       final replyMsg =  replyPod.message;
+    //      !replyPod.showReply ? await chatService.addFirestoreMessage(
+    //         type: type,
+    //         mediaURL: path,
+    //         messageUid: uid,
+    //         timestamp: timestamp,
+    //         receiverUid: receiverUid,
+    //         userBlockMe: chatViewModel.userBlockMe,
+    //       ) :await chatService.addFirestoreMessage(
+    //         type: type,
+    //         isReply: true,
+    //         mediaURL: path,
+    //         messageUid: uid,
+    //         timestamp: timestamp,
+    //         receiverUid: receiverUid,
+    //         userBlockMe: chatViewModel.userBlockMe,
+    //         replyMessage: {
+    //           ReplyField.replyType: replyPod.messageType,
+    //           ReplyField.replyMessageUid:replyPod.messageUid,
+    //           ReplyField.replyMediaUrl: replyMsg != null ? replyMsg[MessageField.mediaURL] : null,
+    //           ReplyField.replyMessageText: replyMsg!= null ? replyMsg[MessageField.messageText]: null,
+    //         }
+    //       )  ;
+
+    //     }
+    //   }
+    //    replyPod.showReplyBool(false);
+    // } else {
+    //   log.w('no media was selected');
+    // }
   }
 }

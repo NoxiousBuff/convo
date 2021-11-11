@@ -8,10 +8,12 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:collection/collection.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/constants/message_string.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
@@ -20,14 +22,6 @@ import 'package:hint/ui/views/profile_view/profile_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/components/hint/textfield/textfield.dart';
 import 'package:hint/ui/components/media/message/message_bubble.dart';
-
-// const systemUiOverlays = SystemUiOverlayStyle(
-//   statusBarBrightness: dark,
-//   statusBarIconBrightness: dark,
-//   systemNavigationBarDividerColor: black,
-//   systemNavigationBarColor: Colors.transparent,
-// );
-// getLogger('$systemUiOverlays');
 
 class ChatView extends StatelessWidget {
   final FireUser fireUser;
@@ -56,7 +50,6 @@ class ChatView extends StatelessWidget {
       viewModelBuilder: () =>
           ChatViewModel(conversationId: conversationId, fireUser: fireUser),
       onModelReady: (model) async {
-        model.scrollController = ScrollController();
         await model.iBlockThisUserCkecker(
             firestoreApi.getCurrentUser()!.uid, fireUser.id);
         log.wtf('iBlockThisUser:${model.iBlockThisUser}');
@@ -65,17 +58,6 @@ class ChatView extends StatelessWidget {
         log.wtf('userBlockMe:${model.userBlockMe}');
       },
       onDispose: (model) async {
-        // if (urlDataHiveBox(conversationId).isOpen) {
-        //   await urlDataHiveBox(conversationId).close();
-        // } else if (imagesMemoryHiveBox(conversationId).isOpen) {
-        //   await imagesMemoryHiveBox(conversationId).close();
-        // } else if (chatRoomMediaHiveBox(conversationId).isOpen) {
-        //   await chatRoomMediaHiveBox(conversationId).close();
-        // } else if (thumbnailsPathHiveBox(conversationId).isOpen) {
-        //   await thumbnailsPathHiveBox(conversationId).close();
-        // } else if (videoThumbnailsHiveBox(conversationId).isOpen) {
-        //   await videoThumbnailsHiveBox(conversationId).close();
-        // }
         if (await model.hasMessage(conversationId)) {
           await chatService.addToRecentList(fireUser.id);
         }
@@ -87,9 +69,7 @@ class ChatView extends StatelessWidget {
           connectivityBuilder: (context, connectivity, child) {
             bool connected = connectivity != ConnectivityResult.none;
 
-            if (connected) {
-              model.seeMsg();
-            }
+            if (connected) model.seeMsg();
             return GestureDetector(
               onTap: () {
                 MediaQuery.of(context).viewInsets.bottom == 0
@@ -260,7 +240,7 @@ class ChatView extends StatelessWidget {
   }
 }
 
-class ChatMessages extends StatelessWidget {
+class ChatMessages extends StatefulWidget {
   final FireUser fireuser;
   final ChatViewModel model;
   final String conversationId;
@@ -274,9 +254,13 @@ class ChatMessages extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    const padding = EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0);
-    var data = model.data;
+  State<ChatMessages> createState() => _ChatMessagesState();
+}
+
+class _ChatMessagesState extends State<ChatMessages> {
+  @override
+  void didUpdateWidget(covariant ChatMessages oldWidget) {
+    var data = widget.model.data;
 
     if (data != null) {
       final groupByDate = groupBy(
@@ -290,73 +274,88 @@ class ChatMessages extends StatelessWidget {
       );
       groupByDate.forEach(
         (date, list) {
-          if (!model.messagesDate.contains(date)) {
-            model.getMessagesDate(date);
+          if (!widget.model.messagesDate.contains(date)) {
+            widget.model.getMessagesDate(date);
           }
           final firstTimestamp = list.last['timestamp'] as Timestamp;
 
-          if (!model.messagesTimestamp.contains(firstTimestamp)) {
-            model.getTimeStamp(firstTimestamp);
+          if (!widget.model.messagesTimestamp.contains(firstTimestamp)) {
+            widget.model.getTimeStamp(firstTimestamp);
           }
         },
       );
     }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ScrollController controller = ScrollController();
+    const padding = EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0);
     bool timestampMatch(Message messageData) {
-      final match = model.messagesTimestamp
+      final match = widget.model.messagesTimestamp
           .any((element) => messageData.timestamp == element);
       return match;
     }
 
-    return ViewModelBuilder<ChatViewModel>.reactive(
-      viewModelBuilder: () =>
-          ChatViewModel(conversationId: conversationId, fireUser: fireuser),
-      builder: (context, model, child) {
-        var data = model.data;
-        if (!model.dataReady) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (model.hasError) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0)),
-            title: const Text(
-              'Something Bad Happened',
-              textAlign: TextAlign.center,
-            ),
-            content: const Text(
-              'Please try again later.',
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              CupertinoButton(
-                child: const Text('Ok'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          );
-        }
-        final messages = data!.docs;
-        return OfflineBuilder(
-          child: const Text('Yahh !!'),
-          connectivityBuilder: (context, connectivity, child) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection(convoFirestorekey)
+            .doc(widget.conversationId)
+            .collection(chatsFirestoreKey)
+            .orderBy(DocumentField.timestamp, descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasError) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.0)),
+              title: const Text(
+                'Something Bad Happened',
+                textAlign: TextAlign.center,
+              ),
+              content: const Text(
+                'Please try again later.',
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                CupertinoButton(
+                  child: const Text('Ok'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          }
+          if (data != null) {
+            final messages = data.docs;
             return messages.isNotEmpty
                 ? ListView.builder(
                     reverse: true,
                     padding: padding,
+                    controller: controller,
                     itemCount: messages.length,
-                    controller: model.scrollController,
                     itemBuilder: (context, i) {
-                      final message = Message.fromFirestore(messages[i]);
+                      String messageUid =
+                          Message.fromFirestore(messages[i]).messageUid;
+                      getLogger('ChatMessages').wtf('MessageUid:$messageUid');
                       return MessageBubble(
                         index: i,
-                        message: message,
-                        fireUser: fireuser,
-                        chatViewModel: model,
-                        receiverUid: receiverUid,
-                        conversationId: conversationId,
-                        isTimestampMatched: timestampMatch(message),
+                        fireUser: widget.fireuser,
+                        chatViewModel: widget.model,
+                        receiverUid: widget.receiverUid,
+                        conversationId: widget.conversationId,
+                        message: Message.fromFirestore(messages[i]),
+                        isTimestampMatched:
+                            timestampMatch(Message.fromFirestore(messages[i])),
                       );
                     },
                   )
@@ -367,9 +366,9 @@ class ChatMessages extends StatelessWidget {
                       ),
                     ),
                   );
-          },
-        );
-      },
-    );
+          } else {
+            return const Text('Data is null now !!');
+          }
+        });
   }
 }

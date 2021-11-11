@@ -140,7 +140,7 @@ class ChatService {
         .snapshots();
   }
 
-  addFirestoreMessage({
+  Future<void> addFirestoreMessage({
     dynamic mediaURL,
     GeoPoint? location,
     bool isRead = false,
@@ -183,7 +183,7 @@ class ChatService {
         }
     }
 
-    _conversationCollection
+  return  _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
         .doc(messageUid)

@@ -86,7 +86,8 @@ class _HintImageState extends State<HintImage> {
           : GestureDetector(
               onTap: widget.onTap,
               child: CachedNetworkImage(
-                placeholder: (context, child) => Image.file(File(widget.mediaPath)),
+                placeholder: (context, child) =>
+                    Image.file(File(widget.mediaPath)),
                 imageUrl: widget.mediaUrl,
               ),
             ),

@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:hint/api/hive_helper.dart';
-import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -32,14 +30,12 @@ class ImageViewModel extends BaseViewModel {
     await saveMediaPath(
       mediaURL: downloadURL,
       messageUid: messageUid,
-      conversationId: conversationId,
     );
   }
 
   Future<void> saveMediaPath({
     required String mediaURL,
     required String messageUid,
-    required String conversationId,
   }) async {
     final now = DateTime.now();
     final firstPart = '${now.year}${now.month}${now.day}';
@@ -52,7 +48,6 @@ class ImageViewModel extends BaseViewModel {
       messageUid: messageUid,
       mediaName: 'IMG-$mediaName.jpeg',
       folderPath: 'Media/Hint Images',
-      hiveBoxName: chatRoomMedia(conversationId),
     );
   }
 
@@ -61,7 +56,6 @@ class ImageViewModel extends BaseViewModel {
     required String mediaName,
     required String folderPath,
     required String messageUid,
-    required String hiveBoxName,
   }) async {
     Directory? directory;
     try {
@@ -104,7 +98,11 @@ class ImageViewModel extends BaseViewModel {
       if (await directory.exists()) {
         await dioApi.downloadMediaFromUrl(
             mediaUrl: mediaUrl, savePath: savePath);
-        await Hive.box(hiveBoxName).put(messageUid, savePath);
+        await hiveApi.saveFilePathInHive(
+          key: messageUid,
+          filePath: savePath,
+          hiveBoxName: HiveHelper.hiveBoxImages,
+        );
       }
     } catch (err) {
       log.e('Error comes in creating the folder : $err');
@@ -123,3 +121,5 @@ class ImageViewModel extends BaseViewModel {
     return false;
   }
 }
+
+

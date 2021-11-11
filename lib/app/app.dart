@@ -52,18 +52,14 @@ class _MyAppState extends State<MyApp> {
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user != null) {
         bool userExists = await getUser(user.uid);
-        final appwriteUser = await AppWriteApi.instance.getUser();
-      
+
         if (userExists) {
-          log.wtf('Status:${appwriteUser.status}');
-          if (appwriteUser.status == 0) {
-            setState(() {
-              loggedIn = true;
-            });
-          } else {
-            log.wtf('Status:${appwriteUser.status}');
-          }
+          setState(() {
+            loggedIn = true;
+          });
         }
+        final appwriteUser = await AppWriteApi.instance.getUser();
+        log.wtf('AppwriteUser:$appwriteUser');
       } else {
         log.wtf('user is null LoggedIn:$loggedIn');
         setState(() {

@@ -29,7 +29,7 @@ import 'package:hint/ui/components/media/reply/reply_back_viewmodel.dart';
 import 'package:hint/ui/components/media/pixabay_image/pixabay_image.dart';
 import 'package:custom_rounded_rectangle_border/custom_rounded_rectangle_border.dart';
 
-class MessageBubble extends StatelessWidget {
+class MessageBubble extends StatefulWidget {
   final int index;
   final Message message;
   final FireUser fireUser;
@@ -37,7 +37,7 @@ class MessageBubble extends StatelessWidget {
   final String conversationId;
   final bool isTimestampMatched;
   final ChatViewModel chatViewModel;
-  MessageBubble({
+  const MessageBubble({
     Key? key,
     required this.index,
     required this.fireUser,
@@ -50,7 +50,21 @@ class MessageBubble extends StatelessWidget {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
 
+  @override
+  State<MessageBubble> createState() => _MessageBubbleState();
+}
+
+class _MessageBubbleState extends State<MessageBubble> {
   final log = getLogger('MessageBubble');
+
+  @override
+  void initState() {
+    log.wtf('MessageIndex:${widget.index}');
+    log.wtf('MessageUid:${widget.message.messageUid}');
+
+    if (widget.message.type == MediaType.image) {}
+    super.initState();
+  }
 
   Widget mediaContent({
     required bool isMe,
@@ -62,30 +76,30 @@ class MessageBubble extends StatelessWidget {
     switch (messageType) {
       case MediaType.image:
         {
-          final hiveBox = imagesMemoryHiveBox(conversationId);
-          Uint8List memeoryImage = hiveBox.get(message.messageUid);
+          final hiveBox = imagesMemoryHiveBox(widget.conversationId);
+          Uint8List memeoryImage = hiveBox.get(widget.message.messageUid);
           return ImageMedia(
-            message: message,
-            isRead: message.isRead,
-            receiverUid: receiverUid,
+            message: widget.message,
+            isRead: widget.message.isRead,
+            receiverUid: widget.receiverUid,
             memoryImage: memeoryImage,
             messageBubbleModel: model,
-            conversationId: conversationId,
+            conversationId: widget.conversationId,
           );
         }
       case MediaType.video:
         {
-          final hiveBox = videoThumbnailsHiveBox(conversationId);
-          final thumbnail = hiveBox.get(message.messageUid);
+          final hiveBox = videoThumbnailsHiveBox(widget.conversationId);
+          final thumbnail = hiveBox.get(widget.message.messageUid);
           if (thumbnail != null) {
             return VideoMedia(
               messageUid: messageUid,
-              isRead: message.isRead,
-              receiverUid: receiverUid,
+              isRead: widget.message.isRead,
+              receiverUid: widget.receiverUid,
               messageBubbleModel: model,
               videoThumbnail: thumbnail,
-              conversationId: conversationId,
-              videoPath: message.message[MessageField.mediaURL],
+              conversationId: widget.conversationId,
+              videoPath: widget.message.message[MessageField.mediaURL],
             );
           } else {
             log.e('Thumbnail is null now');
@@ -95,10 +109,10 @@ class MessageBubble extends StatelessWidget {
       case MediaType.meme:
         {
           return MemeMedia(
-            message: message,
-            isRead: message.isRead,
-            conversationId: conversationId,
-            messageUid: message.messageUid,
+            message: widget.message,
+            isRead: widget.message.isRead,
+            conversationId: widget.conversationId,
+            messageUid: widget.message.messageUid,
           );
         }
       // break;
@@ -107,8 +121,8 @@ class MessageBubble extends StatelessWidget {
           return TextMedia(
             isMe: isMe,
             isRead: isRead,
-            conversationId: conversationId,
-            messageText: message.message[MessageField.messageText],
+            conversationId: widget.conversationId,
+            messageText: widget.message.message[MessageField.messageText],
           );
         }
       case MediaType.url:
@@ -119,21 +133,21 @@ class MessageBubble extends StatelessWidget {
               isMe: isMe,
               isRead: isRead,
               messageUid: messageUid,
-              conversationId: conversationId,
-              url: message.message[MessageField.messageText],
+              conversationId: widget.conversationId,
+              url: widget.message.message[MessageField.messageText],
             ),
           );
         }
       case MediaType.canvasImage:
         {
-          final hiveBox = imagesMemoryHiveBox(conversationId);
-          final data = hiveBox.get(message.messageUid);
+          final hiveBox = imagesMemoryHiveBox(widget.conversationId);
+          final data = hiveBox.get(widget.message.messageUid);
           final imageData = data.cast<int>().toList();
           return CanvasImage(
             isRead: isRead,
-            message: message,
+            message: widget.message,
             messageBubbleModel: model,
-            conversationId: conversationId,
+            conversationId: widget.conversationId,
             imageData: Uint8List.fromList(imageData),
           );
         }
@@ -141,9 +155,9 @@ class MessageBubble extends StatelessWidget {
         {
           return PixaBayImage(
             isRead: isRead,
-            message: message,
+            message: widget.message,
             messageUid: messageUid,
-            conversationId: conversationId,
+            conversationId: widget.conversationId,
           );
         }
       default:
@@ -156,58 +170,57 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isReply = message.isReply;
-    final messageDate = message.timestamp.toDate();
+    bool isReply = widget.message.isReply;
+    DateTime messageDate = widget.message.timestamp.toDate();
     final replyRiverPod = context.read(replyBackProvider);
-    bool isMe = MessageBubble.liveUserUid == message.senderUid;
-    final date = DateFormat('yMMMMd').format(messageDate).toString();
+    bool isMe = MessageBubble.liveUserUid == widget.message.senderUid;
+    String date = DateFormat('yMMMMd').format(messageDate).toString();
     final mainAxis = isMe ? MainAxisAlignment.end : MainAxisAlignment.start;
     final crossAxis = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     return ViewModelBuilder<MessageBubbleViewModel>.reactive(
       viewModelBuilder: () => MessageBubbleViewModel(),
-      onModelReady: (model) {},
       builder: (context, model, child) {
         if (model.hasError) {
           log.e('There is an error');
         }
         return Container(
-          margin: EdgeInsets.symmetric(vertical: message.isReply ? 8 : 2),
+          margin: EdgeInsets.symmetric(vertical: isReply ? 8 : 2),
           child: Column(
             mainAxisAlignment: mainAxis,
             crossAxisAlignment: crossAxis,
             mainAxisSize: MainAxisSize.min,
             children: [
               classifyingDate(date, context),
-              !isMe && message.userBlockMe
+              !isMe && widget.message.userBlockMe
                   ? const SizedBox.shrink()
                   : Column(
                       mainAxisAlignment: mainAxis,
                       crossAxisAlignment: crossAxis,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                       replyMessage(context, isMe, isReply),
+                        replyMessage(context, isMe, isReply),
                         SwipeTo(
                           onRightSwipe: () {
                             replyRiverPod.showReplyBool(true);
                             log.wtf('showReply: ${replyRiverPod.showReply}');
                             replyRiverPod.getSwipedValue(
                               isMeBool: isMe,
-                              fireuser: fireUser,
-                              swipedReply: message.isReply,
-                              swipedMessage: message.message,
-                              swipedMessageType: message.type,
-                              swipedTimestamp: message.timestamp,
-                              swipedMessageUid: message.messageUid,
-                              swipedMessageSenderID: message.senderUid,
+                              fireuser: widget.fireUser,
+                              swipedReply: widget.message.isReply,
+                              swipedMessage: widget.message.message,
+                              swipedMessageType: widget.message.type,
+                              swipedTimestamp: widget.message.timestamp,
+                              swipedMessageUid: widget.message.messageUid,
+                              swipedMessageSenderID: widget.message.senderUid,
                             );
                             log.wtf('Message${replyRiverPod.message}');
                           },
                           child: mediaContent(
                             isMe: isMe,
                             model: model,
-                            isRead: message.isRead,
-                            messageType: message.type,
-                            messageUid: message.messageUid,
+                            isRead: widget.message.isRead,
+                            messageType: widget.message.type,
+                            messageUid: widget.message.messageUid,
                           ),
                         ),
                       ],
@@ -230,10 +243,11 @@ class MessageBubble extends StatelessWidget {
   Widget senderReplySign(BuildContext context, isMe, isReply) {
     if (isReply) {
       const radius = Radius.circular(5);
-      final username = fireUser.username;
-      final replyMessage = message.replyMessage;
+      final username = widget.fireUser.username;
+      final replyMessage = widget.message.replyMessage;
       const borderSide = BorderSide(color: inactiveGray, width: 2);
-      String replySenderID = message.replyMessage![ReplyField.replySenderUid];
+      String replySenderID =
+          widget.message.replyMessage![ReplyField.replySenderUid];
       bool iSend = replySenderID == ChatService.liveUserUid;
       var senderText =
           iSend ? 'you replied to yourself' : 'you replied to $username';
@@ -252,9 +266,9 @@ class MessageBubble extends StatelessWidget {
               ),
               ReplyMedia(
                   isMe: isMe,
-                  fireUser: fireUser,
+                  fireUser: widget.fireUser,
                   replyMessage: replyMessage!,
-                  conversationId: conversationId),
+                  conversationId: widget.conversationId),
             ],
           ),
           Column(
@@ -289,10 +303,11 @@ class MessageBubble extends StatelessWidget {
   Widget receiverReplySing(BuildContext context, isMe, isReply) {
     if (isReply) {
       const radius = Radius.circular(5);
-      final username = fireUser.username;
-      final replyMessage = message.replyMessage;
+      final username = widget.fireUser.username;
+      final replyMessage = widget.message.replyMessage;
       const borderSide = BorderSide(color: inactiveGray, width: 2);
-      String replySenderID = message.replyMessage![ReplyField.replySenderUid];
+      String replySenderID =
+          widget.message.replyMessage![ReplyField.replySenderUid];
       bool iSend = replySenderID == ChatService.liveUserUid;
 
       var receiverText =
@@ -334,9 +349,9 @@ class MessageBubble extends StatelessWidget {
               ),
               ReplyMedia(
                   isMe: isMe,
-                  fireUser: fireUser,
+                  fireUser: widget.fireUser,
                   replyMessage: replyMessage!,
-                  conversationId: conversationId),
+                  conversationId: widget.conversationId),
             ],
           ),
         ],
@@ -463,7 +478,7 @@ class MessageBubble extends StatelessWidget {
       }
     }
 
-    return isTimestampMatched
+    return widget.isTimestampMatched
         ? Align(
             alignment: Alignment.center,
             child: Container(

@@ -48,7 +48,6 @@ class ChatViewModel extends StreamViewModel<QuerySnapshot> {
   final List<Timestamp> _messagesTimestamp = [];
   List<Timestamp> get messagesTimestamp => _messagesTimestamp;
 
-  ScrollController? scrollController;
   final focusNode = FocusNode();
 
   firebase_storage.FirebaseStorage storage =
