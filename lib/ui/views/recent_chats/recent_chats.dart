@@ -1,4 +1,5 @@
 import 'package:hint/app/app.dart';
+import 'package:hint/ui/views/contacts/contacts.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -201,7 +202,20 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body: buildUserContact(model),
+          body: Column(
+            children: [
+              TextButton(
+                child: const Text('Contacts View'),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactsView(),
+                  ),
+                ),
+              ),
+              buildUserContact(model),
+            ],
+          ),
         );
       },
     );

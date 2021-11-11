@@ -219,43 +219,15 @@ class EmailRegisterView extends StatelessWidget {
                             ),
                       onPressed: !isEmpty(model)
                           ? null
-                          : ()  {
+                          : () {
                               final email = model.emailTech.text;
                               final password = model.passwordController.text;
                               final formState = model.emailFormKey.currentState;
                               final validate = formState!.validate();
                               if (validate) {
-                                 model.signUpInFirebase(
+                                model.signUpInFirebase(
                                     email, password, context);
                               }
-                              // if (await model.checkIsEmailExists(email)) {
-                              //   ScaffoldMessenger.of(context).showSnackBar(
-                              //     SnackBar(
-                              //       backgroundColor: extraLightBackgroundGray,
-                              //       content: Text(
-                              //         'This email is already in use choose another',
-                              //         style:
-                              //             Theme.of(context).textTheme.bodyText2,
-                              //       ),
-                              //     ),
-                              //   );
-                              // } else {
-                              //   if (validate) {
-                              //     var user =
-                              //         await model.singUp(email, password);
-                              //     Navigator.push(
-                              //       context,
-                              //       MaterialPageRoute(
-                              //         builder: (context) =>
-                              //             UsernameRegisterView(
-                              //           fireUser: user,
-                              //           email: model.emailTech.text,
-                              //           password: model.passwordController.text,
-                              //         ),
-                              //       ),
-                              //     );
-                              //   }
-                              // }
                             },
                     ),
                   ),
