@@ -3,12 +3,9 @@ import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:animations/animations.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/ui/views/chat/chat_view.dart';
-import 'package:hint/routes/shared_axis_route.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -41,15 +38,8 @@ class ChatService {
     };
 
     createChatRoom(conversationId, chatRoomMap);
-    final route = SharedAxisPageRoute(
-      page: ChatView(
-        randomColor: randomColor,
-        conversationId: conversationId,
-        fireUser: fireUser,
-      ),
-      transitionType: SharedAxisTransitionType.scaled,
-    );
-    Navigator.of(context, rootNavigator: true).push(route);
+    log.wtf('start conversation was tapped');
+
   }
 
   createChatRoom(String chatRoomId, chatRoomMap) {

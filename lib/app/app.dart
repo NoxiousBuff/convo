@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/app/routes.dart';
+import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
 import 'package:hint/ui/views/home/home_view.dart';
-import 'package:hint/ui/views/register/email/email_register_view.dart';
 
 bool isDarkTheme = false;
 
@@ -16,27 +16,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool loggedIn = false;
-
-  @override
-  void didChangeDependencies() {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (user != null) {
-        setState(() {
-          loggedIn = true;
-        });
-        user.reload();
-        getLogger('MyApp').wtf('user is not null LoggedIn:$loggedIn');
-        //getLogger('MyApp').wtf('email:${AuthService.liveUser!.email}');
-      } else {
-        setState(() {
-          loggedIn = false;
-        });
-        getLogger('MyApp').wtf('user is null LoggedIn:$loggedIn');
-      }
-    });
-    super.didChangeDependencies();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +23,12 @@ class _MyAppState extends State<MyApp> {
         systemNavigationBarColor: Colors.transparent,
         statusBarColor: Colors.transparent));
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    //final currentUser = FirebaseAuth.instance.currentUser;
-
     return MaterialApp(
+      restorationScopeId: 'Dule',
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      home: loggedIn ? const HomeView() : const EmailRegisterView(),
+      title: 'Dule',
+      home: FirebaseAuth.instance.currentUser != null ? const HomeView() : const WelcomeView(),
+      routes: appRoutes,
     );
   }
 }

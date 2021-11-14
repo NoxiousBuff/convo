@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/pods/verification_pod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hint/ui/views/register/email/email_register_view.dart';
-
-String verificationCode = '';
+import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
 
 final authService = AuthService();
 
@@ -18,101 +14,98 @@ class AuthService {
 
   static User? liveUser = FirebaseAuth.instance.currentUser;
 
-  // signUp(
-  //     {required String email,
-  //     required String password,
-  //     required Function onComplete,
-  //     Function? accountExists,
-  //     Function? weakPassword,
-  //     Function? randomError}) async {
-  //   try {
-  //     UserCredential userCredential =
-  //         await _auth.createUserWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
-
-  //     log.i('User has been created in the firebase authentication.');
-  //     await userCredential.user!
-  //         .updatePhotoURL(kDefaultPhotoUrl)
-  //         .catchError((e) => getLogger('AuthService').e(e));
-  //     await _firestoreApi
-  //         .createUserInFirebase(
-  //             user: userCredential.user!, interests: [], onError: randomError)
-  //         .then((value) => onComplete);
-  //     await userCredential.user!.sendEmailVerification();
-  //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'weak-password') {
-  //       getLogger('FirebaseAuthException from SignUp')
-  //           .w('The password provided is too weak.');
-  //       if (weakPassword != null) weakPassword();
-  //     } else if (e.code == 'email-already-in-use') {
-  //       getLogger('FirebaseAuthException')
-  //           .w('The account already exists for that email.');
-  //       if (accountExists != null) accountExists();
-  //     } else {
-  //       getLogger('FirebaseAuthException').w(
-  //           'Some error prevented the registration. Please try again later.');
-  //       if (randomError != null) randomError();
-  //     }
-  //   } catch (e) {
-  //     getLogger('AuthService').e(e);
-  //   }
-  // }
+  signUp({
+    required String email,
+    required String password,
+    required Function onComplete,
+    Function? accountExists,
+    Function? weakPassword,
+    Function? randomError,
+  }) async {
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      log.i('User has been created in the firebase authentication.');
+      await userCredential.user!.sendEmailVerification();
+      onComplete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        log.e(e.message);
+        if (weakPassword != null) weakPassword();
+      } else if (e.code == 'email-already-in-use') {
+        log.e(e.message);
+        if (accountExists != null) accountExists();
+      } else {
+        log.e(e.message);
+        if (randomError != null) randomError();
+      }
+    } catch (e) {
+      log.e('Error from try catch : $e');
+    }
+  }
 
   logIn({
     required String email,
     required String password,
     required Function onComplete,
     Function? noAccountExists,
+    Function? invalidEmail,
     Function? onError,
   }) async {
     try {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        getLogger('AuthService from Login')
-            .i('The User with email : $email has been successfully logged In');
+        log.i('The User with email : $email has been successfully logged In');
         onComplete();
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        getLogger('FirebaseAuthException from LogIn')
-            .w('No user found for that email.');
+        log.e(e.message);
         if (noAccountExists != null) noAccountExists();
+      } else if (e.code == 'invalid-email') {
+        log.e(e.message);
+        if(invalidEmail != null) invalidEmail();
       } else {
-        getLogger('FirebaseAuthException from LogIn')
-            .w('Incorrect UserName and Password.');
+        log.e(e.message);
         if (onError != null) onError();
       }
     }
   }
 
-  signOut(BuildContext context,{ Function? onSignOut }) async {
+  signOut(BuildContext context, {Function? onSignOut}) async {
     await _auth.signOut();
-    getLogger('AuthMethod').i('The user has been signed out successfully.');
-    if(onSignOut != null) {
+    log.i('The user has been signed out successfully.');
+    if (onSignOut != null) {
       onSignOut();
     } else {
-      getLogger('AuthService').wtf('User has been loggeed out.');
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute<void>(
-                builder: (BuildContext context) => const EmailRegisterView()),
-            (route) => false);
-  }}
+      Navigator.pushNamedAndRemoveUntil(
+          context, WelcomeView.id, (route) => false);
+    }
+  }
 
   Future<void> forgotPassword(String email,
-      {Function? onComplete, Function? onError}) async {
-    await _auth.sendPasswordResetEmail(email: email).then((value) {
+      {Function? onComplete, Function? noAccountExists, Function? invalidEmailAddress, Function? onError}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email).then((value) {
       if (onComplete != null) onComplete();
       log.i(
           'The user with email : $email has been successfully sent a password reset email.');
-    }).onError((error, stackTrace) {
-      if (onError != null) onError();
-      log.w(
-          'There has been an error sending reset password email to user with email : $email');
     });
+    } on FirebaseAuthException catch (e) {
+      if(e.code == 'auth/invalid-email') {
+        log.e(e.message);
+        if(invalidEmailAddress != null) invalidEmailAddress();
+      } else if( e.code == 'auth/user-not-found') {
+        log.e(e.message);
+        if(noAccountExists != null) noAccountExists();
+      } else {
+        if(onError != null) onError();
+      }
+    }
   }
 
   Future<void> changeUserDisplayName(String value, {Function? onError}) async {
@@ -125,37 +118,5 @@ class AuthService {
       getLogger('Auth Service')
           .w('Error occurred in changing display name. Error : $err');
     });
-  }
-
-  Future<void> signUpWithPhone(String phoneNumber, BuildContext context) async {
-    return FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) {
-        final pod = context.read(codeProvider);
-        final localSmsCode = credential.smsCode;
-        if (localSmsCode != null) pod.getCode(localSmsCode);
-        log.wtf('credential.smsCode : $localSmsCode');
-        log.wtf('Verification Completed Successfuly.');
-        log.wtf('Phone Auth Credential: ${pod.phoneAuthCredential}');
-        pod.getPhoneCredentials(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          log.e('The provided phone number is not valid.');
-        } else {
-          log.e('This was the error in creating phone auth credential : $e');
-        }
-      },
-      codeSent: (String verificationId, int? resendToken) async {
-        // Create a PhoneAuthCredential with the code
-        PhoneAuthCredential credential = PhoneAuthProvider.credential(
-            verificationId: verificationId, smsCode: resendToken.toString());
-        log.v('Phone Auth Credential: $credential');
-      },
-      timeout: const Duration(seconds: 60),
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // Auto-resolution timed out...
-      },
-    );
   }
 }

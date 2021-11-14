@@ -62,7 +62,7 @@ class FirestoreApi {
       log.i('User has been successfully created with details $user');
     } catch (e) {
       log.w('Creating user in firebase failed. Error : $e');
-      onError!();
+      if(onError != null) onError();
     }
   }
 
