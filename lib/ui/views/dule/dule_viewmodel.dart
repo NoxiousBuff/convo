@@ -5,7 +5,7 @@ import 'package:hint/app/app_logger.dart';
 class DuleViewModel extends BaseViewModel {
   final log = getLogger('DuleViewModel');
 
-  final TextEditingController duleTech = TextEditingController(text: 'fdbhjbfhdjfb');
+  final TextEditingController duleTech = TextEditingController();
 
   final TextEditingController otherTech = TextEditingController();
 
@@ -60,6 +60,7 @@ class DuleViewModel extends BaseViewModel {
       duleTech.clear();
       _isDuleEmpty = true;
       updatTextFieldWidth();
+      updateWordLengthLeft(duleTech.text);
     }
   }
 
@@ -73,7 +74,6 @@ class DuleViewModel extends BaseViewModel {
   void dispose() {
     super.dispose();
     duleFocusNode.dispose();
-    duleTech.clear();
     duleTech.dispose();
     otherTech.dispose();
   }
