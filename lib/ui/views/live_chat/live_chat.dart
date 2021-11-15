@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math';
+import 'package:hint/services/chat_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +18,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
 
 class LiveChat extends StatefulWidget {
+  final String? fireUserId;
   const LiveChat({
     Key? key,
+    this.fireUserId,
   }) : super(key: key);
 
   @override
@@ -47,6 +51,14 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
     setState(() {
       textLength = (150 - controller.text.length).toInt();
     });
+    var liveChatId =
+        chatService.getConversationId(widget.fireUserId!, liveUserUid);
+    realtimeDBApi.updateUserDocument(
+      liveUserUid,
+      {
+        LiveChatField.liveChatRoom: liveChatId,
+      },
+    );
     super.initState();
   }
 
@@ -56,37 +68,43 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
     confettiController.dispose();
     spotlightController.removeListener(() {});
     spotlightController.dispose();
+    realtimeDBApi.updateUserDocument(liveUserUid, {
+      LiveChatField.liveChatRoom: null,
+    });
     super.dispose();
   }
 
-  // StreamSubscription<RealtimeMessage> animationHandler() {
-  //   return subscription.stream.listen(
-  //     (data) {
-  //       final receiverUser = LiveChatUser.fromJson(data.payload);
-  //       switch (receiverUser.animationType) {
-  //         case AnimationType.confetti:
-  //           {
-  //             log.w('confetti controller :1');
-  //             confettiController.play();
-  //           }
-  //           break;
-  //         case AnimationType.spotlight:
-  //           {
-  //             log.w('spotlight controller :2');
-  //             spotlightController.forward();
-  //           }
-  //           break;
-  //         default:
-  //           {
-  //             log.wtf('User Message is not equal to any animation value');
-  //           }
-  //       }
-  //     },
-  //     onError: (e) {
-  //       log.e('AppwriteSubscription:$e');
-  //     },
-  //   );
-  // }
+  StreamSubscription<Event> animationHandler() {
+    return realtimeDBApi.documentStream(liveUserUid).listen(
+      (data) {
+        final mapData = data.snapshot.value;
+        final userDocMap = mapData.cast<String, dynamic>();
+        final receiverUser = LiveChatModel.fromJson(userDocMap);
+        switch (receiverUser.animation) {
+          case AnimationType.confetti:
+            {
+              log.w('confetti controller :1');
+              confettiController.play();
+            }
+
+            break;
+          case AnimationType.spotlight:
+            {
+              log.w('spotlight controller :2');
+              spotlightController.forward();
+            }
+            break;
+          default:
+            {
+              log.wtf('User Message is not equal to any animation value');
+            }
+        }
+      },
+      onError: (e) {
+        log.e('StreamSubscription For Animation Error:$e');
+      },
+    );
+  }
 
   @override
   void didUpdateWidget(covariant LiveChat oldWidget) {
@@ -112,7 +130,7 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
         .textTheme
         .bodyText2!
         .copyWith(color: inactiveGray, fontSize: 18);
-    //var style = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 30);
+    animationHandler();
     return ViewModelBuilder<LiveChatViewModel>.reactive(
       viewModelBuilder: () => LiveChatViewModel(),
       builder: (context, model, child) {
@@ -289,7 +307,12 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                                     ),
                               IconButton(
                                 icon: const Icon(CupertinoIcons.wand_stars),
-                                onPressed: () {},
+                                onPressed: () => model.getAnimationValue(
+                                  context: context,
+                                  fireUserId: widget.fireUserId!,
+                                  confettiController: confettiController,
+                                  spotlightController: spotlightController,
+                                ),
                               ),
                               const Spacer(),
                               ValueListenableBuilder<int>(

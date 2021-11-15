@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:confetti/confetti.dart';
+import 'package:hint/api/realtime_database_api.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +17,9 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import 'live_chat.dart';
+import 'live_chat_animation.dart';
 
 class LiveChatViewModel extends BaseViewModel {
   final log = getLogger('LiveChatViewModel');
@@ -74,8 +80,37 @@ class LiveChatViewModel extends BaseViewModel {
     ).animate(controller);
   }
 
-
-  // update user document in realtime database
+  // getting animation Value
+  Future<void> getAnimationValue({
+    required BuildContext context,
+    String? fireUserId,
+    required ConfettiController confettiController,
+    required AnimationController spotlightController,
+  }) async {
+    final val = await Navigator.push(
+      context,
+      cupertinoTransition(
+        enterTo: const LiveChatAnimations(),
+        exitFrom: const LiveChat(),
+      ),
+    );
+    log.wtf('Animation Value:$val');
+    if (val == AnimationType.confetti) {
+      confettiController.play();
+      await realtimeDBApi.updateUserDocument(
+        fireUserId!,
+        {LiveChatField.animationType: val},
+      );
+    } else if (val == AnimationType.spotlight) {
+      spotlightController.forward();
+      await realtimeDBApi.updateUserDocument(
+        fireUserId!,
+        {LiveChatField.animationType: val},
+      );
+    } else {
+      log.wtf('Animation is null');
+    }
+  }
 
   /// uploading a single file into the firebase storage and get progress
   Future<String> uploadFile({
@@ -134,7 +169,6 @@ class LiveChatViewModel extends BaseViewModel {
     setBusy(false);
     return downloadURL;
   }
-
 
   //Alert Dialog For larger File
   Future<void> sizeDialog(BuildContext context) async {
