@@ -1,16 +1,16 @@
 import 'dart:math';
-import 'package:hint/api/firestore.dart';
-import 'package:hint/api/realtime_database_api.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/models/livechat_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/livechat_model.dart';
+import 'package:hint/api/realtime_database_api.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
@@ -103,6 +103,11 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final valueListenable = ValueNotifier<int>(textLength);
     const valueColor = AlwaysStoppedAnimation(activeGreen);
+    const margin = EdgeInsets.fromLTRB(16, 0, 16, 8);
+    const constraints = BoxConstraints(minHeight: 30);
+    final decoration = BoxDecoration(
+        color: extraLightBackgroundGray,
+        borderRadius: BorderRadius.circular(16));
     final textStyle = Theme.of(context)
         .textTheme
         .bodyText2!
@@ -153,27 +158,24 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
                               final map = modelData.cast<String, dynamic>();
                               log.wtf('Value:$map');
                               final doc = LiveChatModel.fromJson(map);
+                              final message = doc.userMessage;
+                              const m = EdgeInsets.only(right: 20, top: 6);
                               return Stack(
                                 alignment: Alignment.topRight,
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    constraints:
-                                        const BoxConstraints(minHeight: 30),
-                                    margin:
-                                        const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                                    decoration: BoxDecoration(
-                                        color: CupertinoColors
-                                            .extraLightBackgroundGray,
-                                        borderRadius:
-                                            BorderRadius.circular(16)),
-                                    child: const Center(
-                                      child: Text('Data From Firebase'),
+                                    margin: margin,
+                                    decoration: decoration,
+                                    constraints: constraints,
+                                    width: screenWidth(context),
+                                    child: Center(
+                                      child: message != null
+                                          ? Text(message)
+                                          : const Text('Hint Message'),
                                     ),
                                   ),
                                   Container(
-                                    margin: const EdgeInsets.only(
-                                        right: 20, top: 6),
+                                    margin: m,
                                     child: const CircleAvatar(
                                       backgroundColor: activeGreen,
                                       maxRadius: 10,
