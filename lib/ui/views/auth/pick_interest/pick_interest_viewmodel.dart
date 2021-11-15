@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
@@ -31,9 +32,10 @@ class PickInterestsViewModel extends BaseViewModel {
             phoneNumber: phoneNumber,
             countryPhoneCode: countryPhoneCode,
             interests: userSelectedInterests)
-        .then((value) {
+        .then((value) async {
+          await databaseService.addUserData(AuthService.liveUser!.uid);
           setBusy(false);
-      Navigator.pushAndRemoveUntil(
+          Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => ChatListView()),
           (route) => false);

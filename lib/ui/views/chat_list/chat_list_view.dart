@@ -75,7 +75,8 @@ class ChatListView extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
-                      navService.materialPageRoute(context, const DistantView());
+                      navService.materialPageRoute(
+                          context, const DistantView());
                     },
                   ),
                 ),
@@ -132,7 +133,13 @@ class ChatListView extends StatelessWidget {
                             return UserItem(
                               fireUser: FireUser.fromFirestore(data[index]),
                               onTap: () {
-                                navService.cupertinoPageRoute(context, const DuleView());
+                                navService.cupertinoPageRoute(
+                                  context,
+                                  DuleView(
+                                    fireUser:
+                                        FireUser.fromFirestore(data[index]),
+                                  ),
+                                );
                               },
                             );
                           });

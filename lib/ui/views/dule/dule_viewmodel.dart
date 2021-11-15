@@ -1,8 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class DuleViewModel extends BaseViewModel {
+class DuleViewModel extends StreamViewModel {
+
+  DuleViewModel(this.fireUser);
+
+  final FireUser fireUser;
   final log = getLogger('DuleViewModel');
 
   final TextEditingController duleTech = TextEditingController();
@@ -64,6 +71,10 @@ class DuleViewModel extends BaseViewModel {
     }
   }
 
+  void updateOtherField(String value) {
+    otherTech.text = value;
+  }
+
   void updateWordLengthLeft(String value) {
     final lengthLeft = 160 - value.length;
     _wordLengthLeft = lengthLeft.toString();
@@ -77,5 +88,9 @@ class DuleViewModel extends BaseViewModel {
     duleTech.dispose();
     otherTech.dispose();
   }
+
+  @override
+  ///TODO: change this to [fireuser.id]
+  Stream get stream => databaseService.getUserData(AuthService.liveUser!.uid);
 
 }

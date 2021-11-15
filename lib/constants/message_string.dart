@@ -63,3 +63,12 @@ class FireUserField {
   static const userCreated = 'userCreated';
   static const blockedUsers = 'blockedUsers';
 }
+
+class DatabaseMessageField {
+  static const msgTxt = 'msgTxt';
+  static const roomUid = 'roomUid';
+  static const url = 'url';
+  static const urlType = 'urlType';
+  static const online = 'online';
+  static const aniType = 'aniType';
+}

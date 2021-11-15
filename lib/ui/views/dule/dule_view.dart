@@ -1,23 +1,32 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/constants/message_string.dart';
+import 'package:hint/models/dule_model.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 
 import 'dule_viewmodel.dart';
 
 class DuleView extends StatelessWidget {
-  const DuleView({Key? key}) : super(key: key);
+  const DuleView({Key? key, required this.fireUser}) : super(key: key);
 
   static const String id = '/DuleView';
+
+  final FireUser fireUser;
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<DuleViewModel>.reactive(
-      viewModelBuilder: () => DuleViewModel(),
+      viewModelBuilder: () => DuleViewModel(fireUser),
       builder: (context, model, child) => Scaffold(
         appBar: AppBar(
-          flexibleSpace: InkWell(onTap:(){}),
+          flexibleSpace: InkWell(onTap: () {}),
           leadingWidth: 90,
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -39,7 +48,7 @@ class DuleView extends StatelessWidget {
                 Expanded(
                   child: ClipOval(
                     child: Image.network(
-                      'https://images.unsplash.com/photo-1621318165483-1cfd49a88ef5?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=751&q=80',
+                      fireUser.photoUrl!,
                       height: 48,
                       width: 48,
                       fit: BoxFit.cover,
@@ -49,9 +58,9 @@ class DuleView extends StatelessWidget {
               ],
             ),
           ),
-          title: const Text(
-            'Devon',
-            style: TextStyle(
+          title: Text(
+            fireUser.username,
+            style: const TextStyle(
                 color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
           ),
           centerTitle: true,
@@ -66,23 +75,54 @@ class DuleView extends StatelessWidget {
               child: Container(
                 width: screenWidthPercentage(context, percentage: 80),
                 alignment: Alignment.center,
-                child: TextFormField(
-                  minLines: null,
-                  maxLines: null,
-                  expands: true,
-                  controller: model.otherTech,
-                  onChanged: (value) {
-                    model.updatTextFieldWidth();
+                child: StreamBuilder<Event>(
+                  stream: FirebaseDatabase.instance
+                      .reference()
+                      .child('dules')
+                      .child(AuthService.liveUser!.uid)
+                      .onValue,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: Text(
+                          'Connecting.......',
+                          style: TextStyle(color: Colors.black38, fontSize: 24),
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          'We are having problem connecting with the user.',
+                          style: TextStyle(color: Colors.black38, fontSize: 24),
+                        ),
+                      );
+                    }
+                    final dataSnapshot = snapshot.data!.snapshot;
+                    final json = dataSnapshot.value.cast<String, dynamic>();
+                    final DuleModel duleModel = DuleModel.fromJson(json);
+                    model.updateOtherField(duleModel.msgTxt);
+                    return TextFormField(
+                      minLines: null,
+                      maxLines: null,
+                      expands: true,
+                      controller: model.otherTech,
+                      onChanged: (value) {
+                        model.updatTextFieldWidth();
+                      },
+                      cursorColor: AppColors.blue,
+                      cursorHeight: 28,
+                      cursorRadius: const Radius.circular(100),
+                      style: const TextStyle(color: Colors.black, fontSize: 24),
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                          hintText: 'Message Received',
+                          hintStyle:
+                              TextStyle(color: Colors.black38, fontSize: 24),
+                          border:
+                              OutlineInputBorder(borderSide: BorderSide.none)),
+                    );
                   },
-                  cursorColor: AppColors.blue,
-                  cursorHeight: 28,
-                  cursorRadius: const Radius.circular(100),
-                  style: const TextStyle(color: Colors.black, fontSize: 24),
-                  textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                      hintText: 'Message Received',
-                      hintStyle: TextStyle(color: Colors.black38, fontSize: 24),
-                      border: OutlineInputBorder(borderSide: BorderSide.none)),
                 ),
                 decoration: BoxDecoration(
                     color: AppColors.grey,
@@ -108,10 +148,12 @@ class DuleView extends StatelessWidget {
                   onChanged: (value) {
                     model.updateWordLengthLeft(value);
                     model.updatTextFieldWidth();
+                    databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, value);
                   },
                   maxLength: 160,
                   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  buildCounter: (_, {required currentLength, maxLength, required isFocused}) {
+                  buildCounter: (_,
+                      {required currentLength, maxLength, required isFocused}) {
                     return const SizedBox.shrink();
                   },
                   controller: model.duleTech,
@@ -143,17 +185,22 @@ class DuleView extends StatelessWidget {
                     model.updateDuleFocus();
                   },
                   icon: const Icon((Icons.keyboard_alt_rounded)),
-                  color: model.duleFocusNode.hasFocus ? AppColors.blue : AppColors.darkGrey,
+                  color: model.duleFocusNode.hasFocus
+                      ? AppColors.blue
+                      : AppColors.darkGrey,
                   iconSize: 32,
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    databaseService.addUserData(fireUser.id);
+                  },
                   icon: const Icon((Icons.emoji_emotions)),
                   color: AppColors.yellow,
                   iconSize: 32,
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                  },
                   icon: const Icon((Icons.camera_rounded)),
                   color: AppColors.darkGrey,
                   iconSize: 32,

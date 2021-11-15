@@ -1,0 +1,3 @@
+class FirebaseRealTimeException implements Exception {
+
+}
