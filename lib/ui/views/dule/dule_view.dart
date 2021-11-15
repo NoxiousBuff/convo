@@ -79,7 +79,7 @@ class DuleView extends StatelessWidget {
                   stream: FirebaseDatabase.instance
                       .reference()
                       .child('dules')
-                      .child(AuthService.liveUser!.uid)
+                      .child(fireUser.id)
                       .onValue,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
