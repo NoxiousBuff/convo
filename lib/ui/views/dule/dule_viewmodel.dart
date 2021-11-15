@@ -91,6 +91,6 @@ class DuleViewModel extends StreamViewModel {
 
   @override
   ///TODO: change this to [fireuser.id]
-  Stream get stream => databaseService.getUserData(AuthService.liveUser!.uid);
+  Stream get stream => databaseService.getUserData(fireUser.id);
 
 }
