@@ -1,6 +1,5 @@
-import 'dart:async';
 import 'dart:math';
-import 'package:hint/services/chat_service.dart';
+import 'dart:async';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:hint/models/livechat_model.dart';
 import 'package:hint/api/realtime_database_api.dart';
 import 'package:firebase_storage/firebase_storage.dart';

@@ -1,10 +1,10 @@
+import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/models/user_contact.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
@@ -17,12 +17,13 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
 
   List<Contact>? _contacts;
   List<Contact>? get contacts => _contacts;
-  FireUser? _fireUser;
+  //FireUser? _fireUser;
   late final FireUser currentFireUser;
   final _firestore = FirebaseFirestore.instance;
   final log = getLogger('RecentChatsViewModel');
   final liveUserUid = FirestoreApi.liveUserUid;
 
+  // request permission for contacts
   Future<bool> _requestContactsPermission() async {
     final permission = Permission.contacts;
     if (await permission.isGranted) {
@@ -115,90 +116,108 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
       );
       _contacts = contacts;
       notifyListeners();
+    } else {
+      log.wtf('Permission is not granted');
     }
   }
 
   // For checking phone number exists in database
   // If phoneNumber exists in firebase this will return true, if not then return false
-  Future<bool> _getFirebaseUser(String phoneNumber) async {
+  Future<bool> _existsInFirestore(String phoneNumber) async {
     final firebstoreUser = await FirebaseFirestore.instance
         .collection(usersFirestoreKey)
         .where(UserField.phone, isEqualTo: phoneNumber)
-        .get(const GetOptions(source: Source.cache));
-    if (firebstoreUser.docs.isNotEmpty) {
-      final user = FireUser.fromFirestore(firebstoreUser.docs.first);
-      _fireUser = user;
-      notifyListeners();
-      log.wtf('_getFirebaseUser:$_fireUser');
-      return true;
-    } else {
+        .get()
+        .catchError((e) {
+      log.e('_existsInFirestore Error:$e');
+    });
+    if (firebstoreUser.docs.isEmpty) {
+      log.v('Not exists firebase');
       return false;
+    } else {
+      log.v('Exists in firebase');
+
+      return true;
     }
+  }
+
+  // get user from firestore
+  Future<FireUser> _getFirestoreUser(String phoneNumber) async {
+    final firebstoreUser = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .where(UserField.phone, isEqualTo: phoneNumber)
+        .get()
+        .catchError((e) {
+      log.e('_getFirestoreUser Error:$e');
+    });
+    final fireUser = FireUser.fromFirestore(firebstoreUser.docs.first);
+    return fireUser;
   }
 
   // Save Those User Contact in HiveBox Which Exists in Database
   Future<void> _saveContactInHive(
-      String contactName, FireUser? fireUser) async {
+    String contactName,
+    FireUser? fireUser,
+  ) async {
     if (fireUser != null) {
-      final value = UserContact(
-          id: fireUser.id,
-          email: fireUser.email,
-          phone: fireUser.phone,
-          contactName: contactName,
-          username: fireUser.username,
-          countryPhoneCode: fireUser.countryPhoneCode);
+      Map<String, dynamic> map = {
+        "id": fireUser.id,
+        "email": fireUser.email,
+        "phone": fireUser.phone,
+        contactName: contactName,
+        "username": fireUser.username,
+        "countryPhoneCode": fireUser.countryPhoneCode
+      };
       await hiveApi
-          .saveInHive(HiveHelper.userContactHiveBox, fireUser.id, value)
-          .whenComplete(() => log.wtf('Save In Hive Contact'));
+          .saveInHive(HiveHelper.userContactHiveBox, fireUser.id, map)
+          .catchError((e) {
+        log.e('_saveContactInHive Error:$e');
+      }).whenComplete(() => log.wtf('Save In Hive Contact'));
     } else {
       log.wtf('FireUser is null now !!');
     }
   }
 
   // Save Those User Contact in HiveBox Which Doesn't Exists in Database
-  Future<void> _saveContactInInvites(
-      String contactName, FireUser? fireUser) async {
-    if (fireUser != null) {
-      final value = UserContact(
-          id: fireUser.id,
-          email: fireUser.email,
-          phone: fireUser.phone,
-          contactName: contactName,
-          username: fireUser.username,
-          countryPhoneCode: fireUser.countryPhoneCode);
-      await hiveApi
-          .saveInHive(HiveHelper.userContactInviteHiveBox, fireUser.id, value)
-          .whenComplete(() => log.wtf('Save In Hive Invites'));
-    } else {
-      log.wtf('FireUser is null now !!');
-    }
+  Future<void> _saveContactInInvites(String contactName, String phone) async {
+    final countryCode = _countryCodeExtract(phone);
+    Map<String, dynamic> map = {
+      "phone": phone,
+      contactName: contactName,
+      "countryPhoneCode": countryCode
+    };
+    final key = countryCode + phone;
+    await hiveApi
+        .saveInHive(HiveHelper.userContactInviteHiveBox, key, map)
+        .catchError((e) {
+      log.e('_saveContactInInvites Error:$e');
+    }).whenComplete(() => log.wtf('Save In Hive Invites'));
   }
 
   // Get User Contacts and Save In Hive
   Future<void> gettingPhoneNumbers() async {
-    List<String> phoneNumbers = [];
+    final hiveBox = Hive.box(HiveHelper.userContactHiveBox);
     try {
       setBusy(true);
       await getContacts();
-      final contacts = _contacts;
       if (contacts != null) {
-        log.wtf('Contacts Length:${contacts.length}');
-        for (var contact in contacts) {
+        for (var contact in _contacts!) {
           List<Item>? phones = contact.phones;
           if (phones != null && phones.isNotEmpty) {
             final mergedPhones = Set.of(phones.toList()).toList();
             for (var phone in mergedPhones) {
               final formattedNumber = numberFormatter(phone.value.toString());
-
-              if (!phoneNumbers.contains(formattedNumber)) {
-                phoneNumbers.add(formattedNumber);
+              bool isExists = await _existsInFirestore(formattedNumber);
+              if (isExists) {
+                final fireUser = await _getFirestoreUser(formattedNumber);
+                String userUniqueUid = fireUser.id;
                 String contactName = contact.displayName ?? 'No Name';
                 log.wtf('Contact:$contactName | Number:$formattedNumber');
-                bool exists = await _getFirebaseUser(formattedNumber);
-                if (exists) {
-                  await _saveContactInHive(contactName, _fireUser);
+                if (!hiveBox.containsKey(userUniqueUid)) {
+                  await _saveContactInHive(contactName, fireUser);
                 } else {
-                  await _saveContactInInvites(contactName, _fireUser);
+                  await _saveContactInInvites(
+                      contactName, phone.value.toString());
                 }
               }
             }
@@ -206,10 +225,6 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
         }
       }
       setBusy(false);
-      log.v('PhoneNumbers:${phoneNumbers.length}');
-      log.v('PhoneNumbers:$phoneNumbers');
-      //final sum = phoneNumbers.sum;
-      //log.v('PhoneNumbers Sum:$sum');
     } catch (e) {
       setBusy(false);
       log.e('gettingPhoneNumberes Error:$e');
@@ -230,6 +245,18 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
     //log.wtf('NumberFormatter:${stopwatch.elapsedMicroseconds}');
 
     return formattedNumber;
+  }
+
+  // extract the phone country code
+  String _countryCodeExtract(String number) {
+    const countryCodePattern =
+        r'\+(?:998|996|995|994|993|992|977|976|975|974|973|972|971|970|968|967|966|965|964|963|962|961|960|886|880|856|855|853|852|850|692|691|690|689|688|687|686|685|683|682|681|680|679|678|677|676|675|674|673|672|670|599|598|597|595|593|592|591|590|509|508|507|506|505|504|503|502|501|500|423|421|420|389|387|386|385|383|382|381|380|379|378|377|376|375|374|373|372|371|370|359|358|357|356|355|354|353|352|351|350|299|298|297|291|290|269|268|267|266|265|264|263|262|261|260|258|257|256|255|254|253|252|251|250|249|248|246|245|244|243|242|241|240|239|238|237|236|235|234|233|232|231|230|229|228|227|226|225|224|223|222|221|220|218|216|213|212|211|98|95|94|93|92|91|90|86|84|82|81|66|65|64|63|62|61|60|58|57|56|55|54|53|52|51|49|48|47|46|45|44\D?1624|44\D?1534|44\D?1481|44|43|41|40|39|36|34|33|32|31|30|27|20|7|1\D?939|1\D?876|1\D?869|1\D?868|1\D?849|1\D?829|1\D?809|1\D?787|1\D?784|1\D?767|1\D?758|1\D?721|1\D?684|1\D?671|1\D?670|1\D?664|1\D?649|1\D?473|1\D?441|1\D?345|1\D?340|1\D?284|1\D?268|1\D?264|1\D?246|1\D?242|1)\D?';
+    RegExp regEx = RegExp(countryCodePattern);
+    Iterable<RegExpMatch> matches = regEx.allMatches(number);
+
+    final match = matches.first;
+    String code = number.substring(match.start, match.end);
+    return code;
   }
 
   Future<FireUser> getCurrentFireUser(String liveUserUid) async {
