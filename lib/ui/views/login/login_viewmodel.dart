@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/services/auth_service.dart';
 
 class LoginViewModel extends BaseViewModel {
@@ -39,16 +38,18 @@ class LoginViewModel extends BaseViewModel {
   }) async {
     try {
       setBusy(true);
-      bool appWriteLoggedIn =
-          await AppWriteApi.instance.logIn(email: email, password: password);
+      // bool appWriteLoggedIn =
+      //     await AppWriteApi.instance.logIn(email: email, password: password);
 
-      if (appWriteLoggedIn) {
-        await _authService.logIn(
-            email: email, password: password, onComplete: onComplete);
-        await AuthService.liveUser!.reload();
-      } else {
-        log.w('Appwrite user is not logged In');
-      }
+      await _authService.logIn(
+          email: email, password: password, onComplete: onComplete);
+      await AuthService.liveUser!.reload();
+
+      // if (appWriteLoggedIn) {
+
+      // } else {
+      //   log.w('Appwrite user is not logged In');
+      // }
       setBusy(false);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

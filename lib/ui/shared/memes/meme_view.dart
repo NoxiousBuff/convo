@@ -13,7 +13,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_offline/flutter_offline.dart';

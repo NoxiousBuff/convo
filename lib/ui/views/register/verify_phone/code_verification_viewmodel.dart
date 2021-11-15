@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/pods/genral_code.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,8 +66,9 @@ class CodeVerificationViewModel extends BaseViewModel {
     try {
       PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
           verificationId: verificationId, smsCode: smsCode);
-      await AuthService.liveUser!.updatePhoneNumber(phoneAuthCredential);
       if (createdUser != null) {
+        await createdUser.updatePhoneNumber(phoneAuthCredential);
+
         Navigator.push(
           context,
           cupertinoTransition(

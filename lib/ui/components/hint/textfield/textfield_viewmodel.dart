@@ -13,7 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

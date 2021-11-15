@@ -1,28 +1,19 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:hint/models/live_chatroom.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/constants/appwrite_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hint/models/appwrite_list_documents.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-
-import 'live_chat.dart';
-import 'live_chat_animations.dart';
 
 class LiveChatViewModel extends BaseViewModel {
   final log = getLogger('LiveChatViewModel');
@@ -32,20 +23,6 @@ class LiveChatViewModel extends BaseViewModel {
 
   TaskState _state = TaskState.success;
   TaskState get state => _state;
-
-  late LiveChatUser _senderLiveChatUser;
-  LiveChatUser get liveChatUser => _senderLiveChatUser;
-
-  LiveChatUser getSenderLiveChatUser(GetDocumentsList docs) {
-    final document = docs.documents.first;
-    final doc = document.cast<String, dynamic>();
-    final user = LiveChatUser.fromJson(doc);
-
-    _senderLiveChatUser = user;
-    notifyListeners();
-
-    return _senderLiveChatUser;
-  }
 
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
@@ -97,11 +74,13 @@ class LiveChatViewModel extends BaseViewModel {
     ).animate(controller);
   }
 
+
+  // update user document in realtime database
+
   /// uploading a single file into the firebase storage and get progress
   Future<String> uploadFile({
     required String filePath,
     required String fileName,
-    required String documentId,
     required BuildContext context,
   }) async {
     var now = DateTime.now();
@@ -153,18 +132,11 @@ class LiveChatViewModel extends BaseViewModel {
     await task;
     String downloadURL = await storage.ref(folder).getDownloadURL();
     setBusy(false);
-    AppWriteApi.instance.updateDocument(
-      collectionId: AppWriteConstants.liveChatscollectionID,
-      documentId: documentId,
-      data: {
-        LiveChatField.mediaType: fileType,
-        LiveChatField.mediaURL: downloadURL,
-        LiveChatField.userMessage: downloadURL,
-      },
-    );
     return downloadURL;
   }
 
+
+  //Alert Dialog For larger File
   Future<void> sizeDialog(BuildContext context) async {
     return showDialog(
       context: context,
@@ -192,27 +164,6 @@ class LiveChatViewModel extends BaseViewModel {
         );
       },
     );
-  }
-
-  // getting animation Value
-  Future<dynamic> getAnimationValue({
-    required FireUser fireUser,
-    required BuildContext context,
-    required GetDocumentsList liverUserDocs,
-    required GetDocumentsList receiverDocs,
-  }) async {
-    final animation = await Navigator.push(
-      context,
-      cupertinoTransition(
-        enterTo: const LiveChatAnimations(),
-        exitFrom: LiveChat(
-            fireUser: fireUser,
-            liverUserDocs: liverUserDocs,
-            receiverUserDocs: receiverDocs),
-      ),
-    );
-    log.wtf('Animation Value:$animation');
-    return animation;
   }
 
   /// Clicking Image from camera
@@ -257,7 +208,8 @@ class LiveChatViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> pickFromGallery(BuildContext context, String documentId) async {
+  // Pick File From Gallery
+  Future<void> pickFromGallery(BuildContext context) async {
     const pickFile = FileType.media;
     final picker = FilePicker.platform;
     final result = await picker.pickFiles(type: pickFile, withData: true);
@@ -300,7 +252,6 @@ class LiveChatViewModel extends BaseViewModel {
             await uploadFile(
                 filePath: path,
                 context: context,
-                documentId: documentId,
                 fileName: result.files.first.name);
           }
         }
@@ -386,17 +337,5 @@ class LiveChatViewModel extends BaseViewModel {
         .collection(usersFirestoreKey)
         .doc(fireUserID)
         .snapshots();
-  }
-
-  Future<dynamic> updateMessage({
-    required String documentId,
-    required String collectionId,
-    required Map<dynamic, dynamic> data,
-  }) async {
-    AppWriteApi.instance.updateDocument(
-      documentId: documentId,
-      collectionId: collectionId,
-      data: data,
-    );
   }
 }

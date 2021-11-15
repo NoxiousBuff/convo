@@ -1,14 +1,17 @@
 import 'dart:math';
+import 'dart:convert';
 import 'package:tcard/tcard.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/register/user_interests/user_intererst_viewmodel.dart';
 
 List<String> get activityNames => _activityNames;
@@ -33,12 +36,45 @@ class InterestsView extends StatefulWidget {
 }
 
 class _InterestsViewState extends State<InterestsView> {
+  late GeoPoint geoPoint;
   final log = getLogger('InterestsView');
   @override
   void initState() {
     super.initState();
-
+    lookUpGeopoint();
     updateCurrentUser();
+  }
+
+  Future<GeoPoint> lookUpGeopoint() async {
+    final response =
+        await http.get(Uri.parse('https://api.ipregistry.co?key=tryout'));
+
+    if (response.statusCode == 200) {
+      final latitude = json.decode(response.body)['location']['latitude'];
+      final longitude = json.decode(response.body)['location']['longitude'];
+      log.wtf('Latitide:$latitude');
+      log.wtf('Longitude:$longitude');
+
+      setState(() {
+        geoPoint = GeoPoint(latitude, longitude);
+      });
+
+      return GeoPoint(latitude, longitude);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: inactiveGray,
+          content: Text(
+            'Turn On Your Internet',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2
+                ?.copyWith(color: systemBackground),
+          ),
+        ),
+      );
+      throw Exception('Failed to get user country from IP address');
+    }
   }
 
   Future<void> updateCurrentUser() async {
@@ -53,17 +89,9 @@ class _InterestsViewState extends State<InterestsView> {
   }
 
   @override
-  void didChangeDependencies() async {
-    await updateCurrentUser();
-    final liveUser = AuthService.liveUser;
-    if (liveUser != null) {
-      log.wtf('photoURL:${liveUser.photoURL}');
-      log.wtf('username:${liveUser.displayName}');
-    } else {
-      log.w('Live User is null now !!');
-    }
-
-    super.didChangeDependencies();
+  void didUpdateWidget(covariant InterestsView oldWidget) {
+    lookUpGeopoint();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -130,6 +158,7 @@ class _InterestsViewState extends State<InterestsView> {
                   if (model.length() > 5) {
                     await model.createUserInDataBase(
                       context,
+                      location: geoPoint,
                       email: widget.email,
                       username: widget.username,
                       createdUser: widget.createdUser,

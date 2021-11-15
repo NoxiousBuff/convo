@@ -1,3 +1,4 @@
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -41,21 +42,23 @@ class FirestoreApi {
   }
 
   Future<void> createUserInFirebase({
-    required String username,
     Function? onError,
     required User user,
+    required String username,
+    required GeoPoint location,
     required String phoneNumber,
-    required String countryPhoneCode,
     required List<String> interests,
+    required String countryPhoneCode,
   }) async {
     try {
       await usersCollection.doc(user.uid).set({
         'bio': '',
-        'blockedUsers': [],
+        'blockedUsers': null,
         'countryPhoneCode': countryPhoneCode,
         'email': user.email,
         'id': user.uid,
         'interests': interests,
+        'position': GeoFirePoint(location.latitude, location.longitude).data,
         'lastSeen': Timestamp.now(),
         'phone': phoneNumber,
         'photoUrl': kDefaultPhotoUrl,

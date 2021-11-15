@@ -11,7 +11,7 @@ import 'package:hint/models/message_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hint/ui/components/media/image/image_viewmodel.dart';
 import 'package:hint/ui/components/media/message/message_viewmodel.dart';

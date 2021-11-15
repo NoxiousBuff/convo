@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessagesViewModel extends StreamViewModel<QuerySnapshot> {

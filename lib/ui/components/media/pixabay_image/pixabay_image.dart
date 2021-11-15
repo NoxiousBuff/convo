@@ -5,7 +5,7 @@ import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_widget.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/message_model.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/components/media/pixabay_image/pixabay_image_viewmodel.dart';
 

@@ -10,7 +10,7 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/chat/chat_view.dart';
 import 'package:hint/routes/shared_axis_route.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final ChatService chatService = ChatService();

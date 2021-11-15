@@ -1,3 +1,4 @@
+import 'package:hint/ui/views/live_chat/live_chat.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
@@ -13,7 +14,7 @@ import 'package:timeago/timeago.dart' as time;
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
@@ -165,9 +166,17 @@ class ChatView extends StatelessWidget {
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 40, 20, 20),
                       child: InkWell(
-                        onTap: () {
-                          model.enterInLiverChat(context);
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          cupertinoTransition(
+                            enterTo: const LiveChat(),
+                            exitFrom: ChatView(
+                              fireUser: fireUser,
+                              randomColor: randomColor,
+                              conversationId: conversationId,
+                            ),
+                          ),
+                        ),
                         child: model.isBusy
                             ? const Center(
                                 child: SizedBox(

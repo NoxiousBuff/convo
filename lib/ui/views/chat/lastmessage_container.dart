@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LastMessageContainer extends StatelessWidget {

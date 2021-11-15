@@ -69,16 +69,16 @@ class ContactsView extends StatelessWidget {
   Widget _buildContactsView(ContactsViewModel model) {
     return model.contacts != null
         ? ListView.separated(
-            separatorBuilder: (context, i) {
-              return const Divider();
-            },
-            physics: const BouncingScrollPhysics(),
             shrinkWrap: true,
+            itemCount: model.contacts!.length,
+            separatorBuilder: (context, i) => const Divider(),
+            physics: const BouncingScrollPhysics(),
             itemBuilder: (context, i) {
               final contact = model.contacts!.elementAt(i);
-              final phones = contact.phones;
-              if (contact.phones!.isNotEmpty && phones != null) {
-              final phone = model.numberFormatter(phones.first.value.toString());
+              final phones = Set.of(contact.phones!.toList()).toList();
+              if (phones.isNotEmpty) {
+                final phone =
+                    model.numberFormatter(phones.first.value.toString());
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 8.0),
@@ -169,7 +169,6 @@ class ContactsView extends StatelessWidget {
                 ),
               );
             },
-            itemCount: model.contacts!.length,
           )
         : const Center(
             child: CircularProgressIndicator(),

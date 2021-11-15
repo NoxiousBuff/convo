@@ -1,11 +1,11 @@
-import 'package:contacts_service/contacts_service.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:stacked/stacked.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ContactsViewModel extends FutureViewModel {
 
-  final log = getLogger('COntactViewModel');
+  final log = getLogger('ContactViewModel');
 
   Iterable<Contact>? _contacts;
   Iterable<Contact>? get contacts => _contacts;

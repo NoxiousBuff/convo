@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/appwrite_api.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/register/phone_auth/phone_auth_view.dart';
@@ -39,9 +38,9 @@ class UsernameRegisterViewModel extends BaseViewModel {
 
       bool isUsernameExists = await checkIsUsernameExists(username);
       if (!isUsernameExists) {
-        await AppWriteApi.instance
-            .signup(name: username, email: email, password: password);
-        await AppWriteApi.instance.logIn(email: email, password: password);
+        // await AppWriteApi.instance
+        //     .signup(name: username, email: email, password: password);
+        //await AppWriteApi.instance.logIn(email: email, password: password);
 
         Navigator.push(
           context,

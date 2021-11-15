@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive_helper.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/views/chat/chat_viewmodel.dart';
 import 'package:uuid/uuid.dart';

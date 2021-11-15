@@ -7,7 +7,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/chat/unread_messages.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';

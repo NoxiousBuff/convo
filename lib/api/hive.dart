@@ -7,28 +7,22 @@ final hiveApi = HiveHelper();
 
 class HiveHelper {
   final log = getLogger('HiveApi');
-  static const String retryMessages = 'retryMessages';
-  static const String hiveBoxImages = 'ImagesHiveBox';
-  static const String hiveBoxAudio = 'AudioHiveBox';
   static const String hiveBoxVideo = 'VideosHiveBox';
-  static const String hiveBoxDocs = 'DocumentsHiveBox';
-  static const String hiveBoxThumbnails = 'ThumbnailsHiveBox';
-  static const String hiveBoxProfilePhotos = 'ProfilePhotosHiveBox';
-  static const String hiveBoxLinkData = 'LinkDataHiveBox';
-  static const String hiveBoxMultiMedia = 'MultiMediaHiveBox';
+  static const String hiveBoxImages = 'ImagesHiveBox';
   static const String hiveBoxEmojies = 'EmojiesHiveBox';
+  static const String hiveBoxLinkData = 'LinkDataHiveBox';
+  static const String userContactHiveBox = 'userContactsHivebox';
+  static const String hiveBoxProfilePhotos = 'ProfilePhotosHiveBox';
+  static const String userContactInviteHiveBox = 'userContactInviteHiveBox';
   Future<void> initialiseHive() async {
-    await Hive.openBox(appSettingsBoxName);
-    await Hive.openBox(retryMessages);
-    await Hive.openBox(hiveBoxProfilePhotos);
-    await Hive.openBox(hiveBoxThumbnails);
-    await Hive.openBox(hiveBoxImages);
     await Hive.openBox(hiveBoxVideo);
-    await Hive.openBox(hiveBoxAudio);
-    await Hive.openBox(hiveBoxDocs);
-    await Hive.openBox(hiveBoxLinkData);
-    await Hive.openBox(hiveBoxMultiMedia);
+    await Hive.openBox(hiveBoxImages);
     await Hive.openBox(hiveBoxEmojies);
+    await Hive.openBox(hiveBoxLinkData);
+    await Hive.openBox(appSettingsBoxName);
+    await Hive.openBox(userContactHiveBox);
+    await Hive.openBox(hiveBoxProfilePhotos);
+    await Hive.openBox(userContactInviteHiveBox);
   }
 
   Future<dynamic> getFromHive(String hiveBoxName, dynamic key) async {

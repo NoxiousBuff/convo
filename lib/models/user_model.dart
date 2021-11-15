@@ -8,6 +8,7 @@ class FireUser {
   final String status;
   final String username;
   final String? photoUrl;
+  final dynamic position;
   final Timestamp lastSeen;
   final Timestamp userCreated;
   final String countryPhoneCode;
@@ -24,6 +25,7 @@ class FireUser {
     required this.status,
     required this.lastSeen,
     required this.username,
+    required this.position,
     required this.interests,
     required this.userCreated,
     required this.countryPhoneCode,
@@ -40,6 +42,7 @@ class FireUser {
       photoUrl: doc['photoUrl'],
       username: doc['username'],
       lastSeen: doc['lastSeen'],
+      position: doc['position'],
       interests: doc['interests'],
       userCreated: doc['userCreated'],
       blockedUsers: doc['blockedUsers'],
