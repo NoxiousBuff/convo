@@ -3,7 +3,6 @@ import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/models/user_contact.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class UserContacts extends StatelessWidget {
   UserContacts({Key? key}) : super(key: key);
@@ -27,13 +26,14 @@ class UserContacts extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final hiveContact = hivebox.getAt(index);
-                final contact = UserContact.fromJson(hiveContact);
-                final image = CachedNetworkImageProvider(contact.photoUrl!);
+                final convert = hiveContact.cast<String, dynamic>();
+                final contact = UserContact.fromJson(convert);
+               // final image = CachedNetworkImageProvider(contact.photoUrl!);
                 return ListTile(
-                  leading: CircleAvatar(
-                    maxRadius: 20,
-                    backgroundImage: image,
-                  ),
+                  // leading: CircleAvatar(
+                  //   maxRadius: 20,
+                  //   backgroundImage: image,
+                  // ),
                   title: Text(
                     contact.contactName,
                     style: Theme.of(context).textTheme.bodyText1,
@@ -41,7 +41,7 @@ class UserContacts extends StatelessWidget {
                   subtitle: SizedBox(
                     width: screenWidthPercentage(context,percentage: 0.8),
                     child: Text(
-                      contact.bio!,
+                    contact.countryPhoneCode + contact.phone,
                       maxLines: 1,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,

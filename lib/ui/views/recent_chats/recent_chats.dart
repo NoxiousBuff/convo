@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/ui/views/live_chat/live_chat.dart';
+import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,8 +31,14 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    //clearHive();
     WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
+  }
+
+  Future<void> clearHive() async {
+    await Hive.box(HiveHelper.userContactHiveBox).clear();
+    await Hive.box(HiveHelper.userContactInviteHiveBox).clear();
   }
 
   Future<void> setStatus({required String status}) async {
@@ -104,7 +112,7 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
         final data = model.data;
 
         if (data != null) {
-          return data.docs.isNotEmpty
+          return data.docs.isEmpty
               ? ListView.builder(
                   shrinkWrap: true,
                   itemCount: data.docs.length,
@@ -240,6 +248,19 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                   //     .catchError((e) {
                   //       log.e('Error:$e');
                   //     });
+                },
+              ),
+              TextButton(
+                child: const Text('Enter'),
+                onPressed: () async{
+                 final user = await model.getFireUser('8920551108');
+                 log.wtf('User:$user');
+                },
+              ),
+              TextButton(
+                child: const Text('Enter In Live'),
+                onPressed: () {
+                  log.wtf(Hive.box(HiveHelper.userContactHiveBox).values.toList());
                 },
               ),
               buildUserContact(model),

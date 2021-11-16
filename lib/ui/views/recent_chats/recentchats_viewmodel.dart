@@ -17,6 +17,8 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
 
   List<Contact>? _contacts;
   List<Contact>? get contacts => _contacts;
+
+
   //FireUser? _fireUser;
   late final FireUser currentFireUser;
   final _firestore = FirebaseFirestore.instance;
@@ -123,7 +125,8 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
 
   // For checking phone number exists in database
   // If phoneNumber exists in firebase this will return true, if not then return false
-  Future<bool> _existsInFirestore(String phoneNumber) async {
+  Future<FireUser?> getFireUser(String phoneNumber) async {
+
     final firebstoreUser = await FirebaseFirestore.instance
         .collection(usersFirestoreKey)
         .where(UserField.phone, isEqualTo: phoneNumber)
@@ -133,26 +136,31 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
     });
     if (firebstoreUser.docs.isEmpty) {
       log.v('Not exists firebase');
-      return false;
+      log.wtf(firebstoreUser.docs.isNotEmpty);
+      return null;
     } else {
       log.v('Exists in firebase');
-
-      return true;
+      final fireUser = FireUser.fromFirestore(firebstoreUser.docs.first);
+      log.wtf(fireUser.email);
+      return fireUser;
     }
   }
 
+
+
+
   // get user from firestore
-  Future<FireUser> _getFirestoreUser(String phoneNumber) async {
-    final firebstoreUser = await FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .where(UserField.phone, isEqualTo: phoneNumber)
-        .get()
-        .catchError((e) {
-      log.e('_getFirestoreUser Error:$e');
-    });
-    final fireUser = FireUser.fromFirestore(firebstoreUser.docs.first);
-    return fireUser;
-  }
+  // Future<FireUser> _getFirestoreUser(String phoneNumber) async {
+  //   final firebstoreUser = await FirebaseFirestore.instance
+  //       .collection(usersFirestoreKey)
+  //       .where(UserField.phone, isEqualTo: phoneNumber)
+  //       .get(const GetOptions(source: Source.cache))
+  //       .catchError((e) {
+  //     log.e('_getFirestoreUser Error:$e');
+  //   });
+  //   final fireUser = FireUser.fromFirestore(firebstoreUser.docs.first);
+  //   return fireUser;
+  // }
 
   // Save Those User Contact in HiveBox Which Exists in Database
   Future<void> _saveContactInHive(
@@ -164,7 +172,7 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
         "id": fireUser.id,
         "email": fireUser.email,
         "phone": fireUser.phone,
-        contactName: contactName,
+        'contactName': contactName,
         "username": fireUser.username,
         "countryPhoneCode": fireUser.countryPhoneCode
       };
@@ -179,11 +187,11 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
   }
 
   // Save Those User Contact in HiveBox Which Doesn't Exists in Database
-  Future<void> _saveContactInInvites(String contactName, String phone) async {
+  Future<void> _saveContactInInvites(String contactName, String phone, String formattedNumber) async {
     final countryCode = _countryCodeExtract(phone);
     Map<String, dynamic> map = {
       "phone": phone,
-      contactName: contactName,
+      "contactName": contactName,
       "countryPhoneCode": countryCode
     };
     final key = countryCode + phone;
@@ -196,6 +204,8 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
 
   // Get User Contacts and Save In Hive
   Future<void> gettingPhoneNumbers() async {
+    setBusy(true);
+
     final hiveBox = Hive.box(HiveHelper.userContactHiveBox);
     try {
       setBusy(true);
@@ -207,9 +217,8 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
             final mergedPhones = Set.of(phones.toList()).toList();
             for (var phone in mergedPhones) {
               final formattedNumber = numberFormatter(phone.value.toString());
-              bool isExists = await _existsInFirestore(formattedNumber);
-              if (isExists) {
-                final fireUser = await _getFirestoreUser(formattedNumber);
+              FireUser? fireUser = await getFireUser(formattedNumber);
+              if (fireUser != null) {
                 String userUniqueUid = fireUser.id;
                 String contactName = contact.displayName ?? 'No Name';
                 log.wtf('Contact:$contactName | Number:$formattedNumber');
@@ -217,7 +226,7 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
                   await _saveContactInHive(contactName, fireUser);
                 } else {
                   await _saveContactInInvites(
-                      contactName, phone.value.toString());
+                      contactName, phone.value.toString(), formattedNumber);
                 }
               }
             }
