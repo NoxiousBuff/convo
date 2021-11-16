@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'dart:convert' show utf8;
 import 'dart:typed_data' show Uint8List;
 
+final storageApi = StorageApi();
+
 class StorageApi {
   FirebaseStorage storage =
       FirebaseStorage.instance;

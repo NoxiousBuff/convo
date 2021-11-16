@@ -72,3 +72,9 @@ class DatabaseMessageField {
   static const online = 'online';
   static const aniType = 'aniType';
 }
+
+
+class AnimationType {
+  static const confetti = 'confetti';
+  static const spotlight = 'spotlight';
+}

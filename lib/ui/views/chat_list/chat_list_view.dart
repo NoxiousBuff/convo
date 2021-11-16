@@ -1,4 +1,8 @@
+import 'package:hint/constants/message_string.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
@@ -130,9 +134,12 @@ class ChatListView extends StatelessWidget {
                           shrinkWrap: true,
                           itemCount: data.length,
                           itemBuilder: (context, index) {
+                              final fireUser = FireUser.fromFirestore(data[index]);
                             return UserItem(
-                              fireUser: FireUser.fromFirestore(data[index]),
+                              fireUser: fireUser,
                               onTap: () {
+                                final convoUid = chatService.getConversationId(fireUser.id, AuthService.liveUser!.uid);
+                                databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, convoUid);
                                 navService.cupertinoPageRoute(
                                   context,
                                   DuleView(

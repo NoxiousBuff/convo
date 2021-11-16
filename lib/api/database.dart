@@ -13,7 +13,7 @@ class DatabaseApi {
     try {
       await _databaseReference
           .child(key)
-          .set(map)
+          .update(map)
           .then((value) => log.wtf('Successfully added the map.'));
     } catch (e) {
       log.e('There was an error in adding data : $e');

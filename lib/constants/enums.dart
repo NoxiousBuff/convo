@@ -13,3 +13,4 @@ enum TextFieldWidthState {
   reg,
   max,
 }
+
