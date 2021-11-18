@@ -11,6 +11,7 @@ class HiveHelper {
   static const String hiveBoxImages = 'ImagesHiveBox';
   static const String hiveBoxEmojies = 'EmojiesHiveBox';
   static const String hiveBoxLinkData = 'LinkDataHiveBox';
+  static const String phoneNumberHiveBox = 'phoneNumberHiveBox';
   static const String userContactHiveBox = 'userContactsHivebox';
   static const String hiveBoxProfilePhotos = 'ProfilePhotosHiveBox';
   static const String userContactInviteHiveBox = 'userContactInviteHiveBox';
@@ -21,6 +22,7 @@ class HiveHelper {
     await Hive.openBox(hiveBoxLinkData);
     await Hive.openBox(appSettingsBoxName);
     await Hive.openBox(userContactHiveBox);
+    await Hive.openBox(phoneNumberHiveBox);
     await Hive.openBox(hiveBoxProfilePhotos);
     await Hive.openBox(userContactInviteHiveBox);
   }

@@ -81,3 +81,8 @@ class AnimationType {
   static const confetti = 'confetti';
   static const spotlight = 'spotlight';
 }
+
+class PhoneNumberField {
+  static const number = 'number';
+  static const contactName = 'contactName';
+}

@@ -1,8 +1,6 @@
-import 'package:firebase_database/firebase_database.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/app/app.dart';
-import 'package:hint/ui/views/live_chat/live_chat.dart';
 import 'package:hive/hive.dart';
+import 'package:hint/app/app.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +11,7 @@ import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
@@ -31,13 +30,13 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    //clearHive();
     WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
   }
 
   Future<void> clearHive() async {
     await Hive.box(HiveHelper.userContactHiveBox).clear();
+    await Hive.box(HiveHelper.phoneNumberHiveBox).clear();
     await Hive.box(HiveHelper.userContactInviteHiveBox).clear();
   }
 
@@ -51,12 +50,6 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
       log.e('setStatus:$e');
     });
   }
-
-  // Future getAppWriteCurrentUser() async {
-  //   final currentUser = await AppWriteApi.instance.account.get();
-  //   log.wtf('Appwrite email: ${currentUser.email}');
-  //   log.wtf('Appwrite ID:${currentUser.$id}');
-  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -129,10 +122,8 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                     Center(
                       child: buttonWidget(
                         context: context,
-                        onPressed: () => model.gettingPhoneNumbers(),
-                        text: model.isBusy
-                            ? 'Loading...'
-                            : 'Find you close friends',
+                        onPressed: () {},
+                        text: 'Find your close friends',
                       ),
                     ),
                   ],
@@ -146,8 +137,6 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final liveChatUsersRef = database.child('/LiveChatUsers');
-
     return ViewModelBuilder<RecentChatsViewModel>.reactive(
       viewModelBuilder: () => RecentChatsViewModel(),
       onModelReady: (model) async {
@@ -219,61 +208,21 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
           ),
           body: Column(
             children: [
-              TextButton(
-                child: const Text('Realtime Database'),
-                onPressed: () async {
-                  Map<String, dynamic> map = {
-                    'userMessage': 'HintMessage',
-                    'animation': null,
-                    'medias': null,
-                    'status': 'Offline',
-                    'chatRoomId': null,
-                  };
-                  await liveChatUsersRef
-                      .child('0HZIVOJxr6baRUhjWxrNsJcFvkJ3')
-                      .set(map)
-                      .whenComplete(() => log.wtf('Added in Realtime Database'))
-                      .catchError((e) {
-                    log.e('RealtimeDatabase Error:$e');
-                  });
-                  // await database
-                  //     .child('liveChat/medias')
-                  //     .push()
-                  //     .set({
-                  //       'URL': 'videoURL',
-                  //       'type': 'imageURL',
-                  //     })
-                  //     .whenComplete(
-                  //         () => 'Document is added in realtimeDatabse')
-                  //     .catchError((e) {
-                  //       log.e('Error:$e');
-                  //     });
-                },
-              ),
-              TextButton(
-                child: const Text('Enter'),
-                onPressed: () async{
-                 final user = await model.getFireUser('8920551108');
-                 log.wtf('User:$user');
-                },
-              ),
-              TextButton(
-                child: const Text('Enter In Live'),
-                onPressed: () {
-                  log.wtf(Hive.box(HiveHelper.userContactHiveBox).values.toList());
-                },
-              ),
+              const SizedBox(height: 8),
               buildUserContact(model),
-              TextButton(
-                child: const Text('Enter In Live Chat'),
-                onPressed: () => Navigator.push(
-                  context,
-                  cupertinoTransition(
-                    enterTo: const LiveChat(),
-                    exitFrom: const RecentChats(),
-                  ),
+              Container(
+                margin: const EdgeInsets.all(8),
+                child: CupertinoButton(
+                  color: systemTeal,
+                  child: model.isBusy
+                      ? const Text('Checking......')
+                      : const Text('Get Users By Interests'),
+                  onPressed: () {
+                    final interests = model.currentFireUser.interests;
+                    model.getUserByInterests(interests);
+                  },
                 ),
-              )
+              ),
             ],
           ),
         );
