@@ -92,6 +92,26 @@ class FirestoreApi {
     }
   }
 
+
+ Future<FireUser?> getUserUsingNumber(String userUid) async {
+    log.i('userUid:$userUid');
+
+    if (userUid.isNotEmpty) {
+      final userDoc = await usersCollection.doc(userUid).get();
+      if (!userDoc.exists) {
+        log.v('We have no user with id $userUid in our database');
+        return null;
+      }
+
+      final userData = userDoc.data();
+      log.v('User found. Data: $userData');
+
+      return FireUser.fromFirestore(userDoc);
+    } else {
+      log.wtf('User cannot be empty. Please fill it correctly.');
+    }
+  }
+
   Future<void> changeUserDisplayName(String username) async {
     final currentUser = auth.currentUser!;
     await usersCollection

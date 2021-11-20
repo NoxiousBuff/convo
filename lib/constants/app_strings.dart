@@ -85,4 +85,9 @@ class AnimationType {
 class PhoneNumberField {
   static const number = 'number';
   static const contactName = 'contactName';
+  static const countryCode = 'countryCode';
+}
+
+class CommonPropertiesInCollection {
+  static const userUid = 'userUid';
 }

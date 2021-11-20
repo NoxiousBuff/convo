@@ -287,7 +287,7 @@ class ProfileView extends StatelessWidget {
         ValueListenableBuilder<Box>(
           valueListenable: appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(darkModeKey, defaultValue: false);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -319,7 +319,7 @@ class ProfileView extends StatelessWidget {
         ValueListenableBuilder<Box>(
           valueListenable: appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(darkModeKey, defaultValue: false);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -356,7 +356,7 @@ class ProfileView extends StatelessWidget {
         ValueListenableBuilder<Box>(
           valueListenable: appSettings.listenable(),
           builder: (context, box, child) {
-            bool darkTheme = box.get(darkModeKey);
+            bool darkTheme = box.get(darkModeKey, defaultValue: false);
             return ListTileTheme(
               tileColor: darkTheme ? darkModeColor : null,
               iconColor: darkTheme ? dirtyWhite : darkModeColor,
@@ -403,49 +403,164 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
-      onModelReady: (model) async {
-        await Hive.openBox(urlData(conversationId));
-        await Hive.openBox(imagesMemory(conversationId));
-        await Hive.openBox(chatRoomMedia(conversationId));
-        await Hive.openBox(thumbnailsPath(conversationId));
-        await Hive.openBox(videoThumbnails(conversationId));
-      },
       builder: (_, viewModel, child) {
-        return Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            automaticallyImplyLeading: true,
-            backgroundColor: Colors.transparent,
-          ),
-          body: ListView(
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            children: [
-              profileBox(context: context, model: viewModel),
-              defaultOptions(context, viewModel),
-              SizedBox(
-                height: 60,
-                child: ListTile(
-                  title: Text(
-                    'More Actions',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
+        return ViewModelBuilder<ProfileViewModel>.reactive(
+            viewModelBuilder: () => ProfileViewModel(),
+            builder: (context, model, child) {
+              return Scaffold(
+                backgroundColor: extraLightBackgroundGray,
+                body: CustomScrollView(
+                  slivers: [
+                    const SliverAppBar(
+                      stretch: true,
+                      floating: true,
+                      automaticallyImplyLeading: true,
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 8),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                children: [
+                                  CircleAvatar(
+                                    maxRadius: 80,
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        fireUser.photoUrl!),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    fireUser.username,
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 0),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                color: systemBackground,
+                                child: const ListTile(
+                                    title: Text('Copy Profile Link'),
+                                    leading: Icon(Icons.link)),
+                              ),
+                              Container(
+                                color: systemBackground,
+                                child: ListTile(
+                                    onTap: () => showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return notificationDialog(
+                                                context, model);
+                                          },
+                                        ),
+                                    title: const Text('Mute Notifications'),
+                                    leading: Icon(model.value != null
+                                        ? CupertinoIcons.bell_slash
+                                        : CupertinoIcons.bell)),
+                              ),
+                              Container(
+                                color: systemBackground,
+                                child: const ListTile(
+                                    title: Text('End-to-End Encryption'),
+                                    leading: Icon(Icons.lock_outline)),
+                              ),
+                              const SizedBox(height: 20),
+                              Container(
+                                color: systemBackground,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 16),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text('About and email',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: screenWidth(context),
+                                      constraints:
+                                          const BoxConstraints(minHeight: 80),
+                                      color: systemBackground,
+                                      child: Center(
+                                        child: Text(
+                                          'Bio',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1,
+                                        ),
+                                      ),
+                                    ),
+                                    const Divider(height: 0),
+                                    ListTile(
+                                      trailing: const Icon(Icons.email),
+                                      subtitle: Text('Email',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption),
+                                      title: Text(fireUser.email,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              moreActionOption(context),
-              SizedBox(
-                height: 60,
-                child: ListTile(
-                  title: Text(
-                    'Privacy',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              ),
-              privacyOption(context, viewModel, model)
-            ],
-          ),
-        );
+              );
+            });
+        // Scaffold(
+        //   appBar: AppBar(
+        //     elevation: 0,
+        //     automaticallyImplyLeading: true,
+        //     backgroundColor: Colors.transparent,
+        //   ),
+        //   body: ListView(
+        //     shrinkWrap: true,
+        //     physics: const BouncingScrollPhysics(),
+        //     children: [
+        //       profileBox(context: context, model: viewModel),
+        //       defaultOptions(context, viewModel),
+        //       SizedBox(
+        //         height: 60,
+        //         child: ListTile(
+        //           title: Text(
+        //             'More Actions',
+        //             style: Theme.of(context).textTheme.headline6,
+        //           ),
+        //         ),
+        //       ),
+        //       moreActionOption(context),
+        //       SizedBox(
+        //         height: 60,
+        //         child: ListTile(
+        //           title: Text(
+        //             'Privacy',
+        //             style: Theme.of(context).textTheme.headline6,
+        //           ),
+        //         ),
+        //       ),
+        //       privacyOption(context, viewModel, model)
+        //     ],
+        //   ),
+        // );
       },
     );
   }

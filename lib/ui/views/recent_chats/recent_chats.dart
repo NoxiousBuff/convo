@@ -30,6 +30,8 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    //final list = Hive.box(HiveHelper.phoneNumberHiveBox).values.toList();
+    //log.wtf(list);
     WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
   }
@@ -50,6 +52,15 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
       log.e('setStatus:$e');
     });
   }
+
+  @override
+  void didChangeDependencies() async {
+    // await clearHive().catchError((e) {
+    //   log.e('clearHive Error:$e');
+    // }).whenComplete(() => log.wtf('Hive Box Clear'));
+    super.didChangeDependencies();
+  }
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -218,8 +229,7 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                       ? const Text('Checking......')
                       : const Text('Get Users By Interests'),
                   onPressed: () {
-                    final interests = model.currentFireUser.interests;
-                    model.getUserByInterests(interests);
+                    model.gettingPhoneNumbers();
                   },
                 ),
               ),

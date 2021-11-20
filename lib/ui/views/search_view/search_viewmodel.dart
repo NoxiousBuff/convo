@@ -17,7 +17,13 @@ class SearchViewModel extends BaseViewModel {
 
   void handleSearch(String query) {
     Future<QuerySnapshot>? searchResults = userCollection
-        .where(UserField.username, isGreaterThanOrEqualTo: query)
+        .where(
+          UserField.username,
+          isGreaterThanOrEqualTo:
+              query.toLowerCase().contains(query.toLowerCase()),
+          isLessThan: query.substring(0, query.length - 1) +
+              String.fromCharCode(query.codeUnitAt(query.length - 1) + 1),
+        )
         .get();
     _searchResultFuture = searchResults;
     notifyListeners();

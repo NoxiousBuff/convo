@@ -18,8 +18,8 @@ Future<void> main() async {
   await Firebase.initializeApp();
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
-  Hive.init(appDocPath);
-  HiveHelper().initialiseHive();
+   Hive.init(appDocPath);
+  await HiveHelper().initialiseHive();
   await Hive.openBox(appSettingsBoxName)
       .whenComplete(() => print('open hive box'));
   runApp(const ProviderScope(child: MyApp()));

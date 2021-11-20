@@ -1,5 +1,4 @@
 import 'package:hint/app/app.dart';
-import 'package:hint/ui/views/user_contacts/user_contacts.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +15,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/views/privacy/privacy.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:hint/ui/views/user_account/account_view.dart';
+import 'package:hint/ui/views/user_contacts/user_contacts.dart';
 import 'package:hint/ui/views/distant_view/distantview_viewmodel.dart';
 
 class DistantView extends StatelessWidget {
@@ -164,7 +164,7 @@ class DistantView extends StatelessWidget {
                             Navigator.push(
                               context,
                               cupertinoTransition(
-                                enterTo: UserContacts(),
+                                enterTo: const UserContacts(),
                                 exitFrom: exitFrom,
                               ),
                             );

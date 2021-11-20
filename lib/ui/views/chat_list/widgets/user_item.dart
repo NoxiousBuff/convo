@@ -1,15 +1,20 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class UserItem extends StatelessWidget {
+class UserItem extends StatefulWidget {
   final FireUser fireUser;
   final Color randomColor;
   final void Function()? onTap;
@@ -19,6 +24,21 @@ class UserItem extends StatelessWidget {
       required this.onTap,
       required this.randomColor})
       : super(key: key);
+
+  @override
+  State<UserItem> createState() => _UserItemState();
+}
+
+class _UserItemState extends State<UserItem> {
+  bool isFriend = false;
+  bool requesteSended = false;
+  final log = getLogger('UserItem');
+
+  @override
+  void initState() {
+    super.initState();
+    requestChecker(widget.fireUser.id);
+  }
 
   buildChatListItemPopup({required FireUser fireUser}) {
     return Material(
@@ -96,14 +116,61 @@ class UserItem extends StatelessWidget {
     );
   }
 
+  Future<void> sendFriendRequest(String userUniqueId) async {
+    await FirebaseFirestore.instance
+        .collection(requestsFirestoreKey)
+        .doc(userUniqueId)
+        .set({
+          'userUid': [widget.fireUser.id],
+        })
+        .catchError((e) => log.e)
+        .whenComplete(() => log.wtf('Document Added'));
+  }
+
+  Future<void> requestChecker(String userUniqueId) async {
+    final document = await FirebaseFirestore.instance
+        .collection(requestsFirestoreKey)
+        .doc(FirestoreApi.liveUserUid)
+        .get();
+    final doc = document.data()![CommonPropertiesInCollection.userUid];
+    List<String> json = doc.cast<String>();
+
+    switch (json.contains(userUniqueId)) {
+      case true:
+        {
+          setState(() {
+            requesteSended = true;
+          });
+        }
+
+        break;
+      case false:
+        {
+          final document = await FirebaseFirestore.instance
+              .collection(friendsFirestoreKey)
+              .doc(FirestoreApi.liveUserUid)
+              .get();
+          final doc = document.data()![CommonPropertiesInCollection.userUid];
+          List<String> json = doc.cast<String>();
+          if (json.contains(userUniqueId)) {
+            setState(() {
+              isFriend = true;
+            });
+          }
+        }
+        break;
+      default:
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Box>(
       valueListenable: appSettings.listenable(),
       builder: (context, box, child) {
-        bool darkMode = box.get(darkModeKey,defaultValue: false);
+        bool darkMode = box.get(darkModeKey, defaultValue: false);
         return ListTile(
-          onTap: onTap,
+          onTap: widget.onTap,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
@@ -115,7 +182,7 @@ class UserItem extends StatelessWidget {
               showCupertinoModalBottomSheet(
                   context: context,
                   builder: (context) {
-                    return buildChatListItemPopup(fireUser: fireUser);
+                    return buildChatListItemPopup(fireUser: widget.fireUser);
                   });
             },
             child: ClipOval(
@@ -124,8 +191,8 @@ class UserItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     colors: [
-                      randomColor.withAlpha(30),
-                      randomColor.withAlpha(50),
+                      widget.randomColor.withAlpha(30),
+                      widget.randomColor.withAlpha(50),
                     ],
                     focal: Alignment.topLeft,
                     radius: 0.8,
@@ -134,7 +201,7 @@ class UserItem extends StatelessWidget {
                 height: 56.0,
                 width: 56.0,
                 child: Text(
-                  fireUser.username[0].toUpperCase(),
+                  widget.fireUser.username[0].toUpperCase(),
                   style: TextStyle(
                     color: darkMode ? systemBackground : black,
                     fontWeight: FontWeight.w600,
@@ -147,7 +214,7 @@ class UserItem extends StatelessWidget {
           title: Padding(
             padding: const EdgeInsets.only(bottom: 5.0),
             child: Text(
-              fireUser.username,
+              widget.fireUser.username,
               style: GoogleFonts.roboto(
                 fontSize: 20,
                 color: darkMode ? systemBackground : black,
@@ -156,11 +223,30 @@ class UserItem extends StatelessWidget {
             ),
           ),
           subtitle: Text(
-            fireUser.email,
+            widget.fireUser.email,
             style: TextStyle(
               color: darkMode ? systemBackground : black,
             ),
           ),
+          trailing: isFriend
+              ? const Text('Friend')
+              : CupertinoButton(
+                  color: activeBlue,
+                  borderRadius: BorderRadius.circular(20),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: Text(requesteSended ? 'Sended' : 'ADD',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(color: systemBackground)),
+                  onPressed: () => requestChecker(widget.fireUser.id),
+                ),
+          // Container(
+          //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+          //   child: Text('ADD', style: Theme.of(context).textTheme.bodyText1),
+          // ),
         );
       },
     );
