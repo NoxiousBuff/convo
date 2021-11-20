@@ -33,7 +33,6 @@ class UsernameAuthViewModel extends BaseViewModel {
       navService.materialPageRoute(context, PickInterestsView(phoneNumber: phoneNumber, displayName: displayNameTech.text, countryCode: countryCode));
     } else {
       customSnackbars.errorSnackbar(context, title: 'Something went wrong !!!');
-      //TODO: write code to terminate the whole thing. and start over.
     }
   }
 }
