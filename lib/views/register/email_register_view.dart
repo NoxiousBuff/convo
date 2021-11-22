@@ -60,7 +60,6 @@ class _EmailRegisterViewState extends State<EmailRegisterView> {
       ),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        brightness: Brightness.light,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),

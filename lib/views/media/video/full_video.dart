@@ -93,7 +93,6 @@ class _FullVideoState extends State<FullVideo> {
               ),
             ),
             backgroundColor: Colors.transparent,
-            brightness: Brightness.dark,
             elevation: 0.0,
             flexibleSpace: AnimatedOpacity(
               duration: fadeDuration,

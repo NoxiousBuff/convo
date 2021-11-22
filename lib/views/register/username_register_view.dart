@@ -83,7 +83,6 @@ class _UserNameRegisterViewState extends State<UserNameRegisterView> {
         ),
       ),
       appBar: AppBar(
-        brightness: Brightness.light,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),

@@ -63,7 +63,6 @@ class _PasswordRegisterViewState extends State<PasswordRegisterView> {
         ),
       ),
       appBar: AppBar(
-        brightness: Brightness.light,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),

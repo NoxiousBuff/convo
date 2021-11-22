@@ -131,7 +131,6 @@ class _ChatViewState extends State<ChatView> {
         // backgroundColor: Color(0xFF121212),
         backgroundColor: CupertinoColors.white,
         appBar: AppBar(
-          brightness: Brightness.light,
           elevation: 0.0,
           //I could also use Cupertino Back Button
           leading: IconButton(

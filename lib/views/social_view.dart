@@ -26,7 +26,6 @@ class _SocialViewState extends State<SocialView> {
       extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        brightness: Brightness.dark,
         toolbarHeight: 45.0,
         elevation: 0.0,
         centerTitle: true,

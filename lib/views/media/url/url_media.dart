@@ -22,7 +22,6 @@ class _PreviewLinkState extends State<PreviewLink> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        brightness: Brightness.dark,
         title: const Text('Example'),
       ),
       body: ListView.builder(

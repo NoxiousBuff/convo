@@ -25,7 +25,6 @@ class _ChatUiPrototypeState extends State<ChatUiPrototype> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          brightness: Brightness.light,
           elevation: 0.0,
           //I could also use Cupertino Back Button
           leading: IconButton(
