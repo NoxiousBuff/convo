@@ -1,6 +1,4 @@
 import 'dart:math';
-import 'package:hint/models/livechat_model.dart';
-import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +9,11 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/models/livechat_model.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
+import 'package:string_validator/string_validator.dart';
 
 class DuleView extends StatefulWidget {
   const DuleView({Key? key, required this.fireUser}) : super(key: key);
@@ -75,24 +76,28 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           {
             if (model.conversationId == duleModel.roomUid) {
               model.updateOtherField(duleModel.msgTxt);
-              return TextFormField(
-                expands: true,
-                minLines: null,
-                maxLines: null,
-                readOnly: true,
-                controller: model.otherTech,
-                onChanged: (value) => model.updatTextFieldWidth(),
-                cursorHeight: 28,
-                cursorColor: AppColors.blue,
-                cursorRadius: const Radius.circular(100),
-                style: const TextStyle(color: Colors.black, fontSize: 24),
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  hintText: 'Message Received',
-                  hintStyle: TextStyle(color: Colors.black38, fontSize: 24),
-                  border: OutlineInputBorder(borderSide: BorderSide.none),
-                ),
-              );
+              if (duleModel.urlType == 'image' && isURL(duleModel.msgTxt)) {
+                return Image.network(duleModel.url);
+              } else {
+                return TextFormField(
+                  expands: true,
+                  minLines: null,
+                  maxLines: null,
+                  readOnly: true,
+                  cursorHeight: 28,
+                  controller: model.otherTech,
+                  cursorColor: AppColors.blue,
+                  textAlign: TextAlign.center,
+                  cursorRadius: const Radius.circular(100),
+                  onChanged: (value) => model.updatTextFieldWidth(),
+                  style: const TextStyle(color: Colors.black, fontSize: 24),
+                  decoration: const InputDecoration(
+                    hintText: 'Message Received',
+                    hintStyle: TextStyle(color: Colors.black38, fontSize: 24),
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                  ),
+                );
+              }
             } else {
               return const Center(
                 child: Text(
