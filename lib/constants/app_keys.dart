@@ -3,12 +3,12 @@
 const String chatsFirestoreKey = 'Chat';
 const String usersFirestoreKey = 'users';
 const String convoFirestorekey = 'convo';
+const String dulesRealtimeDBKey = 'dules';
 const String friendsFirestoreKey = 'friends';
 const String requestsFirestoreKey = 'requests';
 const String recentFirestoreKey = 'recentChats';
 const String phoneNumbersFirestoreKey = 'phoneNumbers';
 const String userSuggestionsFirestoreKey = 'userSuggestions';
-const String defaultImagesFolder = 'Images/Samples';
 
 const String appName = 'Convo';
 

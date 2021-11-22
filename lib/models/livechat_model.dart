@@ -1,25 +1,36 @@
-class LiveChatModel {
-  final String status;
-  final String? animation;
-  final List<Map>? medias;
-  final String? userMessage;
-  final String? liveChatRoomId;
+import 'package:hint/constants/app_strings.dart';
 
-  LiveChatModel({
-    this.medias,
-    this.animation,
-    this.liveChatRoomId,
-    required this.status,
-    required this.userMessage,
+class DuleModel {
+  final String msgTxt;
+  final String url;
+  final String urlType;
+  final String? aniType;
+  final bool online;
+  final String? roomUid;
+
+  DuleModel({
+    required this.msgTxt,
+    required this.roomUid,
+    required this.url,
+    required this.urlType,
+    required this.online,
+    this.aniType,
   });
 
-  factory LiveChatModel.fromJson(Map<String, dynamic> json) {
-    return LiveChatModel(
-      userMessage: json['userMessage'],
-      liveChatRoomId: json['liveChatRoomId'],
-      status: json['status'],
-      animation: json['animation'],
-      medias: json['medias'],
-    );
-  }
+  DuleModel.fromJson(Map<String, dynamic> json)
+      : msgTxt = json[DatabaseMessageField.msgTxt],
+        roomUid = json[DatabaseMessageField.roomUid],
+        url = json[DatabaseMessageField.url],
+        urlType = json[DatabaseMessageField.urlType],
+        online = json[DatabaseMessageField.online],
+        aniType = json[DatabaseMessageField.aniType];
+
+  Map<String, dynamic> toJson() => {
+        DatabaseMessageField.msgTxt: msgTxt,
+        DatabaseMessageField.roomUid: roomUid,
+        DatabaseMessageField.url: url,
+        DatabaseMessageField.urlType: urlType,
+        DatabaseMessageField.online: online,
+        DatabaseMessageField.aniType: aniType,
+      };
 }

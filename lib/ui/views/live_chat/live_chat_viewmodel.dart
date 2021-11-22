@@ -1,28 +1,29 @@
 import 'dart:io';
-import 'dart:async';
-import 'package:confetti/confetti.dart';
-import 'package:hint/api/realtime_database_api.dart';
-import 'package:hint/routes/cupertino_page_route.dart';
-import 'package:mime/mime.dart';
-import 'package:stacked/stacked.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/material.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/ui/shared/custom_snack_bar.dart';
+import 'package:mime/mime.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/services/database_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:stacked/stacked.dart';
+import 'package:hint/app/app_logger.dart';
 
-import 'live_chat.dart';
-import 'live_chat_animation.dart';
+class DuleViewModel extends StreamViewModel<Event> {
+  DuleViewModel(this.fireUser);
 
-class LiveChatViewModel extends BaseViewModel {
-  final log = getLogger('LiveChatViewModel');
+  final FireUser fireUser;
+  final log = getLogger('DuleViewModel');
+
+  String _conversationId = '';
+  String get conversationId => _conversationId;
 
   double _uploadingProgress = 0.0;
   double get uploadingProgress => _uploadingProgress;
@@ -30,174 +31,95 @@ class LiveChatViewModel extends BaseViewModel {
   TaskState _state = TaskState.success;
   TaskState get state => _state;
 
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
+  FirebaseStorage storage = FirebaseStorage.instance;
 
-  CurveTween curveTween =
-      CurveTween(curve: const Interval(0.0, 0.5, curve: Curves.ease));
-  CurveTween curveTween2 =
-      CurveTween(curve: const Interval(0.5, 1.0, curve: Curves.ease));
-
-  /// Radius of Spotlight
-  Animation<double> spotLightRadius(AnimationController controller) {
-    return TweenSequence(
-      [
-        TweenSequenceItem(
-            tween: Tween(begin: 5.0, end: 0.5).chain(curveTween), weight: 50),
-        TweenSequenceItem(
-            tween: Tween(begin: 0.5, end: 5.0).chain(curveTween2), weight: 50)
-      ],
-    ).animate(controller);
+  void createGetConversationId() {
+    _conversationId =
+        chatService.getConversationId(fireUser.id, AuthService.liveUser!.uid);
+    notifyListeners();
   }
 
-  ///  particles container height
-  Animation<double> spotLightParticlesHeight(
-      AnimationController controller, BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    double begin = size.height * 0.0;
-    double end = size.height * 0.4;
-    return TweenSequence(
-      [
-        TweenSequenceItem(
-            tween: Tween(begin: begin, end: end).chain(curveTween), weight: 50),
-        TweenSequenceItem(
-            tween: Tween(begin: end, end: begin).chain(curveTween2),
-            weight: 50),
-      ],
-    ).animate(controller);
+  final TextEditingController duleTech = TextEditingController();
+
+  final TextEditingController otherTech = TextEditingController();
+
+  String _wordLengthLeft = '160';
+  String get wordLengthLeft => _wordLengthLeft;
+
+  int _duleFlexFactor = 1;
+  int get duleFlexFactor => _duleFlexFactor;
+
+  int _otherFlexFactor = 1;
+  int get otherFlexFactor => _otherFlexFactor;
+
+  bool _isDuleEmpty = true;
+  bool get isDuleEmpty => _isDuleEmpty;
+
+  final FocusNode duleFocusNode = FocusNode();
+
+  void updateDuleFocus() {
+    duleFocusNode.hasFocus
+        ? duleFocusNode.unfocus()
+        : duleFocusNode.requestFocus();
+    notifyListeners();
   }
 
-  ///  Particles Container Width
-  Animation<double> spotLightParticlesWidth(AnimationController controller) {
-    return TweenSequence(
-      [
-        TweenSequenceItem(
-            tween: Tween(begin: 0.0, end: 400.0).chain(curveTween), weight: 50),
-        TweenSequenceItem(
-            tween: Tween(begin: 400.0, end: 0.0).chain(curveTween2),
-            weight: 50),
-      ],
-    ).animate(controller);
+  void onTextChanged(String value) {}
+
+  void updatTextFieldWidth() {
+    final duleLength = duleTech.text.length;
+    final otherLength = otherTech.text.length;
+    if (otherLength < 30) {
+      if (duleLength < 30) {
+        _duleFlexFactor = 2;
+        _otherFlexFactor = 2;
+      } else {
+        _duleFlexFactor = 6;
+        _otherFlexFactor = 2;
+      }
+    } else if (otherLength > 30) {
+      if (duleLength < 30) {
+        _duleFlexFactor = 2;
+        _otherFlexFactor = 6;
+      } else if (duleLength > 30) {
+        _duleFlexFactor = 2;
+        _otherFlexFactor = 2;
+      }
+    }
+    _isDuleEmpty = duleTech.text.isEmpty;
+    notifyListeners();
   }
 
-  // getting animation Value
-  Future<void> getAnimationValue({
-    required BuildContext context,
-    String? fireUserId,
-    required ConfettiController confettiController,
-    required AnimationController spotlightController,
-  }) async {
-    final val = await Navigator.push(
-      context,
-      cupertinoTransition(
-        enterTo: const LiveChatAnimations(),
-        exitFrom: const LiveChat(),
-      ),
-    );
-    log.wtf('Animation Value:$val');
-    if (val == AnimationType.confetti) {
-      confettiController.play();
-      await realtimeDBApi.updateUserDocument(
-        fireUserId!,
-        {LiveChatField.animationType: val},
-      );
-    } else if (val == AnimationType.spotlight) {
-      spotlightController.forward();
-      await realtimeDBApi.updateUserDocument(
-        fireUserId!,
-        {LiveChatField.animationType: val},
-      );
-    } else {
-      log.wtf('Animation is null');
+  Future<void> updateUserDataWithKey(String key, dynamic value) {
+    return databaseService.updateUserDataWithKey(key, value);
+  }
+
+  void clearMessage() {
+    if (!isDuleEmpty) {
+      duleTech.clear();
+      _isDuleEmpty = true;
+      updatTextFieldWidth();
+      updateWordLengthLeft(duleTech.text);
+      updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
     }
   }
 
-  /// uploading a single file into the firebase storage and get progress
-  Future<String> uploadFile({
-    required String filePath,
-    required String fileName,
-    required BuildContext context,
-  }) async {
-    var now = DateTime.now();
-    var hourPart = '${now.year}${now.month}${now.day}${now.hour}';
-    var secondPart = '${now.minute}${now.second}${now.millisecond}';
-    final firebasename = hourPart + secondPart;
-    final fileType = lookupMimeType(filePath)!.split("/").first;
-    String folder = fileType == MediaType.image
-        ? 'live Chat/$fileName-$firebasename'
-        : 'live Chat/$fileName-$firebasename';
-
-    firebase_storage.UploadTask task =
-        storage.ref(folder).putFile(File(filePath));
-
-    task.timeout(const Duration(seconds: 10), onTimeout: () {
-      setBusy(false);
-      return task;
-    });
-
-    task.snapshotEvents.listen(
-      (firebase_storage.TaskSnapshot snapshot) {
-        setBusy(true);
-        log.i('Task state: ${snapshot.state}');
-        final progress = snapshot.bytesTransferred.toDouble() /
-            snapshot.totalBytes.toDouble();
-
-        _state = snapshot.state;
-        _uploadingProgress = progress;
-        notifyListeners();
-        log.wtf(_uploadingProgress);
-      },
-      onError: (e) {
-        setBusy(false);
-        task.cancel();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: inactiveGray,
-            content: Text(
-              'Failed to upload file',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(color: systemBackground),
-            ),
-          ),
-        );
-      },
-    );
-    await task;
-    String downloadURL = await storage.ref(folder).getDownloadURL();
-    setBusy(false);
-    return downloadURL;
+  void updateOtherField(String value) {
+    otherTech.text = value;
   }
 
-  //Alert Dialog For larger File
-  Future<void> sizeDialog(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Too Large File Size',
-              style: Theme.of(context).textTheme.bodyText1),
-          content: Text(
-            'Your file size is too large maximum file size is 8 MB',
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'OK',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1!
-                    .copyWith(color: activeBlue),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+  void updateWordLengthLeft(String value) {
+    final lengthLeft = 160 - value.length;
+    _wordLengthLeft = lengthLeft.toString();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    duleFocusNode.dispose();
+    duleTech.dispose();
+    otherTech.dispose();
   }
 
   /// Clicking Image from camera
@@ -212,7 +134,8 @@ class LiveChatViewModel extends BaseViewModel {
       final fileSize = sizeInMB.toInt();
       log.wtf('Image Size:$fileSize');
       if (fileSize > 8) {
-        sizeDialog(context);
+        customSnackbars.errorSnackbar(context,
+            title: 'Maximum size of upload is 8 MB.');
       } else {
         return file;
       }
@@ -221,7 +144,6 @@ class LiveChatViewModel extends BaseViewModel {
     }
   }
 
-  /// Record a Video from camera
   Future<File?> pickVideo(BuildContext context) async {
     final selectedVideo =
         await ImagePicker().pickVideo(source: ImageSource.camera);
@@ -233,12 +155,33 @@ class LiveChatViewModel extends BaseViewModel {
       final fileSize = sizeInMB.toInt();
       log.wtf('Video Size:$fileSize');
       if (fileSize > 8) {
-        sizeDialog(context);
+        customSnackbars.errorSnackbar(context,
+            title: 'Maximum size of upload is 8 MB.');
       } else {
         return file;
       }
     } else {
       log.wtf('pickVideo | Video was not recorded');
+    }
+  }
+
+  Future<void> updateAnimation(String? value) async {
+    switch (value) {
+      case AnimationType.confetti:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, value);
+        }
+
+        break;
+      case AnimationType.balloons:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, value);
+        }
+        break;
+      default:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, null);
+        }
     }
   }
 
@@ -256,32 +199,8 @@ class LiveChatViewModel extends BaseViewModel {
           final fileSize = sizeInMB.toInt();
           log.wtf('File Size: $fileSize MB');
           if (fileSize > 8) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text('Too Large File Size',
-                      style: Theme.of(context).textTheme.bodyText1),
-                  content: Text(
-                    'Your file size is too large maximum file size is 8 MB',
-                    style: Theme.of(context).textTheme.bodyText2,
-                  ),
-                  contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        'OK',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1!
-                            .copyWith(color: activeBlue),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
+            customSnackbars.errorSnackbar(context,
+                title: 'Maximum size of upload is 8 MB.');
           } else {
             await uploadFile(
                 filePath: path,
@@ -295,81 +214,58 @@ class LiveChatViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> cameraOptions(
-      {required BuildContext context,
-      required void Function() takePicture,
-      required void Function() recordVideo}) async {
-    Widget option(
-        {required void Function() onTap, required String optionText}) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Text(optionText, style: Theme.of(context).textTheme.bodyText2),
-        ),
-      );
-    }
+  Future<String> uploadFile({
+    required String filePath,
+    required String fileName,
+    required BuildContext context,
+  }) async {
+    var now = DateTime.now();
+    var hourPart = '${now.year}${now.month}${now.day}${now.hour}';
+    var secondPart = '${now.minute}${now.second}${now.millisecond}';
+    final firebasename = hourPart + secondPart;
+    final fileType = lookupMimeType(filePath)!.split("/").first;
+    String folder = fileType == MediaType.image
+        ? 'live Chat/$fileName-$firebasename'
+        : 'live Chat/$fileName-$firebasename';
 
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              color: systemBackground,
-              constraints: BoxConstraints(
-                maxHeight: screenHeightPercentage(context, percentage: 0.26),
-                maxWidth: screenHeightPercentage(context, percentage: 0.3),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 25),
-                    child: Text('I Want To',
-                        style: Theme.of(context).textTheme.headline6),
-                  ),
-                  const Divider(height: 0),
-                  Column(
-                    children: [
-                      option(
-                        optionText: 'Take a picture',
-                        onTap: takePicture,
-                      ),
-                      const Divider(height: 0),
-                      option(
-                        optionText: 'Record a video',
-                        onTap: recordVideo,
-                      ),
-                      const Divider(height: 0),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Cancel",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1!
-                                .copyWith(color: activeBlue)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+    UploadTask task = storage.ref(folder).putFile(File(filePath));
+
+    task.timeout(const Duration(seconds: 10), onTimeout: () {
+      setBusy(false);
+      return task;
+    });
+    setBusy(true);
+    task.snapshotEvents.listen(
+      (TaskSnapshot snapshot) {
+        log.i('Task state: ${snapshot.state}');
+        final progress = snapshot.bytesTransferred.toDouble() /
+            snapshot.totalBytes.toDouble();
+
+        _state = snapshot.state;
+        _uploadingProgress = progress;
+        notifyListeners();
+        log.wtf(_uploadingProgress);
+      },
+      onError: (e) {
+        setBusy(false);
+        task.cancel();
+        customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
     );
+    await task;
+    String downloadURL = await storage.ref(folder).getDownloadURL();
+    setBusy(false);
+    return downloadURL;
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> statusStream(
-      String fireUserID) {
-    return FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .doc(fireUserID)
-        .snapshots();
+  Stream<Event> realtimeDBDocument() {
+    return FirebaseDatabase.instance
+        .reference()
+        .child(dulesRealtimeDBKey)
+        .child(fireUser.id)
+        .onValue;
   }
+
+  @override
+  Stream<Event> get stream => realtimeDBDocument();
 }

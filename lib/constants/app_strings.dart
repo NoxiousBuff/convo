@@ -78,6 +78,7 @@ class LiveChatField {
 }
 
 class AnimationType {
+  static const balloons = 'balloons';
   static const confetti = 'confetti';
   static const spotlight = 'spotlight';
 }
@@ -90,4 +91,13 @@ class PhoneNumberField {
 
 class CommonPropertiesInCollection {
   static const userUid = 'userUid';
+}
+
+class DatabaseMessageField {
+  static const msgTxt = 'msgTxt';
+  static const roomUid = 'roomUid';
+  static const url = 'url';
+  static const urlType = 'urlType';
+  static const online = 'online';
+  static const aniType = 'aniType';
 }

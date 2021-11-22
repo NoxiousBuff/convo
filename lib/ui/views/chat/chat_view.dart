@@ -169,7 +169,7 @@ class ChatView extends StatelessWidget {
                         onTap: () => Navigator.push(
                           context,
                           cupertinoTransition(
-                            enterTo: const LiveChat(),
+                            enterTo:  DuleView(fireUser: fireUser),
                             exitFrom: ChatView(
                               fireUser: fireUser,
                               randomColor: randomColor,

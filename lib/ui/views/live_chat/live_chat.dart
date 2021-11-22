@@ -1,384 +1,462 @@
 import 'dart:math';
-import 'dart:async';
+import 'package:hint/models/livechat_model.dart';
+import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
-import 'package:confetti/confetti.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/api/firestore.dart';
-import 'package:hint/app/app_logger.dart';
+import 'package:confetti/confetti.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/models/livechat_model.dart';
-import 'package:hint/api/realtime_database_api.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
 
-class LiveChat extends StatefulWidget {
-  final String? fireUserId;
-  const LiveChat({
-    Key? key,
-    this.fireUserId,
-  }) : super(key: key);
+class DuleView extends StatefulWidget {
+  const DuleView({Key? key, required this.fireUser}) : super(key: key);
+
+  static const String id = '/DuleView';
+
+  final FireUser fireUser;
 
   @override
-  State<LiveChat> createState() => _LiveChatState();
+  State<DuleView> createState() => _DuleViewState();
 }
 
-class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
-  int textLength = 0;
-  double radius = 0.0;
+class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
+  final log = getLogger('DuleView');
+  final radius = 0.0;
   bool lightOn = true;
   double x = 100, y = 100;
-  final log = getLogger('LiveChat');
+  bool incongonatedMode = false;
   late ConfettiController confettiController;
+  late AnimationController balloonsController;
   late AnimationController spotlightController;
-  final liveUserUid = FirestoreApi.liveUserUid;
-  final database = FirebaseDatabase.instance.reference();
-  TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
+    balloonsController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 5));
     confettiController =
-        ConfettiController(duration: const Duration(seconds: 3));
+        ConfettiController(duration: const Duration(seconds: 5));
     spotlightController =
         AnimationController(vsync: this, duration: const Duration(seconds: 4));
     spotlightController.addListener(() => setState(() {}));
     confettiController.addListener(() => setState(() {}));
-    setState(() {
-      textLength = (150 - controller.text.length).toInt();
-    });
-    var liveChatId =
-        chatService.getConversationId(widget.fireUserId!, liveUserUid);
-    realtimeDBApi.updateUserDocument(
-      liveUserUid,
-      {
-        LiveChatField.liveChatRoom: liveChatId,
-      },
-    );
+    balloonsController.addListener(() => setState(() {}));
+
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
-    confettiController.dispose();
     spotlightController.removeListener(() {});
+    balloonsController.removeListener(() {});
+    confettiController.dispose();
     spotlightController.dispose();
-    realtimeDBApi.updateUserDocument(liveUserUid, {
-      LiveChatField.liveChatRoom: null,
-    });
+    balloonsController.dispose();
     super.dispose();
   }
 
-  StreamSubscription<Event> animationHandler() {
-    return realtimeDBApi.documentStream(liveUserUid).listen(
-      (data) {
-        final mapData = data.snapshot.value;
-        final userDocMap = mapData.cast<String, dynamic>();
-        final receiverUser = LiveChatModel.fromJson(userDocMap);
-        switch (receiverUser.animation) {
-          case AnimationType.confetti:
-            {
-              log.w('confetti controller :1');
-              confettiController.play();
-            }
+  Widget receiverMessageBubble(Event? data, DuleViewModel model) {
+    if (data == null) {
+      return const Center(
+        child: Text('Connecting...'),
+      );
+    } else {
+      final snapshot = data.snapshot;
+      final json = snapshot.value.cast<String, dynamic>();
+      final duleModel = DuleModel.fromJson(json);
 
-            break;
-          case AnimationType.spotlight:
-            {
-              log.w('spotlight controller :2');
-              spotlightController.forward();
+      switch (duleModel.online) {
+        case true:
+          {
+            if (model.conversationId == duleModel.roomUid) {
+              model.updateOtherField(duleModel.msgTxt);
+              return TextFormField(
+                expands: true,
+                minLines: null,
+                maxLines: null,
+                readOnly: true,
+                controller: model.otherTech,
+                onChanged: (value) => model.updatTextFieldWidth(),
+                cursorHeight: 28,
+                cursorColor: AppColors.blue,
+                cursorRadius: const Radius.circular(100),
+                style: const TextStyle(color: Colors.black, fontSize: 24),
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  hintText: 'Message Received',
+                  hintStyle: TextStyle(color: Colors.black38, fontSize: 24),
+                  border: OutlineInputBorder(borderSide: BorderSide.none),
+                ),
+              );
+            } else {
+              return const Center(
+                child: Text(
+                  'User Is Busy',
+                  style: TextStyle(color: Colors.black38, fontSize: 24),
+                ),
+              );
             }
-            break;
-          default:
-            {
-              log.wtf('User Message is not equal to any animation value');
-            }
-        }
-      },
-      onError: (e) {
-        log.e('StreamSubscription For Animation Error:$e');
-      },
-    );
+          }
+        case false:
+          {
+            return const Center(
+              child: Text(
+                'User is offline.',
+                style: TextStyle(color: Colors.black38, fontSize: 24),
+              ),
+            );
+          }
+        default:
+          {
+            return const SizedBox.shrink();
+          }
+      }
+    }
   }
 
-  @override
-  void didUpdateWidget(covariant LiveChat oldWidget) {
-    setState(() {
-      lightOn = true;
-      x = screenWidthPercentage(context, percentage: 0.785);
-      y = screenWidthPercentage(context, percentage: 0.710);
-    });
+  Widget animationWidget(Event? data) {
+    if (data == null) {
+      return const SizedBox.shrink();
+    } else {
+      final snapshot = data.snapshot;
+      final json = snapshot.value.cast<String, dynamic>();
+      final duleModel = DuleModel.fromJson(json);
 
-    super.didUpdateWidget(oldWidget);
+      switch (duleModel.aniType) {
+        case AnimationType.balloons:
+          {
+            return Lottie.network(
+              'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json',
+              animate: true,
+              width: screenWidth(context),
+              height: screenHeight(context),
+              fit: BoxFit.cover,
+              controller: balloonsController,
+              onLoaded: (composition) {
+                balloonsController
+                  ..duration = const Duration(seconds: 5)
+                  ..forward();
+              },
+            );
+          }
+        case AnimationType.confetti:
+          {
+            return Positioned(
+              bottom: -80,
+              left: screenHeightPercentage(context, percentage: 0.3),
+              child: ConfettiWidget(
+                gravity: 0.3,
+                minBlastForce: 100,
+                maxBlastForce: 400,
+                numberOfParticles: 200,
+                blastDirection: -pi / 2,
+                emissionFrequency: 0.04,
+                confettiController: confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+              ),
+            );
+          }
+        default:
+          {
+            return const SizedBox.shrink();
+          }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final valueListenable = ValueNotifier<int>(textLength);
-    const valueColor = AlwaysStoppedAnimation(activeGreen);
-    const margin = EdgeInsets.fromLTRB(16, 0, 16, 8);
-    const constraints = BoxConstraints(minHeight: 30);
+    final size = MediaQuery.of(context).size;
+
+    setState(() {
+      x = size.width * 0.785;
+      y = size.height * 0.710;
+    });
     final decoration = BoxDecoration(
-        color: extraLightBackgroundGray,
-        borderRadius: BorderRadius.circular(16));
-    final textStyle = Theme.of(context)
-        .textTheme
-        .bodyText2!
-        .copyWith(color: inactiveGray, fontSize: 18);
-    animationHandler();
-    return ViewModelBuilder<LiveChatViewModel>.reactive(
-      viewModelBuilder: () => LiveChatViewModel(),
+        color: incongonatedMode ? transparent : AppColors.grey.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(32));
+    const systemUIOverlay =
+        SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark);
+    return ViewModelBuilder<DuleViewModel>.reactive(
+      onModelReady: (model) => model.createGetConversationId(),
+      viewModelBuilder: () => DuleViewModel(widget.fireUser),
       builder: (context, model, child) {
+        final data = model.data;
+
+        if (model.hasError) {
+          return const Center(
+            child: Text('Model has Error'),
+          );
+        }
         return Scaffold(
-          extendBody: true,
-          extendBodyBehindAppBar: true,
           appBar: AppBar(
-            elevation: 0.0,
+            elevation: 0,
+            leadingWidth: 100,
             centerTitle: true,
-            automaticallyImplyLeading: true,
-            title: Text(
-              'username',
-              style: Theme.of(context).textTheme.bodyText1,
+            backgroundColor: incongonatedMode ? black : transparent,
+            automaticallyImplyLeading: false,
+            systemOverlayStyle: systemUIOverlay,
+            leading: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  padding: const EdgeInsets.all(8),
+                  icon: const Icon(Icons.arrow_back_ios),
+                  color: incongonatedMode ? systemBackground : black,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                horizontalDefaultMessageSpace,
+                ClipOval(
+                  child: Image.network(
+                    widget.fireUser.photoUrl!,
+                    cacheHeight: 48,
+                    cacheWidth: 48,
+                    height: 48,
+                    width: 48,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
             ),
-            actions: const [
-              // Container(
-              //   margin: const EdgeInsets.only(right: 20),
-              //   child: const Center(
-              //     child: CircleAvatar(
-              //       maxRadius: 20,
-              //       backgroundImage:
-              //           CachedNetworkImageProvider('widget.fireUser.photoUrl!'),
-              //     ),
-              //   ),
-              // ),
+            title: Text(
+              widget.fireUser.username,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1!
+                  .copyWith(fontSize: 18, color: black),
+            ),
+            actions: [
+              CupertinoSwitch(
+                value: incongonatedMode,
+                onChanged: (val) {
+                  setState(() {
+                    incongonatedMode = val;
+                  });
+                },
+              ),
             ],
           ),
           body: Stack(
             fit: StackFit.expand,
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 100),
-                child: Column(
-                  children: [
-                    Flexible(
-                      child: StreamBuilder<Event>(
-                          stream: realtimeDBApi.documentStream(liveUserUid),
-                          builder: (context, snapshot) {
-                            final data = snapshot.data;
-                            if (snapshot.hasError) const Text('There is error');
-                            if (data != null) {
-                              final modelData = data.snapshot.value;
-                              final map = modelData.cast<String, dynamic>();
-                              log.wtf('Value:$map');
-                              final doc = LiveChatModel.fromJson(map);
-                              final message = doc.userMessage;
-                              const m = EdgeInsets.only(right: 20, top: 6);
-                              return Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  Container(
-                                    margin: margin,
-                                    decoration: decoration,
-                                    constraints: constraints,
-                                    width: screenWidth(context),
-                                    child: Center(
-                                      child: message != null
-                                          ? Text(message)
-                                          : const Text('Hint Message'),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: m,
-                                    child: const CircleAvatar(
-                                      backgroundColor: activeGreen,
-                                      maxRadius: 10,
-                                    ),
-                                  )
-                                ],
-                              );
-                            } else {
-                              return const Text('Data is null now !!');
-                            }
-                          }),
+              ClipPath(
+                clipper: LightClipper(x, y, radius: radius),
+                child: AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      radius: incongonatedMode ? 0.5 : 5,
+                      center: const Alignment(0.1, -0.6),
+                      colors: const [
+                        systemBackground,
+                        black,
+                      ],
                     ),
-                    Flexible(
+                  ),
+                ),
+              ),
+              Lottie.network(
+                'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json',
+                width: screenWidth(context),
+                height: screenHeightPercentage(context, percentage: 0.8),
+                fit: BoxFit.cover,
+                controller: balloonsController,
+                onLoaded: (composition) {
+                  // balloonsController
+                  //   ..duration = const Duration(seconds: 5)
+                  //   ..forward();
+                },
+              ),
+              Column(
+                children: [
+                  verticalSpaceSmall,
+                  Expanded(
+                    flex: model.otherFlexFactor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Container(
-                        width: screenWidth(context),
-                        constraints: const BoxConstraints(minHeight: 30),
-                        decoration: BoxDecoration(
-                            color: activeBlue,
-                            borderRadius: BorderRadius.circular(16)),
-                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-                        child: Center(
-                          child: CupertinoTextField(
-                            maxLength: 150,
-                            autofocus: true,
-                            showCursor: false,
-                            textAlign: TextAlign.center,
-                            maxLines: controller.text.length > 100 ? 6 : 2,
-                            cursorColor: systemBackground,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              height: 1.5,
-                              color: systemBackground,
-                            ),
-                            controller: controller,
-                            onChanged: (val) {
-                              setState(() {
-                                textLength = (150 - val.length).toInt();
-                              });
-                              realtimeDBApi.updateUserDocument(
-                                liveUserUid,
-                                {
-                                  LiveChatField.userMessage: val,
-                                },
-                              );
-                            },
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 0,
-                                color: Colors.transparent,
-                              ),
-                            ),
-                          ),
-                        ),
+                        decoration: decoration,
+                        alignment: Alignment.center,
+                        child: receiverMessageBubble(data, model),
+                        width: screenWidthPercentage(context, percentage: 80),
                       ),
                     ),
-                    verticalSpaceTiny,
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
+                  ),
+                  verticalSpaceRegular,
+                  Expanded(
+                    flex: model.duleFlexFactor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: AnimatedContainer(
+                        padding: const EdgeInsets.all(0),
+                        duration: const Duration(milliseconds: 200),
+                        width: screenWidthPercentage(context, percentage: 80),
+                        alignment: Alignment.center,
+                        child: TextFormField(
+                          focusNode: model.duleFocusNode,
+                          minLines: null,
+                          maxLines: null,
+                          expands: true,
+                          onChanged: (value) {
+                            model.updateWordLengthLeft(value);
+                            model.updatTextFieldWidth();
+                            model.updateUserDataWithKey(
+                                DatabaseMessageField.msgTxt, value);
+                          },
+                          maxLength: 160,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          buildCounter: (_,
+                              {required currentLength,
+                              maxLength,
+                              required isFocused}) {
+                            return const SizedBox.shrink();
+                          },
+                          controller: model.duleTech,
+                          cursorColor: Colors.white,
+                          cursorHeight: 28,
+                          cursorRadius: const Radius.circular(100),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 24),
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              hintText: 'Type your message',
+                              hintStyle: TextStyle(
+                                  color: Colors.white.withAlpha(200),
+                                  fontSize: 24),
+                              border: const OutlineInputBorder(
+                                  borderSide: BorderSide.none)),
+                        ),
+                        decoration: BoxDecoration(
+                            color: incongonatedMode
+                                ? transparent
+                                : AppColors.blue.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(32)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              KeyboardVisibilityBuilder(
-                                  builder: (context, child, visible) {
-                                return IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    CupertinoIcons.keyboard,
-                                    color: visible ? activeBlue : inactiveGray,
+                        horizontalSpaceRegular,
+                        IconButton(
+                          onPressed: () => model.updateDuleFocus(),
+                          icon: const Icon((CupertinoIcons.keyboard)),
+                          color: model.duleFocusNode.hasFocus
+                              ? AppColors.blue
+                              : inactiveGray,
+                          iconSize: 32,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              elevation: 0,
+                              backgroundColor: transparent,
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                  height: 100,
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 10),
+                                      GestureDetector(
+                                          onTap: () async {
+                                            FocusScope.of(context).unfocus();
+                                            Navigator.pop(context);
+                                            var value = AnimationType.confetti;
+                                            await model.updateAnimation(value);
+                                            confettiController.play();
+                                            await model.updateAnimation(null);
+                                          },
+                                          child: const Chip(
+                                              label: Text('Confetti'))),
+                                      const SizedBox(width: 10),
+                                      const Chip(label: Text('Spotlight')),
+                                      const SizedBox(width: 10),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          var value = AnimationType.balloons;
+                                          await model.updateAnimation(value);
+                                          balloonsController.forward();
+                                          await model.updateAnimation(null);
+                                        },
+                                        child: const Chip(
+                                          label: Text('Balloons'),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
-                              }),
-                              IconButton(
-                                onPressed: () {
-                                  model.cameraOptions(
-                                    context: context,
-                                    takePicture: () async {
-                                      await model.pickImage(context);
-                                    },
-                                    recordVideo: () async {
-                                      await model.pickVideo(context);
-                                    },
-                                  );
-                                },
-                                icon: const Icon(CupertinoIcons.camera),
-                              ),
-                              model.isBusy
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: model.state == TaskState.running
-                                          ? CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor: valueColor,
-                                              backgroundColor: activeBlue,
-                                              value: model.uploadingProgress,
-                                            )
-                                          : const CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor: valueColor,
-                                              backgroundColor: activeBlue,
-                                            ),
-                                    )
-                                  : IconButton(
-                                      icon: const Icon(CupertinoIcons.photo),
-                                      onPressed: () async {
-                                        await model.pickFromGallery(context);
-                                      },
-                                    ),
-                              IconButton(
-                                icon: const Icon(CupertinoIcons.wand_stars),
-                                onPressed: () => model.getAnimationValue(
-                                  context: context,
-                                  fireUserId: widget.fireUserId!,
-                                  confettiController: confettiController,
-                                  spotlightController: spotlightController,
-                                ),
-                              ),
-                              const Spacer(),
-                              ValueListenableBuilder<int>(
-                                valueListenable: valueListenable,
-                                builder: (_, value, __) {
-                                  return Text(value.toString(),
-                                      style: textStyle);
-                                },
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  controller.clear();
-                                  setState(() {
-                                    textLength = 150;
-                                  });
-                                  realtimeDBApi.updateUserDocument(
-                                    liveUserUid,
-                                    {
-                                      LiveChatField.userMessage: null,
-                                    },
-                                  );
-                                },
-                                icon: const Icon(Icons.restart_alt_rounded),
-                              ),
-                            ],
-                          ),
+                              },
+                            );
+                          },
+                          icon: const Icon((Icons.animation)),
+                          color: inactiveGray,
+                          iconSize: 32,
+                        ),
+                        IconButton(
+                          onPressed: () => model.pickImage(context),
+                          icon: const Icon((CupertinoIcons.camera)),
+                          color: inactiveGray,
+                          iconSize: 32,
+                        ),
+                        IconButton(
+                          onPressed: () => model.pickFromGallery(context),
+                          icon: const Icon((Icons.photo_library_outlined)),
+                          color: inactiveGray,
+                          iconSize: 32,
+                        ),
+                        const Spacer(),
+                        Text(
+                          model.wordLengthLeft,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            model.clearMessage();
+                          },
+                          icon: const Icon((Icons.restart_alt)),
+                          color:
+                              model.isDuleEmpty ? inactiveGray : AppColors.red,
+                          iconSize: 32,
                         ),
                       ],
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 50),
+                ],
+              ),
+              Positioned(
+                bottom: -80,
+                left: 0,
+                child: ConfettiWidget(
+                  gravity: 0.2,
+                  minBlastForce: 300,
+                  maxBlastForce: 400,
+                  numberOfParticles: 500,
+                  blastDirection: -pi,
+                  emissionFrequency: 0.01,
+                  confettiController: confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
                 ),
               ),
-              spotlightController.status == AnimationStatus.forward
-                  ? ClipPath(
-                      clipper: LightClipper(x, y, radius: radius),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            radius: model
-                                .spotLightRadius(spotlightController)
-                                .value,
-                            center: const Alignment(0, -0.4),
-                            colors: [
-                              transparent,
-                              black.withOpacity(0.9),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
               Positioned(
-                top: -200,
-                left: 200,
+                bottom: -80,
+                right: 0,
                 child: ConfettiWidget(
-                  gravity: 1.0,
-                  shouldLoop: false,
-                  minBlastForce: 10,
-                  maxBlastForce: 20,
-                  particleDrag: 0.05,
-                  displayTarget: true,
-                  numberOfParticles: 1,
-                  blastDirection: pi / 2,
-                  emissionFrequency: 0.6,
-                  minimumSize: const Size(20, 20),
-                  maximumSize: const Size(30, 30),
+                  gravity: 0.2,
+                  minBlastForce: 300,
+                  maxBlastForce: 400,
+                  numberOfParticles: 500,
+                  blastDirection: pi,
+                  emissionFrequency: 0.01,
                   confettiController: confettiController,
                   blastDirectionality: BlastDirectionality.explosive,
                 ),
@@ -389,61 +467,6 @@ class _LiveChatState extends State<LiveChat> with TickerProviderStateMixin {
       },
     );
   }
-}
-
-class KeyboardVisibilityBuilder extends StatefulWidget {
-  final Widget? child;
-  final Widget Function(
-    BuildContext context,
-    Widget? child,
-    bool isKeyboardVisible,
-  ) builder;
-
-  const KeyboardVisibilityBuilder({
-    Key? key,
-    this.child,
-    required this.builder,
-  }) : super(key: key);
-
-  @override
-  _KeyboardVisibilityBuilderState createState() =>
-      _KeyboardVisibilityBuilderState();
-}
-
-class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
-    with WidgetsBindingObserver {
-  var _isKeyboardVisible =
-      WidgetsBinding.instance!.window.viewInsets.bottom > 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance!.window.viewInsets.bottom;
-    final newValue = bottomInset > 0.0;
-    if (newValue != _isKeyboardVisible) {
-      setState(() {
-        _isKeyboardVisible = newValue;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.builder(
-        context,
-        widget.child,
-        _isKeyboardVisible,
-      );
 }
 
 class LightClipper extends CustomClipper<Path> {
