@@ -1,20 +1,20 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:hint/constants/app_keys.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/ui/shared/custom_snack_bar.dart';
 import 'package:mime/mime.dart';
+import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/database_service.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:stacked/stacked.dart';
-import 'package:hint/app/app_logger.dart';
+import 'package:hint/ui/shared/custom_snack_bar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class DuleViewModel extends StreamViewModel<Event> {
   DuleViewModel(this.fireUser);
