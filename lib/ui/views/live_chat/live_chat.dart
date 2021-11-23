@@ -11,9 +11,9 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/models/livechat_model.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/live_chat/live_chat_viewmodel.dart';
-import 'package:string_validator/string_validator.dart';
 
 class DuleView extends StatefulWidget {
   const DuleView({Key? key, required this.fireUser}) : super(key: key);
@@ -253,7 +253,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               ClipPath(
                 clipper: LightClipper(x, y, radius: radius),
                 child: AnimatedContainer(
-                  duration: const Duration(seconds: 1),
+                  duration: const Duration(milliseconds: 500),
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
                       radius: incongonatedMode ? 0.5 : 5,

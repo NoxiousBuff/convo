@@ -1,13 +1,14 @@
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/routes/cupertino_page_route.dart';
+import 'package:hint/ui/views/live_chat/live_chat.dart';
+import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchViewModel extends BaseViewModel {
-  final ChatService _chatService = ChatService();
   final _firestore = FirebaseFirestore.instance;
   Future<QuerySnapshot>? _searchResultFuture;
   Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
@@ -30,7 +31,13 @@ class SearchViewModel extends BaseViewModel {
   }
 
   void onUserItemTap(BuildContext context, FireUser fireUser) {
-    _chatService.startConversation(context, fireUser, Colors.blue.shade50);
+    Navigator.push(
+      context,
+      cupertinoTransition(
+        enterTo: DuleView(fireUser: fireUser),
+        exitFrom: const SearchView(),
+      ),
+    );
   }
 
   Future<QuerySnapshot> allUsers() {

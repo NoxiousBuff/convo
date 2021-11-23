@@ -5,6 +5,7 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/models/phone_number.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
@@ -18,8 +19,6 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
   List<Contact>? _contacts;
   List<Contact>? get contacts => _contacts;
 
-  //FireUser? _fireUser;
-  late final FireUser currentFireUser;
   final _firestore = FirebaseFirestore.instance;
   final log = getLogger('RecentChatsViewModel');
   final liveUserUid = FirestoreApi.liveUserUid;
@@ -158,7 +157,7 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
   }
 
   // Get User Contacts and Save In Hive
-  Future<void> gettingPhoneNumbers() async {
+  Future<void> gettingPhoneNumbers(FireUser currentFireUser) async {
     setBusy(true);
     await getContacts();
     if (contacts != null) {
@@ -185,6 +184,34 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
             }
           }
         }
+      }
+    }
+    setBusy(false);
+  }
+
+  Future<void> saveContactsinHive() async {
+    setBusy(true);
+    final numberList = Hive.box(HiveHelper.phoneNumberHiveBox).values.toList();
+
+    final numbersList = numberList.map((value) {
+      final json = value.cast<String, dynamic>();
+      final model = PhoneNumber.fromJson(json);
+      return model.number;
+    }).toList();
+
+    for (var number in numbersList) {
+      final phoneNumber = await FirebaseFirestore.instance
+          .collection(phoneNumbersFirestoreKey)
+          .doc(number)
+          .get()
+          .catchError((e) {
+        log.e('Error:$e');
+      });
+      if (phoneNumber.exists) {
+        log.wtf('This number is exists in firebase');
+        log.wtf('number:$number');
+      } else {
+        log.w('Number not exists in firebase');
       }
     }
     setBusy(false);
@@ -223,16 +250,6 @@ class RecentChatsViewModel extends StreamViewModel<QuerySnapshot> {
     return formattedNumber;
   }
 
-  Future<FireUser> getCurrentFireUser(String liveUserUid) async {
-    final firestoreUser = await FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .doc(liveUserUid)
-        .get();
-    final _fireUser = FireUser.fromFirestore(firestoreUser);
-    currentFireUser = _fireUser;
-    notifyListeners();
-    return _fireUser;
-  }
 
   @override
   Stream<QuerySnapshot<Object?>> get stream => chatService.getRecentChatList();

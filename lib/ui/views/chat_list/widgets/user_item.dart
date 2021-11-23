@@ -228,20 +228,7 @@ class _UserItemState extends State<UserItem> {
               color: darkMode ? systemBackground : black,
             ),
           ),
-          trailing: isFriend
-              ? const Text('Friend')
-              : CupertinoButton(
-                  color: activeBlue,
-                  borderRadius: BorderRadius.circular(20),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: Text(requesteSended ? 'Sended' : 'ADD',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(color: systemBackground)),
-                  onPressed: () => requestChecker(widget.fireUser.id),
-                ),
+
           // Container(
           //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),

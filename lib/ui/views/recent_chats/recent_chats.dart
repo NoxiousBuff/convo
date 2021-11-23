@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/app/app.dart';
 import 'package:hint/api/hive.dart';
@@ -7,8 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/routes/cupertino_page_route.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -25,13 +26,26 @@ class RecentChats extends StatefulWidget {
 }
 
 class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
+  late FireUser currentFireUser;
   final log = getLogger('RecentChats');
   final database = FirebaseDatabase.instance.reference();
+
+  Future<FireUser> getCurrentFireUser(String liveUserUid) async {
+    final firestoreUser = await FirebaseFirestore.instance
+        .collection(usersFirestoreKey)
+        .doc(liveUserUid)
+        .get();
+    final _fireUser = FireUser.fromFirestore(firestoreUser);
+    setState(() {
+      currentFireUser = _fireUser;
+    });
+    return _fireUser;
+  }
+
   @override
   void initState() {
     super.initState();
-    //final list = Hive.box(HiveHelper.phoneNumberHiveBox).values.toList();
-    //log.wtf(list);
+    getCurrentFireUser(FirestoreApi.liveUserUid);
     WidgetsBinding.instance!.addObserver(this);
     setStatus(status: 'Online');
   }
@@ -60,7 +74,6 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
     // }).whenComplete(() => log.wtf('Hive Box Clear'));
     super.didChangeDependencies();
   }
-
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -133,7 +146,8 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                     Center(
                       child: buttonWidget(
                         context: context,
-                        onPressed: () {},
+                        onPressed: () =>
+                            model.gettingPhoneNumbers(currentFireUser),
                         text: 'Find your close friends',
                       ),
                     ),
@@ -150,15 +164,6 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return ViewModelBuilder<RecentChatsViewModel>.reactive(
       viewModelBuilder: () => RecentChatsViewModel(),
-      onModelReady: (model) async {
-        await AuthService.liveUser!.reload();
-        await firestoreApi.updateUser(
-          uid: FirestoreApi.liveUserUid,
-          property: UserField.status,
-          updateProperty: 'Online',
-        );
-        await model.getCurrentFireUser(ChatService.liveUserUid);
-      },
       builder: (context, model, child) {
         if (!model.dataReady) {
           return const Center(
@@ -191,7 +196,7 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                 Navigator.push(
                   context,
                   cupertinoTransition(
-                    enterTo: DistantView(fireUser: model.currentFireUser),
+                    enterTo: DistantView(fireUser: currentFireUser),
                     exitFrom: const RecentChats(),
                   ),
                 );
@@ -229,7 +234,13 @@ class _RecentChatsState extends State<RecentChats> with WidgetsBindingObserver {
                       ? const Text('Checking......')
                       : const Text('Get Users By Interests'),
                   onPressed: () {
-                    model.gettingPhoneNumbers();
+                    // FirebaseFirestore.instance
+                    //     .collection('phoneNumbers')
+                    //     .doc('7290874209')
+                    //     .set({
+                    //   'number': '7290874209',
+                    // });
+                    model.saveContactsinHive();
                   },
                 ),
               ),
