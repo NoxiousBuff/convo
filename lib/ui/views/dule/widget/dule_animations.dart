@@ -3,6 +3,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:hint/ui/animations/confetti.dart';
 import 'package:hint/ui/animations/spotlight.dart';
+import 'package:hint/constants/message_string.dart';
 
 class LiveChatAnimations extends StatefulWidget {
   const LiveChatAnimations({Key? key}) : super(key: key);
