@@ -1,5 +1,3 @@
-import 'package:hint/api/hive.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
@@ -23,23 +21,7 @@ class ChatService {
 
   startConversation(
       BuildContext context, FireUser fireUser, Color randomColor) async {
-    String conversationId = getConversationId(fireUser.id, liveUserUid);
-    await Hive.openBox(hiveApi.urlData(conversationId));
-    await Hive.openBox(hiveApi.imagesMemory(conversationId));
-    await Hive.openBox(hiveApi.chatRoomMedia(conversationId));
-    await Hive.openBox(hiveApi.thumbnailsPath(conversationId));
-    await Hive.openBox(hiveApi.videoThumbnails(conversationId));
-    Map<String, dynamic> chatRoomMap = {
-      'nearMe': false,
-      'backgroundImage': null,
-      'liveUserUid': liveUserUid,
-      'receiverUid': fireUser.id,
-      'chatRoomId': conversationId,
-    };
-
-    createChatRoom(conversationId, chatRoomMap);
-    log.wtf('start conversation was tapped');
-
+   
   }
 
   createChatRoom(String chatRoomId, chatRoomMap) {
@@ -148,7 +130,6 @@ class ChatService {
     if (location != null) messageMap[MessageField.location] = location;
     if (messageText != null) messageMap[MessageField.messageText] = messageText;
     if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
-    
 
     switch (type) {
       case MediaType.image:
