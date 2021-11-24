@@ -1,21 +1,16 @@
-import 'dart:async';
-import 'dart:math';
-
-import 'package:hint/api/database.dart';
+import 'package:animated_background/animated_background.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/services/database_service.dart';
-
-import 'dule_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:confetti/confetti.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:firebase_database/firebase_database.dart';
+
+import 'dule_viewmodel.dart';
 
 class DuleView extends StatefulWidget {
   const DuleView({Key? key, required this.fireUser}) : super(key: key);
@@ -30,69 +25,54 @@ class DuleView extends StatefulWidget {
 
 class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   final log = getLogger('DuleView');
-  late ConfettiController confettiController;
-  late AnimationController spotlightController;
+  // late ConfettiController confettiController;
 
-  @override
-  void initState() {
-    confettiController =
-        ConfettiController(duration: const Duration(seconds: 3));
-    spotlightController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 4));
-    spotlightController.addListener(() => setState(() {}));
-    confettiController.addListener(() => setState(() {}));
+  // @override
+  // void initState() {
+  //   confettiController =
+  //       ConfettiController(duration: const Duration(seconds: 3));
+  //   confettiController.addListener(() => setState(() {}));
+  //   super.initState();
+  // }
 
-    super.initState();
-  }
+  // @override
+  // void dispose() {
+  //   confettiController.dispose();
 
-  @override
-  void dispose() {
-    confettiController.dispose();
-    spotlightController.removeListener(() {});
-    spotlightController.dispose();
+  //   super.dispose();
+  // }
 
-    super.dispose();
-  }
+  // StreamSubscription<Event> animationHandler() {
+  //   return databaseService.getUserData(widget.fireUser.id).listen(
+  //     (data) {
+  //       final mapData = data.snapshot.value;
+  //       final userDocMap = mapData.cast<String, dynamic>();
+  //       final receiverUser = DuleModel.fromJson(userDocMap);
+  //       switch (receiverUser.aniType) {
+  //         case AnimationType.confetti:
+  //           {
+  //             log.w('confetti controller :1');
+  //             confettiController.play();
+  //             databaseService.updateUserDataWithKey(
+  //                 DatabaseMessageField.aniType, null);
+  //           }
 
-  StreamSubscription<Event> animationHandler() {
-    return databaseService.getUserData(widget.fireUser.id).listen(
-      (data) {
-        final mapData = data.snapshot.value;
-        final userDocMap = mapData.cast<String, dynamic>();
-        final receiverUser = DuleModel.fromJson(userDocMap);
-        switch (receiverUser.aniType) {
-          case AnimationType.confetti:
-            {
-              log.w('confetti controller :1');
-              confettiController.play();
-              databaseService.updateUserDataWithKey(
-                  DatabaseMessageField.aniType, null);
-            }
-
-            break;
-          case AnimationType.spotlight:
-            {
-              log.w('spotlight controller :2');
-              spotlightController.forward();
-              databaseService.updateUserDataWithKey(
-                  DatabaseMessageField.aniType, null);
-            }
-            break;
-          default:
-            {
-              log.wtf('User Message is not equal to any animation value');
-            }
-        }
-      },
-      onError: (e) {
-        log.e('StreamSubscription For Animation Error:$e');
-      },
-    );
-  }
+  //           break;
+  //         default:
+  //           {
+  //             log.wtf('User Message is not equal to any animation value');
+  //           }
+  //       }
+  //     },
+  //     onError: (e) {
+  //       log.e('StreamSubscription For Animation Error:$e');
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    animationHandler();
+    // animationHandler();
     return ViewModelBuilder<DuleViewModel>.reactive(
       onModelReady: (model) {
         model.createGetConversationId();
@@ -153,16 +133,12 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
                     decoration: BoxDecoration(
-                        color: AppColors.grey.withOpacity(0.5),
+                        color: AppColors.grey,
                         borderRadius: BorderRadius.circular(32)),
                     width: screenWidthPercentage(context, percentage: 80),
                     alignment: Alignment.center,
                     child: StreamBuilder<Event>(
-                      stream: FirebaseDatabase.instance
-                          .reference()
-                          .child('dules')
-                          .child(widget.fireUser.id)
-                          .onValue,
+                      stream: model.stream,
                       builder: (context, snapshot) {
                         Widget child;
                         if (!snapshot.hasData) {
@@ -197,6 +173,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                             onChanged: (value) {
                               model.updatTextFieldWidth();
                             },
+                            maxLength: 160,
+                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             readOnly: true,
                             cursorColor: AppColors.blue,
                             cursorHeight: 28,
@@ -246,8 +224,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onChanged: (value) {
                         model.updateWordLengthLeft(value);
                         model.updatTextFieldWidth();
-                        model.updateUserDataWithKey(
-                            DatabaseMessageField.msgTxt, value);
+                        if (model.wordLengthLeft.length > 160) {
+                          model.updateUserDataWithKey(
+                              DatabaseMessageField.msgTxt, value);
+                        }
                       },
                       maxLength: 160,
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -271,7 +251,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                               borderSide: BorderSide.none)),
                     ),
                     decoration: BoxDecoration(
-                        color: AppColors.blue.withOpacity(0.5),
+                        color: AppColors.blue,
                         borderRadius: BorderRadius.circular(32)),
                   ),
                 ),
@@ -293,29 +273,16 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                     ),
                     IconButton(
                       onPressed: () async {
-                        final val = await model.getAnimationValue(
-                            context: context,
-                            confettiController: confettiController,
-                            spotlightController: spotlightController);
-                        log.wtf('Animation Value:$val');
-                        if (val == AnimationType.confetti) {
-                          await databaseService.updateUserDataWithKey(
-                              DatabaseMessageField.aniType,
-                              AnimationType.confetti);
-                          // confettiController.play();
-                          //  Future.delayed(const Duration(seconds: 3),()=> confettiController.stop());
-                          await databaseService.updateUserDataWithKey(
-                              DatabaseMessageField.aniType, null);
-                        } else if (val == AnimationType.spotlight) {
-                          spotlightController.forward();
-                          await databaseService.updateUserDataWithKey(
-                              DatabaseMessageField.aniType,
-                              AnimationType.spotlight);
-                        } else {
-                          log.wtf('Animation is null');
-                        }
+                        // await databaseService.updateUserDataWithKey(
+                        //     DatabaseMessageField.aniType,
+                        //     AnimationType.confetti);
+                        // confettiController.play();
+                        // Future.delayed(const Duration(seconds: 3),
+                        //     () => confettiController.stop());
+                        // await databaseService.updateUserDataWithKey(
+                        //     DatabaseMessageField.aniType, null);
                       },
-                      icon: const Icon((Icons.emoji_emotions)),
+                      icon: const Icon((Icons.auto_fix_high)),
                       color: AppColors.yellow,
                       iconSize: 32,
                     ),
@@ -347,7 +314,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onPressed: () {
                         model.clearMessage();
                       },
-                      icon: const Icon((Icons.delete)),
+                      icon: const Icon((Icons.autorenew)),
                       color: model.isDuleEmpty
                           ? AppColors.darkGrey
                           : AppColors.red,
@@ -356,28 +323,45 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              bottomPadding(
-                context,
-              )
+              bottomPadding(context)
             ]),
-            Positioned(
-              top: -200,
-              left: 200,
-              child: ConfettiWidget(
-                gravity: 1.0,
-                shouldLoop: false,
-                minBlastForce: 10,
-                maxBlastForce: 20,
-                particleDrag: 0.05,
-                displayTarget: true,
-                numberOfParticles: 1,
-                blastDirection: pi / 2,
-                emissionFrequency: 0.6,
-                minimumSize: const Size(6, 6),
-                maximumSize: const Size(12, 12),
-                confettiController: confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
+            AnimatedBackground(
+              child: const SizedBox.shrink(),
+              vsync: this,
+              behaviour: RandomParticleBehaviour(
+                options: ParticleOptions(
+                  image: Image.asset('assets/blackEmojis.png'),
+                  baseColor: Colors.yellow,
+                  spawnOpacity: 0.6,
+                  opacityChangeRate: 0.25,
+                  minOpacity: 0.7,
+                  maxOpacity: 1,
+                  spawnMinSpeed: 30.0,
+                  spawnMaxSpeed: 70.0,
+                  spawnMinRadius: 15.0,
+                  spawnMaxRadius: 25.0,
+                  particleCount: 40,
+                ),
               ),
+              // Positioned(
+              //   top: -200,
+              //   left: 200,
+              //   child: ConfettiWidget(
+              //     gravity: 1.0,
+              //     shouldLoop: false,
+              //     minBlastForce: 10,
+              //     maxBlastForce: 20,
+              //     particleDrag: 0.05,
+              //     displayTarget: true,
+              //     numberOfParticles: 1,
+              //     blastDirection: pi / 2,
+              //     emissionFrequency: 0.6,
+              //     minimumSize: const Size(6, 6),
+              //     maximumSize: const Size(12, 12),
+              //     confettiController: confettiController,
+              //     blastDirectionality: BlastDirectionality.explosive,
+              //   ),
+              // ),
             ),
           ],
         ),

@@ -53,6 +53,7 @@ class AuthService {
     required Function onComplete,
     Function? noAccountExists,
     Function? invalidEmail,
+    Function? wrongPassword,
     Function? onError,
   }) async {
     try {
@@ -69,6 +70,9 @@ class AuthService {
       } else if (e.code == 'invalid-email') {
         log.e(e.message);
         if(invalidEmail != null) invalidEmail();
+      } else if (e.code == 'wrong-password') {
+        log.e(e.message);
+        if(wrongPassword != null) wrongPassword();
       } else {
         log.e(e.message);
         if (onError != null) onError();

@@ -4,7 +4,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/pick_interest/pick_interest_viewmodel.dart';
 
-AppBar cwAuthAppBar(BuildContext context, {required String title}) {
+AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadingIcon = true}) {
   return AppBar(
     elevation: 0.0,
     systemOverlayStyle:
@@ -14,14 +14,17 @@ AppBar cwAuthAppBar(BuildContext context, {required String title}) {
       style: const TextStyle(
           fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),
     ),
-    backgroundColor: Colors.transparent,
-    leading: IconButton(
-      color: Colors.black,
+    backgroundColor: MaterialStateColor.resolveWith((Set<MaterialState> states) {
+              return states.contains(MaterialState.scrolledUnder) ? Colors.grey.shade50 : Colors.white;
+            }),
+    leadingWidth: showLeadingIcon ? 56.0 : 0.0,
+    leading: showLeadingIcon ? IconButton(
+      color: Colors.black54,
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
         // Navigator.pop(context);
       },
-    ),
+    ) : const SizedBox.shrink(),
   );
 }
 
@@ -76,6 +79,7 @@ Widget cwAuthCheckingTile({required String title, required bool value}) {
     mainAxisSize: MainAxisSize.min,
     children: [
       Checkbox(
+        
         activeColor: LightAppColors.primaryContainer,
         checkColor: LightAppColors.onPrimaryContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

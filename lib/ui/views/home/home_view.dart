@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/explore/explore_view.dart';
 import 'package:hint/ui/views/interest/interest_view.dart';
@@ -17,20 +16,22 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CupertinoTabScaffold(
-        backgroundColor: Colors.white,
         tabBar: CupertinoTabBar(
-          activeColor: CupertinoColors.black,
+          activeColor: Colors.black,
           iconSize: 25.0,
-          backgroundColor: LightAppColors.surface,
-          items: const  [
+          // backgroundColor: AppColors.blue.withAlpha(20),
+          items: const [
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.scribble),
+              icon: Icon(
+                Icons.people,
+                size: 30,
+              ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chat_bubble),
+              icon: Icon(Icons.chat_bubble),
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.memories),
+              icon: Icon(Icons.explore),
             ),
           ],
         ),

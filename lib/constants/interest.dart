@@ -3,6 +3,29 @@ import 'dart:core';
 final userInterest = Interest();
 
 class Interest {
+  final interestTypes = [
+    'Most Popular',
+    'Movies & Telvision',
+    'Activities',
+    'Arts & Culture',
+    'Automotive',
+    'Business',
+    'Career',
+    'Programming',
+    'Education',
+    'Food & Drink',
+    'Gaming',
+    'Health & Fitness',
+    'Life Stages',
+    'Personal Finance',
+    'Pets',
+    'Science',
+    'Social Issues',
+    'Sports',
+    'Style & Fashion',
+    'Technology & Computing',
+    'Travel',
+  ];
   final science = [
     'Animals',
     'Astronomy',

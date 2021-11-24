@@ -27,88 +27,100 @@ class PhoneAuthView extends StatelessWidget {
   Widget forPhoneNumber(BuildContext context, PhoneAuthViewModel model) {
     return Form(
       key: model.phoneFormKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          verticalSpaceRegular,
-          cwAuthHeadingTitle(context, title: 'What\'s your \nnumber?'),
-          verticalSpaceRegular,
-          SizedBox(
-            width: screenWidth(context),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 60,
-                  child: GestureDetector(
-                    onTap: () {
-                      model.pickedCountryCode(context);
-                    },
-                    child: Text(
-                      '+${model.countryCode}',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              verticalSpaceRegular,
+              cwAuthHeadingTitle(context, title: 'What\'s your \nnumber?'),
+              verticalSpaceRegular,
+              SizedBox(
+                width: screenWidth(context),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: GestureDetector(
+                        onTap: () {
+                          model.pickedCountryCode(context);
+                        },
+                        child: Text(
+                          '+${model.countryCode}',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return customSnackbars.errorSnackbar(context,
-                            title: 'Phone number can not be empty.');
-                      } else {
-                        return null;
-                      }
-                    },
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onChanged: (value) => model.phoneEmptyStateChanger(),
-                    controller: model.phoneTech,
-                    keyboardType: TextInputType.number,
-                    autofocus: true,
-                    autofillHints: const [AutofillHints.telephoneNumberNational],
-                    style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87),
-                    showCursor: true,
-                    cursorColor: LightAppColors.primary,
-                    cursorHeight: 32,
-                    decoration: const InputDecoration(
-                      hintText: 'xxxxx xxxxx',
-                      hintStyle:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-                      contentPadding: EdgeInsets.all(0),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none, gapPadding: 0.0),
+                    Expanded(
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return customSnackbars.errorSnackbar(context,
+                                title: 'Phone number can not be empty.');
+                          } else {
+                            return null;
+                          }
+                        },
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onChanged: (value) => model.phoneEmptyStateChanger(),
+                        controller: model.phoneTech,
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        autofillHints: const [AutofillHints.telephoneNumberNational],
+                        style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87),
+                        showCursor: true,
+                        cursorColor: LightAppColors.primary,
+                        cursorHeight: 32,
+                        decoration: const InputDecoration(
+                          hintText: 'xxxxx xxxxx',
+                          hintStyle:
+                              TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+                          contentPadding: EdgeInsets.all(0),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide.none, gapPadding: 0.0),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
+              bottomPadding(context)
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                cwAuthProceedButton(
+                context,
+                buttonTitle: 'Send Code',
+                isLoading: model.busy(model.phoneChecking),
+                onTap: () async {
+                  getLogger('PhoneAuthView').wtf(model.completePhoneNumber);
+                  final validate = model.phoneFormKey.currentState!.validate();
+                  if(validate) {
+                    model.changePhoneVerificationState(PhoneVerificationState.checkingOtp);
+                    customSnackbars.infoSnackbar(context, title: 'Waiting for code to auto verify.....');
+                    model.verifyingPhoneNumber(context);
+                  }
+                },
+                isActive: !model.isPhoneEmpty,
+              ),
+              verticalSpaceLarge,
+              bottomPadding(context)
               ],
-            ),
-          ),
-          const Spacer(),
-          cwAuthProceedButton(
-            context,
-            buttonTitle: 'Send Code',
-            isLoading: model.busy(model.phoneChecking),
-            onTap: () async {
-              getLogger('PhoneAuthView').wtf(model.completePhoneNumber);
-              final validate = model.phoneFormKey.currentState!.validate();
-              if(validate) {
-                model.changePhoneVerificationState(PhoneVerificationState.checkingOtp);
-                customSnackbars.infoSnackbar(context, title: 'Waiting for code to auto verify.....');
-                model.verifyingPhoneNumber(context);
-              }
-            },
-            isActive: !model.isPhoneEmpty,
-          ),
-          verticalSpaceLarge,
-          bottomPadding(context)
+            )
+          )
         ],
       ),
     );
@@ -117,74 +129,87 @@ class PhoneAuthView extends StatelessWidget {
   Widget forOtpCode(BuildContext context, PhoneAuthViewModel model) {
     return Form(
       key: model.otpCodeFormKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          verticalSpaceRegular,
-          cwAuthHeadingTitle(context, title: 'Enter the code \nwe sent you'),
-          verticalSpaceRegular,
-          PinPut(
-            validator: (value) {
-              if(value!.isEmpty) {
-                return customSnackbars.errorSnackbar(context, title: 'Code cannot be empty');
-              } else if (value.length < 6) {
-                return customSnackbars.errorSnackbar(context, title: 'Code is incomplete. Check Again');
-              } else {
-                return null;
-              }
-            },
-            controller: model.otpCodeTech,
-            autofocus: true,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            textStyle: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-            fieldsCount: 6,
-            submittedFieldDecoration: _pinPutDecoration.copyWith(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            selectedFieldDecoration: _pinPutDecoration,
-            followingFieldDecoration: _pinPutDecoration.copyWith(
-              borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(
-                color: deepPurpleAccent.withOpacity(.5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              verticalSpaceRegular,
+              cwAuthHeadingTitle(context, title: 'Enter the code \nwe sent you'),
+              verticalSpaceRegular,
+              PinPut(
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return customSnackbars.errorSnackbar(context, title: 'Code cannot be empty');
+                  } else if (value.length < 6) {
+                    return customSnackbars.errorSnackbar(context, title: 'Code is incomplete. Check Again');
+                  } else {
+                    return null;
+                  }
+                },
+                controller: model.otpCodeTech,
+                autofocus: true,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                textStyle: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+                fieldsCount: 6,
+                submittedFieldDecoration: _pinPutDecoration.copyWith(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                selectedFieldDecoration: _pinPutDecoration,
+                followingFieldDecoration: _pinPutDecoration.copyWith(
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(
+                    color: deepPurpleAccent.withOpacity(.5),
+                  ),
+                ),
               ),
+              verticalSpaceMedium,
+              GestureDetector(
+                onTap: () {
+                  model.changePhoneVerificationState(
+                      PhoneVerificationState.checkingPhoneNumber);
+                  model.setBusyForObject(model.otpChecking, false);
+                },
+                child: const Text(
+                  'Change Phone Number',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: LightAppColors.secondary,
+                      decoration: TextDecoration.underline),
+                ),
+              ),
+              bottomPadding(context)
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                cwAuthProceedButton(
+                context,
+                buttonTitle: 'Verify Code',
+                isLoading: model.busy(model.otpChecking),
+                onTap: () async {
+                  getLogger('PhoneAuthView').wtf(model.completePhoneNumber);
+                  final validate = model.otpCodeFormKey.currentState!.validate();
+                  if(validate) {
+                    PhoneAuthCredential credential =
+                    PhoneAuthProvider.credential(
+                        verificationId: model.verificationId, smsCode: model.otpCodeTech.text);
+                    await model.linkPhoneToUser(context, credential);
+                  }
+                },
+                isActive: !model.isPhoneEmpty,
+              ),
+              verticalSpaceLarge,
+              bottomPadding(context)
+              ],
             ),
-          ),
-          verticalSpaceMedium,
-          GestureDetector(
-            onTap: () {
-              model.changePhoneVerificationState(
-                  PhoneVerificationState.checkingPhoneNumber);
-            },
-            child: const Text(
-              'Change Phone Number',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: LightAppColors.secondary,
-                  decoration: TextDecoration.underline),
-            ),
-          ),
-          const Spacer(),
-          cwAuthProceedButton(
-            context,
-            buttonTitle: 'Verify Code',
-            isLoading: model.busy(model.otpChecking),
-            onTap: () async {
-              getLogger('PhoneAuthView').wtf(model.completePhoneNumber);
-              final validate = model.otpCodeFormKey.currentState!.validate();
-              if(validate) {
-                PhoneAuthCredential credential =
-                PhoneAuthProvider.credential(
-                    verificationId: model.verificationId, smsCode: model.otpCodeTech.text);
-                await model.linkPhoneToUser(context, credential);
-              }
-            },
-            isActive: !model.isPhoneEmpty,
-          ),
-          verticalSpaceLarge,
-          bottomPadding(context)
+          )
         ],
       ),
     );
@@ -206,10 +231,10 @@ class PhoneAuthView extends StatelessWidget {
           return false;
         },
         child: Scaffold(
-          backgroundColor: LightAppColors.background,
+          backgroundColor: Colors.white,
           appBar: cwAuthAppBar(context, title: 'Phone Verification'),
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: model.phoneVerificationState ==

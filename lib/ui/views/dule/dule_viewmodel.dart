@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:confetti/confetti.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/api/database.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/dule/widget/dule_animations.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,7 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class DuleViewModel extends BaseViewModel {
+class DuleViewModel extends StreamViewModel {
   DuleViewModel(this.fireUser);
 
   final FireUser fireUser;
@@ -121,6 +118,11 @@ class DuleViewModel extends BaseViewModel {
   @override
   void dispose() {
     super.dispose();
+    updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+    updateUserDataWithKey(DatabaseMessageField.aniType, null);
+    updateUserDataWithKey(DatabaseMessageField.roomUid, null);
+    updateUserDataWithKey(DatabaseMessageField.url, null);
+    updateUserDataWithKey(DatabaseMessageField.urlType, null);
     duleFocusNode.dispose();
     duleTech.dispose();
     otherTech.dispose();
@@ -256,4 +258,7 @@ class DuleViewModel extends BaseViewModel {
     setBusy(false);
     return downloadURL;
   }
+
+  @override
+  Stream<Event> get stream => databaseService.getUserData(fireUser.id);
 }

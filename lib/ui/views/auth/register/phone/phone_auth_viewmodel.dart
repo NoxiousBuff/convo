@@ -87,7 +87,8 @@ class PhoneAuthViewModel extends BaseViewModel {
     await FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential).then((value){
       navService.materialPageRoute(context, UsernameAuthView(phoneNumber: phoneTech.text, countryCode: '+$countryCode',));
     }).catchError((e) {
-      customSnackbars.errorSnackbar(context, title: e);
+      customSnackbars.errorSnackbar(context, title: e.toString());
+      setBusyForObject(otpChecking, false);
     });
     setBusyForObject(otpChecking, false);
     log.w('Phone Auth Credential: $phoneAuthCredential');

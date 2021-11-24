@@ -113,33 +113,37 @@ class ChatListView extends StatelessWidget {
                       ),
                     ),
                     // buildUserContact(model),
-                    Builder(builder: (context) {
-                      if (!model.dataReady) {
-                        return const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
-                      }
+                    Builder(
+                      builder: (context) {
+                        if (!model.dataReady) {
+                          return const Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          );
+                        }
 
-                      if (model.hasError) {
-                        return const Center(
-                          child: Text('Model has Error'),
-                        );
-                      }
+                        if (model.hasError) {
+                          return const Center(
+                            child: Text('Model has Error'),
+                          );
+                        }
 
-                      final data = model.data!.docs;
+                        final data = model.data!.docs;
 
-                      return ListView.builder(
+                        return ListView.builder(
                           padding: const EdgeInsets.all(0),
                           physics: const AlwaysScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: data.length,
                           itemBuilder: (context, index) {
-                              final fireUser = FireUser.fromFirestore(data[index]);
+                            final fireUser =
+                                FireUser.fromFirestore(data[index]);
                             return UserItem(
                               fireUser: fireUser,
                               onTap: () {
-                                final convoUid = chatService.getConversationId(fireUser.id, AuthService.liveUser!.uid);
-                                databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, convoUid);
+                                final convoUid = chatService.getConversationId(
+                                    fireUser.id, AuthService.liveUser!.uid);
+                                databaseService.updateUserDataWithKey(
+                                    DatabaseMessageField.roomUid, convoUid);
                                 navService.cupertinoPageRoute(
                                   context,
                                   DuleView(
@@ -149,8 +153,10 @@ class ChatListView extends StatelessWidget {
                                 );
                               },
                             );
-                          });
-                    })
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

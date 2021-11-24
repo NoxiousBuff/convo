@@ -52,6 +52,9 @@ dependencies:
   preload_page_view: ^0.1.6
   modal_bottom_sheet: ^2.0.0
   cached_network_image: ^3.0.0
+  confetti: ^0.6.0
+  animated_background: ^2.0.0
+  flutter_reaction_button: ^2.0.0+1
 
   #functional
   dio: ^4.0.0
@@ -70,8 +73,6 @@ dependencies:
   contacts_service: ^0.6.1
   shared_preferences: ^2.0.6
   permission_handler: ^8.0.0+2
-  confetti: ^0.6.0
-  animated_background: ^2.0.0
 
 
 dev_dependencies:

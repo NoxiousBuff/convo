@@ -70,7 +70,6 @@ class CredentialAuthViewModel extends BaseViewModel {
         hasLowercase &
         hasSpecialCharacters &
         hasMinLength;
-    log.wtf('This is the value of ${value.toString()}');
     return value;
   }
 

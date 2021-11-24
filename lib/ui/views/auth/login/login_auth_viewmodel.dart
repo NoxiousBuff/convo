@@ -39,7 +39,7 @@ class LoginAuthViewModel extends BaseViewModel {
 
   Future<void> login(BuildContext context, String email, String password) async {
     setBusy(true);
-    authService.logIn(
+    await authService.logIn(
         email: email,
         password: password,
         onComplete: () {
@@ -57,6 +57,9 @@ class LoginAuthViewModel extends BaseViewModel {
         invalidEmail: () {
           return customSnackbars.errorSnackbar(context,
               title: 'Email Provided is invalid. Please check again.');
+        },
+        wrongPassword: () {
+          return customSnackbars.errorSnackbar(context, title: 'Wrong Passwrod');
         },
         onError: () {
           return customSnackbars.errorSnackbar(context,
