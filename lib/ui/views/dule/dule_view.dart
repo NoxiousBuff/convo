@@ -34,7 +34,6 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   bool incongonatedMode = false;
   late ConfettiController confettiController;
   late AnimationController balloonsController;
-  late AnimationController spotlightController;
 
   @override
   void initState() {
@@ -42,9 +41,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         AnimationController(vsync: this, duration: const Duration(seconds: 5));
     confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
-    spotlightController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 4));
-    spotlightController.addListener(() => setState(() {}));
+
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
 
@@ -53,10 +50,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    spotlightController.removeListener(() {});
     balloonsController.removeListener(() {});
     confettiController.dispose();
-    spotlightController.dispose();
     balloonsController.dispose();
     super.dispose();
   }
