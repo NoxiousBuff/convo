@@ -1,5 +1,6 @@
-import 'package:hive/hive.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 final hiveApi = HiveApi();
 
@@ -14,6 +15,10 @@ class HiveApi {
   }
 
 // -----------------------------------------------------------------------------
+
+  ValueListenable<Box<dynamic>> hiveStream(String hiveBoxName) {
+    return Hive.box(hiveBoxName).listenable();
+  }
 
   Future<dynamic> getFromHive(String hiveBoxName, dynamic key) async {
     bool doesBoxExist = await Hive.boxExists(hiveBoxName);

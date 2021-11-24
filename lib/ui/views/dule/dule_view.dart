@@ -119,55 +119,6 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     }
   }
 
-  Widget animationWidget(Event? data) {
-    if (data == null) {
-      return const SizedBox.shrink();
-    } else {
-      final snapshot = data.snapshot;
-      final json = snapshot.value.cast<String, dynamic>();
-      final duleModel = DuleModel.fromJson(json);
-
-      switch (duleModel.aniType) {
-        case AnimationType.balloons:
-          {
-            return Lottie.network(
-              'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json',
-              animate: true,
-              width: screenWidth(context),
-              height: screenHeight(context),
-              fit: BoxFit.cover,
-              controller: balloonsController,
-              onLoaded: (composition) {
-                balloonsController
-                  ..duration = const Duration(seconds: 5)
-                  ..forward();
-              },
-            );
-          }
-        case AnimationType.confetti:
-          {
-            return Positioned(
-              bottom: -80,
-              left: screenHeightPercentage(context, percentage: 0.3),
-              child: ConfettiWidget(
-                gravity: 0.3,
-                minBlastForce: 100,
-                maxBlastForce: 400,
-                numberOfParticles: 200,
-                blastDirection: -pi / 2,
-                emissionFrequency: 0.04,
-                confettiController: confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
-              ),
-            );
-          }
-        default:
-          {
-            return const SizedBox.shrink();
-          }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +165,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                 horizontalDefaultMessageSpace,
                 ClipOval(
                   child: Image.network(
-                    widget.fireUser.photoUrl!,
+                    widget.fireUser.photoUrl,
                     cacheHeight: 48,
                     cacheWidth: 48,
                     height: 48,

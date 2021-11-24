@@ -65,6 +65,8 @@ class FireUserField {
   static const countryPhoneCode = 'countryPhoneCode';
 }
 
+
+
 class DatabaseMessageField {
   static const msgTxt = 'msgTxt';
   static const roomUid = 'roomUid';

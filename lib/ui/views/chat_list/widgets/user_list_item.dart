@@ -6,7 +6,6 @@ import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/last_message/last_message_container.dart';
 
 class UserListItem extends StatelessWidget {
   UserListItem({Key? key, required this.userUid}) : super(key: key);
@@ -35,16 +34,12 @@ class UserListItem extends StatelessWidget {
               fireUser.id,
               AuthService.liveUser!.uid,
             );
-            child = LastMessage(
-              fireUser: fireUser,
-              conversationId: id,
-              randomColor: randomColor,
-            );
+           
           }
 
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: child,
+          return const AnimatedSwitcher(
+            duration:  Duration(milliseconds: 300),
+            child: Text('Data'),
           );
         });
   }

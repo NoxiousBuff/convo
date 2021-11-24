@@ -1,4 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
@@ -14,12 +19,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 
-import 'widgets/user_item.dart';
-
-class ChatListView extends StatelessWidget {
+class ChatListView extends StatefulWidget {
+  // ignore: prefer_const_constructors_in_immutables
   ChatListView({Key? key}) : super(key: key);
 
+  @override
+  State<ChatListView> createState() => _ChatListViewState();
+}
+
+class _ChatListViewState extends State<ChatListView> {
   final log = getLogger('ChatListView');
+
   final ChatListViewModel model = ChatListViewModel();
 
   Widget buildUserContact(ChatListViewModel model) {
@@ -55,6 +65,34 @@ class ChatListView extends StatelessWidget {
             : const Center(
                 child: Text('There nothing\' here'),
               );
+      },
+    );
+  }
+
+  Widget status(FireUser fireUser) {
+    return StreamBuilder<Event?>(
+      stream: FirebaseDatabase.instance
+          .reference()
+          .child(dulesRealtimeDBKey)
+          .child(fireUser.id)
+          .onValue,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+        if (data == null) {
+          return const Center(
+            child: Text('Connecting...'),
+          );
+        } else {
+          final snapshot = data.snapshot;
+          final json = snapshot.value.cast<String, dynamic>();
+          final duleModel = DuleModel.fromJson(json);
+          bool isOnline = duleModel.online;
+          return Text(
+            isOnline ? 'Online' : 'Offline',
+            style: Theme.of(context).textTheme.caption!.copyWith(
+                color: isOnline ? AppColors.green : AppColors.darkGrey),
+          );
+        }
       },
     );
   }
@@ -112,7 +150,6 @@ class ChatListView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // buildUserContact(model),
                     Builder(
                       builder: (context) {
                         if (!model.dataReady) {
@@ -137,11 +174,11 @@ class ChatListView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final fireUser =
                                 FireUser.fromFirestore(data[index]);
-                            return UserItem(
-                              fireUser: fireUser,
+                            return ListTile(
                               onTap: () {
-                                final convoUid = chatService.getConversationId(
-                                    fireUser.id, AuthService.liveUser!.uid);
+                                String liveUserUid = AuthService.liveUser!.uid;
+                                var convoUid = chatService.getConversationId(
+                                    fireUser.id, liveUserUid);
                                 databaseService.updateUserDataWithKey(
                                     DatabaseMessageField.roomUid, convoUid);
                                 navService.cupertinoPageRoute(
@@ -152,6 +189,16 @@ class ChatListView extends StatelessWidget {
                                   ),
                                 );
                               },
+                              leading: CircleAvatar(
+                                maxRadius: 30,
+                                backgroundImage: CachedNetworkImageProvider(
+                                    fireUser.photoUrl),
+                              ),
+                              title: Text(
+                                fireUser.username,
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                              subtitle: status(fireUser),
                             );
                           },
                         );

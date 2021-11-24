@@ -39,7 +39,7 @@ class UserItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       image: DecorationImage(
-                        image: CachedNetworkImageProvider(fireUser.photoUrl!),
+                        image: CachedNetworkImageProvider(fireUser.photoUrl),
                         fit: BoxFit.cover,
                       ),
                     ),
