@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/chat_list/widgets/last_message/lastmessage_viewmodel.dart';
 
 import '../user_item.dart';

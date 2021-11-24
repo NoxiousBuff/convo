@@ -7,7 +7,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import 'dule_viewmodel.dart';

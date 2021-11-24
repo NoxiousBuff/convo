@@ -1,4 +1,6 @@
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,32 +39,35 @@ class FirestoreApi {
   }
 
   Future<void> createUserInFirebase({
-    required String username,
     Function? onError,
     required User user,
+    required String country,
+    required String username,
+    required GeoPoint location,
     required String phoneNumber,
-    required String countryPhoneCode, 
     required List<String> interests,
+    required String countryPhoneCode,
   }) async {
     try {
+      final position = GeoFirePoint(location.latitude, location.longitude).data;
       await usersCollection.doc(user.uid).set({
-        'bio': '',
-        'blockedUsers':[],
-        'countryPhoneCode' :countryPhoneCode,
-        'email': user.email,
-        'id': user.uid,
-        'interests': interests,
-        'lastSeen': Timestamp.now(),
-        'phone': phoneNumber,
-        'photoUrl': kDefaultPhotoUrl,
-        'status': 'Online',
-        'username': username,
-        'userCreated': Timestamp.now(),
+        FireUserField.bio: 'Hey I am using dule',
+        FireUserField.country: country,
+        FireUserField.countryPhoneCode: countryPhoneCode,
+        FireUserField.email: user.email,
+        FireUserField.hashTags: ['#Dule User'],
+        FireUserField.id: user.uid,
+        FireUserField.interests: interests,
+        FireUserField.phone: phoneNumber,
+        FireUserField.position: position,
+        FireUserField.photoUrl: kDefaultPhotoUrl,
+        FireUserField.username: username,
+        FireUserField.userCreated: Timestamp.now(),
       });
       log.i('User has been successfully created with details $user');
     } catch (e) {
       log.w('Creating user in firebase failed. Error : $e');
-      if(onError != null) onError();
+      if (onError != null) onError();
     }
   }
 

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/ui/views/dule/widget/dule_animations.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
