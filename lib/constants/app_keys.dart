@@ -5,8 +5,7 @@ const String usersFirestoreKey = 'users';
 const String convoFirestorekey = 'convo';
 const String recentFirestoreKey = 'recentChats';
 const String subsFirestoreKey = 'subs';
-
+const String dulesRealtimeDBKey = 'dules';
 const String defaultImagesFolder = 'Images/Samples';
 
 const String appName = 'Convo';
-

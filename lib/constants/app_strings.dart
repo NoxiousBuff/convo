@@ -75,6 +75,7 @@ class DatabaseMessageField {
 }
 
 class AnimationType {
+  static const balloons = 'balloons';
   static const confetti = 'confetti';
   static const spotlight = 'spotlight';
 }
