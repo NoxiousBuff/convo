@@ -71,6 +71,12 @@ class _PickInterestsViewState extends State<PickInterestsView> {
   }
 
   @override
+  void didUpdateWidget(covariant PickInterestsView oldWidget) {
+    lookUpGeopoint();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<PickInterestsViewModel>.reactive(
       viewModelBuilder: () => PickInterestsViewModel(),
@@ -226,7 +232,7 @@ class _PickInterestsViewState extends State<PickInterestsView> {
                 buttonTitle: 'Done',
                 isLoading: model.isBusy,
                 isActive: model.hasUserPickedTenInterests,
-                onTap: ()  {
+                onTap: () {
                   model.createUserInFirebase(context,
                       location: geoPoint,
                       country: _countryName,
