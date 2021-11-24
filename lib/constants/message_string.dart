@@ -55,13 +55,14 @@ class FireUserField {
   static const bio = 'bio';
   static const email = 'email';
   static const phone = 'phone';
-  static const status = 'status';
-  static const lastSeen = 'lastSeen';
+  static const country = 'country';
+  static const hashTags = 'hashTags';
   static const photoUrl = 'photoUrl';
   static const username = 'username';
+  static const position = 'position';
   static const interests = 'interests';
   static const userCreated = 'userCreated';
-  static const blockedUsers = 'blockedUsers';
+  static const countryPhoneCode = 'countryPhoneCode';
 }
 
 class DatabaseMessageField {
@@ -72,7 +73,6 @@ class DatabaseMessageField {
   static const online = 'online';
   static const aniType = 'aniType';
 }
-
 
 class AnimationType {
   static const confetti = 'confetti';
