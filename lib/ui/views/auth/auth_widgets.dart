@@ -5,7 +5,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/pick_interest/pick_interest_viewmodel.dart';
 
-AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadingIcon = true}) {
+AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadingIcon = true, Function? onTap}) {
   return AppBar(
     elevation: 0.0,
     systemOverlayStyle:
@@ -23,6 +23,7 @@ AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadi
       color: Colors.black54,
       icon: const Icon(FeatherIcons.arrowLeft),
       onPressed: () {
+        if(onTap != null) onTap;
         // Navigator.pop(context);
       },
     ) : const SizedBox.shrink(),

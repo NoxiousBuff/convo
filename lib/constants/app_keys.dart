@@ -8,4 +8,4 @@ const String subsFirestoreKey = 'subs';
 const String dulesRealtimeDBKey = 'dules';
 const String defaultImagesFolder = 'Images/Samples';
 
-const String appName = 'Convo';
+const String appName = 'Dule';

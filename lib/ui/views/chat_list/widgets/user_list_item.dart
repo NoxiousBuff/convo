@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
 class UserListItem extends StatelessWidget {
-  UserListItem({Key? key, required this.userUid}) : super(key: key);
+  const UserListItem({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
-  final ChatService chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +28,6 @@ class UserListItem extends StatelessWidget {
             child = loadingUserListItem(context);
           } else {
             FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
-            // final id = chatService.getConversationId(
-            //   fireUser.id,
-            //   AuthService.liveUser!.uid,
-            // );
             child = UserItem(
               fireUser: fireUser,
               onTap: () {},

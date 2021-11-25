@@ -38,7 +38,7 @@ class DistantView extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      navService.materialPageRoute(context, ChatListView());
+                      navService.materialPageRoute(context, const ChatListView());
                     },
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(20.0),
