@@ -1,4 +1,3 @@
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';

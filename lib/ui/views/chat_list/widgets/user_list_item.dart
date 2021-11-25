@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,10 +30,10 @@ class UserListItem extends StatelessWidget {
             child = loadingUserListItem(context);
           } else {
             FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
-            final id = chatService.getConversationId(
-              fireUser.id,
-              AuthService.liveUser!.uid,
-            );
+            // final id = chatService.getConversationId(
+            //   fireUser.id,
+            //   AuthService.liveUser!.uid,
+            // );
             child = UserItem(
               fireUser: fireUser,
               onTap: () {},
