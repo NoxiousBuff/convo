@@ -39,13 +39,13 @@ class _HomeViewState extends State<HomeView> {
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              return ChatListView();
+              return const  ChatListView();
             case 1:
               return const ExploreView();
             case 2:
               return const DiscoverView();
             default:
-              return ChatListView();
+              return const ChatListView();
           }
         },
       ),

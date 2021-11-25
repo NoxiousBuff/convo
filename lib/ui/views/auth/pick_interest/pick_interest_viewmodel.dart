@@ -42,7 +42,7 @@ class PickInterestsViewModel extends BaseViewModel {
       setBusy(false);
       Navigator.pushAndRemoveUntil(
           context,
-          CupertinoPageRoute(builder: (context) => ChatListView()),
+          CupertinoPageRoute(builder: (context) => const ChatListView()),
           (route) => false);
     });
   }

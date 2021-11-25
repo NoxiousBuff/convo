@@ -45,7 +45,7 @@ class LoginAuthViewModel extends BaseViewModel {
         onComplete: () {
         Navigator.pushAndRemoveUntil(
         context,
-        CupertinoPageRoute(builder: (context) => ChatListView()),
+        CupertinoPageRoute(builder: (context) => const ChatListView()),
         (route) => false);
           return customSnackbars.successSnackbar(context,
               title: 'You have been successfully logged in.');
