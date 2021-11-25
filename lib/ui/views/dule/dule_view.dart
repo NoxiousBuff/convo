@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/api/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:hint/ui/views/dule/dule_viewmodel.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -53,6 +56,11 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     balloonsController.removeListener(() {});
     confettiController.dispose();
     balloonsController.dispose();
+    databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, null);
+    hiveApi.saveInHive(HiveApi.recentChatsHiveBox, widget.fireUser.id, {
+      RecentUserField.uid: widget.fireUser.id,
+      RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch,
+    });
     super.dispose();
   }
 
@@ -118,7 +126,6 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -196,22 +203,24 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           body: Stack(
             fit: StackFit.expand,
             children: [
-              ClipPath(
-                clipper: LightClipper(x, y, radius: radius),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 500),
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      radius: incongonatedMode ? 0.5 : 5,
-                      center: const Alignment(0.1, -0.6),
-                      colors: const [
-                        systemBackground,
-                        black,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              incongonatedMode
+                  ? ClipPath(
+                      clipper: LightClipper(x, y, radius: radius),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        decoration: const BoxDecoration(
+                          gradient: RadialGradient(
+                            radius: 0.5,
+                            center: Alignment(0.1, -0.6),
+                            colors: [
+                              systemBackground,
+                              black,
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               Lottie.network(
                 'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json',
                 width: screenWidth(context),
@@ -367,7 +376,12 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                         const Spacer(),
                         Text(
                           model.wordLengthLeft,
-                          style: Theme.of(context).textTheme.bodyText1,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(
+                                color: incongonatedMode ? inactiveGray : black,
+                              ),
                         ),
                         IconButton(
                           onPressed: () {

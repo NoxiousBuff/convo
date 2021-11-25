@@ -11,14 +11,15 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
   ScrollController? scrollController;
   final AuthService authService = AuthService();
 
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection(usersFirestoreKey);
+  final CollectionReference usersCollection = FirebaseFirestore.instance
+      .collection(usersFirestoreKey)
+      .doc(AuthService.liveUser!.uid)
+      .collection(recentFirestoreKey);
 
   final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
-  void signOut(BuildContext context) =>
-      authService.signOut(context);
+  void signOut(BuildContext context) => authService.signOut(context);
 
   @override
   Stream<QuerySnapshot<Object?>> get stream => usersCollection.snapshots();

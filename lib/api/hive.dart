@@ -6,7 +6,6 @@ final hiveApi = HiveApi();
 
 class HiveApi {
   final log = getLogger('HiveApi');
-
   static const String appSettingsBoxName = 'AppSettings';
   static const String recentChatsHiveBox = 'RecentChats';
   Future<void> initialiseHive() async {

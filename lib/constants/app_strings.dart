@@ -65,8 +65,6 @@ class FireUserField {
   static const countryPhoneCode = 'countryPhoneCode';
 }
 
-
-
 class DatabaseMessageField {
   static const msgTxt = 'msgTxt';
   static const roomUid = 'roomUid';
@@ -80,4 +78,9 @@ class AnimationType {
   static const balloons = 'balloons';
   static const confetti = 'confetti';
   static const spotlight = 'spotlight';
+}
+
+class RecentUserField {
+  static const uid = 'uid';
+  static const timestamp = 'timestamp';
 }
