@@ -1,3 +1,4 @@
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -174,7 +175,7 @@ class Privacy extends StatelessWidget {
                         leading: IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(
-                            CupertinoIcons.back,
+                            FeatherIcons.arrowLeft,
                             color: activeBlue,
                           ),
                         ),

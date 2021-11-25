@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:stacked/stacked.dart';
@@ -18,7 +19,7 @@ class SearchView extends StatelessWidget {
       elevation: 0.0,
       backgroundColor: Colors.transparent,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(FeatherIcons.arrowLeft),
         color: Colors.black,
         onPressed: () {
           Navigator.pop(context);
@@ -87,13 +88,13 @@ class SearchView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(32.0),
             child: Icon(
-              Icons.icecream,
+              FeatherIcons.atSign,
               size: 128.0,
               color: CupertinoColors.inactiveGray,
             ),
           ),
           Text(
-            'Sorry, nothing found.\nMay be we can interest you in \nIceCream.',
+            'Sorry, nothing found.\nTry searching for another \nusername.',
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.black54,
@@ -115,7 +116,7 @@ class SearchView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(32.0),
             child: Icon(
-              Icons.face_unlock_sharp,
+              FeatherIcons.smile,
               size: 128.0,
               color: CupertinoColors.inactiveGray,
             ),

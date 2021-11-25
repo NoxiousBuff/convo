@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
@@ -100,8 +101,8 @@ class LoginAuthView extends StatelessWidget {
                           suffixIcon: IconButton(
                             color: AppColors.blue,
                             icon: Icon(model.isPasswordShown
-                                ? CupertinoIcons.lock_open
-                                : CupertinoIcons.lock),
+                                ? FeatherIcons.eye
+                                : FeatherIcons.eyeOff),
                             onPressed: () {
                               model.updatePasswordShown();
                             },

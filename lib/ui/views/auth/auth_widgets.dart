@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/pick_interest/pick_interest_viewmodel.dart';
@@ -20,7 +21,7 @@ AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadi
     leadingWidth: showLeadingIcon ? 56.0 : 0.0,
     leading: showLeadingIcon ? IconButton(
       color: Colors.black54,
-      icon: const Icon(Icons.arrow_back),
+      icon: const Icon(FeatherIcons.arrowLeft),
       onPressed: () {
         // Navigator.pop(context);
       },
@@ -122,7 +123,7 @@ Widget cwAuthInterestTopicPicker(
           Container(
             child: icon ??
                 const Icon(
-                  Icons.add,
+                  FeatherIcons.plus,
                   color: LightAppColors.onPrimary,
                 ),
             padding: const EdgeInsets.all(4),

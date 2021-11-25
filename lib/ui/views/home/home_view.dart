@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
+import 'package:hint/ui/views/discover/discover_view.dart';
 import 'package:hint/ui/views/explore/explore_view.dart';
-import 'package:hint/ui/views/interest/interest_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -18,31 +19,31 @@ class _HomeViewState extends State<HomeView> {
       body: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
           activeColor: Colors.black,
-          iconSize: 25.0,
-          // backgroundColor: AppColors.blue.withAlpha(20),
+          iconSize: 28.0,
+          backgroundColor: Colors.white,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.people,
-                size: 30,
-              ),
+              icon: Icon(FeatherIcons.messageCircle),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble),
+              icon: Icon(FeatherIcons.search),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.explore),
+              icon: Icon(FeatherIcons.compass),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(FeatherIcons.user),
             ),
           ],
         ),
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              return const InterestView();
-            case 1:
               return ChatListView();
-            case 2:
+            case 1:
               return const ExploreView();
+            case 2:
+              return const DiscoverView();
             default:
               return ChatListView();
           }

@@ -1,8 +1,8 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 Widget networkImage(String image) {
-  return CachedNetworkImage(imageUrl: image);
+  return ExtendedImage.network(image);
 }
 
 List<String> kolabanga = [

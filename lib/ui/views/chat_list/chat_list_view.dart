@@ -1,20 +1,14 @@
-import 'package:hint/constants/message_string.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/services/database_service.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/distant_view/distant_view.dart';
-import 'package:hint/ui/views/dule/dule_view.dart';
-import 'package:hint/ui/views/search_view/search_view.dart';
-import 'chat_list_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 
-import 'widgets/user_item.dart';
+import 'chat_list_viewmodel.dart';
 
 class ChatListView extends StatelessWidget {
   ChatListView({Key? key}) : super(key: key);
@@ -62,9 +56,6 @@ class ChatListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatListViewModel>.reactive(
-      onModelReady: (model) async {
-        model.scrollController = ScrollController();
-      },
       disposeViewModel: true,
       viewModelBuilder: () => ChatListViewModel(),
       builder: (context, model, child) {
@@ -74,87 +65,109 @@ class ChatListView extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             slivers: [
               CupertinoSliverNavigationBar(
+                automaticallyImplyLeading: false,
                 backgroundColor: Colors.white,
-                trailing: Material(
-                  child: IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      navService.materialPageRoute(
-                          context, const DistantView());
-                    },
-                  ),
+                leading: const Material(
+                  color: Colors.transparent,
+                  child: Icon(FeatherIcons.linkedin),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: const Icon(FeatherIcons.userPlus),
+                        onPressed: () {
+                          navService.materialPageRoute(
+                              context, const DistantView());
+                        },
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: const Icon(FeatherIcons.send),
+                        onPressed: () {
+                          navService.materialPageRoute(
+                              context, const DistantView());
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 stretch: true,
-                largeTitle: const Text('Messages'),
+                largeTitle: const Text('Friends'),
                 border: Border.all(width: 0.0, color: Colors.transparent),
               ),
               SliverList(
                 delegate: SliverChildListDelegate(
                   [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      child: Hero(
-                        tag: 'search',
-                        child: CupertinoTextField.borderless(
-                          padding: const EdgeInsets.all(8.0),
-                          readOnly: true,
-                          onTap: () => navService.materialPageRoute(
-                              context, const SearchView()),
-                          placeholder: 'Search for someone',
-                          placeholderStyle:
-                              TextStyle(color: Colors.indigo.shade900),
-                          decoration: BoxDecoration(
-                            color: Colors.indigo.shade50,
-                            border: Border.all(
-                                color: CupertinoColors.lightBackgroundGray),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                        ),
-                      ),
-                    ),
                     // buildUserContact(model),
-                    Builder(
-                      builder: (context) {
-                        if (!model.dataReady) {
-                          return const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
-                        }
-
-                        if (model.hasError) {
-                          return const Center(
-                            child: Text('Model has Error'),
-                          );
-                        }
-
-                        final data = model.data!.docs;
-
-                        return ListView.builder(
+                    ListView.builder(
                           padding: const EdgeInsets.all(0),
-                          physics: const AlwaysScrollableScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: data.length,
+                          itemCount: 24,
                           itemBuilder: (context, index) {
-                            final fireUser =
-                                FireUser.fromFirestore(data[index]);
-                            return UserItem(
-                              fireUser: fireUser,
-                              onTap: () {
-                                final convoUid = chatService.getConversationId(
-                                    fireUser.id, AuthService.liveUser!.uid);
-                                databaseService.updateUserDataWithKey(
-                                    DatabaseMessageField.roomUid, convoUid);
-                                navService.cupertinoPageRoute(
-                                  context,
-                                  DuleView(
-                                    fireUser:
-                                        FireUser.fromFirestore(data[index]),
+                            return ListTile(
+                              onTap: () {},
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                ),
+                              ),
+                              leading: ClipOval(
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        Colors.indigo.shade300.withAlpha(30),
+                                        Colors.indigo.shade400.withAlpha(50),
+                                      ],
+                                      focal: Alignment.topLeft,
+                                      radius: 0.8,
+                                    ),
                                   ),
-                                );
-                              },
+                                  height: 56.0,
+                                  width: 56.0,
+                                  child: const Text(
+                                    '',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              title: Padding(
+                                padding: const EdgeInsets.only(bottom: 5.0),
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                      right: screenWidthPercentage(context,
+                                          percentage: 0.1)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.indigo.shade400.withAlpha(30),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(''),
+                                ),
+                              ),
+                              subtitle: Container(
+                                margin: EdgeInsets.only(
+                                    right: screenWidthPercentage(context,
+                                        percentage: 0.4)),
+                                decoration: BoxDecoration(
+                                  color: Colors.indigo.shade300.withAlpha(30),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(''),
+                              ),
                             );
-                          },
-                        );
+                          
                       },
                     ),
                   ],

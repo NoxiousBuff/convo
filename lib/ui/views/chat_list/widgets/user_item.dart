@@ -1,11 +1,11 @@
 import 'dart:ui';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class UserItem extends StatelessWidget {
   final FireUser fireUser;
@@ -39,7 +39,7 @@ class UserItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       image: DecorationImage(
-                        image: CachedNetworkImageProvider(fireUser.photoUrl!),
+                        image: ExtendedNetworkImageProvider(fireUser.photoUrl!),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -79,15 +79,15 @@ class UserItem extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(CupertinoIcons.chat_bubble),
+                icon: const Icon(FeatherIcons.messageCircle),
               ),
               IconButton(
                 onPressed: () {},
-                icon: const Icon(CupertinoIcons.phone),
+                icon: const Icon(FeatherIcons.phone),
               ),
               IconButton(
                 onPressed: () {},
-                icon: const Icon(CupertinoIcons.video_camera),
+                icon: const Icon(FeatherIcons.video),
               ),
             ],
           ),
@@ -139,7 +139,7 @@ class UserItem extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 5.0),
             child: Text(
               fireUser.username,
-              style: GoogleFonts.roboto(
+              style: const TextStyle(
                 fontSize: 20,
                 color: black,
                 fontWeight: FontWeight.w600,

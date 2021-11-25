@@ -1,4 +1,5 @@
 import 'package:animated_background/animated_background.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +96,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               children: [
                 horizontalSpaceRegular,
                 const Icon(
-                  Icons.arrow_back_ios,
+                  FeatherIcons.arrowLeft,
                   color: Colors.black,
                 ),
                 horizontalDefaultMessageSpace,
@@ -290,7 +291,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onPressed: () async {
                         await model.pickImage(context);
                       },
-                      icon: const Icon((Icons.photo_camera)),
+                      icon: const Icon((FeatherIcons.camera)),
                       color: AppColors.darkGrey,
                       iconSize: 32,
                     ),
@@ -298,7 +299,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onPressed: () {
                         model.pickFromGallery(context);
                       },
-                      icon: const Icon((Icons.photo_library_rounded)),
+                      icon: const Icon((FeatherIcons.image)),
                       color: AppColors.darkGrey,
                       iconSize: 32,
                     ),
@@ -314,7 +315,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onPressed: () {
                         model.clearMessage();
                       },
-                      icon: const Icon((Icons.autorenew)),
+                      icon: const Icon((FeatherIcons.refreshCw)),
                       color: model.isDuleEmpty
                           ? AppColors.darkGrey
                           : AppColors.red,

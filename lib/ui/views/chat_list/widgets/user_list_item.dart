@@ -6,7 +6,7 @@ import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/last_message/last_message_container.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 
 class UserListItem extends StatelessWidget {
   UserListItem({Key? key, required this.userUid}) : super(key: key);
@@ -35,10 +35,9 @@ class UserListItem extends StatelessWidget {
               fireUser.id,
               AuthService.liveUser!.uid,
             );
-            child = LastMessage(
+            child = UserItem(
               fireUser: fireUser,
-              conversationId: id,
-              randomColor: randomColor,
+              onTap: () {},
             );
           }
 

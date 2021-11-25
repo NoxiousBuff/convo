@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -95,7 +96,7 @@ class _AccountState extends State<Account> {
                     .copyWith(color: systemRed),
               ),
               trailing: const Icon(
-                Icons.arrow_forward_ios,
+                FeatherIcons.arrowRight,
                 size: 14.0,
               ),
             ),
@@ -126,7 +127,7 @@ class _AccountState extends State<Account> {
               children: [
                 Text(trailingText!),
                 const Icon(
-                  Icons.arrow_forward_ios,
+                  FeatherIcons.arrowRight,
                   size: 14.0,
                 ),
               ],

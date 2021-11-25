@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:extended_image/extended_image.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+
 import 'account_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,7 +11,6 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfilePhoto extends StatelessWidget {
   final FireUser fireUser;
@@ -59,7 +61,7 @@ class ProfilePhoto extends StatelessWidget {
           children: [
             Container(
                 margin: const EdgeInsets.only(top: 20),
-                child: const Icon(CupertinoIcons.wifi,
+                child: const Icon(FeatherIcons.wifi,
                     color: inactiveGray, size: 40)),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -222,7 +224,7 @@ class ProfilePhoto extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: CircleAvatar(
                 maxRadius: 30,
-                backgroundImage: CachedNetworkImageProvider(fireUser.photoUrl!),
+                backgroundImage: ExtendedNetworkImageProvider(fireUser.photoUrl!),
               ),
             ),
             Text(

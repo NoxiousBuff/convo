@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -101,8 +102,8 @@ class CredentialAuthView extends StatelessWidget {
                           suffixIcon: IconButton(
                             color: AppColors.blue,
                             icon: Icon(model.isPasswordShown
-                                ? CupertinoIcons.lock_open
-                                : CupertinoIcons.lock),
+                                ? FeatherIcons.eye
+                                : FeatherIcons.eyeOff),
                             onPressed: () {
                               model.updatePasswordShown();
                             },
