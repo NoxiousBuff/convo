@@ -1,29 +1,30 @@
+import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FireUser {
   final String id;
-  final String? bio;
-  final String phone;
+  final String bio;
   final String email;
-  final String status;
+  final String phone;
+  final String country;
+  final List<dynamic> hashTags;
+  final String photoUrl;
   final String username;
-  final String? photoUrl;
-  final Timestamp lastSeen;
+  final GeoPoint position;
+  final List<dynamic> interests;
   final Timestamp userCreated;
   final String countryPhoneCode;
-  final List<dynamic> interests;
-  final List<dynamic>? blockedUsers;
 
   FireUser({
-    this.bio,
-    this.photoUrl,
-    this.blockedUsers,
     required this.id,
+    required this.bio,
     required this.email,
     required this.phone,
-    required this.status,
-    required this.lastSeen,
+    required this.country,
+    required this.hashTags,
+    required this.photoUrl,
     required this.username,
+    required this.position,
     required this.interests,
     required this.userCreated,
     required this.countryPhoneCode,
@@ -32,18 +33,18 @@ class FireUser {
   //deserializing the user document
   factory FireUser.fromFirestore(DocumentSnapshot doc) {
     return FireUser(
-      id: doc['id'],
-      bio: doc['bio'],
-      email: doc['email'],
-      phone: doc['phone'],
-      status: doc['status'],
-      photoUrl: doc['photoUrl'],
-      username: doc['username'],
-      lastSeen: doc['lastSeen'],
-      interests: doc['interests'],
-      userCreated: doc['userCreated'],
-      blockedUsers: doc['blockedUsers'],
-      countryPhoneCode: doc['countryPhoneCode'],
+      id: doc[FireUserField.id],
+      bio: doc[FireUserField.bio],
+      email: doc[FireUserField.email],
+      phone: doc[FireUserField.phone],
+      country: doc[FireUserField.country],
+      hashTags: doc[FireUserField.hashTags],
+      photoUrl: doc[FireUserField.photoUrl],
+      username: doc[FireUserField.username],
+      position: doc[FireUserField.position],
+      interests: doc[FireUserField.interests],
+      userCreated: doc[FireUserField.userCreated],
+      countryPhoneCode: doc[FireUserField.countryPhoneCode],
     );
   }
 }

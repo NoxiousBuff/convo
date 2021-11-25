@@ -1,4 +1,4 @@
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/constants/app_strings.dart';
 
 class DuleModel {
   final String msgTxt;

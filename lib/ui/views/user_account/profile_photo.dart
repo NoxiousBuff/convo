@@ -224,7 +224,7 @@ class ProfilePhoto extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: CircleAvatar(
                 maxRadius: 30,
-                backgroundImage: ExtendedNetworkImageProvider(fireUser.photoUrl!),
+                backgroundImage: ExtendedNetworkImageProvider(fireUser.photoUrl),
               ),
             ),
             Text(

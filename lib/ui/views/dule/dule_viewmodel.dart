@@ -1,23 +1,22 @@
 import 'dart:io';
-import 'package:confetti/confetti.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:hint/ui/views/dule/widget/dule_animations.dart';
 import 'package:mime/mime.dart';
+import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/constants/message_string.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/database_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:stacked/stacked.dart';
-import 'package:hint/app/app_logger.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/firebase_database.dart';
 
-class DuleViewModel extends StreamViewModel {
+class DuleViewModel extends StreamViewModel<Event> {
   DuleViewModel(this.fireUser);
 
   final FireUser fireUser;
@@ -91,8 +90,8 @@ class DuleViewModel extends StreamViewModel {
     notifyListeners();
   }
 
-  void updateUserDataWithKey(String key, dynamic value) {
-    databaseService.updateUserDataWithKey(key, value);
+  Future<void> updateUserDataWithKey(String key, dynamic value) {
+    return databaseService.updateUserDataWithKey(key, value);
   }
 
   void clearMessage() {
@@ -118,11 +117,6 @@ class DuleViewModel extends StreamViewModel {
   @override
   void dispose() {
     super.dispose();
-    updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
-    updateUserDataWithKey(DatabaseMessageField.aniType, null);
-    updateUserDataWithKey(DatabaseMessageField.roomUid, null);
-    updateUserDataWithKey(DatabaseMessageField.url, null);
-    updateUserDataWithKey(DatabaseMessageField.urlType, null);
     duleFocusNode.dispose();
     duleTech.dispose();
     otherTech.dispose();
@@ -171,19 +165,24 @@ class DuleViewModel extends StreamViewModel {
     }
   }
 
-  // getting animation Value
-  Future<String> getAnimationValue({
-    required BuildContext context,
-    required ConfettiController confettiController,
-    required AnimationController spotlightController,
-  }) async {
-    final val = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const LiveChatAnimations(),
-      ),
-    );
-    return val;
+  Future<void> updateAnimation(String? value) async {
+    switch (value) {
+      case AnimationType.confetti:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, value);
+        }
+
+        break;
+      case AnimationType.balloons:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, value);
+        }
+        break;
+      default:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, null);
+        }
+    }
   }
 
   // Pick File From Gallery
@@ -259,6 +258,14 @@ class DuleViewModel extends StreamViewModel {
     return downloadURL;
   }
 
+  Stream<Event> realtimeDBDocument() {
+    return FirebaseDatabase.instance
+        .reference()
+        .child(dulesRealtimeDBKey)
+        .child(fireUser.id)
+        .onValue;
+  }
+
   @override
-  Stream<Event> get stream => databaseService.getUserData(fireUser.id);
+  Stream<Event> get stream => realtimeDBDocument();
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
@@ -21,21 +22,25 @@ class PickInterestsViewModel extends BaseViewModel {
   }
 
   Future<void> createUserInFirebase(BuildContext context,
-      {required String displayName,
+      {required String country,
+      required GeoPoint location,
       required String phoneNumber,
+      required String displayName,
       required String countryPhoneCode}) async {
     setBusy(true);
     firestoreApi
         .createUserInFirebase(
+            country: country,
+            location: location,
             username: displayName,
-            user: AuthService.liveUser!,
             phoneNumber: phoneNumber,
+            user: AuthService.liveUser!,
             countryPhoneCode: countryPhoneCode,
             interests: userSelectedInterests)
         .then((value) async {
-          await databaseService.addUserData(AuthService.liveUser!.uid);
-          setBusy(false);
-          Navigator.pushAndRemoveUntil(
+      await databaseService.addUserData(AuthService.liveUser!.uid);
+      setBusy(false);
+      Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => ChatListView()),
           (route) => false);

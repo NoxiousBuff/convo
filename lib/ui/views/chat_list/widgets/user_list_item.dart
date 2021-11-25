@@ -41,9 +41,9 @@ class UserListItem extends StatelessWidget {
             );
           }
 
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: child,
+          return const AnimatedSwitcher(
+            duration:  Duration(milliseconds: 300),
+            child: Text('Data'),
           );
         });
   }
