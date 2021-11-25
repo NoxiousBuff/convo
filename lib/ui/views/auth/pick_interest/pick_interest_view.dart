@@ -33,6 +33,11 @@ class _PickInterestsViewState extends State<PickInterestsView> {
   late final GeoPoint geoPoint;
 
   final log = getLogger('PickInterests');
+  @override
+  void initState() {
+    lookUpGeopoint();
+    super.initState();
+  }
 
   Future<GeoPoint> lookUpGeopoint() async {
     final response =
@@ -72,12 +77,13 @@ class _PickInterestsViewState extends State<PickInterestsView> {
 
   @override
   void didUpdateWidget(covariant PickInterestsView oldWidget) {
-    lookUpGeopoint();
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
+    lookUpGeopoint();
+
     return ViewModelBuilder<PickInterestsViewModel>.reactive(
       viewModelBuilder: () => PickInterestsViewModel(),
       builder: (context, model, child) => Scaffold(

@@ -1,44 +1,96 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/database_service.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/ui/views/dule/dule_view.dart';
 
 class UserListItem extends StatelessWidget {
   const UserListItem({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
 
+  Widget userStatus(FireUser fireUser) {
+    return StreamBuilder<Event?>(
+        stream: FirebaseDatabase.instance
+            .reference()
+            .child(dulesRealtimeDBKey)
+            .child(fireUser.id)
+            .onValue,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (data != null) {
+            final snapshot = data.snapshot;
+            final json = snapshot.value.cast<String, dynamic>();
+            final duleModel = DuleModel.fromJson(json);
+            bool isOnline = duleModel.online;
+            return Text(
+              isOnline ? 'Online' : 'Offline',
+              style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                  color: isOnline ? AppColors.green : AppColors.darkGrey),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection(usersFirestoreKey)
-            .doc(userUid)
-            .get(),
-        builder: (context, snapshot) {
-          Widget child;
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('It has Error'),
-            );
-          }
-          if (!snapshot.hasData) {
-            child = loadingUserListItem(context);
-          } else {
-            FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
-            child = UserItem(
-              fireUser: fireUser,
-              onTap: () {},
-            );
-          }
-
-          return const AnimatedSwitcher(
-            duration:  Duration(milliseconds: 300),
-            child: Text('Data'),
+      future: FirebaseFirestore.instance
+          .collection(usersFirestoreKey)
+          .doc(userUid)
+          .get(),
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text('It has Error'),
           );
-        });
+        }
+        if (!snapshot.hasData) {
+          return loadingUserListItem(context);
+        } else {
+          if (data != null) {
+            final fireUser = FireUser.fromFirestore(data);
+            return ListTile(
+              onTap: () async {
+                String liveUserUid = AuthService.liveUser!.uid;
+                String value =
+                    chatService.getConversationId(fireUser.id, liveUserUid);
+                await databaseService.updateUserDataWithKey(
+                    DatabaseMessageField.roomUid, value);
+                navService.cupertinoPageRoute(
+                    context, DuleView(fireUser: fireUser));
+              },
+              leading: ClipOval(
+                child: ExtendedImage(image: NetworkImage(fireUser.photoUrl)),
+              ),
+              title: Text(
+                fireUser.username,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              subtitle: userStatus(fireUser),
+            );
+          }
+        }
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: loadingUserListItem(context),
+        );
+      },
+    );
   }
 
   Widget loadingUserListItem(BuildContext context) {

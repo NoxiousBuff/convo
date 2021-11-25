@@ -10,7 +10,7 @@ class FireUser {
   final List<dynamic> hashTags;
   final String photoUrl;
   final String username;
-  final GeoPoint position;
+  final Map<String, dynamic> position;
   final List<dynamic> interests;
   final Timestamp userCreated;
   final String countryPhoneCode;

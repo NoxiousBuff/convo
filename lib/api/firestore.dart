@@ -1,3 +1,4 @@
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -38,15 +39,12 @@ class FirestoreApi {
             getLogger('FirestoreApi').e("Failed to update user: $error"));
   }
 
-  Future<void> addToRecentList(String id, String fireUserId) async {
-    _firestore
-        .collection(usersFirestoreKey)
-        .doc(id)
-        .collection(recentFirestoreKey)
-        .doc(fireUserId)
-        .set({'userUid': fireUserId}).catchError((e) {
-      log.e('addToRecent Error:$e');
-    }).whenComplete(() => log.wtf('Added In Recent List'));
+  Future<void> addToRecentList(String liveUserUid) async {
+    final value = {
+      RecentUserField.uid: liveUserUid,
+      RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch
+    };
+    hiveApi.saveInHive(HiveApi.recentChatsHiveBox, liveUserUid, value);
   }
 
   Future<void> createUserInFirebase({
@@ -76,7 +74,7 @@ class FirestoreApi {
         FireUserField.userCreated: Timestamp.now(),
       });
       log.i('User has been successfully created with details $user');
-      await addToRecentList(user.uid, user.uid);
+      await addToRecentList(user.uid);
     } catch (e) {
       log.w('Creating user in firebase failed. Error : $e');
       if (onError != null) onError();
