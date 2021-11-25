@@ -16,9 +16,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/dule/dule_view.dart';
 
 class UserListItem extends StatelessWidget {
-  UserListItem({Key? key, required this.userUid}) : super(key: key);
+  const UserListItem({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
-  final ChatService chatService = ChatService();
 
   Widget userStatus(FireUser fireUser) {
     return StreamBuilder<Event?>(
