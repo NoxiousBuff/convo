@@ -3,13 +3,9 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/recent_user.dart';
-<<<<<<< HEAD
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/nav_service.dart';
-=======
 import 'package:hint/ui/shared/ui_helpers.dart';
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hive/hive.dart';
@@ -20,14 +16,6 @@ import 'package:hint/app/app_logger.dart';
 
 import 'chat_list_viewmodel.dart';
 
-<<<<<<< HEAD
-class ChatListView extends StatefulWidget {
-  const ChatListView({Key? key}) : super(key: key);
-
-  @override
-  State<ChatListView> createState() => _ChatListViewState();
-}
-=======
 class ChatListView extends StatefulWidget  {
   const ChatListView({Key? key}) : super(key: key);
 
@@ -37,10 +25,7 @@ class ChatListView extends StatefulWidget  {
 }
 
 class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClientMixin<ChatListView> {
-  final log = getLogger('ChatListView');
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
-
-class _ChatListViewState extends State<ChatListView> {
+ 
   final log = getLogger('ChatListView');
   late final FireUser currentFireUser;
   final ChatListViewModel model = ChatListViewModel();
@@ -89,16 +74,7 @@ class _ChatListViewState extends State<ChatListView> {
                       child: IconButton(
                         icon: const Icon(FeatherIcons.userPlus),
                         onPressed: () {
-<<<<<<< HEAD
-                          navService.materialPageRoute(
-                            context,
-                            DistantView(
-                              currentFireUser: currentFireUser,
-                            ),
-                          );
-=======
                           
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
                         },
                       ),
                     ),
@@ -107,16 +83,7 @@ class _ChatListViewState extends State<ChatListView> {
                       child: IconButton(
                         icon: const Icon(FeatherIcons.send),
                         onPressed: () {
-<<<<<<< HEAD
-                          navService.materialPageRoute(
-                            context,
-                            DistantView(
-                              currentFireUser: currentFireUser,
-                            ),
-                          );
-=======
                           mainViewPageController.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
                         },
                       ),
                     ),

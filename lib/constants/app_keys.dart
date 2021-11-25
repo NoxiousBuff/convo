@@ -7,9 +7,4 @@ const String recentFirestoreKey = 'recentChats';
 const String subsFirestoreKey = 'subs';
 const String dulesRealtimeDBKey = 'dules';
 const String defaultImagesFolder = 'Images/Samples';
-<<<<<<< HEAD
-const String appName = 'Convo';
-=======
-
 const String appName = 'Dule';
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea

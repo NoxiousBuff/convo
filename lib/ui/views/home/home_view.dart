@@ -40,23 +40,15 @@ class _HomeViewState extends State<HomeView> {
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-<<<<<<< HEAD
-              return const  ChatListView();
-=======
-              return  const MainView();
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
+              return const MainView();
             case 1:
               return const ExploreView();
             case 2:
               return const DiscoverView();
             case 3:
-              return const DistantView();
+              return const MainView();
             default:
-<<<<<<< HEAD
-              return const ChatListView();
-=======
-              return  const MainView();
->>>>>>> c069fe14f9f4bcca90b9ed84715259209cd149ea
+              return const MainView();
           }
         },
       ),
