@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/discover/discover_view.dart';
-import 'package:hint/ui/views/distant_view/distant_view.dart';
-import 'package:hint/ui/views/explore/explore_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/ui/views/main/main_view.dart';
+import 'package:hint/ui/views/explore/explore_view.dart';
+import 'package:hint/ui/views/discover/discover_view.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);

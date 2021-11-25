@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
@@ -14,6 +13,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:hint/ui/views/dule/dule_viewmodel.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -57,7 +57,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     confettiController.dispose();
     balloonsController.dispose();
     databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, null);
-    databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, null);
+    databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
 
     hiveApi.saveInHive(HiveApi.recentChatsHiveBox, widget.fireUser.id, {
       RecentUserField.uid: widget.fireUser.id,

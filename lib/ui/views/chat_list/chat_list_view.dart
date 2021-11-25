@@ -5,7 +5,6 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/recent_user.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/auth_service.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hive/hive.dart';
