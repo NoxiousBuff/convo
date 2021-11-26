@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/database_service.dart';
-import 'package:hint/ui/views/main/main_view.dart';
+import 'package:hint/ui/views/home/home_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -26,23 +26,27 @@ class PickInterestsViewModel extends BaseViewModel {
       required GeoPoint location,
       required String phoneNumber,
       required String displayName,
-      required String countryPhoneCode}) async {
+      required String countryPhoneCode,
+      required String username
+      }) async {
     setBusy(true);
     firestoreApi
         .createUserInFirebase(
             country: country,
             location: location,
-            username: displayName,
+            displayName: displayName,
             phoneNumber: phoneNumber,
             user: AuthService.liveUser!,
             countryPhoneCode: countryPhoneCode,
-            interests: userSelectedInterests)
+            interests: userSelectedInterests,
+            username: username,
+            )
         .then((value) async {
       await databaseService.addUserData(AuthService.liveUser!.uid);
       setBusy(false);
       Navigator.pushAndRemoveUntil(
           context,
-          CupertinoPageRoute(builder: (context) =>  const MainView()),
+          CupertinoPageRoute(builder: (context) =>  const HomeView()),
           (route) => false);
     });
   }

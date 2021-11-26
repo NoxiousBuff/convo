@@ -22,7 +22,7 @@ class DiscoverView extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(FeatherIcons.shield),
+                icon: const Icon(FeatherIcons.refreshCcw),
                 color: Colors.black,
                 iconSize: 24,
               ),
@@ -31,7 +31,8 @@ class DiscoverView extends StatelessWidget {
                 icon: const Icon(FeatherIcons.pocket),
                 color: Colors.black,
                 iconSize: 24,
-              )
+              ),
+              horizontalSpaceSmall
             ],
             elevation: 0.0,
             toolbarHeight: 60,

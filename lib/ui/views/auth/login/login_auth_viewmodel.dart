@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/views/main/main_view.dart';
+import 'package:hint/ui/views/home/home_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -43,9 +43,10 @@ class LoginAuthViewModel extends BaseViewModel {
         email: email,
         password: password,
         onComplete: () {
+          
         Navigator.pushAndRemoveUntil(
         context,
-        CupertinoPageRoute(builder: (context) =>  const MainView()),
+        CupertinoPageRoute(builder: (context) =>  const HomeView()),
         (route) => false);
           return customSnackbars.successSnackbar(context,
               title: 'You have been successfully logged in.');

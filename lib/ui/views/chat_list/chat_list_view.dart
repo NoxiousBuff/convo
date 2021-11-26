@@ -119,7 +119,7 @@ class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClie
                       child: IconButton(
                         icon: const Icon(FeatherIcons.send),
                         onPressed: () {
-                          mainViewPageController.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+                          mainViewPageController.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
                         },
                       ),
                     ),
@@ -144,6 +144,7 @@ class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClie
                         recentList
                             .sort((a, b) => a.timestamp.compareTo(b.timestamp));
                         return ListView.builder(
+                          padding: const EdgeInsets.all(0),
                             shrinkWrap: true,
                             itemCount: recentList.length,
                             itemBuilder: (context, i) {

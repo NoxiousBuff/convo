@@ -55,9 +55,7 @@ class DistantView extends StatelessWidget {
                   ),
                   const Divider(height: 0.0),
                   InkWell(
-                    onTap: () {
-                      // navService.materialPageRoute(context, const UsernameAuthView());
-                    },
+                    onTap: () {},
                     child: const ListTile(
                       title: Text('Groups'),
                       leading: Icon(CupertinoIcons.person_2),

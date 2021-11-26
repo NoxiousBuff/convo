@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
@@ -23,12 +24,19 @@ class AuthService {
     Function? randomError,
   }) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
         email: email,
         password: password,
-      );
+      ).then((value) async {
+        await firestoreApi.addToRecentList(value.user!.uid);
+        log.wtf(value.user!.uid.toString());
+        return value;
+      });
       log.i('User has been created in the firebase authentication.');
+      // final userData = userCredential.user;
+      
+      // if (userData != null) await firestoreApi.addToRecentList(userData.uid);
       await userCredential.user!.sendEmailVerification();
       onComplete();
     } on FirebaseAuthException catch (e) {
@@ -69,10 +77,10 @@ class AuthService {
         if (noAccountExists != null) noAccountExists();
       } else if (e.code == 'invalid-email') {
         log.e(e.message);
-        if(invalidEmail != null) invalidEmail();
+        if (invalidEmail != null) invalidEmail();
       } else if (e.code == 'wrong-password') {
         log.e(e.message);
-        if(wrongPassword != null) wrongPassword();
+        if (wrongPassword != null) wrongPassword();
       } else {
         log.e(e.message);
         if (onError != null) onError();
@@ -92,22 +100,25 @@ class AuthService {
   }
 
   Future<void> forgotPassword(String email,
-      {Function? onComplete, Function? noAccountExists, Function? invalidEmailAddress, Function? onError}) async {
+      {Function? onComplete,
+      Function? noAccountExists,
+      Function? invalidEmailAddress,
+      Function? onError}) async {
     try {
       await _auth.sendPasswordResetEmail(email: email).then((value) {
-      if (onComplete != null) onComplete();
-      log.i(
-          'The user with email : $email has been successfully sent a password reset email.');
-    });
+        if (onComplete != null) onComplete();
+        log.i(
+            'The user with email : $email has been successfully sent a password reset email.');
+      });
     } on FirebaseAuthException catch (e) {
-      if(e.code == 'auth/invalid-email') {
+      if (e.code == 'auth/invalid-email') {
         log.e(e.message);
-        if(invalidEmailAddress != null) invalidEmailAddress();
-      } else if( e.code == 'auth/user-not-found') {
+        if (invalidEmailAddress != null) invalidEmailAddress();
+      } else if (e.code == 'auth/user-not-found') {
         log.e(e.message);
-        if(noAccountExists != null) noAccountExists();
+        if (noAccountExists != null) noAccountExists();
       } else {
-        if(onError != null) onError();
+        if (onError != null) onError();
       }
     }
   }

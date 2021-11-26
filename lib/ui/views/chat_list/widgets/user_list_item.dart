@@ -68,16 +68,16 @@ class UserListItem extends StatelessWidget {
                 String liveUserUid = AuthService.liveUser!.uid;
                 String value =
                     chatService.getConversationId(fireUser.id, liveUserUid);
-                await databaseService.updateUserDataWithKey(
-                    DatabaseMessageField.roomUid, value);
                 navService.cupertinoPageRoute(
                     context, DuleView(fireUser: fireUser));
+                await databaseService.updateUserDataWithKey(
+                    DatabaseMessageField.roomUid, value);
               },
               leading: ClipOval(
                 child: ExtendedImage(image: NetworkImage(fireUser.photoUrl)),
               ),
               title: Text(
-                fireUser.username,
+                fireUser.displayName,
                 style: Theme.of(context).textTheme.headline6,
               ),
               subtitle: userStatus(fireUser),

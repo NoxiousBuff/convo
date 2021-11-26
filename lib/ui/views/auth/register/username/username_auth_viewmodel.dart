@@ -1,38 +1,47 @@
-import 'package:flutter/material.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/views/auth/pick_interest/pick_interest_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/constants/enums.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class UsernameAuthViewModel extends BaseViewModel {
-  final log = getLogger('UsernameAuthModel');
-  final String countryCode;
-  final String phoneNumber;
+class UserNameAuthViewModel extends BaseViewModel {
+  final log = getLogger('UserNameAuthViewModel');
 
-  UsernameAuthViewModel(this.countryCode, this.phoneNumber);
+  final userNameFormKey = GlobalKey<FormState>();
 
-  bool isDisplayNameEmpty = true;
+  final TextEditingController userNameTech = TextEditingController();
 
-  final TextEditingController displayNameTech = TextEditingController();
+  UserNameExists _doesExists = UserNameExists.didNotChecked;
+  UserNameExists get doesExists => _doesExists;
 
-  void updateDisplayNameEmpty() {
-    isDisplayNameEmpty = displayNameTech.text.isEmpty;
+  final FocusNode focusNode = FocusNode();
+
+  bool _isUserNameEmpty = true;
+  bool get isUserNameEmpty => _isUserNameEmpty;
+
+  void updateUserNameEmpty() {
+    _isUserNameEmpty = userNameTech.text.length < 3;
     notifyListeners();
   }
 
-  final displayNameFormKey = GlobalKey<FormState>();
-
-  Future<void> updateDisplayName(BuildContext context) async {
-    setBusy(true);
-    final liveUser = AuthService.liveUser;
-    if (liveUser != null) {
-      liveUser.updateDisplayName(displayNameTech.text);
-      setBusy(false);
-      navService.materialPageRoute(context, PickInterestsView(phoneNumber: phoneNumber, displayName: displayNameTech.text, countryCode: countryCode));
+  void findUsernameExistOrNot(String value) async {
+    if(value.length > 3) {
+      _doesExists = UserNameExists.checking;
+    notifyListeners();
+    final snapshotData = await FirebaseFirestore.instance.collection('users').where('username', isEqualTo: value).get();
+    final doc = snapshotData.docs;
+    if(doc.isNotEmpty) {
+      _doesExists = UserNameExists.no;
     } else {
-      customSnackbars.errorSnackbar(context, title: 'Something went wrong !!!');
+      _doesExists = UserNameExists.yes;
+    }
+    log.wtf(doc.toString());
+    log.wtf(_doesExists);
+    notifyListeners();
+    } else {
+      _doesExists = UserNameExists.tooShort;
+      notifyListeners();
     }
   }
+
 }

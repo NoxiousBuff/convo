@@ -5,7 +5,7 @@ import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/enums.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/views/auth/register/username/username_auth_view.dart';
+import 'package:hint/ui/views/auth/register/displayname/displayname_auth_view.dart';
 import 'package:stacked/stacked.dart';
 
 class PhoneAuthViewModel extends BaseViewModel {
@@ -85,7 +85,7 @@ class PhoneAuthViewModel extends BaseViewModel {
   Future<void> linkPhoneToUser(BuildContext context, PhoneAuthCredential credential) async {
     setBusyForObject(otpChecking, true);
     await FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential).then((value){
-      navService.materialPageRoute(context, UsernameAuthView(phoneNumber: phoneTech.text, countryCode: '+$countryCode',));
+      navService.materialPageRoute(context, DisplayNameAuthView(phoneNumber: phoneTech.text, countryCode: '+$countryCode',));
     }).catchError((e) {
       customSnackbars.errorSnackbar(context, title: e.toString());
       setBusyForObject(otpChecking, false);

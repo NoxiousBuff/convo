@@ -15,7 +15,7 @@ class SearchViewModel extends BaseViewModel {
   void handleSearch(String query) {
     Future<QuerySnapshot>? searchResults = usersCollection
         .where(
-          'username',
+          'display',
           isGreaterThanOrEqualTo: query,
           isLessThan: query.substring(0, query.length - 1) +
               String.fromCharCode(query.codeUnitAt(query.length - 1) + 1),

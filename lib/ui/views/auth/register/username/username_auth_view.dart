@@ -1,67 +1,81 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/constants/enums.dart';
+import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/custom_chips.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/auth/pick_interest/pick_interest_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
 import 'username_auth_viewmodel.dart';
 
-class UsernameAuthView extends StatelessWidget {
-  const UsernameAuthView(
-      {Key? key, required this.countryCode, required this.phoneNumber})
+class UserNameAuthView extends StatelessWidget {
+  const UserNameAuthView(
+      {Key? key,
+      required this.countryCode,
+      required this.displayName,
+      required this.phoneNumber})
       : super(key: key);
+
   final String countryCode;
   final String phoneNumber;
+  final String displayName;
 
-  static const String id = '/UsernameAuthView';
+  static const String id = '/UserNameAuthView';
 
   @override
   Widget build(BuildContext context) {
-    final log = getLogger('UsernameAuthView');
-    return ViewModelBuilder<UsernameAuthViewModel>.reactive(
-      viewModelBuilder: () => UsernameAuthViewModel(countryCode, phoneNumber),
+    final log = getLogger('UserNameAuthView');
+    return ViewModelBuilder<UserNameAuthViewModel>.reactive(
+      viewModelBuilder: () => UserNameAuthViewModel(),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
-        appBar: cwAuthAppBar(context, title: 'Choose a Display Name'),
+        appBar: cwAuthAppBar(context, title: 'Find a username'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Form(
-            key: model.displayNameFormKey,
+            key: model.userNameFormKey,
             child: Stack(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     verticalSpaceRegular,
-                    cwAuthHeadingTitle(context, title: 'What\'s your \nname '),
+                    cwAuthHeadingTitle(context, title: 'Pick your \nusername '),
                     verticalSpaceSmall,
                     cwAuthDescription(context,
                         title:
-                            'Choose a display name - That\'s what your friends will see.'),
+                            'Find a catchy and unique username so\nyour friends can find you easily.'),
                     verticalSpaceRegular,
                     TextFormField(
-                      controller: model.displayNameTech,
+                      controller: model.userNameTech,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return customSnackbars.errorSnackbar(context,
-                              title: 'Display name cannot be empty.');
+                              title: 'Username cannot be empty.');
                         } else if (value.length < 3) {
                           return customSnackbars.errorSnackbar(context,
-                              title: 'Display name cannot be that short.');
+                              title: 'Username cannot be that short.');
                         } else {
                           return null;
                         }
                       },
+                      focusNode: model.focusNode,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (value) {
                         log.wtf('on field submitted');
                       },
-                      onChanged: (value) => model.updateDisplayNameEmpty(),
+                      onChanged: (value) {
+                        model.updateUserNameEmpty();
+                        model.findUsernameExistOrNot(value);
+                      },
                       textCapitalization: TextCapitalization.none,
                       autofocus: true,
-                      autofillHints: const [AutofillHints.name],
+                      autofillHints: const [AutofillHints.nickname],
                       style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
@@ -70,13 +84,50 @@ class UsernameAuthView extends StatelessWidget {
                       cursorColor: LightAppColors.primary,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
-                        hintText: 'Name',
+                        hintText: '@username',
                         hintStyle: TextStyle(
                             fontSize: 28, fontWeight: FontWeight.w700),
                         contentPadding: EdgeInsets.all(0),
                         border: OutlineInputBorder(
                             borderSide: BorderSide.none, gapPadding: 0.0),
                       ),
+                    ),
+                    verticalSpaceRegular,
+                    Builder(
+                      builder: (context) {
+                        Widget child;
+                        switch (model.doesExists) {
+                          case UserNameExists.tooShort:
+                            child = model.userNameTech.text.length < 4
+                                ? customChips.errorChip('Username too short.')
+                                : const Text('');
+                            break;
+                          case UserNameExists.yes:
+                            child = model.userNameTech.text.length > 3
+                                ? customChips.successChip('Username exists')
+                                : const Text('');
+                            break;
+                          case UserNameExists.no:
+                            child = model.userNameTech.text.length > 3
+                                ? customChips
+                                    .errorChip('Username does not exists')
+                                : const Text('');
+                            break;
+                          case UserNameExists.checking:
+                            child = model.userNameTech.text.length > 3
+                                ? customChips.progressChip()
+                                : const Text('');
+                            break;
+                          default:
+                            {
+                              child = const Text('');
+                            }
+                        }
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: child,
+                        );
+                      },
                     ),
                     bottomPadding(context),
                   ],
@@ -88,14 +139,29 @@ class UsernameAuthView extends StatelessWidget {
                     children: [
                       cwAuthProceedButton(
                         context,
-                        buttonTitle: 'Done',
+                        buttonTitle: 'Got it',
                         isLoading: model.isBusy,
-                        isActive: !model.isDisplayNameEmpty,
+                        isActive: !model.isUserNameEmpty &&
+                            model.doesExists == UserNameExists.yes,
                         onTap: () async {
                           final validate =
-                              model.displayNameFormKey.currentState!.validate();
+                              model.userNameFormKey.currentState!.validate();
                           if (validate) {
-                            model.updateDisplayName(context);
+                            if (model.userNameTech.text.length > 3 &&
+                                model.doesExists == UserNameExists.yes) {
+                              model.setBusy(true);
+                              model.focusNode.unfocus();
+                              navService.cupertinoPageRoute(
+                                context,
+                                PickInterestsView(
+                                  phoneNumber: phoneNumber,
+                                  countryCode: countryCode,
+                                  displayName: displayName,
+                                  username: model.userNameTech.text,
+                                ),
+                              );
+                              model.setBusy(false);
+                            }
                           }
                         },
                       ),

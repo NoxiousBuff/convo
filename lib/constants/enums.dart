@@ -14,3 +14,7 @@ enum TextFieldWidthState {
   max,
 }
 
+enum UserNameExists {
+  yes, no, didNotChecked, checking, tooShort
+}
+

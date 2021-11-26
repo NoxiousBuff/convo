@@ -5,7 +5,6 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/auth/login/login_auth_view.dart';
 import 'package:hint/ui/views/auth/register/credential/credential_auth_view.dart';
-import 'package:hint/ui/views/home/home_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'welcome_viewmodel.dart';
@@ -40,13 +39,13 @@ class WelcomeView extends StatelessWidget {
                 navService.cupertinoPageRoute(context, const LoginAuthView());
               }),
               verticalSpaceLarge,
-              cwAuthProceedButton(context,
-                  buttonTitle: 'Skip',
-                  isLoading: false,
-                  isActive: true, onTap: () {
-                navService.cupertinoPageRoute(context, const HomeView());
-              }),
-              verticalSpaceLarge,
+              // cwAuthProceedButton(context,
+              //     buttonTitle: 'Skip',
+              //     isLoading: false,
+              //     isActive: true, onTap: () {
+              //   navService.cupertinoPageRoute(context, const HomeView());
+              // }),
+              // verticalSpaceLarge,
               bottomPadding(context,)
             ],
           ),

@@ -15,3 +15,4 @@ class RecentUser {
         RecentUserField.timestamp: timestamp,
       };
 }
+ 

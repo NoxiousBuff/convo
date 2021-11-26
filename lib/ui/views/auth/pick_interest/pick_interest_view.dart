@@ -15,7 +15,9 @@ class PickInterestsView extends StatefulWidget {
       {Key? key,
       required this.countryCode,
       required this.displayName,
-      required this.phoneNumber})
+      required this.phoneNumber,
+      required this.username,
+      })
       : super(key: key);
 
   static const String id = '/PickInterestsView';
@@ -23,6 +25,7 @@ class PickInterestsView extends StatefulWidget {
   final String displayName;
   final String countryCode;
   final String phoneNumber;
+  final String username;
 
   @override
   State<PickInterestsView> createState() => _PickInterestsViewState();
@@ -244,7 +247,9 @@ class _PickInterestsViewState extends State<PickInterestsView> {
                       country: _countryName,
                       phoneNumber: widget.phoneNumber,
                       displayName: widget.displayName,
-                      countryPhoneCode: widget.countryCode);
+                      countryPhoneCode: widget.countryCode,
+                      username: widget.username,
+                      );
                 },
               ),
               verticalSpaceLarge,

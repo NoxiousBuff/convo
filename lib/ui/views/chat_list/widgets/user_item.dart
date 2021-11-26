@@ -53,7 +53,7 @@ class UserItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                fireUser.username,
+                fireUser.displayName,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 24.0),
               ),
@@ -125,7 +125,7 @@ class UserItem extends StatelessWidget {
                 height: 56.0,
                 width: 56.0,
                 child: Text(
-                  fireUser.username[0].toUpperCase(),
+                  fireUser.displayName[0].toUpperCase(),
                   style: const TextStyle(
                     color: black,
                     fontWeight: FontWeight.w600,
@@ -138,7 +138,7 @@ class UserItem extends StatelessWidget {
           title: Padding(
             padding: const EdgeInsets.only(bottom: 5.0),
             child: Text(
-              fireUser.username,
+              fireUser.displayName,
               style: const TextStyle(
                 fontSize: 20,
                 color: black,

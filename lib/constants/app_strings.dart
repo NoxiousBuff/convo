@@ -58,11 +58,17 @@ class FireUserField {
   static const country = 'country';
   static const hashTags = 'hashTags';
   static const photoUrl = 'photoUrl';
-  static const username = 'username';
+  static const displayName = 'displayName';
   static const position = 'position';
   static const interests = 'interests';
   static const userCreated = 'userCreated';
   static const countryPhoneCode = 'countryPhoneCode';
+  static const username = 'username';
+  static const blocked = 'blocked';
+  static const blockedBy = 'blockedBy';
+  static const romanticStatus = 'romanticStatus';
+  static const dob = 'dob';
+  static const gender = 'gender';
 }
 
 class DatabaseMessageField {

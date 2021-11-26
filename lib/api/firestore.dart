@@ -44,13 +44,14 @@ class FirestoreApi {
       RecentUserField.uid: liveUserUid,
       RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch
     };
-    hiveApi.saveInHive(HiveApi.recentChatsHiveBox, liveUserUid, value);
+    await hiveApi.saveInHive(HiveApi.recentChatsHiveBox, liveUserUid, value);
   }
 
   Future<void> createUserInFirebase({
     Function? onError,
     required User user,
     required String country,
+    required String displayName,
     required String username,
     required GeoPoint location,
     required String phoneNumber,
@@ -70,8 +71,14 @@ class FirestoreApi {
         FireUserField.phone: phoneNumber,
         FireUserField.position: position,
         FireUserField.photoUrl: kDefaultPhotoUrl,
-        FireUserField.username: username,
+        FireUserField.displayName: displayName,
         FireUserField.userCreated: Timestamp.now(),
+        FireUserField.username : username,
+        FireUserField.blocked : [],
+        FireUserField.blockedBy : [],
+        FireUserField.romanticStatus : 'Prefer Not To Say',
+        FireUserField.gender : 'Prefer Not To Say',
+        FireUserField.dob : null
       });
       log.i('User has been successfully created with details $user');
       await addToRecentList(user.uid);
@@ -100,16 +107,29 @@ class FirestoreApi {
     }
   }
 
-  Future<void> changeUserDisplayName(String username) async {
+  Future<void> changeUserName(String userName) async {
     final currentUser = auth.currentUser!;
     await usersCollection
         .doc(currentUser.uid)
-        .update({'username': username})
+        .update({'userName': userName})
         .then((value) => log.i(
-            'User display name : $username has been successfully changed in firestore.'))
+            'Username : $userName has been successfully changed in firestore.'))
         .onError((error, stackTrace) {
           log.w(
-              'There has been an error in changing username : $username in firebase.');
+              'There has been an error in changing userName : $userName in firebase.');
+        });
+  }
+
+  Future<void> changeUserDisplayName(String displayName) async {
+    final currentUser = auth.currentUser!;
+    await usersCollection
+        .doc(currentUser.uid)
+        .update({'displayName': displayName})
+        .then((value) => log.i(
+            'User display name : $displayName has been successfully changed in firestore.'))
+        .onError((error, stackTrace) {
+          log.w(
+              'There has been an error in changing displayName : $displayName in firebase.');
         });
   }
 

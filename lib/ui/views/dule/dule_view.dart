@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/ui/views/chat_list/widgets/light_clipper.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +90,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   maxLines: null,
                   readOnly: true,
                   cursorHeight: 28,
+                  maxLength: 160,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   controller: model.otherTech,
                   cursorColor: AppColors.blue,
                   textAlign: TextAlign.center,
@@ -136,7 +140,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       y = size.height * 0.710;
     });
     final decoration = BoxDecoration(
-        color: incongonatedMode ? transparent : AppColors.grey.withOpacity(0.5),
+        color: incongonatedMode ? transparent : AppColors.grey,
         borderRadius: BorderRadius.circular(32));
     const systemUIOverlay =
         SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark);
@@ -152,11 +156,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           );
         }
         return Scaffold(
+          extendBodyBehindAppBar: true,
           appBar: AppBar(
+            
             elevation: 0,
             leadingWidth: 100,
             centerTitle: true,
-            backgroundColor: incongonatedMode ? black : transparent,
+            
+            backgroundColor: transparent,
             automaticallyImplyLeading: false,
             systemOverlayStyle: systemUIOverlay,
             leading: Row(
@@ -165,7 +172,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               children: [
                 IconButton(
                   padding: const EdgeInsets.all(8),
-                  icon: const Icon(Icons.arrow_back_ios),
+                  icon: const Icon(FeatherIcons.arrowLeft),
                   color: incongonatedMode ? systemBackground : black,
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -183,7 +190,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               ],
             ),
             title: Text(
-              widget.fireUser.username,
+              widget.fireUser.displayName,
               style: Theme.of(context)
                   .textTheme
                   .bodyText1!
@@ -211,7 +218,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                         decoration: const BoxDecoration(
                           gradient: RadialGradient(
                             radius: 0.5,
-                            center: Alignment(0.1, -0.6),
+                            center: Alignment(0.0, -0.3),
                             colors: [
                               systemBackground,
                               black,
@@ -235,7 +242,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               ),
               Column(
                 children: [
-                  verticalSpaceSmall,
+                  topPadding(context),
+                  const SizedBox(height: 56),
                   Expanded(
                     flex: model.otherFlexFactor,
                     child: Padding(
@@ -266,8 +274,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                           onChanged: (value) {
                             model.updateWordLengthLeft(value);
                             model.updatTextFieldWidth();
-                            model.updateUserDataWithKey(
+                            if (value.length <= 160) {
+                              model.updateUserDataWithKey(
                                 DatabaseMessageField.msgTxt, value);
+                            }
                           },
                           maxLength: 160,
                           maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -295,7 +305,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                         decoration: BoxDecoration(
                             color: incongonatedMode
                                 ? transparent
-                                : AppColors.blue.withOpacity(0.5),
+                                : AppColors.blue,
                             borderRadius: BorderRadius.circular(32)),
                       ),
                     ),
@@ -307,7 +317,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                         horizontalSpaceRegular,
                         IconButton(
                           onPressed: () => model.updateDuleFocus(),
-                          icon: const Icon((CupertinoIcons.keyboard)),
+                          icon: const Icon(FeatherIcons.edit3),
                           color: model.duleFocusNode.hasFocus
                               ? AppColors.blue
                               : inactiveGray,
@@ -357,19 +367,19 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                               },
                             );
                           },
-                          icon: const Icon((Icons.animation)),
+                          icon: const Icon(FeatherIcons.loader),
                           color: inactiveGray,
                           iconSize: 32,
                         ),
                         IconButton(
                           onPressed: () => model.pickImage(context),
-                          icon: const Icon((CupertinoIcons.camera)),
+                          icon: const Icon(FeatherIcons.camera),
                           color: inactiveGray,
                           iconSize: 32,
                         ),
                         IconButton(
                           onPressed: () => model.pickFromGallery(context),
-                          icon: const Icon((Icons.photo_library_outlined)),
+                          icon: const Icon(FeatherIcons.image),
                           color: inactiveGray,
                           iconSize: 32,
                         ),
@@ -380,22 +390,23 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                               .textTheme
                               .bodyText1!
                               .copyWith(
-                                color: incongonatedMode ? inactiveGray : black,
+                                color: incongonatedMode ? inactiveGray : inactiveGray,
                               ),
                         ),
                         IconButton(
                           onPressed: () {
                             model.clearMessage();
                           },
-                          icon: const Icon((Icons.restart_alt)),
+                          icon: const Icon((FeatherIcons.refreshCcw)),
                           color:
                               model.isDuleEmpty ? inactiveGray : AppColors.red,
                           iconSize: 32,
                         ),
+                        horizontalSpaceTiny,
                       ],
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  bottomPadding(context),
                 ],
               ),
               Positioned(
@@ -434,21 +445,4 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   }
 }
 
-class LightClipper extends CustomClipper<Path> {
-  final double x, y;
-  final double radius;
-  LightClipper(this.x, this.y, {this.radius = 50.0});
 
-  @override
-  Path getClip(Size size) {
-    final circlePath = Path()
-      ..addOval(Rect.fromCircle(center: Offset(x, y), radius: radius));
-    final fullPath = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    return Path.combine(PathOperation.reverseDifference, circlePath, fullPath);
-  }
-
-  @override
-  bool shouldReclip(LightClipper oldClipper) =>
-      x != oldClipper.x || y != oldClipper.y;
-}

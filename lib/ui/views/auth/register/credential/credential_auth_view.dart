@@ -100,7 +100,7 @@ class CredentialAuthView extends StatelessWidget {
                       cursorHeight: 32,
                       decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: AppColors.blue,
+                            color: LightAppColors.secondary,
                             icon: Icon(model.isPasswordShown
                                 ? FeatherIcons.eye
                                 : FeatherIcons.eyeOff),
