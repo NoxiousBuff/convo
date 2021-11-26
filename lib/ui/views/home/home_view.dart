@@ -40,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              return  const MainView();
+              return const MainView();
             case 1:
               return const ExploreView();
             case 2:
@@ -48,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
             case 3:
               return const ProfileView();
             default:
-              return  const MainView();
+              return const MainView();
           }
         },
       ),

@@ -59,6 +59,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     confettiController.dispose();
     balloonsController.dispose();
     databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, null);
+    databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+
     hiveApi.saveInHive(HiveApi.recentChatsHiveBox, widget.fireUser.id, {
       RecentUserField.uid: widget.fireUser.id,
       RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch,
