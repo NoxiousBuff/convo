@@ -1,15 +1,16 @@
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
+import 'privacy_viewmodel.dart';
+import 'package:hive/hive.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 
-import 'privacy_viewmodel.dart';
-
-class Privacy extends StatelessWidget {
-  const Privacy({Key? key}) : super(key: key);
+class PrivacyView extends StatelessWidget {
+  const PrivacyView({Key? key}) : super(key: key);
 
   Widget heading({required BuildContext context, required String title}) {
     return ListTile(
@@ -70,7 +71,7 @@ class Privacy extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: activeBlue,
+              activeColor: AppColors.blue,
               groupValue: model.lastSeenValue,
               title: Text(
                 model.dialogptions[index],
@@ -78,7 +79,7 @@ class Privacy extends StatelessWidget {
               ),
               onChanged: (int? i) {
                 model.currentIndex(i);
-                getLogger('Privacy')
+                getLogger('PrivacyView')
                     .wtf("LastSeenValue:${model.lastSeenValue}");
                 Navigator.pop(context);
               },
@@ -103,7 +104,7 @@ class Privacy extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: activeBlue,
+              activeColor: AppColors.blue,
               groupValue: model.profileValue,
               title: Text(
                 model.dialogptions[index],
@@ -111,7 +112,7 @@ class Privacy extends StatelessWidget {
               ),
               onChanged: (int? i) {
                 model.photoValueIndex(i);
-                getLogger('Privacy')
+                getLogger('PrivacyView')
                     .wtf("ProfilePhotValue:${model.profileValue}");
                 Navigator.pop(context);
               },
@@ -135,7 +136,7 @@ class Privacy extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: activeBlue,
+              activeColor: AppColors.blue,
               groupValue: model.aboutValue,
               title: Text(
                 model.dialogptions[index],
@@ -143,7 +144,7 @@ class Privacy extends StatelessWidget {
               ),
               onChanged: (int? i) {
                 model.aboutValueIndex(i);
-                getLogger('Privacy').wtf("AboutValue:${model.aboutValue}");
+                getLogger('PrivacyView').wtf("AboutValue:${model.aboutValue}");
                 Navigator.pop(context);
               },
             ),
@@ -159,41 +160,58 @@ class Privacy extends StatelessWidget {
       viewModelBuilder: () => PrivacyViewModel(),
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: extraLightBackgroundGray,
+          appBar: CupertinoNavigationBar(
+            backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: true,
+            leading: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'PrivacyView',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ],
+            ),
+          ),
           body: SizedBox(
             width: screenWidth(context),
             height: screenHeight(context),
             child: Column(
               children: [
-                SizedBox(
-                  height: screenHeightPercentage(context, percentage: 0.2),
-                  child: CustomScrollView(
-                    slivers: [
-                      CupertinoSliverNavigationBar(
-                        border: Border.all(color: Colors.transparent),
-                        backgroundColor: Colors.transparent,
-                        leading: IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(
-                            FeatherIcons.arrowLeft,
-                            color: activeBlue,
-                          ),
-                        ),
-                        largeTitle: Text(
-                          'Privacy & Safety',
-                          style: Theme.of(context).textTheme.headline4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 Container(
-                  color: systemBackground,
+                  color: AppColors.white,
                   child: Column(
                     children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16, top: 16),
+                          child: Text(
+                            'Who can see my personal info',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(color: Colors.black54),
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        subtitle: Text(
+                          'If you dpn\'t share your username, Online status, you won\'t be able to see others people details.',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ),
                       widget(
                         context: context,
-                        text: 'Last seen',
+                        text: 'Online Status',
                         subtitle: viewModel.lastSeenSubtitle,
                         onTap: () => lastSeenDialog(viewModel, context),
                       ),
@@ -205,7 +223,7 @@ class Privacy extends StatelessWidget {
                       ),
                       widget(
                         context: context,
-                        text: 'About',
+                        text: 'Bio',
                         subtitle: viewModel.aboutSubtitle,
                         onTap: () => aboutDialog(viewModel, context),
                       ),
@@ -214,17 +232,30 @@ class Privacy extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Container(
-                  color: systemBackground,
+                  color: AppColors.white,
                   child: ListTile(
-                    title: Text(
-                      'Read receipts',
-                      style: Theme.of(context).textTheme.bodyText2,
+                    isThreeLine: true,
+                    title: const Text('Incognated Mode'),
+                    trailing: ValueListenableBuilder<Box>(
+                      valueListenable:
+                          hiveApi.hiveStream(HiveApi.appSettingsBoxName),
+                      builder: (context, box, child) {
+                        const boxName = HiveApi.appSettingsBoxName;
+                        const key = AppSettingKeys.incognatedMode;
+                        bool incognatedMode =
+                            Hive.box(boxName).get(key, defaultValue: false);
+                        return CupertinoSwitch(
+                          value: incognatedMode,
+                          onChanged: (val) {
+                            box.put(
+                                AppSettingKeys.incognatedMode, !incognatedMode);
+                          },
+                        );
+                      },
                     ),
-                    subtitle: const Text(
-                        'If you truned off, you won\'t send or receive Read receipts.'),
-                    trailing: CupertinoSwitch(
-                      value: viewModel.readReceipts,
-                      onChanged: (value) => viewModel.readReceiptsBool(value),
+                    subtitle: Text(
+                      'If you on this setting no one can see your your online status and your username in live chat',
+                      style: Theme.of(context).textTheme.caption,
                     ),
                   ),
                 ),
@@ -255,7 +286,7 @@ class Privacy extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .caption!
-                    .copyWith(color: black)),
+                    .copyWith(color: AppColors.black)),
           ),
         ),
         const Divider(height: 0.0),

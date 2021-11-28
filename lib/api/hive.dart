@@ -21,20 +21,12 @@ class HiveApi {
     return Hive.box(hiveBoxName).listenable();
   }
 
-  Future<dynamic> getFromHive(String hiveBoxName, dynamic key) async {
-    bool doesBoxExist = await Hive.boxExists(hiveBoxName);
-    bool isBoxOpen = Hive.isBoxOpen(hiveBoxName);
-    if (!doesBoxExist && !isBoxOpen) {
-      await Hive.openBox(hiveBoxName);
+   dynamic getFromHive(String hiveBoxName, String key, ) {
+    try {
+     return Hive.box(hiveBoxName).get(key);
+    } catch (e) {
+      log.e('getFromHive Error:$e');
     }
-    var openedHiveBox = Hive.box(hiveBoxName);
-    final value = openedHiveBox
-        .get(key)
-        .then((value) => log.i(
-            'The item for the key:$key in the hiveBox:$hiveBoxName has been successfully retrieved.'))
-        .onError((error, stackTrace) => log
-            .e('The value for the key has not been retrieved. Error : $error'));
-    return value;
   }
 
   Future<void> deleteInHive(String hiveBoxName, dynamic key) async {

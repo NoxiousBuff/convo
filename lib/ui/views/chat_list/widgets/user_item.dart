@@ -3,7 +3,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -127,7 +126,7 @@ class UserItem extends StatelessWidget {
                 child: Text(
                   fireUser.displayName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: black,
+                    color: Colors.black,
                     fontWeight: FontWeight.w600,
                     fontSize: 22,
                   ),
@@ -141,7 +140,7 @@ class UserItem extends StatelessWidget {
               fireUser.displayName,
               style: const TextStyle(
                 fontSize: 20,
-                color: black,
+                color: Colors.black,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -149,7 +148,7 @@ class UserItem extends StatelessWidget {
           subtitle: subtitle ?? Text(
             fireUser.email,
             style: const TextStyle(
-              color: black,
+              color: Colors.black,
             ),
           ),
         );

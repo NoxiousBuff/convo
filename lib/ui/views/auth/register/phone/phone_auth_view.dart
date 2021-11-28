@@ -170,7 +170,7 @@ class PhoneAuthView extends StatelessWidget {
                 followingFieldDecoration: _pinPutDecoration.copyWith(
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(
-                    color: deepPurpleAccent.withOpacity(.5),
+                    color: AppColors.purpleAccent,
                   ),
                 ),
               ),

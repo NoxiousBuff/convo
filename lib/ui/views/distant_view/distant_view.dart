@@ -1,8 +1,10 @@
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/views/settings/help_view.dart';
+import 'package:hint/ui/views/settings/chats_customization/chat_customization.dart';
+import 'package:hint/ui/views/user_account/account_view.dart';
 
 class DistantView extends StatelessWidget {
   final FireUser currentFireUser;
@@ -34,8 +36,6 @@ class DistantView extends StatelessWidget {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         automaticallyImplyMiddle: true,
-        border: Border.all(color: transparent),
-        backgroundColor: AppColors.blue,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -43,16 +43,13 @@ class DistantView extends StatelessWidget {
               onTap: () => Navigator.pop(context),
               child: const Icon(
                 Icons.arrow_back_ios_new,
-                color: AppColors.white,
-                size: 25,
+                size: 22,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               'Settings',
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .copyWith(color: AppColors.white),
+              style: Theme.of(context).textTheme.headline6,
             ),
           ],
         ),
@@ -60,26 +57,19 @@ class DistantView extends StatelessWidget {
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          ListTile(
-            leading: ClipOval(
-              child: ExtendedImage(
-                image: NetworkImage(currentFireUser.photoUrl),
-              ),
-            ),
-            title: Text(currentFireUser.username),
-            subtitle: Text(currentFireUser.bio),
-          ),
           const Divider(height: 0),
-          optionTile(
-            context,
-            icon: CupertinoIcons.person,
-            title: 'Account',
-            subtitle: 'Privacy, Security, Change Number',
-          ),
+          optionTile(context,
+              icon: CupertinoIcons.person,
+              title: 'Account',
+              subtitle: 'Privacy, Security, Change Number',
+              onTap: () => navService.cupertinoPageRoute(
+                  context, Account(fireUser: currentFireUser))),
           optionTile(context,
               icon: CupertinoIcons.chat_bubble,
               title: 'Chats',
-              subtitle: 'Chats Customization'),
+              subtitle: 'Chats Customization',
+              onTap: () =>
+                  navService.cupertinoPageRoute(context, const Chats())),
           optionTile(context,
               icon: CupertinoIcons.bell,
               title: 'Notifications',
@@ -87,7 +77,9 @@ class DistantView extends StatelessWidget {
           optionTile(context,
               icon: CupertinoIcons.question_circle,
               title: 'Help',
-              subtitle: 'Help Center, Contact us, Privacy Policy'),
+              subtitle: 'Help Center, Contact us, Privacy Policy',
+              onTap: () =>
+                  navService.cupertinoPageRoute(context, const HelpView())),
           optionTile(context,
               icon: CupertinoIcons.person_2, title: 'Invites a Conatct')
         ],

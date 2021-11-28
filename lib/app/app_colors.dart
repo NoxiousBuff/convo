@@ -1,51 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-const teal = Color(0xff23C7DA);
-const grey = Color(0xffE5E5EA);
 
-const black = Colors.black;
-const black54 = Colors.black54;
-const transparent = Colors.transparent;
-// --------- ColorCodes --------------------------------------------------------
-const green = Color(0xff04D939);
-const darkPink = Color(0xffdd2476);
-const lightBlue = Color(0xff55A5F5);
-const unreadMsg = Color(0x14350bdf);
-const systemTeal = Color(0xff50c9c3);
-const dirtyWhite = Color(0xfff5f6f8);
-const systemOrange = Color(0xffff512f);
-const darkModeColor = Color(0xFF3C3C3D);
-const darkModeSecondColor = Color(0xff2b2b2b);
-//---------- CupertinoColors ---------------------------------------------------
-const systemRed = CupertinoColors.systemRed;
-const activeBlue = CupertinoColors.activeBlue;
-const activeGreen = CupertinoColors.activeGreen;
-const systemGrey6 = CupertinoColors.systemGrey6;
-const deepPurpleAccent = Colors.deepPurpleAccent;
-const inactiveGray = CupertinoColors.inactiveGray;
-const systemBackground = CupertinoColors.systemBackground;
-const extraLightBackgroundGray = CupertinoColors.extraLightBackgroundGray;
 
-List<Color> colors = [
-  teal,
-  grey,
-  green,
-  darkPink,
-  lightBlue,
-  unreadMsg,
-  systemTeal,
-  dirtyWhite,
-  systemOrange,
-  systemRed,
-  activeBlue,
-  activeGreen,
-  systemGrey6,
-  deepPurpleAccent,
-  inactiveGray,
-  systemBackground,
-  extraLightBackgroundGray,
-];
 
 class LightAppColors {
 
@@ -95,4 +52,29 @@ class AppColors {
   static const black = Color.fromARGB(0, 0, 0, 1);
   static const white = Color.fromRGBO(255, 255, 255, 1);
   static const taintedBackground = Color.fromRGBO(254, 250, 240, 1);
+}
+
+class MaterialColorsCode {
+  static const red800 = 0xffC62828; //Red
+  static const red600 = 0xffE53935; // Light Red
+  static const blue300 = 0xff64B5F6; // Blue
+  static const lightBlue200 = 0xff81D4FA; //Light Blue
+  static const pink400 = 0xffEC407A; //Pink
+  static const pink200 = 0xffF48FB1; //Light Pink
+  static const purple500 = 0xff9C27B0; //Purple
+  static const purple400 = 0xffAB47BC; // Light Purple
+  static const deepPurple500 = 0xff673AB7; //Deep purple
+  static const deepPurple400 = 0xff7E57C2; //Light Purple
+  static const indigo500 = 0xff3F51B5; //Indigo
+  static const indigo400 = 0xff5C6BC0; //Light Indigo
+  static const cyan500 = 0xff00BCD4; //Cyan
+  static const cyan200 = 0xff80DEEA; //Light Cyan
+  static const teal500 = 0xff009688; //Teal
+  static const teal300 = 0xff4DB6AC; //Light Teal
+  static const green500 = 0xff4CAF50; //Green
+  static const green300 = 0xff81C784; //Green Light
+  static const orange700 = 0xffF57C00; //Orange
+  static const orange400 = 0xffFFA726; //Light Orange
+  static const yellow600 = 0xffFDD835; //Yellow
+  static const yellowA200 = 0xffFFFF00; //Yellow Light
 }

@@ -3,8 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/services/database_service.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:hint/ui/views/dule/dule_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'search_viewmodel.dart';
@@ -63,14 +69,22 @@ class SearchView extends StatelessWidget {
         final searchResults = snapshot.data!.docs;
         return searchResults.isNotEmpty
             ? ListView.builder(
-              physics: const BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 itemCount: searchResults.length,
                 itemBuilder: (context, i) {
                   FireUser localFireUser =
                       FireUser.fromFirestore(snapshot.data!.docs[i]);
                   return UserItem(
                     fireUser: localFireUser,
-                    onTap: () => model.onUserItemTap(context, localFireUser),
+                    onTap: () async {
+                      String liveUserUid = AuthService.liveUser!.uid;
+                      String value = chatService.getConversationId(
+                          localFireUser.id, liveUserUid);
+                      navService.cupertinoPageRoute(
+                          context, DuleView(fireUser: localFireUser));
+                      await databaseService.updateUserDataWithKey(
+                          DatabaseMessageField.roomUid, value);
+                    },
                   );
                 },
               )

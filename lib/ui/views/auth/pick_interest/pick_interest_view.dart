@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:hint/ui/shared/custom_snackbars.dart';
+
 import 'pick_interest_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -62,18 +64,7 @@ class _PickInterestsViewState extends State<PickInterestsView> {
 
       return GeoPoint(latitude, longitude);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: inactiveGray,
-          content: Text(
-            'Turn On Your Internet',
-            style: Theme.of(context)
-                .textTheme
-                .bodyText2
-                ?.copyWith(color: systemBackground),
-          ),
-        ),
-      );
+     customSnackbars.infoSnackbar(context, title: 'Turn On Your Internet');
       throw Exception('Failed to get user country from IP address');
     }
   }

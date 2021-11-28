@@ -8,3 +8,15 @@ const String subsFirestoreKey = 'subs';
 const String dulesRealtimeDBKey = 'dules';
 const String defaultImagesFolder = 'Images/Samples';
 const String appName = 'Dule';
+
+
+/// Hive Settings Keys
+class AppSettingKeys {
+  static const String darkTheme = 'darkTheme';
+  static const String incognatedMode = 'incognatedMode';
+  static const String confettiAnimation = 'confettiAnimation';
+  static const String balloonsAnimation = 'balloonsAnimation';
+  static const String senderBubbleColor = 'senderBubbleColor';
+  static const String receiverBubbleColor = 'receiverBubbleColor';
+  static const String securityNotifications = 'securityNotifications';
+}

@@ -37,7 +37,7 @@ class _UpdateUserState extends State<UpdateUser> {
   Widget build(BuildContext context) {
     final width = screenWidthPercentage(context, percentage: 0.8);
     return Scaffold(
-      backgroundColor: systemBackground,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -49,7 +49,7 @@ class _UpdateUserState extends State<UpdateUser> {
               .copyWith(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon:const Icon(FeatherIcons.arrowLeft, color: activeBlue),
+          icon:const Icon(FeatherIcons.arrowLeft, color: AppColors.blue),
           onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.transparent,
@@ -70,7 +70,7 @@ class _UpdateUserState extends State<UpdateUser> {
                   placeholderStyle: Theme.of(context).textTheme.bodyText2,
                   decoration: const BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: inactiveGray),
+                      bottom: BorderSide(color: AppColors.darkGrey),
                     ),
                   ),
                 ),
@@ -80,7 +80,7 @@ class _UpdateUserState extends State<UpdateUser> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 50),
             child: CupertinoButton(
-              color: activeBlue,
+              color: AppColors.blue,
               child: isUpdating
                   ? const CircularProgressIndicator()
                   : Text(
@@ -88,7 +88,7 @@ class _UpdateUserState extends State<UpdateUser> {
                       style: Theme.of(context)
                           .textTheme
                           .button!
-                          .copyWith(color: systemBackground),
+                          .copyWith(color: AppColors.white),
                     ),
               onPressed: () async {
                 await update();

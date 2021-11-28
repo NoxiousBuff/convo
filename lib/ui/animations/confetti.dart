@@ -41,7 +41,7 @@ class _ConfettiState extends State<Confetti>
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: systemBackground,
+      color: AppColors.white,
       height: screenHeight(context),
       child: Stack(
         children: <Widget>[
@@ -52,7 +52,7 @@ class _ConfettiState extends State<Confetti>
                 Flexible(
                   child: Container(
                     decoration: BoxDecoration(
-                        color: extraLightBackgroundGray,
+                        color: AppColors.lightGrey,
                         borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
@@ -66,13 +66,13 @@ class _ConfettiState extends State<Confetti>
                 Flexible(
                   child: Container(
                     decoration: BoxDecoration(
-                        color: activeBlue,
+                        color: AppColors.blue,
                         borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
                         'Sender Message',
                         style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                          color: systemBackground
+                          color: AppColors.white
                         ),
                       ),
                     ),
