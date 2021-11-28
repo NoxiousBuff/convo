@@ -6,7 +6,6 @@ import 'package:hint/models/user_model.dart';
 import 'package:stacked/stacked.dart';
 
 class SearchViewModel extends BaseViewModel {
-
   Future<QuerySnapshot>? _searchResultFuture;
   Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
 
@@ -14,24 +13,19 @@ class SearchViewModel extends BaseViewModel {
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
   void handleSearch(String query) {
+    final localQuery = query.toLowerCase();
     Future<QuerySnapshot>? searchResults = subsCollection
         .where(
           FireUserField.username,
-          isGreaterThanOrEqualTo: query,
-          isLessThan: query.substring(0, query.length - 1) +
-              String.fromCharCode(query.codeUnitAt(query.length - 1) + 1),
+          isGreaterThanOrEqualTo: localQuery,
+          isLessThan: localQuery.substring(0, localQuery.length - 1) +
+              String.fromCharCode(
+                  localQuery.codeUnitAt(localQuery.length - 1) + 1),
         )
-        // .where(
-        //   FireUserField.phone,
-        //   isGreaterThanOrEqualTo: query,
-        //   isLessThan: query.substring(0, query.length - 1) +
-        //       String.fromCharCode(query.codeUnitAt(query.length - 1) + 1),
-        // )
         .get();
     _searchResultFuture = searchResults;
     notifyListeners();
   }
 
-  void onUserItemTap(BuildContext context, FireUser fireUser) {
-  }
+  void onUserItemTap(BuildContext context, FireUser fireUser) {}
 }
