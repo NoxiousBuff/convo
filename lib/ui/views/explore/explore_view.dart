@@ -17,8 +17,10 @@ class ExploreView extends StatelessWidget {
       builder: (context, model, child) => Scaffold(
         extendBodyBehindAppBar: true,
         body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverAppBar(
+              snap: true,
               floating: true,
               elevation: 0.0,
               backgroundColor: Colors.white,

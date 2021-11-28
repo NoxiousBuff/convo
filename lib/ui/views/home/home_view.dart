@@ -1,57 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/discover/discover_view.dart';
-import 'package:hint/ui/views/explore/explore_view.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/pods/page_controller_pod.dart';
+import 'package:hint/ui/views/letters/letters_view.dart';
 import 'package:hint/ui/views/main/main_view.dart';
-import 'package:hint/ui/views/profile/profile_view.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
 
   @override
-  _HomeViewState createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          activeColor: Colors.black,
-          iconSize: 28.0,
-          backgroundColor: Colors.white,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(FeatherIcons.messageCircle),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FeatherIcons.search),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FeatherIcons.compass),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FeatherIcons.user),
-            ),
-          ],
-        ),
-        tabBuilder: (BuildContext context, int index) {
-          switch (index) {
-            case 0:
-              return const MainView();
-            case 1:
-              return const ExploreView();
-            case 2:
-              return const DiscoverView();
-            case 3:
-              return const ProfileView();
-            default:
-              return const MainView();
-          }
-        },
-      ),
+    // final pageControllerProvider = pageControllerPod.;
+    return Consumer(
+      builder: (BuildContext context,
+          T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
+        final pageControllerProvider = watch(pageControllerPod);
+        return Theme(
+          data: ThemeData(colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.transparent)),
+          child: PageView(
+            controller: mainViewPageController,
+            physics: pageControllerProvider.currentIndex != 0 ? const NeverScrollableScrollPhysics() : const ClampingScrollPhysics(),
+            children: const [
+              MainView(),
+              LettersView(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

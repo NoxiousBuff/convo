@@ -1,51 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/recent_user.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
 
 import 'chat_list_viewmodel.dart';
 
-class ChatListView extends StatefulWidget  {
+class ChatListView extends StatefulWidget {
   const ChatListView({Key? key}) : super(key: key);
-
 
   @override
   State<ChatListView> createState() => _ChatListViewState();
 }
 
-class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClientMixin<ChatListView> {
- 
-  final log = getLogger('ChatListView');
-  late final FireUser currentFireUser;
-  final ChatListViewModel model = ChatListViewModel();
-
-  @override
-  void initState() {
-    getFireUser();
-    super.initState();
-  }
-
-  Future<void> getFireUser() async {
-    final firebaseUser = await FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
-        .doc(AuthService.liveUser!.uid)
-        .get();
-    final fireUser = FireUser.fromFirestore(firebaseUser);
-    setState(() {
-      currentFireUser = fireUser;
-    });
-  }
-
+class _ChatListViewState extends State<ChatListView>
+    with AutomaticKeepAliveClientMixin<ChatListView> {
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -72,9 +45,7 @@ class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClie
                       color: Colors.transparent,
                       child: IconButton(
                         icon: const Icon(FeatherIcons.userPlus),
-                        onPressed: () {
-                          
-                        },
+                        onPressed: () {},
                       ),
                     ),
                     Material(
@@ -82,7 +53,9 @@ class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClie
                       child: IconButton(
                         icon: const Icon(FeatherIcons.send),
                         onPressed: () {
-                          mainViewPageController.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+                          mainViewPageController.animateToPage(1,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut);
                         },
                       ),
                     ),
@@ -107,7 +80,7 @@ class _ChatListViewState extends State<ChatListView> with AutomaticKeepAliveClie
                         recentList
                             .sort((a, b) => a.timestamp.compareTo(b.timestamp));
                         return ListView.builder(
-                          padding: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(0),
                             shrinkWrap: true,
                             itemCount: recentList.length,
                             itemBuilder: (context, i) {

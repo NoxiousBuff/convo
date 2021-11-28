@@ -6,7 +6,7 @@ class FireUser {
   final String bio;
   final String email;
   final String phone;
-  final String country;
+  final String? country;
   final List<dynamic> hashTags;
   final List<dynamic>? blockedBy;
   final List<dynamic>? blocked;
@@ -15,7 +15,7 @@ class FireUser {
   final int? dob;
   final String photoUrl;
   final String displayName;
-  final Map<String, dynamic> position;
+  final Map<String, dynamic>? position;
   final List<dynamic> interests;
   final Timestamp userCreated;
   final String countryPhoneCode;
@@ -64,5 +64,50 @@ class FireUser {
       dob: doc[FireUserField.dob],
       gender: doc[FireUserField.gender],
     );
+  }
+
+  Map<String, dynamic> toJson() => {
+        FireUserField.id: id,
+        FireUserField.bio: bio,
+        FireUserField.email: email,
+        FireUserField.phone: phone,
+        FireUserField.country: country,
+        FireUserField.hashTags: hashTags,
+        FireUserField.photoUrl: photoUrl,
+        FireUserField.displayName: displayName,
+        FireUserField.position: position,
+        FireUserField.interests: interests,
+        FireUserField.userCreated: userCreated,
+        FireUserField.countryPhoneCode: countryPhoneCode,
+        FireUserField.username: username,
+        FireUserField.blocked: blocked,
+        FireUserField.blockedBy: blockedBy,
+        FireUserField.romanticStatus: romanticStatus,
+        FireUserField.dob: dob,
+        FireUserField.gender: gender,
+      };
+
+  @override
+  String toString() {
+    return {
+      FireUserField.id: id,
+      FireUserField.bio: bio,
+      FireUserField.email: email,
+      FireUserField.phone: phone,
+      FireUserField.country: country,
+      FireUserField.hashTags: hashTags,
+      FireUserField.photoUrl: photoUrl,
+      FireUserField.displayName: displayName,
+      FireUserField.position: position,
+      FireUserField.interests: interests,
+      FireUserField.userCreated: userCreated,
+      FireUserField.countryPhoneCode: countryPhoneCode,
+      FireUserField.username: username,
+      FireUserField.blocked: blocked,
+      FireUserField.blockedBy: blockedBy,
+      FireUserField.romanticStatus: romanticStatus,
+      FireUserField.dob: dob,
+      FireUserField.gender: gender,
+    }.toString();
   }
 }

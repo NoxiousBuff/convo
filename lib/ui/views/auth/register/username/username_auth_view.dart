@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/enums.dart';
 import 'package:hint/services/nav_service.dart';
@@ -73,6 +74,9 @@ class UserNameAuthView extends StatelessWidget {
                         model.updateUserNameEmpty();
                         model.findUsernameExistOrNot(value);
                       },
+                      inputFormatters: const [
+                        //TODO: add username filters
+                      ],
                       textCapitalization: TextCapitalization.none,
                       autofocus: true,
                       autofillHints: const [AutofillHints.nickname],

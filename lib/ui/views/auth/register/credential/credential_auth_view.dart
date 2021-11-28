@@ -63,6 +63,7 @@ class CredentialAuthView extends StatelessWidget {
                       showCursor: true,
                       cursorColor: LightAppColors.primary,
                       cursorHeight: 32,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',
                         hintStyle: TextStyle(

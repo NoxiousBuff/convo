@@ -14,6 +14,14 @@ class PhoneAuthViewModel extends BaseViewModel {
   final String phoneChecking = 'phoneChecking';
   final String otpChecking = 'otpChecking';
 
+  bool _otpSent = false;
+  bool get otpSent => _otpSent;
+
+  void otpSentChanger(bool localOtpSent) {
+    _otpSent = localOtpSent;
+    notifyListeners();
+  }
+
   final phoneFormKey = GlobalKey<FormState>();
   final otpCodeFormKey = GlobalKey<FormState>();
 
@@ -86,14 +94,15 @@ class PhoneAuthViewModel extends BaseViewModel {
     setBusyForObject(otpChecking, true);
     await FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential).then((value){
       navService.materialPageRoute(context, DisplayNameAuthView(phoneNumber: phoneTech.text, countryCode: '+$countryCode',));
+      customSnackbars.successSnackbar(context,
+            title: 'Your phone number has been successfully linked.');
     }).catchError((e) {
       customSnackbars.errorSnackbar(context, title: e.toString());
       setBusyForObject(otpChecking, false);
     });
     setBusyForObject(otpChecking, false);
     log.w('Phone Auth Credential: $phoneAuthCredential');
-    customSnackbars.successSnackbar(context,
-            title: 'Your phone number has been successfully linked.');
+    
   }
 
   Future<void> verifyingPhoneNumber(BuildContext context) async {
@@ -119,6 +128,7 @@ class PhoneAuthViewModel extends BaseViewModel {
             title: 'Type your phone number correctly.');
       },
       codeSent: (String verificationId, int? resendToken) async {
+        otpSentChanger(true);
         _verificationId = verificationId;
         notifyListeners();
         customSnackbars.infoSnackbar(context,

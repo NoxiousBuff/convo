@@ -8,9 +8,11 @@ class HiveApi {
   final log = getLogger('HiveApi');
   static const String appSettingsBoxName = 'AppSettings';
   static const String recentChatsHiveBox = 'RecentChats';
+  static const String userdataHiveBox = 'UserData';
   Future<void> initialiseHive() async {
-    await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(appSettingsBoxName);
+    await Hive.openBox(recentChatsHiveBox);
+    await Hive.openBox(userdataHiveBox);
   }
 
 // -----------------------------------------------------------------------------

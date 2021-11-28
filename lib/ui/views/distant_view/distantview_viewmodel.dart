@@ -44,7 +44,7 @@ class DistantViewViewModel extends BaseViewModel {
 
   Future<FireUser> getCurrentFireUser(String liveUserUid) async {
     final firestoreUser = await FirebaseFirestore.instance
-        .collection(usersFirestoreKey)
+        .collection(subsFirestoreKey)
         .doc(liveUserUid)
         .get();
     final _fireUser = FireUser.fromFirestore(firestoreUser);

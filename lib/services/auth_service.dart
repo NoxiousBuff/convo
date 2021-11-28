@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
 
 final authService = AuthService();
@@ -24,21 +27,18 @@ class AuthService {
     Function? randomError,
   }) async {
     try {
-      UserCredential userCredential = await _auth
+      await _auth
           .createUserWithEmailAndPassword(
         email: email,
         password: password,
-      ).then((value) async {
+      )
+          .then((value) async {
         await firestoreApi.addToRecentList(value.user!.uid);
-        log.wtf(value.user!.uid.toString());
+        await value.user!.sendEmailVerification();
+        onComplete();
         return value;
       });
       log.i('User has been created in the firebase authentication.');
-      // final userData = userCredential.user;
-      
-      // if (userData != null) await firestoreApi.addToRecentList(userData.uid);
-      await userCredential.user!.sendEmailVerification();
-      onComplete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         log.e(e.message);
@@ -67,8 +67,42 @@ class AuthService {
     try {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) {
+          .then((value) async {
         log.i('The User with email : $email has been successfully logged In');
+        await firestoreApi.addToRecentList(value.user!.uid);
+        FireUser? fireuser =
+            await firestoreApi.getUserFromFirebase(value.user!.uid);
+        if (fireuser != null) {
+          final fireUserGeoPoint =
+              fireuser.position![FireUserField.geopoint] as GeoPoint;
+          final userData = {
+            FireUserField.id: fireuser.id,
+            FireUserField.bio: fireuser.bio,
+            FireUserField.email: fireuser.email,
+            FireUserField.phone: fireuser.phone,
+            FireUserField.country: fireuser.country,
+            FireUserField.hashTags: fireuser.hashTags,
+            FireUserField.photoUrl: fireuser.photoUrl,
+            FireUserField.displayName: fireuser.displayName,
+            FireUserField.position: {
+              FireUserField.geohash: fireuser.position![FireUserField.geohash],
+              FireUserField.geopoint: [
+                fireUserGeoPoint.latitude,
+                fireUserGeoPoint.longitude
+              ]
+            },
+            FireUserField.interests: fireuser.interests,
+            FireUserField.userCreated: fireuser.userCreated.millisecondsSinceEpoch,
+            FireUserField.countryPhoneCode: fireuser.countryPhoneCode,
+            FireUserField.username: fireuser.username,
+            FireUserField.blocked: fireuser.blocked,
+            FireUserField.blockedBy: fireuser.blockedBy,
+            FireUserField.romanticStatus: fireuser.romanticStatus,
+            FireUserField.dob: fireuser.dob,
+            FireUserField.gender: fireuser.gender,
+          };
+          await firestoreApi.saveUserDataInHive(value.user!.uid, userData);
+        }
         onComplete();
       });
     } on FirebaseAuthException catch (e) {

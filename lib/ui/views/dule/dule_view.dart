@@ -94,6 +94,12 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   cursorHeight: 28,
                   maxLength: 160,
                   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  buildCounter: (_,
+                              {required currentLength,
+                              maxLength,
+                              required isFocused}) {
+                            return const SizedBox.shrink();
+                          },
                   controller: model.otherTech,
                   cursorColor: AppColors.blue,
                   textAlign: TextAlign.center,

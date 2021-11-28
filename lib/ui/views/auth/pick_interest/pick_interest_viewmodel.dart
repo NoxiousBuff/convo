@@ -13,6 +13,14 @@ final List<String> userSelectedInterests = [];
 class PickInterestsViewModel extends BaseViewModel {
   final log = getLogger('PickInterestsViewModel');
 
+  int _userClickedButton = 0;
+  int get userClickedButton => _userClickedButton;
+
+  void userClickedButtonChanger() {
+    _userClickedButton++;
+    notifyListeners();
+  }
+
   bool _hasUserPickedTenInterests = false;
   bool get hasUserPickedTenInterests => _hasUserPickedTenInterests;
 
@@ -43,6 +51,7 @@ class PickInterestsViewModel extends BaseViewModel {
             )
         .then((value) async {
       await databaseService.addUserData(AuthService.liveUser!.uid);
+      userSelectedInterests.clear;
       setBusy(false);
       Navigator.pushAndRemoveUntil(
           context,

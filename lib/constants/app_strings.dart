@@ -69,6 +69,8 @@ class FireUserField {
   static const romanticStatus = 'romanticStatus';
   static const dob = 'dob';
   static const gender = 'gender';
+  static const geohash = 'geohash';
+  static const geopoint = 'geopoint';
 }
 
 class DatabaseMessageField {

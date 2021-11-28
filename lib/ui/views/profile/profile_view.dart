@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/constants/interest.dart';
+import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 
@@ -34,6 +35,7 @@ class ProfileView extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
+                authService.signOut(context);
               },
               icon: const Icon(FeatherIcons.edit),
               color: Colors.black,

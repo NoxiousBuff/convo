@@ -33,7 +33,7 @@ class PickInterestsView extends StatefulWidget {
 
 class _PickInterestsViewState extends State<PickInterestsView> {
   String _countryName = '';
-  late final GeoPoint geoPoint;
+  GeoPoint? geoPoint;
 
   final log = getLogger('PickInterests');
   @override
@@ -241,15 +241,25 @@ class _PickInterestsViewState extends State<PickInterestsView> {
                 buttonTitle: 'Done',
                 isLoading: model.isBusy,
                 isActive: model.hasUserPickedTenInterests,
-                onTap: () {
-                  model.createUserInFirebase(context,
-                      location: geoPoint,
+                onTap: () async {
+                  final localGeoPoint = geoPoint;
+                  if(localGeoPoint == null) {
+                    await lookUpGeopoint();
+                  }
+                  if(localGeoPoint != null) {
+                    model.createUserInFirebase(context,
+                      location: localGeoPoint,
                       country: _countryName,
                       phoneNumber: widget.phoneNumber,
                       displayName: widget.displayName,
                       countryPhoneCode: widget.countryCode,
                       username: widget.username,
                       );
+                  }
+                  model.userClickedButtonChanger();
+                  if(model.userClickedButton > 3) {
+                    //TODO: when ip registery is not working
+                  }
                 },
               ),
               verticalSpaceLarge,

@@ -65,6 +65,14 @@ class PhoneAuthView extends StatelessWidget {
                             return null;
                           }
                         },
+                        maxLength: 10,
+                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                        buildCounter: (_,
+                              {required currentLength,
+                              maxLength,
+                              required isFocused}) {
+                            return const SizedBox.shrink();
+                          },
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.digitsOnly
                         ],
@@ -149,6 +157,7 @@ class PhoneAuthView extends StatelessWidget {
                 },
                 controller: model.otpCodeTech,
                 autofocus: true,
+                
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
                 ],
@@ -203,7 +212,7 @@ class PhoneAuthView extends StatelessWidget {
                     await model.linkPhoneToUser(context, credential);
                   }
                 },
-                isActive: !model.isPhoneEmpty,
+                isActive: !model.isPhoneEmpty && model.otpSent,
               ),
               verticalSpaceLarge,
               bottomPadding(context)
@@ -225,6 +234,7 @@ class PhoneAuthView extends StatelessWidget {
               PhoneVerificationState.checkingOtp) {
             model.changePhoneVerificationState(
                 PhoneVerificationState.checkingPhoneNumber);
+                model.otpSentChanger(false);
           } else {
             return true;
           }

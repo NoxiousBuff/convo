@@ -14,8 +14,8 @@ class ChatService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final String liveUserUid = _auth.currentUser!.uid;
-  static final CollectionReference _userCollection =
-      _firestore.collection(usersFirestoreKey);
+  static final CollectionReference subsCollection =
+      _firestore.collection(subsFirestoreKey);
   static final CollectionReference _conversationCollection =
       _firestore.collection(convoFirestorekey);
 
@@ -39,13 +39,13 @@ class ChatService {
   }
 
   _addToRecentListForSender(String receiverUid) async {
-    final doc = await _userCollection
+    final doc = await subsCollection
         .doc(liveUserUid)
         .collection(recentFirestoreKey)
         .doc(receiverUid)
         .get();
     if (doc.exists) {
-      _userCollection
+      subsCollection
           .doc(liveUserUid)
           .collection(recentFirestoreKey)
           .doc(receiverUid)
@@ -55,7 +55,7 @@ class ChatService {
           .catchError((e) => log
               .e('timestamp : ${Timestamp.now()}receiverUid : $receiverUid'));
     } else {
-      _userCollection
+      subsCollection
           .doc(liveUserUid)
           .collection(recentFirestoreKey)
           .doc(receiverUid)
@@ -68,13 +68,13 @@ class ChatService {
   }
 
   _addTORecentListForReceiver(String receiverUid) async {
-    final doc = await _userCollection
+    final doc = await subsCollection
         .doc(receiverUid)
         .collection(recentFirestoreKey)
         .doc(liveUserUid)
         .get();
     if (doc.exists) {
-      _userCollection
+      subsCollection
           .doc(receiverUid)
           .collection(recentFirestoreKey)
           .doc(liveUserUid)
@@ -84,7 +84,7 @@ class ChatService {
           .catchError((e) => log.e(
               'There has been error in updating timestamp for user with id : $liveUserUid'));
     } else {
-      _userCollection
+      subsCollection
           .doc(receiverUid)
           .collection(recentFirestoreKey)
           .doc(liveUserUid)
@@ -103,7 +103,7 @@ class ChatService {
 
   Stream<QuerySnapshot> getRecentChatList() {
     return _firestore
-        .collection(usersFirestoreKey)
+        .collection(subsFirestoreKey)
         .doc(liveUserUid)
         .collection(recentFirestoreKey)
         .orderBy(DocumentField.timestamp, descending: true)
