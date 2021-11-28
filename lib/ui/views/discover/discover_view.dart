@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:stacked/stacked.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+
 
 import 'discover_viewmodel.dart';
 
