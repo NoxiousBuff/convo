@@ -15,6 +15,5 @@ Future<void> main() async {
   String appDocPath = appDocDir.path;
   Hive.init(appDocPath);
   await hiveApi.initialiseHive();
-
   runApp(const ProviderScope(child: MyApp()));
 }

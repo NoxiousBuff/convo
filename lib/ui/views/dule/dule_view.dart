@@ -1,8 +1,6 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hive/hive.dart';
+import 'package:hint/api/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +15,13 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:string_validator/string_validator.dart';
-import 'package:hint/ui/views/dule/dule_viewmodel.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/widgets/light_clipper.dart';
+
+import 'dule_viewmodel.dart';
 
 class DuleView extends StatefulWidget {
   const DuleView({Key? key, required this.fireUser}) : super(key: key);

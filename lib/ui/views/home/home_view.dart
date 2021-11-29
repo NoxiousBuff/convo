@@ -5,9 +5,19 @@ import 'package:hint/pods/page_controller_pod.dart';
 import 'package:hint/ui/views/letters/letters_view.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     // final pageControllerProvider = pageControllerPod.;

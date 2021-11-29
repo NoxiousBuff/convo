@@ -89,25 +89,23 @@ class FireUser {
 
   @override
   String toString() {
-    return {
-      FireUserField.id: id,
-      FireUserField.bio: bio,
-      FireUserField.email: email,
-      FireUserField.phone: phone,
-      FireUserField.country: country,
-      FireUserField.hashTags: hashTags,
-      FireUserField.photoUrl: photoUrl,
-      FireUserField.displayName: displayName,
-      FireUserField.position: position,
-      FireUserField.interests: interests,
-      FireUserField.userCreated: userCreated,
-      FireUserField.countryPhoneCode: countryPhoneCode,
-      FireUserField.username: username,
-      FireUserField.blocked: blocked,
-      FireUserField.blockedBy: blockedBy,
-      FireUserField.romanticStatus: romanticStatus,
-      FireUserField.dob: dob,
-      FireUserField.gender: gender,
-    }.toString();
+    return '${FireUserField.id}: $id\n'
+        '${FireUserField.bio}: $bio\n'
+        '${FireUserField.email}: $email\n'
+        '${FireUserField.phone}: $phone\n'
+        '${FireUserField.country}: $country\n'
+        '${FireUserField.hashTags}: $hashTags\n'
+        '${FireUserField.photoUrl}: $photoUrl\n'
+        '${FireUserField.displayName}: $displayName\n'
+        '${FireUserField.position}: $position\n'
+        '${FireUserField.interests}: $interests\n'
+        '${FireUserField.userCreated}: $userCreated\n'
+        '${FireUserField.countryPhoneCode}: $countryPhoneCode\n'
+        '${FireUserField.username}: $username\n'
+        '${FireUserField.blocked}: $blocked\n'
+        '${FireUserField.blockedBy}: $blockedBy\n'
+        '${FireUserField.romanticStatus}: $romanticStatus\n'
+        '${FireUserField.dob}: $dob\n'
+        '${FireUserField.gender}: $gender\n';
   }
 }

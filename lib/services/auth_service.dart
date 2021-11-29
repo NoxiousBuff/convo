@@ -75,33 +75,62 @@ class AuthService {
         if (fireuser != null) {
           final fireUserGeoPoint =
               fireuser.position![FireUserField.geopoint] as GeoPoint;
-          final userData = {
-            FireUserField.id: fireuser.id,
-            FireUserField.bio: fireuser.bio,
-            FireUserField.email: fireuser.email,
-            FireUserField.phone: fireuser.phone,
-            FireUserField.country: fireuser.country,
-            FireUserField.hashTags: fireuser.hashTags,
-            FireUserField.photoUrl: fireuser.photoUrl,
-            FireUserField.displayName: fireuser.displayName,
-            FireUserField.position: {
-              FireUserField.geohash: fireuser.position![FireUserField.geohash],
-              FireUserField.geopoint: [
-                fireUserGeoPoint.latitude,
-                fireUserGeoPoint.longitude
-              ]
-            },
-            FireUserField.interests: fireuser.interests,
-            FireUserField.userCreated: fireuser.userCreated.millisecondsSinceEpoch,
-            FireUserField.countryPhoneCode: fireuser.countryPhoneCode,
-            FireUserField.username: fireuser.username,
-            FireUserField.blocked: fireuser.blocked,
-            FireUserField.blockedBy: fireuser.blockedBy,
-            FireUserField.romanticStatus: fireuser.romanticStatus,
-            FireUserField.dob: fireuser.dob,
-            FireUserField.gender: fireuser.gender,
-          };
-          await firestoreApi.saveUserDataInHive(value.user!.uid, userData);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.bio, fireuser.bio);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.country, fireuser.country);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.countryPhoneCode, fireuser.countryPhoneCode);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.email, fireuser.email);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.hashTags, fireuser.hashTags);
+          await firestoreApi.saveUserDataInHive(FireUserField.id, fireuser.id);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.interests, fireuser.interests);
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.phone, fireuser.phone);
+          await firestoreApi.saveUserDataInHive(FireUserField.position, {
+            FireUserField.geohash: fireuser.position![FireUserField.geohash],
+            FireUserField.geopoint: [
+              fireUserGeoPoint.latitude,
+              fireUserGeoPoint.longitude
+            ]
+          });
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.photoUrl,
+            fireuser.photoUrl,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.displayName,
+            fireuser.displayName,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.userCreated,
+            fireuser.userCreated.millisecondsSinceEpoch,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.username,
+            fireuser.username,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.blocked,
+            fireuser.blocked,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.blockedBy,
+            fireuser.blockedBy,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.romanticStatus,
+            fireuser.romanticStatus,
+          );
+          await firestoreApi.saveUserDataInHive(
+            FireUserField.gender,
+            fireuser.gender,
+          );
+          await firestoreApi.saveUserDataInHive(
+              FireUserField.dob, fireuser.dob);
         }
         onComplete();
       });

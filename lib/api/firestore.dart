@@ -39,8 +39,7 @@ class FirestoreApi {
             getLogger('FirestoreApi').e("Failed to update user: $error"));
   }
 
-  Future<void> saveUserDataInHive(
-      String key, Map<String, dynamic> userData) async {
+  Future<void> saveUserDataInHive(String key, dynamic userData) async {
     await hiveApi.saveInHive(HiveApi.userdataHiveBox, key, userData);
   }
 
@@ -65,30 +64,8 @@ class FirestoreApi {
   }) async {
     try {
       final position = GeoFirePoint(location.latitude, location.longitude).data;
-      final userData = {
+      await subsCollection.doc(user.uid).set({
         FireUserField.bio: 'Hey I am using dule',
-        FireUserField.country: country,
-        FireUserField.countryPhoneCode: countryPhoneCode,
-        FireUserField.email: user.email,
-        FireUserField.hashTags: ['#Dule User'],
-        FireUserField.id: user.uid,
-        FireUserField.interests: interests,
-        FireUserField.phone: phoneNumber,
-        FireUserField.position: {
-          FireUserField.geohash : position[FireUserField.geohash],
-          FireUserField.geopoint : [location.latitude, location.longitude]
-        },
-        FireUserField.photoUrl: kDefaultPhotoUrl,
-        FireUserField.displayName: displayName,
-        FireUserField.userCreated: Timestamp.now().millisecondsSinceEpoch,
-        FireUserField.username: username,
-        FireUserField.blocked: [],
-        FireUserField.blockedBy: [],
-        FireUserField.romanticStatus: 'Prefer Not To Say',
-        FireUserField.gender: 'Prefer Not To Say',
-        FireUserField.dob: null
-      };
-      await subsCollection.doc(user.uid).set({FireUserField.bio: 'Hey I am using dule',
         FireUserField.country: country,
         FireUserField.countryPhoneCode: countryPhoneCode,
         FireUserField.email: user.email,
@@ -105,8 +82,53 @@ class FirestoreApi {
         FireUserField.blockedBy: [],
         FireUserField.romanticStatus: 'Prefer Not To Say',
         FireUserField.gender: 'Prefer Not To Say',
-        FireUserField.dob: null});
-      await saveUserDataInHive(user.uid, userData);
+        FireUserField.dob: null
+      });
+      saveUserDataInHive(FireUserField.bio, 'Hey I am using dule');
+      saveUserDataInHive(FireUserField.country, country);
+      saveUserDataInHive(FireUserField.countryPhoneCode, countryPhoneCode);
+      saveUserDataInHive(FireUserField.email, user.email);
+      saveUserDataInHive(FireUserField.hashTags, ['#Dule User']);
+      saveUserDataInHive(FireUserField.id, user.uid);
+      saveUserDataInHive(FireUserField.interests, interests);
+      saveUserDataInHive(FireUserField.phone, phoneNumber);
+      saveUserDataInHive(FireUserField.position, {
+        FireUserField.geohash: position[FireUserField.geohash],
+        FireUserField.geopoint: [location.latitude, location.longitude]
+      });
+      saveUserDataInHive(
+        FireUserField.photoUrl,
+        kDefaultPhotoUrl,
+      );
+      saveUserDataInHive(
+        FireUserField.displayName,
+        displayName,
+      );
+      saveUserDataInHive(
+        FireUserField.userCreated,
+        Timestamp.now().millisecondsSinceEpoch,
+      );
+      saveUserDataInHive(
+        FireUserField.username,
+        username,
+      );
+      saveUserDataInHive(
+        FireUserField.blocked,
+        [],
+      );
+      saveUserDataInHive(
+        FireUserField.blockedBy,
+        [],
+      );
+      saveUserDataInHive(
+        FireUserField.romanticStatus,
+        'Prefer Not To Say',
+      );
+      saveUserDataInHive(
+        FireUserField.gender,
+        'Prefer Not To Say',
+      );
+      saveUserDataInHive(FireUserField.dob, null);
       log.i('User has been successfully created with details $user');
     } catch (e) {
       log.w('Creating user in firebase failed. Error : $e');
