@@ -1,7 +1,9 @@
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/models/recent_user.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+import 'package:hint/ui/shared/empty_list_ui.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -68,6 +70,11 @@ class _ChatListViewState extends State<ChatListView>
               SliverList(
                 delegate: SliverChildListDelegate(
                   [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: buildEmptyListUi(context),
+                    ),
+                    verticalSpaceRegular,
                     ValueListenableBuilder<Box>(
                       valueListenable:
                           hiveApi.hiveStream(HiveApi.recentChatsHiveBox),
@@ -80,6 +87,7 @@ class _ChatListViewState extends State<ChatListView>
                         recentList
                             .sort((a, b) => a.timestamp.compareTo(b.timestamp));
                         return ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(0),
                             shrinkWrap: true,
                             itemCount: recentList.length,
@@ -89,6 +97,7 @@ class _ChatListViewState extends State<ChatListView>
                             });
                       },
                     ),
+                    verticalSpaceLarge,
                   ],
                 ),
               ),

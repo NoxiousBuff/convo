@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/dio.dart';
 import 'package:hint/app/app.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
@@ -96,7 +95,6 @@ class DistantViewViewModel extends BaseViewModel {
 
   DioApi dioApi = DioApi();
   Directory? globalDirectory;
-  HiveApi hiveApi = HiveApi();
 
   Future<void> uploadAndSave(String filePath) async {
     final downloadURL = await uploadFile(filePath: filePath);
@@ -164,8 +162,6 @@ class DistantViewViewModel extends BaseViewModel {
       if (await directory.exists()) {
         await dioApi.downloadMediaFromUrl(
             mediaUrl: mediaUrl, savePath: savePath);
-        // await hiveApi.appSettings.put(HiveApi.chatBackgroundKey, savePath);
-        // log.wtf('HiveSavedPath:${hiveApi.appSettings.get(HiveApi.chatBackgroundKey)}');
       }
     } catch (err) {
       log.e('Error comes in creating the folder : $err');

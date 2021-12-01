@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/dule/dule_view.dart';
+
+import 'database_service.dart';
+import 'nav_service.dart';
 
 final ChatService chatService = ChatService();
 
@@ -19,6 +24,8 @@ class ChatService {
   static final CollectionReference _conversationCollection =
       _firestore.collection(convoFirestorekey);
 
+  final liveUserId = hiveApi.getUserDataWithHive(FireUserField.id);
+
   startConversation(
       BuildContext context, FireUser fireUser, Color randomColor) async {
    
@@ -26,6 +33,15 @@ class ChatService {
 
   createChatRoom(String chatRoomId, chatRoomMap) {
     _conversationCollection.doc(chatRoomId).set(chatRoomMap);
+  }
+
+  startDuleConversation(BuildContext context, FireUser fireUser, ) async {
+    String value =
+                    chatService.getConversationId(fireUser.id, liveUserUid);
+                navService.cupertinoPageRoute(
+                    context, DuleView(fireUser: fireUser));
+                await databaseService.updateUserDataWithKey(
+                    DatabaseMessageField.roomUid, value);
   }
 
   getConversationId(String a, String b) {

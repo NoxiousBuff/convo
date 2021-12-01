@@ -29,17 +29,23 @@ class ExploreView extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Hero(
                   tag: 'search',
-                  child: CupertinoTextField.borderless(
-                    padding: const EdgeInsets.all(8.0),
-                    readOnly: true,
+                  child: GestureDetector(
                     onTap: () => navService.materialPageRoute(
                         context, const SearchView()),
-                    placeholder: 'Search for someone',
-                    placeholderStyle: TextStyle(color: Colors.grey.shade900),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12.0),
+                    child: IgnorePointer(
+                      ignoring: false,
+                      child: CupertinoTextField.borderless(
+                        padding: const EdgeInsets.all(8.0),
+                        readOnly: true,
+                        placeholder: 'Search for someone',
+                        placeholderStyle:
+                            TextStyle(color: Colors.grey.shade900),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
                     ),
                   ),
                 ),

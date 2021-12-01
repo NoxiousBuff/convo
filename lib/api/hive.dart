@@ -9,10 +9,14 @@ class HiveApi {
   static const String appSettingsBoxName = 'AppSettings';
   static const String recentChatsHiveBox = 'RecentChats';
   static const String userdataHiveBox = 'UserData';
+  static const String savedPeopleHiveBox = 'savedPeople';
+  static const String recentSearchesHiveBox = 'recentSearches';
   Future<void> initialiseHive() async {
     await Hive.openBox(appSettingsBoxName);
     await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(userdataHiveBox);
+    await Hive.openBox(savedPeopleHiveBox);
+    await Hive.openBox(recentSearchesHiveBox);
   }
 
 // -----------------------------------------------------------------------------
@@ -21,9 +25,31 @@ class HiveApi {
     return Hive.box(hiveBoxName).listenable();
   }
 
-   dynamic getFromHive(String hiveBoxName, String key, ) {
+  dynamic getFromHive(
+    String hiveBoxName,
+    String key,
+  ) {
     try {
-     return Hive.box(hiveBoxName).get(key);
+      return Hive.box(hiveBoxName).get(key);
+    } catch (e) {
+      log.e('getFromHive Error:$e');
+    }
+  }
+
+  dynamic getUserDataWithHive(String key) {
+    try {
+      return Hive.box(userdataHiveBox).get(key);
+    } catch (e) {
+      log.e('getFromHive Error:$e');
+    }
+  }
+
+  dynamic doesHiveContain(
+    String hiveBoxName,
+    String key,
+  ) {
+    try {
+      return Hive.box(hiveBoxName).containsKey(key);
     } catch (e) {
       log.e('getFromHive Error:$e');
     }
@@ -31,11 +57,11 @@ class HiveApi {
 
   Future<void> deleteInHive(String hiveBoxName, dynamic key) async {
     bool doesBoxExist = await Hive.boxExists(hiveBoxName);
-    getLogger('HiveApi').i('doesBoxExists : $doesBoxExist');
+    log.i('doesBoxExists : $doesBoxExist');
     bool isBoxOpen = Hive.isBoxOpen(hiveBoxName);
     if (!doesBoxExist && !isBoxOpen) {
       await Hive.openBox(hiveBoxName);
-      getLogger('HiveApi').i('Hive box : $hiveBoxName is successfully opened.');
+      log.i('Hive box : $hiveBoxName is successfully opened.');
     }
     var openedHiveBox = Hive.box(hiveBoxName);
     openedHiveBox
@@ -57,14 +83,13 @@ class HiveApi {
       var openedHiveBox = Hive.box(hiveBoxName);
       if (!openedHiveBox.containsKey(key)) {
         await openedHiveBox.put(key, value).then((instance) {
-          getLogger('HiveApi').i(
-              'Value: $value for key: $key has been successfully completed.');
+          log.i('Value: $value for key: $key has been successfully completed.');
         }).onError((dynamic error, stackTrace) {
-          getLogger('HiveApi').w('Error in saving file path : $error');
+          log.w('Error in saving file path : $error');
         });
       }
     } catch (err) {
-      getLogger('HiveApi').w(
+      log.w(
           'Error in opening hive box: $hiveBoxName.This is the following error : $err');
     }
   }

@@ -9,8 +9,20 @@ class SearchViewModel extends BaseViewModel {
   Future<QuerySnapshot>? _searchResultFuture;
   Future<QuerySnapshot>? get searchResultFuture => _searchResultFuture;
 
+  bool _searchEmpty = true;
+  bool get searchEmpty => _searchEmpty;
+
+  TextEditingController searchTech = TextEditingController();
+
+  final FocusNode searchFocusNode = FocusNode();
+
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
+
+  void updateSearchEmpty() {
+    _searchEmpty = searchTech.text.isEmpty;
+    notifyListeners();
+  }
 
   void handleSearch(String query) {
     final localQuery = query.toLowerCase();
@@ -28,4 +40,10 @@ class SearchViewModel extends BaseViewModel {
   }
 
   void onUserItemTap(BuildContext context, FireUser fireUser) {}
+
+  @override
+  void dispose() {
+    super.dispose();
+    searchTech.dispose();
+  }
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:hint/api/dio.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -11,7 +10,6 @@ class PathHelper {
 
   DioApi dioApi = DioApi();
   Directory? globalDirectory;
-  HiveApi hiveApi = HiveApi();
 
   Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {
