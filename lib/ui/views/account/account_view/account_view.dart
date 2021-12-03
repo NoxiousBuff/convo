@@ -103,17 +103,32 @@ class AccountView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    box.get(displayNameKey),
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ],
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      box.get(displayNameKey),
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    horizontalSpaceTiny,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+                                      decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: AppColors.darkGrey)),
+                                  child: Text(
+                                box.get(relationshipKey),
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600),
                               ),
-                              verticalSpaceTiny,
+                                    )
+                                  ],
+                                ),
+                              ),
                               Wrap(
                                 spacing: 8,
                                 direction: Axis.horizontal,
