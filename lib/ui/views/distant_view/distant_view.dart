@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/views/phone_contacts/phone_contacts_view.dart';
 import 'package:hint/ui/views/settings/help_view.dart';
-import 'package:hint/ui/views/settings/chats_customization/chat_customization.dart';
 import 'package:hint/ui/views/user_account/account_view.dart';
+import 'package:hint/ui/views/settings/chats_customization/chat_customization.dart';
 
 class DistantView extends StatelessWidget {
-  final FireUser currentFireUser;
-  const DistantView({Key? key, required this.currentFireUser})
+  const DistantView({Key? key})
       : super(key: key);
 
   Widget optionTile(
@@ -63,13 +62,19 @@ class DistantView extends StatelessWidget {
               title: 'Account',
               subtitle: 'Privacy, Security, Change Number',
               onTap: () => navService.cupertinoPageRoute(
-                  context, Account(fireUser: currentFireUser))),
+                  context, const Account())),
           optionTile(context,
               icon: CupertinoIcons.chat_bubble,
               title: 'Chats',
               subtitle: 'Chats Customization',
               onTap: () =>
                   navService.cupertinoPageRoute(context, const Chats())),
+          optionTile(context,
+              icon: CupertinoIcons.doc_person,
+              title: 'Phone Contacts',
+              subtitle: 'Connect or upload your contacts',
+              onTap: () =>
+                  navService.cupertinoPageRoute(context, const PhoneContactView())),
           optionTile(context,
               icon: CupertinoIcons.bell,
               title: 'Notifications',

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:hint/services/chat_service.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:lottie/lottie.dart';
@@ -15,7 +16,6 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/database_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:string_validator/string_validator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -64,10 +64,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, null);
     databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
 
-    hiveApi.saveInHive(HiveApi.recentChatsHiveBox, widget.fireUser.id, {
-      RecentUserField.uid: widget.fireUser.id,
-      RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch,
-    });
+    chatService.addToRecentList(widget.fireUser.id);
     super.dispose();
   }
 
@@ -167,10 +164,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               const hiveBox = HiveApi.appSettingsBoxName;
               const sKey = AppSettingKeys.senderBubbleColor;
               const rKey = AppSettingKeys.receiverBubbleColor;
-              int senderBubbleCode = Hive.box(hiveBox).get(sKey,
-                  defaultValue: MaterialColorsCode.blue300);
-              int receiverBubbleCode = Hive.box(hiveBox).get(rKey,
-                  defaultValue: MaterialColorsCode.lightBlue200);
+              int senderBubbleCode = Hive.box(hiveBox)
+                  .get(sKey, defaultValue: MaterialColorsCode.blue300);
+              int receiverBubbleCode = Hive.box(hiveBox)
+                  .get(rKey, defaultValue: MaterialColorsCode.lightBlue200);
               return Scaffold(
                 extendBodyBehindAppBar: true,
                 appBar: AppBar(

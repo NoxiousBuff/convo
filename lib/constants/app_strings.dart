@@ -89,6 +89,9 @@ class AnimationType {
 }
 
 class RecentUserField {
-  static const uid = 'uid';
+  static const userUid = 'userUid';
+  static const pinned = 'pinned';
+  static const archive = 'archive';
   static const timestamp = 'timestamp';
+  static const isFromContact = 'isFromContact';
 }

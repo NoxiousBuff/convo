@@ -28,8 +28,8 @@ class _UpdateUserState extends State<UpdateUser> {
     });
     return firestoreApi.updateUser(
       uid: widget.fireUser.id,
-      updateProperty: controller.text,
-      property: widget.property,
+      value: controller.text,
+      propertyName: widget.property,
     );
   }
 

@@ -63,6 +63,7 @@ dependencies:
   contacts_service: ^0.6.1
   shared_preferences: ^2.0.6
   permission_handler: ^8.0.0+2
+  filesize: ^2.0.1
 
 dev_dependencies:
   flutter_test:

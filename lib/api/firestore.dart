@@ -6,6 +6,7 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/services/auth_service.dart';
 
 final FirestoreApi firestoreApi = FirestoreApi();
 
@@ -28,28 +29,59 @@ class FirestoreApi {
 
   Future<void> updateUser(
       {required String uid,
-      required String updateProperty,
-      required String property}) {
+      required dynamic value,
+      required String propertyName}) {
     return subsCollection
         .doc(uid)
-        .update({property: updateProperty})
-        .then((value) => getLogger('FirestoreApi')
-            .wtf("$property is updated to $updateProperty"))
+        .update({propertyName: value})
+        .then((instance) => getLogger('FirestoreApi')
+            .wtf("$propertyName is updated to $value"))
         .catchError((error) =>
             getLogger('FirestoreApi').e("Failed to update user: $error"));
   }
+
+
+  /// Update Recent User
+  Future<void> updateRecentUser({
+    required dynamic value,
+    required String fireUserUid,
+    required String propertyName,
+  }) async {
+    subsCollection
+        .doc(AuthService.liveUser!.uid)
+        .collection(recentFirestoreKey)
+        .doc(fireUserUid)
+        .update({propertyName: value});
+  }
+
+  /// Delete Recent User From Recent and Archive Both
+  Future<void> deleteRecentUser(String fireUserUid) async {
+    await subsCollection
+        .doc(AuthService.liveUser!.uid)
+        .collection(archivesFirestorekey)
+        .doc(fireUserUid)
+        .delete();
+    await subsCollection
+        .doc(AuthService.liveUser!.uid)
+        .collection(recentFirestoreKey)
+        .doc(fireUserUid)
+        .delete();
+  }
+
+  /// Delete User Only From Recent
+  Future<void> deleteOnlyRecent(String fireUserUid) async {
+    await subsCollection
+        .doc(AuthService.liveUser!.uid)
+        .collection(recentFirestoreKey)
+        .doc(fireUserUid)
+        .delete();
+  }
+
 
   Future<void> saveUserDataInHive(String key, dynamic userData) async {
     await hiveApi.saveInHive(HiveApi.userdataHiveBox, key, userData);
   }
 
-  Future<void> addToRecentList(String liveUserUid) async {
-    final value = {
-      RecentUserField.uid: liveUserUid,
-      RecentUserField.timestamp: Timestamp.now().millisecondsSinceEpoch
-    };
-    await hiveApi.saveInHive(HiveApi.recentChatsHiveBox, liveUserUid, value);
-  }
 
   Future<void> createUserInFirebase({
     Function? onError,

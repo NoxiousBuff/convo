@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 
@@ -24,7 +24,6 @@ class SavedPeopleView extends StatelessWidget {
             final savedPeopleList = box.values.toList();
             return ListView.builder(
               padding: const EdgeInsets.all(0),
-              shrinkWrap: true,
               itemCount: savedPeopleList.length,
               itemBuilder: (context, i) {
                 final recentUser = savedPeopleList[i];

@@ -6,6 +6,7 @@ final hiveApi = HiveApi();
 
 class HiveApi {
   final log = getLogger('HiveApi');
+  static const String userContacts = 'userContacts';
   static const String appSettingsBoxName = 'AppSettings';
   static const String recentChatsHiveBox = 'RecentChats';
   static const String userdataHiveBox = 'UserData';
@@ -13,6 +14,7 @@ class HiveApi {
   static const String recentSearchesHiveBox = 'recentSearches';
   Future<void> initialiseHive() async {
     await Hive.openBox(appSettingsBoxName);
+    await Hive.openBox(userContacts);
     await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(userdataHiveBox);
     await Hive.openBox(savedPeopleHiveBox);
@@ -42,6 +44,24 @@ class HiveApi {
     } catch (e) {
       log.e('getFromHive Error:$e');
     }
+  }
+
+  dynamic updateUserdateWithHive(String key, dynamic value) {
+    try {
+      return Hive.box(userdataHiveBox).put(key, value);
+    } catch (e) {
+      log.e('updateUserFromHive Error:$e');
+    }
+  }
+
+  void addToSavedPeople(String uid) {
+    hiveApi.saveInHive(HiveApi.savedPeopleHiveBox, uid, uid);
+    log.wtf('added');
+  }
+
+  void deleteFromSavedPeople(String uid) {
+    hiveApi.deleteInHive(HiveApi.savedPeopleHiveBox, uid);
+    log.wtf('deleted');
   }
 
   dynamic doesHiveContain(

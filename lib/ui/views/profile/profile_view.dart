@@ -1,13 +1,10 @@
-import 'package:hint/api/firestore.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/ui/views/distant_view/distant_view.dart';
-import 'encryption.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/ui/shared/explore_interest_chip.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -15,7 +12,9 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'profile_viewmodel.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  const ProfileView({Key? key, required this.fireUser}) : super(key: key);
+
+  final FireUser fireUser;
 
   static const String id = '/ProfileView';
 
@@ -24,104 +23,196 @@ class ProfileView extends StatelessWidget {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
       builder: (context, model, child) => ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
-          builder: (context, box, child) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              appBar: AppBar(
-                actions: [
-                  IconButton(
-                    onPressed: () async {
-                      final fireUser = await firestoreApi
-                          .getUserFromFirebase(AuthService.liveUser!.uid);
-                      navService.cupertinoPageRoute(
-                          context, DistantView(currentFireUser: fireUser!));
-                    },
-                    icon: const Icon(FeatherIcons.settings),
-                    color: Colors.black,
-                    iconSize: 24,
-                  ),
-                  IconButton(
-                    onPressed: () => navService.cupertinoPageRoute(
-                        context, const EncryptionView()),
-                    icon: const Icon(FeatherIcons.shield),
-                    color: Colors.black,
-                    iconSize: 24,
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(FeatherIcons.edit),
-                    color: Colors.black,
-                    iconSize: 24,
-                  ),
-                  horizontalSpaceSmall
-                ],
-                elevation: 0.0,
-                toolbarHeight: 60,
-                systemOverlayStyle: const SystemUiOverlayStyle(
-                    statusBarIconBrightness: Brightness.dark),
-                title: Text(
-                  box.get(FireUserField.username),
-                  style: const TextStyle(
-                  fontWeight: FontWeight.w700,
+        valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+        builder: (context, model, child) {
+          return Scaffold(
+            backgroundColor: AppColors.white,
+            appBar: AppBar(
+              actions: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(FeatherIcons.moreVertical),
                   color: Colors.black,
-                  fontSize: 32),
+                  iconSize: 24,
                 ),
-                backgroundColor:
-                    MaterialStateColor.resolveWith((Set<MaterialState> states) {
-                  return states.contains(MaterialState.scrolledUnder)
-                      ? Colors.grey.shade50
-                      : Colors.white;
-                }),
-                leadingWidth: 0,
+                horizontalSpaceSmall
+              ],
+              elevation: 0.0,
+              toolbarHeight: 60,
+              title: Text(
+                fireUser.username,
+                style: const TextStyle(
+                  fontSize: 32,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              body: SingleChildScrollView(
-                child: Column(
+              backgroundColor:
+                  MaterialStateColor.resolveWith((Set<MaterialState> states) {
+                return states.contains(MaterialState.scrolledUnder)
+                    ? Colors.grey.shade50
+                    : Colors.white;
+              }),
+              leading: IconButton(
+                color: Colors.black54,
+                icon: const Icon(FeatherIcons.arrowLeft),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            body: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                verticalSpaceRegular,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    verticalSpaceRegular,
-                    Row(
-                      children: [
-                        horizontalSpaceRegular,
-                        ClipOval(
-                          child: SizedBox(
-                            height: 200,
-                            width: 200,
-                            child: Image.network(
-                              box.get(FireUserField.photoUrl),
-                              fit: BoxFit.cover,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: ExtendedImage(
+                        image: NetworkImage(fireUser.photoUrl),
+                        height: 84,
+                        width: 84,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    horizontalSpaceRegular,
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            fireUser.displayName,
+                            style: const TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w700),
+                          ),
+                          verticalSpaceTiny,
+                          Wrap(
+                            spacing: 8,
+                            direction: Axis.horizontal,
+                            children: List.generate(
+                              fireUser.hashTags.length,
+                              (index) => Text(
+                                fireUser.hashTags[index],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.black54,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    verticalSpaceRegular,
-                    Row(
-                      children: [
-                        horizontalSpaceRegular,
-                        Text(
-                          box.get(FireUserField.displayName),
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    verticalSpaceRegular,
-                    Row(
-                      children: [
-                        horizontalSpaceRegular,
-                        Text(
-                          box.get(FireUserField.bio),
-                          style: const TextStyle(fontSize: 14),
-                        )
-                      ],
-                    ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              ),
-            );
-          }),
+                verticalSpaceLarge,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: AppColors.blue,
+                            borderRadius: BorderRadius.circular(14.2)),
+                        child: const Text(
+                          'Message',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    horizontalSpaceSmall,
+                    Container(
+                        height: 40,
+                        width: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14.2),
+                            border: Border.all(color: AppColors.darkGrey)),
+                        child: const Icon(FeatherIcons.send)),
+                    horizontalSpaceSmall,
+                    Container(
+                        height: 40,
+                        width: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14.2),
+                            border: Border.all(color: AppColors.darkGrey)),
+                        child: const Icon(FeatherIcons.zap)),
+                    horizontalSpaceSmall,
+                    ValueListenableBuilder<Box>(
+                        valueListenable:
+                            hiveApi.hiveStream(HiveApi.savedPeopleHiveBox),
+                        builder: (context, savedbox, child) {
+                          final bool alreadySaved = hiveApi.doesHiveContain(
+                              HiveApi.savedPeopleHiveBox, fireUser.id);
+                          return GestureDetector(
+                            onTap: () {
+                              alreadySaved
+                                  ? hiveApi.deleteFromSavedPeople(
+                                      fireUser.id.toString())
+                                  : hiveApi
+                                      .addToSavedPeople(fireUser.id.toString());
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              height: 40,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 7),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14.2),
+                                  border:
+                                      Border.all(color: AppColors.darkGrey)),
+                              child: Center(
+                                child: !alreadySaved
+                                    ? const Icon(
+                                        FeatherIcons.bookmark,
+                                        color: Colors.black,
+                                      )
+                                    : Text(
+                                        'Bookmarked',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade600),
+                                      ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ],
+                ),
+                verticalSpaceLarge,
+                Text(
+                  fireUser.bio,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                verticalSpaceMedium,
+                SizedBox(
+                  child: Wrap(
+                    spacing: 4,
+                    children: List.generate(
+                      fireUser.interests.length,
+                      (index) => exploreInterestChip(fireUser.interests[index]),
+                    ),
+                  ),
+                ),
+                verticalSpaceLarge,
+                bottomPadding(context),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

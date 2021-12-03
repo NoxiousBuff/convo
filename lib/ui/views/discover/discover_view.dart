@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
@@ -8,7 +6,7 @@ import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/loading_list_item.dart';
 import 'package:hint/ui/views/discover/widgets/dule_person.dart';
 import 'package:hint/ui/shared/empty_list_ui.dart';
-import 'package:hint/ui/views/discover/widgets/explore_interest_chip.dart';
+import 'package:hint/ui/shared/explore_interest_chip.dart';
 import 'package:hint/ui/views/saved_people/saved_people_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -67,116 +65,112 @@ class DiscoverView extends StatelessWidget {
           }),
         ),
         backgroundColor: Colors.white,
-        body: ListView(
-          shrinkWrap: true,
-          children: [
-            verticalSpaceMedium,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Explore Interests',
-                    style: TextStyle(
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            sliverVerticalSpaceMedium,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Explore Interests',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                          fontSize: 20),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'See All',
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
-                        fontSize: 20),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    'See All',
-                    style: TextStyle(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    horizontalDefaultMessageSpace,
+                    GestureDetector(
+                      child: const Icon(
+                        FeatherIcons.chevronRight,
+                        color: Colors.black54,
+                        size: 28,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            sliverVerticalSpaceRegular,
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 11),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: userInterest.moviesAndTelevision.length,
+                  itemBuilder: (context, i) {
+                    return exploreInterestChip(
+                        userInterest.moviesAndTelevision[i]);
+                  },
+                ),
+              ),
+            ),
+            sliverVerticalSpaceTiny,
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 11),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: userInterest.automotive.length,
+                  itemBuilder: (context, i) {
+                    return exploreInterestChip(userInterest.automotive[i]);
+                  },
+                ),
+              ),
+            ),
+            sliverVerticalSpaceLarge,
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Text(
+                  'Today\'s Top Picks',
+                  style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  horizontalDefaultMessageSpace,
-                  GestureDetector(
-                    child: const Icon(
-                      FeatherIcons.chevronRight,
-                      color: Colors.black54,
-                      size: 28,
-                    ),
-                  ),
-                ],
+                      color: Colors.black,
+                      fontSize: 20),
+                ),
               ),
             ),
-            verticalSpaceRegular,
-            SizedBox(
-              height: 40,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 11),
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: userInterest.moviesAndTelevision.length,
-                itemBuilder: (context, i) {
-                  return exploreInterestChip(
-                      userInterest.moviesAndTelevision, i);
-                },
-              ),
-            ),
-            verticalSpaceTiny,
-            SizedBox(
-              height: 40,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 11),
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: userInterest.personalFinance.length,
-                itemBuilder: (context, i) {
-                  return exploreInterestChip(userInterest.personalFinance, i);
-                },
-              ),
-            ),
-            verticalSpaceLarge,
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Text(
-                'Today\'s Top Picks',
-                style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                    fontSize: 20),
-              ),
-            ),
-            verticalSpaceRegular,
+            sliverVerticalSpaceRegular,
             FutureBuilder<QuerySnapshot>(
               future: model.peopleSuggestionsFuture,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return ListView.separated(separatorBuilder: (context, i) => const Divider(),
-                      shrinkWrap: true,
-                    itemBuilder: (context, i) =>
-                        loadingUserListItem(context, showInterestChips: true),
-                    itemCount: 3,
-                  );
+                  return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                          (context, i) => loadingUserListItem(context,
+                              showInterestChips: true),
+                          childCount: 3));
                 }
                 final searchResults = snapshot.data!.docs;
                 return searchResults.isNotEmpty
-                    ? ListView.separated(
-                        separatorBuilder: (context, i) {
-                          return const Divider();
-                        },
-                        shrinkWrap: true,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: searchResults.length,
-                        itemBuilder: (context, i) {
-                          FireUser localFireUser =
-                              FireUser.fromFirestore(snapshot.data!.docs[i]);
-                          return dulePerson(context, model, localFireUser,
-                              onTap: () {
-                            log('ghbdfjbgjhfd');
-                            // model.savePeopleinHive(localFireUser.id);
-                          });
-                        },
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: buildEmptyListUi(context,
-                            title: 'More interest\n More friends',
-                            buttonTitle: 'Add interests',
-                            color: AppColors.taintedBackground),
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate((context, i) {
+                        FireUser localFireUser =
+                            FireUser.fromFirestore(snapshot.data!.docs[i]);
+                        return dulePerson(context, model, localFireUser);
+                      }, childCount: searchResults.length))
+                    : SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: buildEmptyListUi(context,
+                              title: 'More interest\n More friends',
+                              buttonTitle: 'Add interests',
+                              color: AppColors.taintedBackground),
+                        ),
                       );
               },
             )

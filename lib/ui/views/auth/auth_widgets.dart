@@ -5,8 +5,13 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/pick_interest/pick_interest_viewmodel.dart';
 
-AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadingIcon = true, Function? onTap}) {
+AppBar cwAuthAppBar(BuildContext context,
+    {required String title,
+    bool showLeadingIcon = true,
+    void Function()? onPressed,
+    List<Widget>? actions}) {
   return AppBar(
+    actions: actions,
     elevation: 0.0,
     systemOverlayStyle:
         const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
@@ -15,25 +20,27 @@ AppBar cwAuthAppBar(BuildContext context, {required String title, bool showLeadi
       style: const TextStyle(
           fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),
     ),
-    backgroundColor: MaterialStateColor.resolveWith((Set<MaterialState> states) {
-              return states.contains(MaterialState.scrolledUnder) ? Colors.grey.shade50 : Colors.white;
-            }),
+    backgroundColor:
+        MaterialStateColor.resolveWith((Set<MaterialState> states) {
+      return states.contains(MaterialState.scrolledUnder)
+          ? Colors.grey.shade50
+          : Colors.white;
+    }),
     leadingWidth: showLeadingIcon ? 56.0 : 0.0,
-    leading: showLeadingIcon ? IconButton(
-      color: Colors.black54,
-      icon: const Icon(FeatherIcons.arrowLeft),
-      onPressed: () {
-        if(onTap != null) onTap;
-        // Navigator.pop(context);
-      },
-    ) : const SizedBox.shrink(),
+    leading: showLeadingIcon
+        ? IconButton(
+            color: Colors.black54,
+            icon: const Icon(FeatherIcons.arrowLeft),
+            onPressed: onPressed,
+          )
+        : const SizedBox.shrink(),
   );
 }
 
 Widget cwAuthProceedButton(BuildContext context,
     {required String buttonTitle,
     void Function()? onTap,
-    required bool isLoading,
+    bool isLoading = false,
     bool isActive = true}) {
   return GestureDetector(
     onTap: isActive
@@ -81,7 +88,6 @@ Widget cwAuthCheckingTile({required String title, required bool value}) {
     mainAxisSize: MainAxisSize.min,
     children: [
       Checkbox(
-        
         activeColor: LightAppColors.primaryContainer,
         checkColor: LightAppColors.onPrimaryContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -129,9 +135,8 @@ Widget cwAuthInterestTopicPicker(
                 ),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: color ?? AppColors.blue
-            ),
+                borderRadius: BorderRadius.circular(20),
+                color: color ?? AppColors.blue),
           ),
           horizontalSpaceRegular,
           Text(

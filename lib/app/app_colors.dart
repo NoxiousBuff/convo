@@ -51,6 +51,7 @@ class AppColors {
   static const darkGrey = Color.fromRGBO(215,217,224, 1);
   static const black = Color.fromARGB(0, 0, 0, 1);
   static const white = Color.fromRGBO(255, 255, 255, 1);
+  static const inActiveGray = CupertinoColors.inactiveGray;
   static const taintedBackground = Color.fromRGBO(254, 250, 240, 1);
 }
 

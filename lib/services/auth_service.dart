@@ -33,7 +33,6 @@ class AuthService {
         password: password,
       )
           .then((value) async {
-        await firestoreApi.addToRecentList(value.user!.uid);
         await value.user!.sendEmailVerification();
         onComplete();
         return value;
@@ -69,7 +68,6 @@ class AuthService {
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) async {
         log.i('The User with email : $email has been successfully logged In');
-        await firestoreApi.addToRecentList(value.user!.uid);
         FireUser? fireuser =
             await firestoreApi.getUserFromFirebase(value.user!.uid);
         if (fireuser != null) {

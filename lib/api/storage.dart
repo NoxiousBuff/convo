@@ -13,22 +13,24 @@ class StorageApi {
 
   final log = getLogger('StorageApi');
 
-  Future<void> uploadFile(String filePath) async {
+   Future<String?> uploadFile(String filePath, String firestorePath, {Function? onError} ) async {
     File file = File(filePath);
     try {
-      await FirebaseStorage.instance
-          .ref('uploads/file-to-upload.png')
-          .putFile(file);
+      final uploaded =
+          await FirebaseStorage.instance.ref(firestorePath).putFile(file);
+      return await uploaded.ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      log.e(e);
+      log.e(e.message);
+      if(onError != null) onError();
+      return null;
     }
   }
 
-  Future<void> uploadFilesList(List<String> filePathList) async {
-    for (String filePath in filePathList) {
-      await uploadFile(filePath);
-    }
-  }
+  // Future<void> uploadFilesList(List<String> filePathList) async {
+  //   for (String filePath in filePathList) {
+  //     await uploadFile(filePath);
+  //   }
+  // }
 
   Future<void> uploadString() async {
     String dataUrl = 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==';

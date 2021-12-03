@@ -23,14 +23,4 @@ class DiscoverViewModel extends BaseViewModel {
     _peopleSuggestionsFuture = searchResults;
     notifyListeners();
   }
-
-  void addToSavedPeople(String uid) {
-    hiveApi.saveInHive(HiveApi.savedPeopleHiveBox, uid, uid);
-    log.wtf('added');
-  }
-
-  void deleteFromSavedPeople(String uid) {
-    hiveApi.deleteInHive(HiveApi.savedPeopleHiveBox, uid);
-    log.wtf('deleted');
-  }
 }

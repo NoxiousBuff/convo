@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'explore_viewmodel.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
-import 'package:stacked/stacked.dart';
-
-import 'explore_viewmodel.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class ExploreView extends StatelessWidget {
   const ExploreView({Key? key}) : super(key: key);
@@ -14,6 +13,7 @@ class ExploreView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ExploreViewModel>.reactive(
       viewModelBuilder: () => ExploreViewModel(),
+      onModelReady: (model) => model.getImages(),
       builder: (context, model, child) => Scaffold(
         extendBodyBehindAppBar: true,
         body: CustomScrollView(
@@ -29,23 +29,17 @@ class ExploreView extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Hero(
                   tag: 'search',
-                  child: GestureDetector(
+                  child: CupertinoTextField.borderless(
+                    padding: const EdgeInsets.all(8.0),
+                    readOnly: true,
                     onTap: () => navService.materialPageRoute(
                         context, const SearchView()),
-                    child: IgnorePointer(
-                      ignoring: false,
-                      child: CupertinoTextField.borderless(
-                        padding: const EdgeInsets.all(8.0),
-                        readOnly: true,
-                        placeholder: 'Search for someone',
-                        placeholderStyle:
-                            TextStyle(color: Colors.grey.shade900),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                      ),
+                    placeholder: 'Search for someone',
+                    placeholderStyle: TextStyle(color: Colors.grey.shade900),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
                   ),
                 ),
@@ -54,16 +48,17 @@ class ExploreView extends StatelessWidget {
             ),
             SliverStaggeredGrid.countBuilder(
               crossAxisCount: 3,
-              itemCount: 30,
-              itemBuilder: (BuildContext context, int index) => Container(
-                color: Colors.grey.shade200,
-                child: Center(
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text('$index'),
-                  ),
-                ),
-              ),
+              itemCount: model.images!.length,
+              itemBuilder: (BuildContext context, int index) {
+                final list = model.images;
+                String? imageLink = list![index].getThumbnailLink();
+                return Container(
+                  color: Colors.grey.shade200,
+                  child: Image.network(
+                      imageLink ?? 'https://pixabay.com/images/id-6818683/',
+                      fit: BoxFit.cover),
+                );
+              },
               staggeredTileBuilder: (int index) => StaggeredTile.count(
                   index % 8 == 0 ? 2 : 1, index % 8 == 0 ? 2 : 1),
               mainAxisSpacing: 4.0,

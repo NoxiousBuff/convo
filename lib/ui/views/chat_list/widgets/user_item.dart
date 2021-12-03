@@ -115,25 +115,16 @@ class UserItem extends StatelessWidget {
                     return buildChatListItemPopup(fireUser: fireUser);
                   });
             },
-            child: ClipOval(
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade100,  
+           child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: ExtendedImage(
+                  image: NetworkImage(fireUser.photoUrl),
+                  height: 56,
+                  width: 56,
+                  fit: BoxFit.cover,
+                  
                 ),
-                height: 56.0,
-                width: 56.0,
-                child: Text(
-                  fireUser.displayName[0].toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 22,
-                  ),
-                ),
-              ),
-            ),
-          ),
+              ),),
           title: Padding(
             padding: const EdgeInsets.only(bottom: 5.0),
             child: Text(

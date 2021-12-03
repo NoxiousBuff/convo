@@ -9,62 +9,39 @@ import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
-import 'package:hint/app/app_logger.dart';
 
-class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
-  final log = getLogger('ChatListViewModel');
-
-  Stream<QuerySnapshot> recentChats() {
+class ArchiveViewModel extends StreamViewModel<QuerySnapshot> {
+  Stream<QuerySnapshot> archiveChats() {
     return FirebaseFirestore.instance
         .collection(subsFirestoreKey)
         .doc(AuthService.liveUser!.uid)
-        .collection(recentFirestoreKey)
+        .collection(archivesFirestorekey)
         .orderBy(DocumentField.timestamp, descending: true)
-        .snapshots(includeMetadataChanges: true);
+        .snapshots();
   }
 
-  Future<void> showTileOptions(String fireuserId, context, bool pinned) async {
+  Future<void> showTileOptions(String fireuserId, context) async {
     return showModalBottomSheet(
       context: context,
       builder: (context) {
         return SizedBox(
-          height: screenHeightPercentage(context, percentage: 0.3),
+          height: screenHeightPercentage(context, percentage: 0.25),
           child: Column(
             children: [
               ListTile(
                 onTap: () {
-                  chatService.addToArchive(fireuserId);
+                  chatService.removeFromArchive(fireuserId);
                   Navigator.pop(context);
                 },
                 leading: const Icon(CupertinoIcons.archivebox_fill),
-                title: Text('Archive',
+                title: Text('Remove',
                     style: Theme.of(context)
                         .textTheme
                         .bodyText2!
                         .copyWith(fontSize: 18)),
               ),
               ListTile(
-                onTap: () {
-                  firestoreApi.updateRecentUser(
-                      fireUserUid: fireuserId,
-                      value: pinned ? false : true,
-                      propertyName: RecentUserField.pinned);
-                  Navigator.pop(context);
-                },
-                leading: Icon(pinned
-                    ? CupertinoIcons.pin_slash_fill
-                    : CupertinoIcons.pin_fill),
-                title: Text(pinned ? 'Remove Pinned' : 'Pinned',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 18)),
-              ),
-              ListTile(
-                onTap: () {
-                  firestoreApi.deleteOnlyRecent(fireuserId);
-                  Navigator.pop(context);
-                },
+                onTap: () => firestoreApi.deleteRecentUser(fireuserId),
                 leading: const Icon(CupertinoIcons.delete_solid),
                 title: Text('Delete',
                     style: Theme.of(context)
@@ -88,5 +65,5 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
   }
 
   @override
-  Stream<QuerySnapshot> get stream => recentChats();
+  Stream<QuerySnapshot> get stream => archiveChats();
 }
