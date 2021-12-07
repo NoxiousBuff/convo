@@ -33,7 +33,7 @@ class PickInterestsView extends StatelessWidget {
         backgroundColor: LightAppColors.background,
         appBar: cwAuthAppBar(context, title: 'Pick few things you like'),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -1,28 +1,38 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/constants/app_strings.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/services/database_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
-import 'package:hint/ui/views/dule/dule_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:stacked/stacked.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/services/auth_service.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/ui/views/dule/dule_view.dart';
+import 'package:hint/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
 
 import 'search_viewmodel.dart';
 
-class SearchView extends StatelessWidget {
+class SearchView extends StatefulWidget {
   const SearchView({Key? key}) : super(key: key);
 
+  @override
+  State<SearchView> createState() => _SearchViewState();
+}
+
+class _SearchViewState extends State<SearchView>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
   AppBar buildSearchHeader(BuildContext context, SearchViewModel model) {
+    final style = Theme.of(context).textTheme.bodyText1;
+
     return AppBar(
       elevation: 0.0,
       backgroundColor: Colors.transparent,
@@ -45,6 +55,14 @@ class SearchView extends StatelessWidget {
             controller: model.searchTech,
             padding: const EdgeInsets.all(8.0),
             placeholder: 'Search for someone',
+            suffix: model.searchTech.text.isEmpty
+                ? const SizedBox.shrink()
+                : IconButton(
+                    onPressed: () => model.searchTech.clear(),
+                    icon: const Icon(
+                      FeatherIcons.x,
+                      color: AppColors.inActiveGray,
+                    )),
             placeholderStyle: TextStyle(color: Colors.indigo.shade900),
             decoration: BoxDecoration(
               color: Colors.indigo.shade50,
@@ -52,59 +70,42 @@ class SearchView extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.0),
             ),
             onChanged: (value) {
+              model.handleDisplayNameSearch(value);
+              model.handleUsernameSearch(value);
+              model.handleEmailSearch(value);
+              model.handleInterestsSearch(value);
               model.updateSearchEmpty();
-              model.handleSearch(value);
             },
           ),
         ),
       ),
       titleSpacing: 0,
+      // actions: [
+      //   IconButton(onPressed: ()=> model.searchTech.clear(), icon:Icon(FeatherIcons.x))
+      // ],
+      bottom: TabBar(
+        isScrollable: true,
+        controller: tabController,
+        indicatorColor: AppColors.inActiveGray,
+        indicatorSize: TabBarIndicatorSize.label,
+        tabs: [
+          Text('Username', style: style),
+          Text('Email', style: style),
+          Text('DisplayName', style: style),
+          Text('Interests', style: style)
+        ],
+      ),
     );
   }
 
-  Widget buildSearchContent(BuildContext context, SearchViewModel model) {
-    return FutureBuilder<QuerySnapshot>(
-      future: model.searchResultFuture,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CupertinoActivityIndicator());
-        }
-        final searchResults = snapshot.data!.docs;
-        return snapshot.data != null && searchResults.isNotEmpty
-            ? ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: searchResults.length,
-                itemBuilder: (context, i) {
-                  FireUser localFireUser =
-                      FireUser.fromFirestore(snapshot.data!.docs[i]);
-                  return UserItem(
-                    fireUser: localFireUser,
-                    onTap: () async {
-                      String liveUserUid = AuthService.liveUser!.uid;
-                      String value = chatService.getConversationId(
-                          localFireUser.id, liveUserUid);
-                      navService.cupertinoPageRoute(
-                          context, DuleView(fireUser: localFireUser));
-                      await databaseService.updateUserDataWithKey(
-                          DatabaseMessageField.roomUid, value);
-                      model.addToRecentSearches(localFireUser.id);
-                    },
-                  );
-                },
-              )
-            : buildEmptySearch();
-      },
-    );
-  }
-
-  Widget buildEmptySearch() {
+  Widget buildEmptySearch(String query) {
     return Container(
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Padding(
+        children: [
+          const Padding(
             padding: EdgeInsets.all(32.0),
             child: Icon(
               FeatherIcons.atSign,
@@ -113,9 +114,9 @@ class SearchView extends StatelessWidget {
             ),
           ),
           Text(
-            'Sorry, nothing found.\nTry searching for another \nusername.',
+            'Sorry, nothing found.\nTry searching for another \n$query.',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
                 color: Colors.black54,
                 fontWeight: FontWeight.w300,
                 fontSize: 24.0),
@@ -173,15 +174,213 @@ class SearchView extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    tabController = TabController(length: 4, initialIndex: 0, vsync: this);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<SearchViewModel>.reactive(
       viewModelBuilder: () => SearchViewModel(),
-      builder: (context, model, child) => Scaffold(
-        appBar: buildSearchHeader(context, model),
-        body: !model.searchEmpty
-            ? buildSearchContent(context, model)
-            : buildInitialContent(model),
+      onDispose: (model) {
+        model.searchTech.dispose();
+      },
+      builder: (context, model, child) => DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          appBar: buildSearchHeader(context, model),
+          body: TabBarView(
+            controller: tabController,
+            children: [
+              usernameSearch(model),
+              emailSearch(model),
+              displayNameSearch(model),
+              interestsSearch(model),
+            ],
+          ),
+          // !model.searchEmpty
+          //     ? buildSearchContent(context, model)
+          //     : buildInitialContent(model),
+        ),
       ),
+    );
+  }
+
+  Widget emailSearch(SearchViewModel model) {
+    return FutureBuilder<QuerySnapshot>(
+      future: model.emailSearchFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return buildInitialContent(model);
+        }
+        final searchResults = snapshot.data!.docs;
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            snapshot.data != null && searchResults.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, index) {
+                        var fireUser =
+                            FireUser.fromFirestore(searchResults[index]);
+                        return UserItem(
+                          fireUser: fireUser,
+                          title: fireUser.email,
+                          subtitle: Text(fireUser.username),
+                          onTap: () async {
+                            String liveUserUid = AuthService.liveUser!.uid;
+                            String value = chatService.getConversationId(
+                                fireUser.id, liveUserUid);
+                            navService.cupertinoPageRoute(
+                                context, DuleView(fireUser: fireUser));
+                            await databaseService.updateUserDataWithKey(
+                                DatabaseMessageField.roomUid, value);
+                            model.addToRecentSearches(fireUser.id);
+                          },
+                        );
+                      },
+                      childCount: searchResults.length,
+                    ),
+                  )
+                : SliverToBoxAdapter(child: buildEmptySearch('email')),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget displayNameSearch(SearchViewModel model) {
+    return FutureBuilder<QuerySnapshot>(
+      future: model.displayNameSearchFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return buildInitialContent(model);
+        }
+        final searchResults = snapshot.data!.docs;
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            snapshot.data != null && searchResults.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, index) {
+                        var fireUser =
+                            FireUser.fromFirestore(searchResults[index]);
+                        return UserItem(
+                          fireUser: fireUser,
+                          title: fireUser.displayName,
+                          onTap: () async {
+                            String liveUserUid = AuthService.liveUser!.uid;
+                            String value = chatService.getConversationId(
+                                fireUser.id, liveUserUid);
+                            navService.cupertinoPageRoute(
+                                context, DuleView(fireUser: fireUser));
+                            await databaseService.updateUserDataWithKey(
+                                DatabaseMessageField.roomUid, value);
+                            model.addToRecentSearches(fireUser.id);
+                          },
+                        );
+                      },
+                      childCount: searchResults.length,
+                    ),
+                  )
+                : SliverToBoxAdapter(child: buildEmptySearch('displayName')),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget usernameSearch(SearchViewModel model) {
+    return FutureBuilder<QuerySnapshot>(
+      future: model.usernameSearchFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return buildInitialContent(model);
+        }
+        final searchResults = snapshot.data!.docs;
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            snapshot.data != null && searchResults.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, index) {
+                        var fireUser =
+                            FireUser.fromFirestore(searchResults[index]);
+                        return UserItem(
+                          fireUser: fireUser,
+                          title: fireUser.username,
+                          onTap: () async {
+                            String liveUserUid = AuthService.liveUser!.uid;
+                            String value = chatService.getConversationId(
+                                fireUser.id, liveUserUid);
+                            navService.cupertinoPageRoute(
+                                context, DuleView(fireUser: fireUser));
+                            await databaseService.updateUserDataWithKey(
+                                DatabaseMessageField.roomUid, value);
+                            model.addToRecentSearches(fireUser.id);
+                          },
+                        );
+                      },
+                      childCount: searchResults.length,
+                    ),
+                  )
+                : SliverToBoxAdapter(child: buildEmptySearch('username')),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget interestsSearch(SearchViewModel model) {
+    return FutureBuilder<QuerySnapshot>(
+      future: model.interestsSearchFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return buildInitialContent(model);
+        }
+        final searchResults = snapshot.data!.docs;
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            snapshot.data != null && searchResults.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, index) {
+                        var fireUser =
+                            FireUser.fromFirestore(searchResults[index]);
+                        return UserItem(
+                          fireUser: fireUser,
+                          title: fireUser.username,
+                          onTap: () async {
+                            String liveUserUid = AuthService.liveUser!.uid;
+                            String value = chatService.getConversationId(
+                                fireUser.id, liveUserUid);
+                            navService.cupertinoPageRoute(
+                                context, DuleView(fireUser: fireUser));
+                            await databaseService.updateUserDataWithKey(
+                                DatabaseMessageField.roomUid, value);
+                            model.addToRecentSearches(fireUser.id);
+                          },
+                        );
+                      },
+                      childCount: searchResults.length,
+                    ),
+                  )
+                : SliverToBoxAdapter(child: buildEmptySearch('Interests')),
+          ],
+        );
+      },
     );
   }
 }

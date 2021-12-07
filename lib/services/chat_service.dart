@@ -10,7 +10,6 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/dule/dule_view.dart';
 
-import 'auth_service.dart';
 import 'database_service.dart';
 import 'nav_service.dart';
 
@@ -63,24 +62,10 @@ class ChatService {
         value: true,
         fireUserUid: fireuserId,
         propertyName: RecentUserField.archive);
-    await subsCollection
-        .doc(AuthService.liveUser!.uid)
-        .collection(archivesFirestorekey)
-        .doc(fireuserId)
-        .set({
-      RecentUserField.userUid: fireuserId,
-      RecentUserField.isFromContact: false,
-      RecentUserField.timestamp: Timestamp.now(),
-    });
   }
 
   /// Remove user from archive
   Future<void> removeFromArchive(String fireuserId) async {
-    await subsCollection
-        .doc(AuthService.liveUser!.uid)
-        .collection(archivesFirestorekey)
-        .doc(fireuserId)
-        .delete();
     await firestoreApi.updateRecentUser(
         value: false,
         fireUserUid: fireuserId,

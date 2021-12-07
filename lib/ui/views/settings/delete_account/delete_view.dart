@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
 
 class DeleteMyAccount extends StatelessWidget {
   const DeleteMyAccount({Key? key}) : super(key: key);
@@ -23,25 +24,7 @@ class DeleteMyAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: true,
-        middle: Row(
-          children: [
-            Text(
-              'Security',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-          ],
-        ),
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(
-            Icons.arrow_back_ios_new,
-            size: 22,
-          ),
-        ),
-      ),
+      appBar: cwAuthAppBar(context, title:'Security',onPressed: ()=> Navigator.pop(context)),
       body: Column(
         children: [
           const SizedBox(height: 40),

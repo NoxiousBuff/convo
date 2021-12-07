@@ -51,16 +51,17 @@ Widget cwCIInterestTopicPicker(
 }
 
 Widget cwCIInterestChip(String label, ChangeInterestViewModel model) {
-  bool isSelected = model.userInterests.contains(label);
+  bool isSelected = model.userSelectedInterests.contains(label);
   return GestureDetector(
     onTap: () {
       if (!isSelected) {
-        model.userInterests.add(label);
+        model.userSelectedInterests.add(label);
         log('added $label');
       } else {
-        model.userInterests.remove(label);
+        model.userSelectedInterests.remove(label);
         log('remove $label');
       }
+      model.isEdited ? () {} : model.updateIsEdited(true);
       model.notifyListeners();
     },
     child: Chip(

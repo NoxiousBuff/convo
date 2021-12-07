@@ -24,7 +24,7 @@ class CredentialAuthView extends StatelessWidget {
         backgroundColor: Colors.white,
         appBar: cwAuthAppBar(context, title: 'SignUp'),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Form(
             key: model.credentialFormKey,
             child: Stack(

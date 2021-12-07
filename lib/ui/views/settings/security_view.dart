@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hive/hive.dart';
 
 class SecurityView extends StatelessWidget {
@@ -11,30 +14,16 @@ class SecurityView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: true,
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'SecurityView',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-          ],
-        ),
+      backgroundColor: AppColors.white,
+      appBar: cwAuthAppBar(
+        context,
+        title: 'Security',
+        onPressed: () => Navigator.pop(context),
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          const SizedBox(height: 20),
+          verticalSpaceRegular,
           Align(
             alignment: Alignment.center,
             child: CircleAvatar(
@@ -53,49 +42,47 @@ class SecurityView extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          verticalSpaceMedium,
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 30),
-            child: Text(
+            child: const Text(
               'Messages in end-to-end encrypted chats stay between you and the people you choose. Not even Dule can read them.',
-              textAlign: TextAlign.left,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(fontSize: 16, color: Colors.black54),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.black54,
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          verticalSpaceMedium,
           const Divider(height: 0),
-          const SizedBox(height: 20),
-          ListTile(
-            title: const Text(
-              'Show security notifications on this phone',
-            ),
-            trailing: ValueListenableBuilder<Box>(
-              valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
-              builder: (context, box, child) {
-                const boxName = HiveApi.appSettingsBoxName;
-                const key = AppSettingKeys.securityNotifications;
-                bool securityNotifications =
-                    Hive.box(boxName).get(key, defaultValue: false);
-                return CupertinoSwitch(
-                  value: securityNotifications,
-                  onChanged: (val) {
-                    box.put(AppSettingKeys.securityNotifications,
-                        !securityNotifications);
-                  },
-                );
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Get notify when your security code changes for a contacts\'s phone in an end-to-end encrypted chat.',
-              style:
-                  Theme.of(context).textTheme.caption!.copyWith(fontSize: 14),
-            ),
+          verticalSpaceMedium,
+          ValueListenableBuilder<Box>(
+            valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
+            builder: (context, box, child) {
+              const boxName = HiveApi.appSettingsBoxName;
+              const key = AppSettingKeys.securityNotifications;
+              bool securityNotifications =
+                  Hive.box(boxName).get(key, defaultValue: false);
+              return Row(
+                children: [
+                  Expanded(
+                      child: cwEADetailsTile(
+                          context, 'Show security notifications',
+                          subtitle:
+                              'Get notify when your security code changes for a contacts\'s phone in an end-to-end encrypted chat.',
+                          showTrailingIcon: false)),
+                  horizontalSpaceRegular,
+                  CupertinoSwitch(
+                    value: securityNotifications,
+                    onChanged: (val) {
+                      box.put(AppSettingKeys.securityNotifications,
+                          !securityNotifications);
+                    },
+                  )
+                ],
+              );
+            },
           ),
         ],
       ),

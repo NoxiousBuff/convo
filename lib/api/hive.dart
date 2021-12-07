@@ -12,11 +12,15 @@ class HiveApi {
   static const String userdataHiveBox = 'UserData';
   static const String savedPeopleHiveBox = 'savedPeople';
   static const String recentSearchesHiveBox = 'recentSearches';
+  static const String pinnedUsersHiveBox = 'pinnedUsers';
+  static const String archivedUsersHiveBox = 'archiveUsers';
   Future<void> initialiseHive() async {
     await Hive.openBox(appSettingsBoxName);
+    await Hive.openBox(pinnedUsersHiveBox);
+    await Hive.openBox(userdataHiveBox);
+    await Hive.openBox(archivedUsersHiveBox);
     await Hive.openBox(userContacts);
     await Hive.openBox(recentChatsHiveBox);
-    await Hive.openBox(userdataHiveBox);
     await Hive.openBox(savedPeopleHiveBox);
     await Hive.openBox(recentSearchesHiveBox);
   }
@@ -56,12 +60,32 @@ class HiveApi {
 
   void addToSavedPeople(String uid) {
     hiveApi.saveInHive(HiveApi.savedPeopleHiveBox, uid, uid);
-    log.wtf('added');
+    log.wtf('$uid added to saved people');
   }
 
   void deleteFromSavedPeople(String uid) {
     hiveApi.deleteInHive(HiveApi.savedPeopleHiveBox, uid);
-    log.wtf('deleted');
+    log.wtf('$uid deleted from saved people');
+  }
+
+  void addToPinnedUsers(String uid) {
+    hiveApi.saveInHive(HiveApi.pinnedUsersHiveBox, uid, uid);
+    log.wtf('$uid added to pinned users');
+  }
+
+  void deleteFromPinnedUsers(String uid) {
+    hiveApi.deleteInHive(HiveApi.pinnedUsersHiveBox, uid);
+    log.wtf('$uid deleted from pinned users');
+  }
+
+  void addToArchivedUsers(String uid) {
+    hiveApi.saveInHive(HiveApi.archivedUsersHiveBox, uid, uid);
+    log.wtf('$uid added to archived users');
+  }
+
+  void deleteFromArchivedUsers(String uid) {
+    hiveApi.deleteInHive(HiveApi.archivedUsersHiveBox, uid);
+    log.wtf('$uid deleted from archived users');
   }
 
   dynamic doesHiveContain(
@@ -90,6 +114,13 @@ class HiveApi {
             'The item for the key:$key in hiveBox:$hiveBoxName has been successfully deleted.'))
         .onError((error, stackTrace) => log.e(
             'The value for the key in hiveBox:$hiveBoxName has not been deleted. Error : $error'));
+  }
+
+  Future<void> saveAndReplace(
+      String hiveBoxName, dynamic key, dynamic value) async {
+    Hive.box(hiveBoxName).put(key, value);
+    log.wtf('Value:$value');
+    log.wtf('Succesfully Replace In Hive');
   }
 
   Future<void> saveInHive(

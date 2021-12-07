@@ -1,7 +1,5 @@
-import 'dart:math';
-
-import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item_viewmodel.dart';
-import 'package:stacked/stacked.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
@@ -10,22 +8,19 @@ import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/ui/views/dule/dule_view.dart';
-import 'package:hint/services/database_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 // ignore: must_be_immutable
 class UserListItem extends StatelessWidget {
   bool pinned;
   final String userUid;
+  final Function? onTap;
   UserListItem({
     Key? key,
     required this.userUid,
     this.pinned = false,
+    this.onTap,
   }) : super(key: key);
 
   final log = getLogger('UserListItem');
@@ -47,7 +42,7 @@ class UserListItem extends StatelessWidget {
           return Text(
             isOnline ? 'Online' : 'Offline',
             style: Theme.of(context).textTheme.caption!.copyWith(
-                color: isOnline ? AppColors.green : AppColors.darkGrey),
+                color: isOnline ? AppColors.blue : AppColors.darkGrey),
           );
         } else {
           return const SizedBox.shrink();
@@ -56,56 +51,37 @@ class UserListItem extends StatelessWidget {
     );
   }
 
-  Future<void> updateRTDB(FireUser fireUser, BuildContext context) async {
-    String liveUserUid = AuthService.liveUser!.uid;
-    String value = chatService.getConversationId(fireUser.id, liveUserUid);
-
-    await databaseService.updateUserDataWithKey(
-        DatabaseMessageField.roomUid, value);
-    navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<UserListItemViewModel>.reactive(
-      viewModelBuilder: () => UserListItemViewModel(userUid),
-      builder: (context, model, child) {
-        final _data = model.data;
-        if (model.hasError) {
-          return const Center(
-            child: Text('It has Error'),
-          );
-        }
-        if (!model.dataReady) {
-          return loadingUserListItem(context);
-        } else {
-          if (_data != null) {
-            final fireUser = FireUser.fromFirestore(_data);
-            return ListTile(
-              onTap: () => updateRTDB(fireUser, context),
-              leading: CircleAvatar(
-                maxRadius: 30,
-                backgroundImage: NetworkImage(fireUser.photoUrl),
-              ),
-              title: Text(
-                fireUser.displayName,
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              subtitle: userStatus(fireUser),
-              trailing: pinned
-                  ? Transform.rotate(
-                      angle: pi / 180 - 5,
-                      child: const Icon(CupertinoIcons.pin_fill))
-                  : const SizedBox.shrink(),
+    return FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance
+            .collection(subsFirestoreKey)
+            .doc(userUid)
+            .get(),
+        builder: (context, snapshot) {
+          Widget child;
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text('It has Error'),
             );
           }
-        }
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: loadingUserListItem(context),
-        );
-      },
-    );
+          if (!snapshot.hasData) {
+            child = loadingUserListItem(context);
+          } else {
+            FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
+            child = UserItem(
+                fireUser: fireUser,
+                onTap: () {
+                  chatService.startDuleConversation(context, fireUser);
+                },
+                title: fireUser.displayName, subtitle: userStatus(fireUser));
+          }
+
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: child,
+          );
+        });
   }
 
   Widget loadingUserListItem(BuildContext context) {
@@ -117,28 +93,27 @@ class UserListItem extends StatelessWidget {
           bottomLeft: Radius.circular(20),
         ),
       ),
-      leading: ClipOval(
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                Colors.indigo.shade300.withAlpha(30),
-                Colors.indigo.shade400.withAlpha(50),
-              ],
-              focal: Alignment.topLeft,
-              radius: 0.8,
-            ),
+      leading: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          gradient: RadialGradient(
+            colors: [
+              Colors.indigo.shade300.withAlpha(30),
+              Colors.indigo.shade400.withAlpha(50),
+            ],
+            focal: Alignment.topLeft,
+            radius: 0.8,
           ),
-          height: 56.0,
-          width: 56.0,
-          child: const Text(
-            '',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+        height: 56.0,
+        width: 56.0,
+        child: const Text(
+          '',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

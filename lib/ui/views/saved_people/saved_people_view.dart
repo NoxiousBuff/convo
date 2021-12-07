@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -17,7 +18,10 @@ class SavedPeopleView extends StatelessWidget {
     return ViewModelBuilder<SavedPeopleViewModel>.reactive(
       viewModelBuilder: () => SavedPeopleViewModel(),
       builder: (context, model, child) => Scaffold(
-        appBar: cwAuthAppBar(context, title: 'Saved People'),
+        backgroundColor: Colors.white,
+        appBar: cwAuthAppBar(context, title: 'Saved People', onPressed: () {
+          Navigator.pop(context);
+        }),
         body: ValueListenableBuilder<Box>(
           valueListenable: hiveApi.hiveStream(HiveApi.savedPeopleHiveBox),
           builder: (context, box, child) {
@@ -26,8 +30,20 @@ class SavedPeopleView extends StatelessWidget {
               padding: const EdgeInsets.all(0),
               itemCount: savedPeopleList.length,
               itemBuilder: (context, i) {
-                final recentUser = savedPeopleList[i];
-                return UserListItem(userUid: recentUser);
+                final savedUser = savedPeopleList[i];
+                return Row(
+                  children: [
+                    Expanded(
+                      child: UserListItem(
+                        userUid: savedUser,
+                        onTap: () {
+                          log('printed');
+                        },
+                      ),
+                    ),
+                    
+                  ],
+                );
               },
             );
           },

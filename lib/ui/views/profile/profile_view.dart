@@ -1,6 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/shared/explore_interest_chip.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -84,11 +85,32 @@ class ProfileView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            fireUser.displayName,
-                            style: const TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.w700),
-                          ),
+                          SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      fireUser.displayName,
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    horizontalSpaceTiny,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+                                      decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: AppColors.darkGrey)),
+                                  child: Text(
+                                fireUser.romanticStatus!,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                                    )
+                                  ],
+                                ),
+                              ),
                           verticalSpaceTiny,
                           Wrap(
                             spacing: 8,
@@ -114,18 +136,24 @@ class ProfileView extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        height: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            color: AppColors.blue,
-                            borderRadius: BorderRadius.circular(14.2)),
-                        child: const Text(
-                          'Message',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14.2),
+                            onTap: () {
+                              chatService.startDuleConversation(context, fireUser);
+                            },
+                        child: Container(
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: AppColors.blue,
+                              borderRadius: BorderRadius.circular(14.2)),
+                          child: const Text(
+                            'Message',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -139,15 +167,6 @@ class ProfileView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(14.2),
                             border: Border.all(color: AppColors.darkGrey)),
                         child: const Icon(FeatherIcons.send)),
-                    horizontalSpaceSmall,
-                    Container(
-                        height: 40,
-                        width: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14.2),
-                            border: Border.all(color: AppColors.darkGrey)),
-                        child: const Icon(FeatherIcons.zap)),
                     horizontalSpaceSmall,
                     ValueListenableBuilder<Box>(
                         valueListenable:

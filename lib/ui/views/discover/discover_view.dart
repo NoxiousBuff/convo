@@ -7,6 +7,7 @@ import 'package:hint/ui/shared/loading_list_item.dart';
 import 'package:hint/ui/views/discover/widgets/dule_person.dart';
 import 'package:hint/ui/shared/empty_list_ui.dart';
 import 'package:hint/ui/shared/explore_interest_chip.dart';
+import 'package:hint/ui/views/discover_interest/discover_interest_view.dart';
 import 'package:hint/ui/views/saved_people/saved_people_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,11 @@ class DiscoverView extends StatelessWidget {
       viewModelBuilder: () => DiscoverViewModel(),
       builder: (context, model, child) => Scaffold(
         appBar: AppBar(
+          // shape: RoundedRectangleBorder(side: MaterialStateBorderSide.resolveWith((states) {
+          //   return states.contains(MaterialState.scrolledUnder)
+          // ? BorderSide(color: Colors.red, width: 3)
+          // : BorderSide(color: Colors.black);
+          // })),
           systemOverlayStyle: const SystemUiOverlayStyle(
               statusBarIconBrightness: Brightness.dark),
           elevation: 0.0,
@@ -111,8 +117,14 @@ class DiscoverView extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   itemCount: userInterest.moviesAndTelevision.length,
                   itemBuilder: (context, i) {
-                    return exploreInterestChip(
-                        userInterest.moviesAndTelevision[i]);
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(100),
+                      onTap: () {
+                        navService.cupertinoPageRoute(context, DiscoverInterestView(interestName: userInterest.moviesAndTelevision[i]));
+                      },
+                      child: exploreInterestChip(
+                          userInterest.moviesAndTelevision[i]),
+                    );
                   },
                 ),
               ),
@@ -173,7 +185,9 @@ class DiscoverView extends StatelessWidget {
                         ),
                       );
               },
-            )
+            ),
+            sliverVerticalSpaceLarge,
+            SliverToBoxAdapter(child: bottomPadding(context)),
           ],
         ),
       ),

@@ -1,3 +1,6 @@
+import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
+
 import 'privacy_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
@@ -160,137 +163,73 @@ class PrivacyView extends StatelessWidget {
       viewModelBuilder: () => PrivacyViewModel(),
       builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: CupertinoNavigationBar(
-            backgroundColor: Colors.transparent,
-            automaticallyImplyLeading: true,
-            leading: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 22,
-                  ),
+          backgroundColor: AppColors.white,
+          appBar: cwAuthAppBar(context,
+              title: 'Privacy', onPressed: () => Navigator.pop(context)),
+          body: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              Container(
+                color: AppColors.white,
+                child: Column(
+                  children: [
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.only(left: 16, top: 16),
+                    //     child: Text(
+                    //       'Who can see my personal info',
+                    //       style: Theme.of(context)
+                    //           .textTheme
+                    //           .bodyText1!
+                    //           .copyWith(color: Colors.black54),
+                    //     ),
+                    //   ),
+                    // ),
+                    cwEAHeading('Who can see \nmy personal info'),
+                    cwEADescriptionTitle(context,
+                        'If you don\'t share your username & online status, you won\'t be able to see others people details.'),
+                    verticalSpaceRegular,
+                    cwEADetailsTile(context, 'Online Status',
+                        onTap: () => lastSeenDialog(viewModel, context)),
+                    cwEADetailsTile(context, 'Profile photo',
+                        onTap: () => profilePhotoDialog(viewModel, context)),
+                    cwEADetailsTile(context, 'Bio',
+                        onTap: () => aboutDialog(viewModel, context)),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'PrivacyView',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ],
-            ),
-          ),
-          body: SizedBox(
-            width: screenWidth(context),
-            height: screenHeight(context),
-            child: Column(
-              children: [
-                Container(
-                  color: AppColors.white,
-                  child: Column(
+              ),
+              const SizedBox(height: 20),
+              ValueListenableBuilder<Box>(
+                valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
+                builder: (context, box, child) {
+                  const boxName = HiveApi.appSettingsBoxName;
+                  const key = AppSettingKeys.incognatedMode;
+                  bool incognatedMode =
+                      Hive.box(boxName).get(key, defaultValue: false);
+                  return Row(
                     children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16, top: 16),
-                          child: Text(
-                            'Who can see my personal info',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1!
-                                .copyWith(color: Colors.black54),
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        subtitle: Text(
-                          'If you dpn\'t share your username, Online status, you won\'t be able to see others people details.',
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                      ),
-                      widget(
-                        context: context,
-                        text: 'Online Status',
-                        subtitle: viewModel.lastSeenSubtitle,
-                        onTap: () => lastSeenDialog(viewModel, context),
-                      ),
-                      widget(
-                        context: context,
-                        text: 'Profile photo',
-                        subtitle: viewModel.profileSubtitle,
-                        onTap: () => profilePhotoDialog(viewModel, context),
-                      ),
-                      widget(
-                        context: context,
-                        text: 'Bio',
-                        subtitle: viewModel.aboutSubtitle,
-                        onTap: () => aboutDialog(viewModel, context),
-                      ),
+                      Expanded(
+                          child: cwEADetailsTile(context, 'Incongnito Mode',
+                              subtitle:
+                                  'If you on this setting no one can see your your online status and your username in live chat',
+                              showTrailingIcon: false)),
+                              horizontalSpaceRegular,
+                      CupertinoSwitch(
+                      value: incognatedMode,
+                        onChanged: (val) {
+                          box.put(
+                              AppSettingKeys.incognatedMode, !incognatedMode);
+                        },
+                      )
                     ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  color: AppColors.white,
-                  child: ListTile(
-                    isThreeLine: true,
-                    title: const Text('Incognated Mode'),
-                    trailing: ValueListenableBuilder<Box>(
-                      valueListenable:
-                          hiveApi.hiveStream(HiveApi.appSettingsBoxName),
-                      builder: (context, box, child) {
-                        const boxName = HiveApi.appSettingsBoxName;
-                        const key = AppSettingKeys.incognatedMode;
-                        bool incognatedMode =
-                            Hive.box(boxName).get(key, defaultValue: false);
-                        return CupertinoSwitch(
-                          value: incognatedMode,
-                          onChanged: (val) {
-                            box.put(
-                                AppSettingKeys.incognatedMode, !incognatedMode);
-                          },
-                        );
-                      },
-                    ),
-                    subtitle: Text(
-                      'If you on this setting no one can see your your online status and your username in live chat',
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget widget({
-    required String text,
-    required Function onTap,
-    String? subtitle = '',
-    required BuildContext context,
-  }) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap as void Function()?,
-          child: ListTile(
-            title: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            subtitle: Text(subtitle!,
-                style: Theme.of(context)
-                    .textTheme
-                    .caption!
-                    .copyWith(color: AppColors.black)),
-          ),
-        ),
-        const Divider(height: 0.0),
-      ],
     );
   }
 }

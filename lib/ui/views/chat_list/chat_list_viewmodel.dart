@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/firestore.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
@@ -34,6 +34,7 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
               ListTile(
                 onTap: () {
                   chatService.addToArchive(fireuserId);
+                  hiveApi.addToArchivedUsers(fireuserId);
                   Navigator.pop(context);
                 },
                 leading: const Icon(CupertinoIcons.archivebox_fill),
@@ -49,6 +50,9 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
                       fireUserUid: fireuserId,
                       value: pinned ? false : true,
                       propertyName: RecentUserField.pinned);
+                  pinned
+                      ? hiveApi.deleteFromPinnedUsers(fireuserId)
+                      : hiveApi.addToPinnedUsers(fireuserId);
                   Navigator.pop(context);
                 },
                 leading: Icon(pinned
@@ -67,14 +71,6 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
                 },
                 leading: const Icon(CupertinoIcons.delete_solid),
                 title: Text('Delete',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontSize: 18)),
-              ),
-              ListTile(
-                leading: const Icon(FeatherIcons.bellOff),
-                title: Text('Diasble Notification',
                     style: Theme.of(context)
                         .textTheme
                         .bodyText2!

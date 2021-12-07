@@ -120,7 +120,7 @@ class FirestoreApi {
       saveUserDataInHive(FireUserField.country, country);
       saveUserDataInHive(FireUserField.countryPhoneCode, countryPhoneCode);
       saveUserDataInHive(FireUserField.email, user.email);
-      saveUserDataInHive(FireUserField.hashTags, ['#Dule User']);
+      saveUserDataInHive(FireUserField.hashTags, ['#duleuser', '#new' , '#available']);
       saveUserDataInHive(FireUserField.id, user.uid);
       saveUserDataInHive(FireUserField.interests, interests);
       saveUserDataInHive(FireUserField.phone, phoneNumber);

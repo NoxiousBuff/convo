@@ -9,7 +9,7 @@ import 'package:hint/ui/shared/explore_interest_chip.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/edit_account_view.dart';
 import 'package:hint/ui/views/contacts/contacts_view.dart';
-import 'package:hint/ui/views/distant_view/distant_view.dart';
+import 'package:hint/ui/views/settings/settings_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 
@@ -44,7 +44,7 @@ class AccountView extends StatelessWidget {
                   actions: [
                     IconButton(
                       onPressed: () => navService.cupertinoPageRoute(
-                          context, const DistantView()),
+                          context, const SettingsView()),
                       icon: const Icon(FeatherIcons.settings),
                       color: Colors.black,
                       iconSize: 24,
@@ -79,7 +79,6 @@ class AccountView extends StatelessWidget {
                   leadingWidth: 0,
                 ),
                 body: ListView(
-                  shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     verticalSpaceRegular,
@@ -184,7 +183,6 @@ class AccountView extends StatelessWidget {
                     ),
                     verticalSpaceMedium,
                     SizedBox(
-                      // margin: const EdgeInsets.symmetric(horizontal: 8),
                       child: Wrap(
                         spacing: 4,
                         children: List.generate(

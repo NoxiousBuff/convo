@@ -8,8 +8,6 @@ import 'app/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // Directory appDocDir = await getApplicationDocumentsDirectory();
-  // String appDocPath = appDocDir.path;
   await Hive.initFlutter();
   await hiveApi.initialiseHive();
   runApp(const ProviderScope(child: MyApp()));

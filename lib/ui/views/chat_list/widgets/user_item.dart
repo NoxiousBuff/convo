@@ -1,23 +1,24 @@
 import 'dart:ui';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class UserItem extends StatelessWidget {
-  final FireUser fireUser;
+  final String title;
   final Widget? trailing;
   final Widget? subtitle;
+  final FireUser fireUser;
   final void Function()? onTap;
   const UserItem(
       {Key? key,
+      required this.title,
       required this.fireUser,
       required this.onTap,
       this.trailing,
-      this.subtitle
-      })
+      this.subtitle})
       : super(key: key);
 
   buildChatListItemPopup({required FireUser fireUser}) {
@@ -99,49 +100,49 @@ class UserItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-          onTap: onTap,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-            ),
+      onTap: onTap,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          bottomLeft: Radius.circular(20),
+        ),
+      ),
+      trailing: trailing ?? const SizedBox.shrink(),
+      leading: GestureDetector(
+        onTap: () {
+          showCupertinoModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return buildChatListItemPopup(fireUser: fireUser);
+              });
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: ExtendedImage(
+            image: NetworkImage(fireUser.photoUrl),
+            height: 56,
+            width: 56,
+            fit: BoxFit.cover,
           ),
-          trailing: trailing ?? const SizedBox.shrink(),
-          leading: GestureDetector(
-            onTap: () {
-              showCupertinoModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return buildChatListItemPopup(fireUser: fireUser);
-                  });
-            },
-           child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: ExtendedImage(
-                  image: NetworkImage(fireUser.photoUrl),
-                  height: 56,
-                  width: 56,
-                  fit: BoxFit.cover,
-                  
-                ),
-              ),),
-          title: Padding(
-            padding: const EdgeInsets.only(bottom: 5.0),
-            child: Text(
-              fireUser.displayName,
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+        ),
+      ),
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5.0),
+        child: Text(
+          fireUser.displayName,
+          style: const TextStyle(
+            fontSize: 20,
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
           ),
-          subtitle: subtitle ?? Text(
-            fireUser.email,
-            style: const TextStyle(
-              color: Colors.black,
-            ),
-          ),
-        );
+        ),
+      ),
+      subtitle: subtitle ?? Text(
+        fireUser.email,
+        style: const TextStyle(
+          color: Colors.black,
+        ),
+      ),
+    );
   }
 }

@@ -1,201 +1,206 @@
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/ui/shared/empty_list_ui.dart';
 import 'package:hint/ui/views/main/main_view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/archives/archives_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
 
-class ChatListView extends StatefulWidget {
+class ChatListView extends StatelessWidget {
   const ChatListView({Key? key}) : super(key: key);
-
-  @override
-  State<ChatListView> createState() => _ChatListViewState();
-}
-
-class _ChatListViewState extends State<ChatListView> {
-  final log = getLogger('ChatListView');
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatListViewModel>.reactive(
       viewModelBuilder: () => ChatListViewModel(),
       builder: (context, model, child) {
-        final data = model.data;
-        if (model.hasError) {
-          return const Center(
-            child: Text('Model has Error'),
-          );
-        }
-        if (!model.dataReady) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (data != null) {
-          final docs = data.docs;
-          return Scaffold(
-            body: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                CupertinoSliverNavigationBar(
-                  backgroundColor: Colors.white,
-                  automaticallyImplyLeading: false,
-                  leading: const Material(
-                    color: Colors.transparent,
-                    child: Icon(FeatherIcons.linkedin),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Material(
-                        color: Colors.transparent,
-                        child: IconButton(
-                          icon: const Icon(FeatherIcons.userPlus),
-                          onPressed: () {},
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: IconButton(
-                          icon: const Icon(FeatherIcons.send),
-                          onPressed: () {
-                            mainViewPageController.animateToPage(1,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOut);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  stretch: true,
-                  largeTitle: const Text('Friends'),
-                  border: Border.all(width: 0.0, color: Colors.transparent),
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              CupertinoSliverNavigationBar(
+                backgroundColor: Colors.white,
+                automaticallyImplyLeading: false,
+                leading: const Material(
+                  color: Colors.transparent,
+                  child: Icon(FeatherIcons.linkedin),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: buildEmptyListUi(context),
-                  ),
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection(subsFirestoreKey)
-                            .doc(AuthService.liveUser!.uid)
-                            .collection(archivesFirestorekey)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          final archiveData = snapshot.data;
-                          if (snapshot.hasError) {
-                            return const Center(
-                              child: Text('Archive Has Error'),
-                            );
-                          }
-                          if (archiveData != null) {
-                            final archiveDocs = archiveData.docs;
-                            return archiveDocs.isNotEmpty
-                                ? ListTile(
-                                    onTap: () {
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: const Icon(FeatherIcons.userPlus),
+                        onPressed: () {
+                          log(Hive.box(HiveApi.pinnedUsersHiveBox)
+                              .values
+                              .toString());
+                        },
+                      ),
+                    ),
+                    ValueListenableBuilder<Box>(
+                        valueListenable:
+                            hiveApi.hiveStream(HiveApi.archivedUsersHiveBox),
+                        builder: (context, archivedUsersBox, child) {
+                          final archivedUsersList =
+                              archivedUsersBox.values.toList();
+                          return archivedUsersList.isEmpty
+                              ? const SizedBox.shrink()
+                              : Material(
+                                  color: Colors.transparent,
+                                  child: IconButton(
+                                    icon: const Icon(FeatherIcons.archive),
+                                    onPressed: () {
                                       navService.cupertinoPageRoute(
                                           context, const ArchiveView());
                                     },
-                                    leading: const CircleAvatar(
-                                      backgroundColor: Colors.transparent,
-                                      maxRadius: 30,
-                                      child: Icon(
-                                        CupertinoIcons.archivebox_fill,
-                                        color: AppColors.blue,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      'Archive',
-                                      style:
-                                          Theme.of(context).textTheme.headline6,
-                                    ),
-                                  )
-                                : const SizedBox.shrink();
-                          } else {
-                            return const SizedBox.shrink();
-                          }
+                                  ),
+                                );
+                        }),
+                    Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: const Icon(FeatherIcons.send),
+                        onPressed: () {
+                          mainViewPageController.animateToPage(1,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut);
                         },
                       ),
-                      SizedBox(
-                        height: screenHeight(context),
-                        child: Column(
-                          children: [
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: docs.length,
-                              padding: EdgeInsets.zero,
-                              itemBuilder: (context, i) {
-                                final doc = docs[i];
-                                final uid = doc[RecentUserField.userUid];
-                                bool pinned = doc[RecentUserField.pinned];
-                                return pinned
-                                    ? GestureDetector(
-                                        onLongPress: () =>
-                                            model.showTileOptions(
-                                                uid, context, pinned),
-                                        child: UserListItem(
-                                            userUid: uid, pinned: pinned))
-                                    : const SizedBox.shrink();
-                              },
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: docs.length,
-                              padding: EdgeInsets.zero,
-                              physics: const BouncingScrollPhysics(),
-                              itemBuilder: (context, i) {
-                                final doc = docs[i];
-                                final uid = doc[RecentUserField.userUid];
-                                bool archive = doc[RecentUserField.archive];
-                                bool pinned = doc[RecentUserField.pinned];
-
-                                return archive
-                                    ? const SizedBox.shrink()
-                                    : pinned
-                                        ? const SizedBox.shrink()
-                                        : GestureDetector(
-                                            onLongPress: () =>
-                                                model.showTileOptions(
-                                                    uid, context, pinned),
-                                            child: UserListItem(
-                                              userUid: uid,
-                                              pinned: pinned,
-                                            ),
-                                          );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        } else {
-          return const Text('Data Is Null');
-        }
+                stretch: true,
+                largeTitle: const Text('Friends'),
+                border: Border.all(width: 0.0, color: Colors.transparent),
+              ),
+              ValueListenableBuilder<Box>(
+                valueListenable: hiveApi.hiveStream(HiveApi.pinnedUsersHiveBox),
+                builder: (context, pinnedUsersBox, child) {
+                  final pinnedUsersList = pinnedUsersBox.values.toList();
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent:
+                          screenWidthPercentage(context, percentage: 0.4),
+                      childAspectRatio: 1.0,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final userUid = pinnedUsersList[index];
+                        return FutureBuilder<
+                                DocumentSnapshot<Map<String, dynamic>>>(
+                            future: FirebaseFirestore.instance
+                                .collection(subsFirestoreKey)
+                                .doc(userUid)
+                                .get(const GetOptions(source: Source.cache)),
+                            builder: (context, snapshot) {
+                              final data = snapshot.data;
+                              if (data != null) {
+                                final fireUser = FireUser.fromFirestore(data);
+                                return GestureDetector(
+                                  onTap: () {
+                                    model.showTileOptions(
+                                        userUid, context, true);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: Column(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          child: SizedBox(
+                                            height: screenWidthPercentage(
+                                                context,
+                                                percentage: 0.25),
+                                            width: screenWidthPercentage(
+                                                context,
+                                                percentage: 0.25),
+                                            child: ExtendedImage.network(
+                                              fireUser.photoUrl,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        verticalSpaceSmall,
+                                        Text(
+                                          fireUser.displayName,
+                                          style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return const CircularProgressIndicator
+                                    .adaptive();
+                              }
+                            });
+                      },
+                      childCount: pinnedUsersList.length,
+                    ),
+                  );
+                },
+              ),
+              Builder(
+                builder: (context) {
+                  final data = model.data;
+                  if (model.hasError) {
+                    log(model.error().toString());
+                    return const SliverToBoxAdapter(
+                      child: Center(
+                        child: Text('Model has Error'),
+                      ),
+                    );
+                  }
+                  if (!model.dataReady) {
+                    return const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()));
+                  }
+                  if (data != null) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final doc = data.docs[index];
+                        final userUid = doc[RecentUserField.userUid];
+                        final archived = doc[RecentUserField.archive];
+                        final pinned = doc[RecentUserField.pinned];
+                        return GestureDetector(
+                          onLongPress: () {
+                            model.showTileOptions(userUid, context, false);
+                          },
+                          child: archived || pinned
+                              ? const SizedBox.shrink()
+                              : UserListItem(userUid: userUid),
+                          // child: UserListItem(userUid: userUid),
+                        );
+                      }, childCount: data.docs.length),
+                    );
+                  } else {
+                    return const SliverToBoxAdapter(
+                      child: Text('Data is null'),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        );
       },
     );
   }

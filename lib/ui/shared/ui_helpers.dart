@@ -26,6 +26,8 @@ const Widget sliverVerticalSpaceRegular = SliverToBoxAdapter(child: SizedBox(hei
 const Widget sliverVerticalSpaceMedium = SliverToBoxAdapter(child: SizedBox(height: 25.0));
 const Widget sliverVerticalSpaceLarge = SliverToBoxAdapter(child: SizedBox(height: 50.0));
 
+const Widget shrinkBox = SizedBox.shrink();
+
 Widget bottomPadding(BuildContext context) => SizedBox(height:  MediaQuery.of(context).padding.bottom);
 Widget topPadding(BuildContext context) => SizedBox(height:  MediaQuery.of(context).padding.top);
 
