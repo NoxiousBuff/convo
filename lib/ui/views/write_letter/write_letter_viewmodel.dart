@@ -30,11 +30,14 @@ class WriteLetterViewModel extends BaseViewModel {
 
   Future<void> sendLetter(BuildContext context, FireUser fireUser) async {
     setBusy(true);
-    letterService.sendLetter(fireUser.id, letterTech.text.trim(),
-        onComplete: () {
-      setBusy(false);
-      Navigator.pop(context);
+    letterService.sendLetter(fireUser, letterTech.text.trim(), onComplete: () {
+      letterTech.clear();
+      updateLetterEmpty();
+      updateIsEdited(false);
+      Todo:'Fix This Bug'; 
+      Navigator.maybePop(context);
     }, onError: () {
+      setBusy(false);
       customSnackbars.errorSnackbar(context,
           title:
               'There was an error in sending your letters. Please try again later.');

@@ -14,16 +14,6 @@ class SearchViewModel extends BaseViewModel {
   Future<QuerySnapshot>? _usernameSearchFuture;
   Future<QuerySnapshot>? get usernameSearchFuture => _usernameSearchFuture;
 
-  Future<QuerySnapshot>? _emailSearchFuture;
-  Future<QuerySnapshot>? get emailSearchFuture => _emailSearchFuture;
-
-  Future<QuerySnapshot>? _displayNameSearchFuture;
-  Future<QuerySnapshot>? get displayNameSearchFuture =>
-      _displayNameSearchFuture;
-
-  Future<QuerySnapshot>? _interestsSearchFuture;
-  Future<QuerySnapshot>? get interestsSearchFuture => _interestsSearchFuture;
-
   bool _searchEmpty = true;
   bool get searchEmpty => _searchEmpty;
 
@@ -54,58 +44,6 @@ class SearchViewModel extends BaseViewModel {
         .get();
     _usernameSearchFuture = searchResults;
     notifyListeners();
-  }
-
-  /// search the user by its email address
-  void handleEmailSearch(String query) {
-    var emailQuery = query.toLowerCase();
-    Future<QuerySnapshot>? searchResults = subsCollection
-        .where(
-          FireUserField.email,
-          isGreaterThanOrEqualTo: emailQuery,
-          isLessThan: emailQuery.isNotEmpty
-              ? emailQuery.substring(0, emailQuery.length - 1) +
-                  String.fromCharCode(
-                      emailQuery.codeUnitAt(emailQuery.length - 1) + 1)
-              : () {},
-        )
-        .get();
-    _emailSearchFuture = searchResults;
-    notifyListeners();
-  }
-
-  /// search the user by its displayname
-  void handleDisplayNameSearch(String query) {
-    var displayNameQuery = toBeginningOfSentenceCase(query);
-    Future<QuerySnapshot>? searchResults = subsCollection
-        .where(
-          FireUserField.displayName,
-          isGreaterThanOrEqualTo: displayNameQuery,
-          isLessThan: displayNameQuery!.isNotEmpty
-              ? displayNameQuery.substring(0, displayNameQuery.length - 1) +
-                  String.fromCharCode(
-                      displayNameQuery.codeUnitAt(displayNameQuery.length - 1) +
-                          1)
-              : () {},
-        )
-        .get();
-    _displayNameSearchFuture = searchResults;
-    notifyListeners();
-  }
-
-  /// search the user by it's interests
-  void handleInterestsSearch(String query) {
-    try {
-      String? interests = toBeginningOfSentenceCase(query);
-      log.wtf('Interests:$interests');
-      Future<QuerySnapshot>? searchResults = subsCollection
-          .where(FireUserField.interests, arrayContains: interests ?? 'Anime')
-          .get();
-      _interestsSearchFuture = searchResults;
-      notifyListeners();
-    } catch (e) {
-      log.wtf('handleInterestsSearch Error:$e');
-    }
   }
 
   void addToRecentSearches(String uid) {

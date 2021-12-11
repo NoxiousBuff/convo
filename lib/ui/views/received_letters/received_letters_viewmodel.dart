@@ -3,9 +3,9 @@ import 'package:hint/services/letter_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class LettersViewModel extends StreamViewModel<QuerySnapshot> {
-  final log = getLogger('LettersViewModel');
+class ReceivedLettersViewModel extends StreamViewModel<QuerySnapshot> {
+  final log = getLogger('ReceivedLettersViewModel');
 
   @override
-  Stream<QuerySnapshot> get stream => letterService.getSentLetters();
+  Stream<QuerySnapshot> get stream => letterService.getReceivedLetters();
 }

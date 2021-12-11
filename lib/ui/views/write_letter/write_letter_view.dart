@@ -23,6 +23,7 @@ class WriteLetterView extends StatelessWidget {
       viewModelBuilder: () => WriteLetterViewModel(),
       builder: (context, model, child) => WillPopScope(
         onWillPop: () async {
+            model.log.wtf('hello');
           if (model.isEdited) {
             final shouldPop = await showDialog(
                 context: context,

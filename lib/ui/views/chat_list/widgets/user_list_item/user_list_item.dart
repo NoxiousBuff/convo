@@ -57,7 +57,7 @@ class UserListItem extends StatelessWidget {
         future: FirebaseFirestore.instance
             .collection(subsFirestoreKey)
             .doc(userUid)
-            .get(),
+            .get(const GetOptions(source: Source.cache)),
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {

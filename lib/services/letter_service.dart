@@ -3,31 +3,54 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/user_model.dart';
 
 final letterService = LetterService();
 
 class LetterService {
   final log = getLogger('LetterService');
 
-  final CollectionReference _lettersCollection =
+  final CollectionReference _letterCollection =
       FirebaseFirestore.instance.collection(lettersFirestoreKey);
 
-  final CollectionReference _myLettersCollection = FirebaseFirestore.instance
+  final CollectionReference _receivedLettersCollection = FirebaseFirestore
+      .instance
       .collection(lettersFirestoreKey)
       .doc(hiveApi.getUserDataWithHive(FireUserField.id))
-      .collection(usersLettersFirestoreKey);
+      .collection(receivedLettersFirestoreKey);
 
-  Future<void> sendLetter(String userUid, String letterText,
+  final CollectionReference _sentLettersCollection = FirebaseFirestore.instance
+      .collection(lettersFirestoreKey)
+      .doc(hiveApi.getUserDataWithHive(FireUserField.id))
+      .collection(sentLettersFirestoreKey);
+
+  Future<void> sendLetter(FireUser fireUser, String letterText,
       {Function? onError, Function? onComplete}) async {
-    _lettersCollection
-        .doc(userUid)
-        .collection(usersLettersFirestoreKey)
-        .doc(hiveApi.getUserDataWithHive(FireUserField.id))
-        .set({
+    _letterCollection
+        .doc(fireUser.id)
+        .collection(receivedLettersFirestoreKey)
+        .add({
       LetterFields.id: hiveApi.getUserDataWithHive(FireUserField.id),
-      LetterFields.photoUrl: hiveApi.getUserDataWithHive(FireUserField.photoUrl),
-      LetterFields.displayName: hiveApi.getUserDataWithHive(FireUserField.displayName),
-      LetterFields.username: hiveApi.getUserDataWithHive(FireUserField.username),
+      LetterFields.photoUrl:
+          hiveApi.getUserDataWithHive(FireUserField.photoUrl),
+      LetterFields.displayName:
+          hiveApi.getUserDataWithHive(FireUserField.displayName),
+      LetterFields.username:
+          hiveApi.getUserDataWithHive(FireUserField.username),
+      LetterFields.letterText: letterText,
+      LetterFields.timestamp: Timestamp.now(),
+    }).then((value) {
+      log.i('letter sent successfully');
+      if (onComplete != null) onComplete();
+    }).catchError((e) {
+      log.e('Error catched in sending the letter : $e');
+      if (onError != null) onError();
+    });
+    _sentLettersCollection.add({
+      LetterFields.id: fireUser.id,
+      LetterFields.photoUrl: fireUser.photoUrl,
+      LetterFields.displayName: fireUser.displayName,
+      LetterFields.username: fireUser.username,
       LetterFields.letterText: letterText,
       LetterFields.timestamp: Timestamp.now(),
     }).then((value) {
@@ -39,8 +62,14 @@ class LetterService {
     });
   }
 
-  Stream<QuerySnapshot> getUsersLetters() {
-    return _myLettersCollection
+  Stream<QuerySnapshot> getReceivedLetters() {
+    return _receivedLettersCollection
+        .orderBy(LetterFields.timestamp, descending: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getSentLetters() {
+    return _sentLettersCollection
         .orderBy(LetterFields.timestamp, descending: true)
         .snapshots();
   }

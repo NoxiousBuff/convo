@@ -11,7 +11,8 @@ const String defaultImagesFolder = 'Images/Samples';
 const String appName = 'Dule';
 const String pixaBayApiKey = '24560588-abd85a4f3224ed81eb7c4a1de';
 const String lettersFirestoreKey = 'letters';
-const String usersLettersFirestoreKey = 'myLetters';
+const String receivedLettersFirestoreKey = 'receivedLetters';
+const String sentLettersFirestoreKey = 'sentLetters';
 
 /// Hive Settings Keys
 class AppSettingKeys {

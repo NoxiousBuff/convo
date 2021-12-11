@@ -1,4 +1,9 @@
 import 'dart:io';
+import 'package:confetti/confetti.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/models/dule_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +26,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
   final FireUser fireUser;
   final log = getLogger('DuleViewModel');
+
+  bool controllerIsMedia = false;
 
   String _conversationId = '';
   String get conversationId => _conversationId;
@@ -90,8 +97,14 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     notifyListeners();
   }
 
+  /// Update live user data in realtime database.
   Future<void> updateUserDataWithKey(String key, dynamic value) {
     return databaseService.updateUserDataWithKey(key, value);
+  }
+
+  Future<void> updateFireUserDataWithKey(
+      String fireUserId, String key, dynamic value) {
+    return databaseService.updateFireUserDataWithKey(fireUserId, key, value);
   }
 
   void clearMessage() {
@@ -122,6 +135,12 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     otherTech.dispose();
   }
 
+  /// Change the controller text value
+  void _changeControllerTextValue(String value) {
+    duleTech.text = value;
+    notifyListeners();
+  }
+
   /// Clicking Image from camera
   Future<File?> pickImage(BuildContext context) async {
     final selectedImage =
@@ -144,6 +163,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     }
   }
 
+  /// Make a video through camera
   Future<File?> pickVideo(BuildContext context) async {
     final selectedVideo =
         await ImagePicker().pickVideo(source: ImageSource.camera);
@@ -182,6 +202,33 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         {
           await updateUserDataWithKey(DatabaseMessageField.aniType, null);
         }
+    }
+  }
+
+  Future pickGallery(BuildContext context) async {
+    String title = 'Maximum file size is 8 MB';
+    const type = FileType.media;
+    final picker = FilePicker.platform;
+    final result = await picker.pickFiles(type: type, withData: true);
+    if (result != null) {
+      final path = result.paths.first;
+      final fileName = result.names.first;
+      final size = File(path!).lengthSync();
+      final sizeInMB = size / (1024 * 1024);
+      final fileSize = sizeInMB.toInt();
+      log.wtf('File Size: $fileSize MB');
+      if (fileSize > 8) {
+        setBusy(false);
+        customSnackbars.infoSnackbar(context, title: title);
+      } else {
+        _changeControllerTextValue(path);
+        setBusyForObject(controllerIsMedia, true);
+        await uploadFile(filePath: path, fileName: fileName!, context: context);
+      }
+      return File(result.paths.first!);
+    } else {
+      log.wtf('Nothing was picked from gallery');
+      return null;
     }
   }
 
@@ -232,6 +279,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
     task.timeout(const Duration(seconds: 10), onTimeout: () {
       setBusy(false);
+      setBusyForObject(controllerIsMedia, false);
+      _changeControllerTextValue('');
       return task;
     });
     setBusy(true);
@@ -248,13 +297,21 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       },
       onError: (e) {
         setBusy(false);
+        setBusyForObject(controllerIsMedia, false);
+        _changeControllerTextValue('');
         task.cancel();
         customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
     );
     await task;
     String downloadURL = await storage.ref(folder).getDownloadURL();
+    await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
+    await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
+
     setBusy(false);
+    _changeControllerTextValue('');
+    setBusyForObject(controllerIsMedia, false);
+
     return downloadURL;
   }
 
@@ -264,6 +321,34 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         .child(dulesRealtimeDBKey)
         .child(fireUser.id)
         .onValue;
+  }
+
+  // int senderBubble() {
+  //   const hiveBox = HiveApi.appSettingsBoxName;
+  //   const key = AppSettingKeys.senderBubbleColor;
+  //   return Hive.box(hiveBox).get(key, defaultValue: MaterialColorsCode.blue300);
+  // }
+
+  // int receiverbubble() {
+  //   const box = HiveApi.appSettingsBoxName;
+  //   const key = AppSettingKeys.receiverBubbleColor;
+  //   const lightBlue200 = MaterialColorsCode.lightBlue200;
+  //   return Hive.box(box).get(key, defaultValue: lightBlue200);
+  // }
+
+  void listenReceiverAnimation(
+      DuleModel model,
+      AnimationController balloonsController,
+      ConfettiController confettiController) {
+    if (model.aniType == AnimationType.confetti) {
+      log.wtf('Begin Confetti');
+      confettiController.play();
+    } else if (model.aniType == AnimationType.balloons) {
+      log.wtf('Begin Balloons');
+      balloonsController.forward();
+    } else {
+      log.wtf('No animation is running now !!');
+    }
   }
 
   @override

@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/explore_page_view/explore_page_view.dart';
+
+import 'explore_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
@@ -14,8 +17,6 @@ import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import 'explore_viewmodel.dart';
-
 class ExploreView extends StatefulWidget {
   const ExploreView({Key? key}) : super(key: key);
 
@@ -23,10 +24,11 @@ class ExploreView extends StatefulWidget {
   State<ExploreView> createState() => _ExploreViewState();
 }
 
-class _ExploreViewState extends State<ExploreView> {
+class _ExploreViewState extends State<ExploreView>
+    with AutomaticKeepAliveClientMixin {
   bool isLoading = false;
   bool initialData = true;
-  List<String> imagesList = [];
+  List<PixabayMedia> imagesList = [];
   final log = getLogger('ExploreView');
   ScrollController scrollController = ScrollController();
   PixabayPicker picker = PixabayPicker(apiKey: pixaBayApiKey);
@@ -65,10 +67,9 @@ class _ExploreViewState extends State<ExploreView> {
       });
       var response = await getImages();
       var list = response!.hits;
-      if (list != null) {
+      if (list != null && list.isNotEmpty) {
         for (var pixaBayMedia in list) {
-          var url = pixaBayMedia.getThumbnailLink();
-          imagesList.add(url!);
+          imagesList.add(pixaBayMedia);
         }
       } else {
         log.wtf('Image not fetched yet');
@@ -90,7 +91,9 @@ class _ExploreViewState extends State<ExploreView> {
   }
 
   _scrollListener() {
-    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
+    if (scrollController.offset >=
+            scrollController.position.maxScrollExtent -
+                MediaQuery.of(context).size.height * 0.2 &&
         !scrollController.position.outOfRange) {
       log.wtf("reach the bottom");
       fetchImages();
@@ -141,6 +144,7 @@ class _ExploreViewState extends State<ExploreView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ViewModelBuilder<ExploreViewModel>.reactive(
       viewModelBuilder: () => ExploreViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -183,14 +187,19 @@ class _ExploreViewState extends State<ExploreView> {
                     ? loadingItems()
                     : SliverStaggeredGrid.countBuilder(
                         crossAxisCount: 3,
+                        addAutomaticKeepAlives: false,
                         itemCount: imagesList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            color: Colors.grey.shade200,
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: imagesList[index],
-                              
+                        itemBuilder: (BuildContext context, int i) {
+                          var imageUrl = imagesList[i].getThumbnailLink();
+                          return InkWell(
+                            onTap: () => navService.cupertinoPageRoute(context,
+                                ExplorePageview(pixaBayMedia: imagesList[i])),
+                            child: Container(
+                              color: Colors.grey.shade200,
+                              child: CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                imageUrl: imageUrl!,
+                              ),
                             ),
                           );
                         },
@@ -227,61 +236,10 @@ class _ExploreViewState extends State<ExploreView> {
             );
           },
         ),
-        // Column(
-        //   children: [
-        //     Expanded(
-        //       child: GridView.builder(
-        //         shrinkWrap: true,
-        //         controller: scrollController,
-        //         itemCount: imagesList.length,
-        //         physics: const BouncingScrollPhysics(),
-        //         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        //             crossAxisCount: 2),
-        //         itemBuilder: (BuildContext context, int index) {
-        //           return Container(
-        //             width: 80,
-        //             height: 80,
-        //             color: Colors.grey.shade200,
-        //             child: CachedNetworkImage(
-        //               fit: BoxFit.cover,
-        //               imageUrl: imagesList[index],
-        //               placeholder: (_, url) => Container(
-        //                 height: 80,
-        //                 width: 80,
-        //                 color: Colors.grey.shade200,
-        //               ),
-        //               errorWidget: (_, url, error) => const Icon(Icons.error),
-        //             ),
-        //           );
-        //         },
-        //       ),
-        //     ),
-        //     isLoading
-        //         ? Padding(
-        //             padding: const EdgeInsets.all(8.0),
-        //             child: Row(
-        //               mainAxisAlignment: MainAxisAlignment.center,
-        //               children: [
-        //                 Text(
-        //                   'Load More',
-        //                   style: Theme.of(context).textTheme.caption,
-        //                 ),
-        //                 const SizedBox(width: 8),
-        //                 const SizedBox(
-        //                   height: 20,
-        //                   width: 20,
-        //                   child: CircularProgressIndicator(
-        //                     valueColor:
-        //                         AlwaysStoppedAnimation(AppColors.blue),
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           )
-        //         : const SizedBox.shrink(),
-        //   ],
-        // )
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
