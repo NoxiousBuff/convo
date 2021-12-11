@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/database_service.dart';

@@ -22,8 +22,8 @@ class MainView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context,
-          T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
-        final pageControllerProvider = watch(pageControllerPod);
+          ref, Widget? child) {
+        final pageControllerProvider = ref.watch(pageControllerPod);
         return CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
             activeColor: Colors.black,

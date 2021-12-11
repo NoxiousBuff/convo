@@ -22,12 +22,12 @@ class ChangeBioViewModel extends BaseViewModel {
   bool _isEdited = false;
   bool get isEdited => _isEdited;
 
-  bool get isActive => !_isBioNameEmpty && isEdited; 
-
   void updateIsEdited(bool localIsEdited) {
     _isEdited = localIsEdited;
     notifyListeners();
   } 
+  
+  bool get isActive => !_isBioNameEmpty && isEdited; 
 
   Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value) async {
     setBusy(true);

@@ -16,7 +16,7 @@ import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class DuleViewModel extends StreamViewModel<Event> {
+class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   DuleViewModel(this.fireUser);
 
   final FireUser fireUser;
@@ -258,14 +258,14 @@ class DuleViewModel extends StreamViewModel<Event> {
     return downloadURL;
   }
 
-  Stream<Event> realtimeDBDocument() {
+  Stream<DatabaseEvent> realtimeDBDocument() {
     return FirebaseDatabase.instance
-        .reference()
+        .ref()
         .child(dulesRealtimeDBKey)
         .child(fireUser.id)
         .onValue;
   }
 
   @override
-  Stream<Event> get stream => realtimeDBDocument();
+  Stream<DatabaseEvent> get stream => realtimeDBDocument();
 }

@@ -51,47 +51,56 @@ class ChatRoomField {
 }
 
 class FireUserField {
-  static const id = 'id';
-  static const bio = 'bio';
-  static const email = 'email';
-  static const phone = 'phone';
-  static const country = 'country';
-  static const hashTags = 'hashTags';
-  static const photoUrl = 'photoUrl';
-  static const displayName = 'displayName';
-  static const position = 'position';
-  static const interests = 'interests';
-  static const userCreated = 'userCreated';
-  static const countryPhoneCode = 'countryPhoneCode';
-  static const username = 'username';
-  static const blocked = 'blocked';
-  static const blockedBy = 'blockedBy';
-  static const romanticStatus = 'romanticStatus';
-  static const dob = 'dob';
-  static const gender = 'gender';
-  static const geohash = 'geohash';
-  static const geopoint = 'geopoint';
+  static const String id = 'id';
+  static const String bio = 'bio';
+  static const String email = 'email';
+  static const String phone = 'phone';
+  static const String country = 'country';
+  static const String hashTags = 'hashTags';
+  static const String photoUrl = 'photoUrl';
+  static const String displayName = 'displayName';
+  static const String position = 'position';
+  static const String interests = 'interests';
+  static const String userCreated = 'userCreated';
+  static const String countryPhoneCode = 'countryPhoneCode';
+  static const String username = 'username';
+  static const String blocked = 'blocked';
+  static const String blockedBy = 'blockedBy';
+  static const String romanticStatus = 'romanticStatus';
+  static const String dob = 'dob';
+  static const String gender = 'gender';
+  static const String geohash = 'geohash';
+  static const String geopoint = 'geopoint';
 }
 
 class DatabaseMessageField {
-  static const msgTxt = 'msgTxt';
-  static const roomUid = 'roomUid';
-  static const url = 'url';
-  static const urlType = 'urlType';
-  static const online = 'online';
-  static const aniType = 'aniType';
+  static const String msgTxt = 'msgTxt';
+  static const String roomUid = 'roomUid';
+  static const String url = 'url';
+  static const String urlType = 'urlType';
+  static const String online = 'online';
+  static const String aniType = 'aniType';
 }
 
 class AnimationType {
-  static const balloons = 'balloons';
-  static const confetti = 'confetti';
-  static const spotlight = 'spotlight';
+  static const String balloons = 'balloons';
+  static const String confetti = 'confetti';
+  static const String spotlight = 'spotlight';
 }
 
 class RecentUserField {
-  static const userUid = 'userUid';
-  static const pinned = 'pinned';
-  static const archive = 'archive';
-  static const timestamp = 'timestamp';
-  static const isFromContact = 'isFromContact';
+  static const String userUid = 'userUid';
+  static const String pinned = 'pinned';
+  static const String archive = 'archive';
+  static const String timestamp = 'timestamp';
+  static const String isFromContact = 'isFromContact';
+}
+
+class LetterFields {
+  static const String letterText = 'letterText';
+  static const String username = 'username';
+  static const String photoUrl = 'photoUrl';
+  static const String displayName = 'displayName';
+  static const String id = 'id';
+  static const String timestamp = 'timestamp';
 }

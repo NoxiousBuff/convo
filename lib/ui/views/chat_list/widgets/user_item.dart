@@ -1,8 +1,6 @@
-import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -39,7 +37,7 @@ class UserItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       image: DecorationImage(
-                        image: ExtendedNetworkImageProvider(fireUser.photoUrl),
+                        image: CachedNetworkImageProvider(fireUser.photoUrl),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -118,8 +116,8 @@ class UserItem extends StatelessWidget {
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: ExtendedImage(
-            image: NetworkImage(fireUser.photoUrl),
+          child: CachedNetworkImage(
+            imageUrl: fireUser.photoUrl,
             height: 56,
             width: 56,
             fit: BoxFit.cover,

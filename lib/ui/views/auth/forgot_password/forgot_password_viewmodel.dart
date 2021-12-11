@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/views/auth/login/login_auth_view.dart';

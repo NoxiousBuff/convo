@@ -1,4 +1,4 @@
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
@@ -88,8 +88,8 @@ class AccountView extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(30),
-                          child: ExtendedImage(
-                            image: NetworkImage(box.get(profileKey)),
+                          child: CachedNetworkImage(
+                            imageUrl: box.get(profileKey),
                             height: 84,
                             width: 84,
                             fit: BoxFit.cover,
@@ -114,16 +114,19 @@ class AccountView extends StatelessWidget {
                                     ),
                                     horizontalSpaceTiny,
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4.0),
                                       decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: AppColors.darkGrey)),
-                                  child: Text(
-                                box.get(relationshipKey),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600),
-                              ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              color: AppColors.darkGrey)),
+                                      child: Text(
+                                        box.get(relationshipKey),
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -155,7 +158,8 @@ class AccountView extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(14.2),
                             onTap: () {
-                              navService.cupertinoPageRoute(context, EditAccountView());
+                              navService.cupertinoPageRoute(
+                                  context, EditAccountView());
                             },
                             child: Container(
                               height: 40,
@@ -163,7 +167,8 @@ class AccountView extends StatelessWidget {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14.2),
-                                  border: Border.all(color: AppColors.darkGrey)),
+                                  border:
+                                      Border.all(color: AppColors.darkGrey)),
                               child: const Text(
                                 'Edit Profile',
                                 style: TextStyle(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:filesize/filesize.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/constants/app_strings.dart';
@@ -10,7 +12,6 @@ import 'package:hint/api/storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 
 class EditAccountViewModel extends BaseViewModel {

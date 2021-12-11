@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_logger.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 // ignore: must_be_immutable
 class UserListItem extends StatelessWidget {
@@ -26,9 +25,9 @@ class UserListItem extends StatelessWidget {
   final log = getLogger('UserListItem');
 
   Widget userStatus(FireUser fireUser) {
-    return StreamBuilder<Event?>(
+    return StreamBuilder<DatabaseEvent?>(
       stream: FirebaseDatabase.instance
-          .reference()
+          .ref()
           .child(dulesRealtimeDBKey)
           .child(fireUser.id)
           .onValue,
@@ -36,7 +35,8 @@ class UserListItem extends StatelessWidget {
         final data = snapshot.data;
         if (data != null) {
           final snapshot = data.snapshot;
-          final json = snapshot.value.cast<String, dynamic>();
+          final json = snapshot.value;
+          log.wtf(json);
           final duleModel = DuleModel.fromJson(json);
           bool isOnline = duleModel.online;
           return Text(
@@ -61,8 +61,9 @@ class UserListItem extends StatelessWidget {
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {
+            log.wtf('User List Item Error : ${snapshot.error}');
             return const Center(
-              child: Text('It has Error'),
+              child: Text('It has Error: '),
             );
           }
           if (!snapshot.hasData) {

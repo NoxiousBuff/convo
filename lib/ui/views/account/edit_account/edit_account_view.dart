@@ -1,4 +1,4 @@
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/constants/relationship_status_list.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
@@ -111,8 +111,8 @@ class EditAccountView extends StatelessWidget {
                                     child: CupertinoActivityIndicator())
                                 : ClipRRect(
                                     borderRadius: BorderRadius.circular(38),
-                                    child: ExtendedImage(
-                                      image: NetworkImage(profileKey),
+                                    child: CachedNetworkImage(
+                                      imageUrl: profileKey,
                                       height: 104,
                                       width: 104,
                                       fit: BoxFit.cover,

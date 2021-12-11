@@ -16,13 +16,14 @@ Widget cwEADescriptionTitle(BuildContext context, String title) {
 
 Widget cwEATextField(
     BuildContext context, TextEditingController controller, String hintText,
-    {int? maxLength, bool expands = false, void Function(String)? onChanged, String? Function(String?)? validator}) {
+    {int? maxLength, bool expands = false, void Function(String)? onChanged, String? Function(String?)? validator, bool autoFocus = false}) {
   return TextFormField(
     controller: controller,
     maxLength: maxLength,
     minLines: 1,
-    maxLines: 10,
+    maxLines: null,
     validator: validator,
+    autofocus: autoFocus,
     maxLengthEnforcement: MaxLengthEnforcement.enforced,
     style: const TextStyle(
         fontSize: 28, fontWeight: FontWeight.w700, color: Colors.black87),

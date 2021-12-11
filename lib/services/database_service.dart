@@ -22,7 +22,13 @@ class DatabaseService {
     await databaseApi.updateData('/$path', {key: value});
   }
 
-  Stream<Event> getUserData(String uid) {
+ Future<void> updateFireUserDataWithKey(
+      String fireUserId, String key, dynamic value) async {
+    await databaseApi.updateData('/$fireUserId', {key: value});
+  }
+
+
+  Stream<DatabaseEvent> getUserData(String uid) {
     return databaseApi.getDataStream(uid);
   }
 }

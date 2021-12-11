@@ -1,4 +1,4 @@
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
@@ -52,8 +52,8 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                                     percentage: 0.4),
                                 width: screenWidthPercentage(context,
                                     percentage: 0.4),
-                                child: ExtendedImage(
-                                  image: NetworkImage(fireUser.photoUrl),
+                                child: CachedNetworkImage(
+                                  imageUrl: fireUser.photoUrl,
                                   fit: BoxFit.cover,
                                 ),
                                 color: Colors.indigo.shade200.withAlpha(50),
@@ -212,8 +212,8 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                       child: Container(
                         height: screenWidthPercentage(context, percentage: 0.2),
                         width: screenWidthPercentage(context, percentage: 0.2),
-                        child: ExtendedImage(
-                          image: NetworkImage(fireUser.photoUrl),
+                        child: CachedNetworkImage(
+                          imageUrl: fireUser.photoUrl,
                           fit: BoxFit.cover,
                         ),
                         color: Colors.indigo.shade200.withAlpha(50),

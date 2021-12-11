@@ -9,7 +9,7 @@ AppBar cwAuthAppBar(BuildContext context,
     {required String title,
     bool showLeadingIcon = true,
     void Function()? onPressed,
-    List<Widget>? actions}) {
+    List<Widget>? actions, IconData? leadingIcon}) {
   return AppBar(
     actions: actions,
     elevation: 0.0,
@@ -30,7 +30,7 @@ AppBar cwAuthAppBar(BuildContext context,
     leading: showLeadingIcon
         ? IconButton(
             color: Colors.black54,
-            icon: const Icon(FeatherIcons.arrowLeft),
+            icon: Icon(leadingIcon ?? FeatherIcons.arrowLeft),
             onPressed: onPressed,
           )
         : const SizedBox.shrink(),

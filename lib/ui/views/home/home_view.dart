@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/pods/page_controller_pod.dart';
@@ -23,8 +22,8 @@ class _HomeViewState extends State<HomeView> {
     // final pageControllerProvider = pageControllerPod.;
     return Consumer(
       builder: (BuildContext context,
-          T Function<T>(ProviderBase<Object?, T>) watch, Widget? child) {
-        final pageControllerProvider = watch(pageControllerPod);
+          ref, Widget? child) {
+        final pageControllerProvider = ref.watch(pageControllerPod);
         return Theme(
           data: ThemeData(colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.transparent)),
           child: PageView(

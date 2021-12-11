@@ -1,4 +1,4 @@
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
@@ -71,8 +71,8 @@ class ProfileView extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(30),
-                      child: ExtendedImage(
-                        image: NetworkImage(fireUser.photoUrl),
+                      child: CachedNetworkImage(
+                        imageUrl: fireUser.photoUrl,
                         height: 84,
                         width: 84,
                         fit: BoxFit.cover,

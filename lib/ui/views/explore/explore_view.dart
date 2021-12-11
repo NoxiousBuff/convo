@@ -1,11 +1,8 @@
 import 'dart:math';
-import 'package:extended_image/extended_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-
-import 'explore_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -16,6 +13,8 @@ import 'package:pixabay_picker/model/pixabay_media.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'explore_viewmodel.dart';
 
 class ExploreView extends StatefulWidget {
   const ExploreView({Key? key}) : super(key: key);
@@ -188,9 +187,9 @@ class _ExploreViewState extends State<ExploreView> {
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
                             color: Colors.grey.shade200,
-                            child: ExtendedImage(
+                            child: CachedNetworkImage(
                               fit: BoxFit.cover,
-                              image: NetworkImage(imagesList[index]),
+                              imageUrl: imagesList[index],
                               
                             ),
                           );

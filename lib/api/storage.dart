@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_storage/firebase_storage.dart' ;
-import 'package:firebase_core/firebase_core.dart';
 import 'dart:convert' show utf8;
 import 'dart:typed_data' show Uint8List;
 

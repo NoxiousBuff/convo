@@ -7,7 +7,7 @@ class DatabaseApi {
   final log = getLogger('DatabaseApi');
 
   final DatabaseReference _databaseReference =
-      FirebaseDatabase.instance.reference().child('dules');
+      FirebaseDatabase.instance.ref().child('dules');
 
   Future<void> addDataWithKey(String key, Map<String, dynamic> map) async {
     try {
@@ -29,7 +29,7 @@ class DatabaseApi {
     }
   }
 
-  Stream<Event> getDataStream(String key) {
+  Stream<DatabaseEvent> getDataStream(String key) {
     return _databaseReference.child(key).onValue;
   }
 }

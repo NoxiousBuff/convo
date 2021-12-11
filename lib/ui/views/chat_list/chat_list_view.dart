@@ -1,6 +1,6 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
@@ -129,8 +129,8 @@ class ChatListView extends StatelessWidget {
                                             width: screenWidthPercentage(
                                                 context,
                                                 percentage: 0.25),
-                                            child: ExtendedImage.network(
-                                              fireUser.photoUrl,
+                                            child: CachedNetworkImage(
+                                              imageUrl : fireUser.photoUrl,
                                               fit: BoxFit.cover,
                                             ),
                                           ),

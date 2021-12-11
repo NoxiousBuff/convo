@@ -28,21 +28,20 @@ class ChatService {
   final liveUserId = hiveApi.getUserDataWithHive(FireUserField.id);
 
   startConversation(
-      BuildContext context, FireUser fireUser, Color randomColor) async {
-   
-  }
+      BuildContext context, FireUser fireUser, Color randomColor) async {}
 
   createChatRoom(String chatRoomId, chatRoomMap) {
     _conversationCollection.doc(chatRoomId).set(chatRoomMap);
   }
 
-  startDuleConversation(BuildContext context, FireUser fireUser, ) async {
-    String value =
-                    chatService.getConversationId(fireUser.id, liveUserUid);
-                navService.cupertinoPageRoute(
-                    context, DuleView(fireUser: fireUser));
-                await databaseService.updateUserDataWithKey(
-                    DatabaseMessageField.roomUid, value);
+  startDuleConversation(
+    BuildContext context,
+    FireUser fireUser,
+  ) async {
+    String value = chatService.getConversationId(fireUser.id, liveUserUid);
+    navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
+    await databaseService.updateUserDataWithKey(
+        DatabaseMessageField.roomUid, value);
   }
 
   getConversationId(String a, String b) {
@@ -55,7 +54,6 @@ class ChatService {
     }
   }
 
- 
   /// Archive the user
   Future<void> addToArchive(String fireuserId) async {
     await firestoreApi.updateRecentUser(
@@ -141,6 +139,7 @@ class ChatService {
               'There has been error in adding user with id : $liveUserUid to recieverUid : $receiverUid'));
     }
   }
+
   Future<void> addToRecentList(String receiverUid) async {
     _addToRecentListForSender(receiverUid);
     _addTORecentListForReceiver(receiverUid);

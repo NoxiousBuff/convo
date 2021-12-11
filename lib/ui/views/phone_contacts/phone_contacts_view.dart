@@ -2,7 +2,6 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hive_flutter/hive_flutter.dart';

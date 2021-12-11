@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'package:hint/models/dule_model.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:lottie/lottie.dart';
@@ -10,16 +13,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:confetti/confetti.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/database_service.dart';
-import 'package:string_validator/string_validator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/widgets/light_clipper.dart';
+import 'package:string_validator/string_validator.dart';
 
 import 'dule_viewmodel.dart';
 
@@ -52,7 +54,6 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
-
     super.initState();
   }
 
@@ -68,14 +69,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget receiverMessageBubble(Event? data, DuleViewModel model) {
+  Widget receiverMessageBubble(DatabaseEvent? data, DuleViewModel model) {
     if (data == null) {
       return const Center(
         child: Text('Connecting...'),
       );
     } else {
       final snapshot = data.snapshot;
-      final json = snapshot.value.cast<String, dynamic>();
+      final json = snapshot.value;
       final duleModel = DuleModel.fromJson(json);
 
       switch (duleModel.online) {
@@ -84,7 +85,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             if (model.conversationId == duleModel.roomUid) {
               model.updateOtherField(duleModel.msgTxt);
               if (duleModel.urlType == 'image' && isURL(duleModel.msgTxt)) {
-                return Image.network(duleModel.url);
+                final url = duleModel.url;
+                if (url != null) {
+                  return Image.network(url);
+                } else {
+                  log.e(
+                      'Url is null. Check the receiver messagebubble in the dule_view class.');
+                  return const Text('Something bad happened.');
+                }
               } else {
                 return TextFormField(
                   expands: true,
@@ -135,6 +143,9 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           }
       }
     }
+    // return const Center(
+    //   child: Text('Fix this asap'),
+    // );
   }
 
   @override
@@ -408,6 +419,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                               IconButton(
                                 onPressed: () => model.pickFromGallery(context),
                                 icon: const Icon(FeatherIcons.image),
+                                color: AppColors.darkGrey,
+                                iconSize: 32,
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  navService.materialPageRoute(context, WriteLetterView(fireUser: widget.fireUser));
+                                },
+                                icon: const Icon(FeatherIcons.send),
                                 color: AppColors.darkGrey,
                                 iconSize: 32,
                               ),
