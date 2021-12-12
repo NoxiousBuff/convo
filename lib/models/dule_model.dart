@@ -3,7 +3,8 @@ import 'package:hint/constants/app_strings.dart';
 class DuleModel {
   final String msgTxt;
   final String? url;
-  final String? urlType;
+  //TODO : change the urlType to type
+  final String urlType;
   final String? aniType;
   final bool online;
   final String? roomUid;

@@ -36,7 +36,6 @@ class UserListItem extends StatelessWidget {
         if (data != null) {
           final snapshot = data.snapshot;
           final json = snapshot.value;
-          log.wtf(json);
           final duleModel = DuleModel.fromJson(json);
           bool isOnline = duleModel.online;
           return Text(
@@ -61,7 +60,7 @@ class UserListItem extends StatelessWidget {
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {
-            log.wtf('User List Item Error : ${snapshot.error}');
+            log.e('User List Item Error : ${snapshot.error}');
             return const Center(
               child: Text('It has Error: '),
             );

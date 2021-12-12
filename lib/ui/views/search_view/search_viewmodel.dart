@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';

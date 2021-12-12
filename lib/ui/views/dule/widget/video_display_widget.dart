@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class VideoDisplayWidget extends StatefulWidget {
   final String videoUrl;
@@ -43,33 +43,44 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        FutureBuilder(
-          future: _initializeVideoPlayerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              // If the VideoPlayerController has finished initialization, use
-              // the data it provides to limit the aspect ratio of the video.
-              return AspectRatio(
+    return FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If the VideoPlayerController has finished initialization, use
+          // the data it provides to limit the aspect ratio of the video.
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
                 // Use the VideoPlayer widget to display the video.
-                child: VideoPlayer(_controller),
-              );
-            } else {
-              // If the VideoPlayerController is still initializing, show a
-              // loading spinner.
-              return const SizedBox.shrink();
-            }
-          },
-        ),
-        const Icon(
-          FeatherIcons.playCircle,
-          size: 60,
-          color: AppColors.white,
-        ),
-      ],
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: VideoPlayer(_controller)),
+              ),
+              Container(
+                height: 40,
+                width: 40,
+                padding: const EdgeInsets.only(left:4),
+                decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.8),
+                    shape: BoxShape.circle),
+                alignment: Alignment.center,
+                child: const Icon(
+                  FeatherIcons.play,
+                  size: 16,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          );
+        } else {
+          // If the VideoPlayerController is still initializing, show a
+          // loading spinner.
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 }

@@ -1,9 +1,6 @@
 import 'dart:io';
 import 'package:confetti/confetti.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +17,7 @@ import 'package:hint/services/database_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:uuid/uuid.dart';
 
 class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   DuleViewModel(this.fireUser);
@@ -28,6 +26,18 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   final log = getLogger('DuleViewModel');
 
   bool controllerIsMedia = false;
+
+  String _sendingMediaType = '';
+  String get sendingMediaType => _sendingMediaType;
+
+  String _key = '';
+  String get key => _key;
+
+  void updateKeyValue() {
+    _key = const Uuid().v4();
+    log.d(_key);
+    notifyListeners();
+  } 
 
   String _conversationId = '';
   String get conversationId => _conversationId;
@@ -141,6 +151,13 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     notifyListeners();
   }
 
+  /// Change the value of sendingMediaType variable
+  void _changeSendingMediaType(String value) {
+    _sendingMediaType = value;
+    notifyListeners();
+    log.wtf(_sendingMediaType);
+  }
+
   /// Clicking Image from camera
   Future<File?> pickImage(BuildContext context) async {
     final selectedImage =
@@ -232,34 +249,6 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     }
   }
 
-  // Pick File From Gallery
-  Future<void> pickFromGallery(BuildContext context) async {
-    const pickFile = FileType.media;
-    final picker = FilePicker.platform;
-    final result = await picker.pickFiles(type: pickFile, withData: true);
-
-    if (result != null) {
-      for (var path in result.paths) {
-        if (path != null) {
-          final size = File(path).lengthSync();
-          final sizeInMB = size / (1024 * 1024);
-          final fileSize = sizeInMB.toInt();
-          log.wtf('File Size: $fileSize MB');
-          if (fileSize > 8) {
-            customSnackbars.errorSnackbar(context,
-                title: 'Maximum size of upload is 8 MB.');
-          } else {
-            await uploadFile(
-                filePath: path,
-                context: context,
-                fileName: result.files.first.name);
-          }
-        }
-      }
-    } else {
-      log.wtf('Result is null now!!');
-    }
-  }
 
   Future<String> uploadFile({
     required String filePath,
@@ -274,13 +263,15 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     String folder = fileType == MediaType.image
         ? 'live Chat/$fileName-$firebasename'
         : 'live Chat/$fileName-$firebasename';
-
+      
+      log.wtf('FileType:$fileType');
     UploadTask task = storage.ref(folder).putFile(File(filePath));
-
+      _changeSendingMediaType(fileType);
     task.timeout(const Duration(seconds: 10), onTimeout: () {
       setBusy(false);
       setBusyForObject(controllerIsMedia, false);
       _changeControllerTextValue('');
+      _changeSendingMediaType('');
       return task;
     });
     setBusy(true);
@@ -299,9 +290,12 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         setBusy(false);
         setBusyForObject(controllerIsMedia, false);
         _changeControllerTextValue('');
+        _changeSendingMediaType('');
+
         task.cancel();
         customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
+      onDone: () => _changeSendingMediaType(fileType),
     );
     await task;
     String downloadURL = await storage.ref(folder).getDownloadURL();
@@ -310,6 +304,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
     setBusy(false);
     _changeControllerTextValue('');
+    _changeSendingMediaType('');
     setBusyForObject(controllerIsMedia, false);
 
     return downloadURL;

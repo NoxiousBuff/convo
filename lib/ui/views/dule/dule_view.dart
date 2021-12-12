@@ -53,7 +53,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     balloonsController =
         AnimationController(vsync: this, duration: const Duration(seconds: 5));
     confettiController =
-        ConfettiController(duration: const Duration(seconds: 5));
+        ConfettiController(duration: const Duration(seconds: 3));
 
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
@@ -113,46 +113,52 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   }
 
   Widget mediaWidget(DuleModel duleModel, DuleViewModel model) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        duleModel.urlType == 'image'
-            ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 24),
+    switch (duleModel.urlType) {
+      case 'image':
+        {
+          return Dismissible(
+            onDismissed: (dissmissDirection) async {
+              final fireUserId = widget.fireUser.id;
+              const urlKey = DatabaseMessageField.url;
+              const typeKey = DatabaseMessageField.urlType;
+              await model.updateFireUserDataWithKey(fireUserId, urlKey, '');
+              await model.updateFireUserDataWithKey(fireUserId, typeKey, '');
+              model.updateKeyValue();
+            },
+            key: Key(model.key),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Material(
                 color: Colors.transparent,
                 elevation: 8,
                 borderRadius: BorderRadius.circular(32),
                 child: ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: CachedNetworkImage(
-                      imageUrl: duleModel.url!,
-                      fit: BoxFit.cover,
-                    ),
+                  borderRadius: BorderRadius.circular(32),
+                  child: CachedNetworkImage(
+                    imageUrl: duleModel.url!,
+                    fit: BoxFit.cover,
                   ),
+                ),
               ),
-            )
-            : VideoDisplayWidget(videoUrl: duleModel.url!),
-        InkWell(
-          onTap: () async {
-            final fireUserId = widget.fireUser.id;
-            const urlKey = DatabaseMessageField.url;
-            const typeKey = DatabaseMessageField.urlType;
-            await model.updateFireUserDataWithKey(fireUserId, urlKey, null);
-            await model.updateFireUserDataWithKey(fireUserId, typeKey, null);
-          },
-          child: const CircleAvatar(
-              maxRadius: 16,
-              backgroundColor: AppColors.darkGrey,
-              child: Icon(FeatherIcons.x,
-                  size: 25, color: AppColors.inActiveGray)),
-        )
-      ],
-    );
+            ),
+          );
+        }
+      case 'video':
+        {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: VideoDisplayWidget(videoUrl: duleModel.url!),
+          );
+        }
+      default:
+        {
+          return const Text('media widget default');
+        }
+    }
   }
 
-  Widget receiverMessageBubble(
-      DatabaseEvent? data, DuleViewModel model, int receiverBubbleCode) {
+  Widget receiverMessageBubble(BuildContext context, DatabaseEvent? data,
+      DuleViewModel model, int receiverBubbleCode) {
     return StreamBuilder<DatabaseEvent>(
       stream: model.stream,
       builder: (context, snapshot) {
@@ -169,13 +175,15 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             final json = data.snapshot.value;
             final duleModel = DuleModel.fromJson(json);
             bool isInChatRoom = model.conversationId == duleModel.roomUid;
+
             switch (isInChatRoom) {
               case true:
                 {
+                  //model.updateKeyValue();
                   model.updateOtherField(duleModel.msgTxt);
                   var mediaUrl = duleModel.url;
-                  var urlType = duleModel.urlType;
-                  bool isMediaUrlNotNull = mediaUrl != null && urlType != null;
+                  bool isMediaUrlNotNull =
+                      mediaUrl != null && mediaUrl.isNotEmpty;
                   return Expanded(
                     child: AnimatedContainer(
                       margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -242,39 +250,70 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     );
   }
 
+  Widget senderMediaWidget(DuleViewModel model) {
+    switch (model.sendingMediaType) {
+      case 'image':
+        {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child:
+                    Image.file(File(model.duleTech.text), fit: BoxFit.cover)),
+          );
+        }
+      case 'video':
+        {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: VideoDisplayWidget(videoUrl: model.duleTech.text),
+          );
+        }
+      default:
+        {
+          return const Center(child: Text('Image'));
+        }
+    }
+  }
+
   Widget senderMessageBubble(DuleViewModel model) {
-    return !model.busy(model.controllerIsMedia)
-        ? TextFormField(
-            focusNode: model.duleFocusNode,
-            minLines: null,
-            maxLines: null,
-            expands: true,
-            onChanged: (value) {
-              model.updateWordLengthLeft(value);
-              model.updatTextFieldWidth();
-              if (value.length <= 160) {
-                model.updateUserDataWithKey(DatabaseMessageField.msgTxt, value);
-              }
-            },
-            maxLength: 160,
-            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-            buildCounter: (_,
-                {required currentLength, maxLength, required isFocused}) {
-              return const SizedBox.shrink();
-            },
-            cursorHeight: 28,
-            controller: model.duleTech,
-            textAlign: TextAlign.center,
-            cursorColor: AppColors.white,
-            cursorRadius: const Radius.circular(100),
-            style: const TextStyle(color: AppColors.white, fontSize: 24),
-            decoration: InputDecoration(
-                hintText: 'Type your message',
-                hintStyle:
-                    TextStyle(color: Colors.white.withAlpha(200), fontSize: 24),
-                border: const OutlineInputBorder(borderSide: BorderSide.none)),
-          )
-        : Image.file(File(model.duleTech.text), fit: BoxFit.contain);
+    Widget switcherChild;
+    if (!model.busy(model.controllerIsMedia)) {
+      switcherChild = TextFormField(
+        focusNode: model.duleFocusNode,
+        minLines: null,
+        maxLines: null,
+        expands: true,
+        onChanged: (value) {
+          model.updateWordLengthLeft(value);
+          model.updatTextFieldWidth();
+          if (value.length <= 160) {
+            model.updateUserDataWithKey(DatabaseMessageField.msgTxt, value);
+          }
+        },
+        maxLength: 160,
+        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+        buildCounter: (_,
+            {required currentLength, maxLength, required isFocused}) {
+          return const SizedBox.shrink();
+        },
+        cursorHeight: 28,
+        controller: model.duleTech,
+        textAlign: TextAlign.center,
+        cursorColor: AppColors.white,
+        cursorRadius: const Radius.circular(100),
+        style: const TextStyle(color: AppColors.white, fontSize: 24),
+        decoration: InputDecoration(
+            hintText: 'Type your message',
+            hintStyle:
+                TextStyle(color: Colors.white.withAlpha(200), fontSize: 24),
+            border: const OutlineInputBorder(borderSide: BorderSide.none)),
+      );
+    } else {
+      switcherChild = senderMediaWidget(model);
+    }
+    return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300), child: switcherChild);
   }
 
   @override
@@ -331,24 +370,38 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       onPressed: () => Navigator.pop(context),
                     ),
                     horizontalDefaultMessageSpace,
-                    ClipOval(
-                      child: Image.network(
-                        widget.fireUser.photoUrl,
-                        cacheHeight: 48,
-                        cacheWidth: 48,
-                        height: 48,
-                        width: 48,
-                        fit: BoxFit.cover,
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: CachedNetworkImageProvider(
+                            widget.fireUser.photoUrl,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                title: Text(
-                  widget.fireUser.displayName,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(fontSize: 18, color: Colors.black),
+                title: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.fireUser.displayName,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(fontSize: 18, color: Colors.black),
+                    ),
+                    DuleModel.fromJson(data!.snapshot.value).online
+                        ? const Text(
+                            'Online',
+                            style: TextStyle(color: Colors.black45,fontSize: 12),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
                 ),
                 actions: [
                   CupertinoSwitch(
@@ -359,6 +412,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       });
                     },
                   ),
+                  horizontalSpaceRegular,
                 ],
               ),
               body: Stack(
@@ -392,10 +446,11 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                     children: [
                       topPadding(context),
                       const SizedBox(height: 56),
-                      receiverMessageBubble(data, model, receiverBubbleCode),
+                      receiverMessageBubble(
+                          context, data, model, receiverBubbleCode),
                       verticalSpaceRegular,
                       Expanded(
-                        //flex: model.duleFlexFactor,
+                        flex: model.duleFlexFactor,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: AnimatedContainer(
@@ -547,8 +602,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       gravity: 0.2,
                       minBlastForce: 300,
                       maxBlastForce: 400,
-                      numberOfParticles: 500,
-                      blastDirection: -pi,
+                      numberOfParticles: 250,
+                      blastDirection: -pi / 4,
                       emissionFrequency: 0.01,
                       confettiController: confettiController,
                       blastDirectionality: BlastDirectionality.explosive,
@@ -561,8 +616,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                       gravity: 0.2,
                       minBlastForce: 300,
                       maxBlastForce: 400,
-                      numberOfParticles: 500,
-                      blastDirection: pi,
+                      numberOfParticles: 250,
+                      blastDirection: pi / 4,
                       emissionFrequency: 0.01,
                       confettiController: confettiController,
                       blastDirectionality: BlastDirectionality.explosive,

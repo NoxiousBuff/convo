@@ -34,7 +34,7 @@ class WriteLetterViewModel extends BaseViewModel {
       letterTech.clear();
       updateLetterEmpty();
       updateIsEdited(false);
-      Todo:'Fix This Bug'; 
+      // TODO:'Fix This Bug'; 
       Navigator.maybePop(context);
     }, onError: () {
       setBusy(false);
