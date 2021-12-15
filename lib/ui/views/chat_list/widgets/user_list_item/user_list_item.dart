@@ -14,7 +14,7 @@ import 'package:hint/services/chat_service.dart';
 class UserListItem extends StatelessWidget {
   bool pinned;
   final String userUid;
-  final Function? onTap;
+  final Function(FireUser fireUser)? onTap;
   UserListItem({
     Key? key,
     required this.userUid,
@@ -56,7 +56,7 @@ class UserListItem extends StatelessWidget {
         future: FirebaseFirestore.instance
             .collection(subsFirestoreKey)
             .doc(userUid)
-            .get(const GetOptions(source: Source.cache)),
+            .get(),
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {
@@ -72,7 +72,10 @@ class UserListItem extends StatelessWidget {
             child = UserItem(
                 fireUser: fireUser,
                 onTap: () {
-                  chatService.startDuleConversation(context, fireUser);
+                  final function = onTap;
+                  if (function != null ) {
+                    function(fireUser);
+                  } else {chatService.startDuleConversation(context, fireUser);}
                 },
                 title: fireUser.displayName, subtitle: userStatus(fireUser));
           }

@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
@@ -27,6 +27,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
   BoxFit imageFit = BoxFit.fitHeight;
   final log = getLogger('ExplorePageView');
   PreloadPageController controller = PreloadPageController();
+  PageController pageController = PageController(viewportFraction: 0.6);
   PixabayPicker picker = PixabayPicker(apiKey: pixaBayApiKey);
 
   @override
@@ -41,12 +42,14 @@ class _ExplorePageviewState extends State<ExplorePageview>
       builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: false,
-          backgroundColor: AppColors.black,
+          backgroundColor: AppColors.white,
           appBar: cwAuthAppBar(context,
               title: 'Explore', onPressed: () => Navigator.pop(context)),
-          body: PreloadPageView.builder(
-            preloadPagesCount: 4,
-            controller: controller,
+          body: PageView.builder(
+            scrollBehavior: const CupertinoScrollBehavior(),
+            padEnds: false,
+            allowImplicitScrolling: true,
+            controller: pageController,
             scrollDirection: Axis.vertical,
             itemCount: model.imagesList.length,
             onPageChanged: (int i) {
@@ -60,50 +63,30 @@ class _ExplorePageviewState extends State<ExplorePageview>
                 color: AppColors.white,
                 child: Column(
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          title!,
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                    const Divider(height: 0),
+                    ListTile(
+                      title: Text(
+                        title!,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(
                       child: CachedNetworkImage(
                         imageUrl: imageUrl!,
-                        fit: BoxFit.fitHeight,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Icon(FeatherIcons.tag, size: 30),
-                          ),
-                          Flexible(
-                            child: Text(
-                              tags!,
-                              maxLines: 3,
-                              textAlign: TextAlign.start,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
+                    ListTile(
+                      leading: const Icon(FeatherIcons.tag),
+                      title: Text(
+                        tags!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.black54, fontWeight: FontWeight.w500),
                       ),
                     ),
-                    verticalSpaceRegular,
                   ],
                 ),
               );

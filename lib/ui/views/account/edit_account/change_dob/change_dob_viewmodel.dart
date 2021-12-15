@@ -4,7 +4,7 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -41,8 +41,9 @@ class ChangeDobViewModel extends BaseViewModel {
     final birthDateInMilliseconds = hiveApi.getUserDataWithHive(FireUserField.dob); 
     if(birthDateInMilliseconds != null) {
       final dobAsInt = birthDateInMilliseconds as int;
-      String dateFormat = DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(dobAsInt));
-      _formattedBirthDate = dateFormat;
+      final dobAsDateTime = DateTime.fromMillisecondsSinceEpoch(dobAsInt);
+      final jiffyFormattedDate = Jiffy(dobAsDateTime).format("MMM do yyyy");
+      _formattedBirthDate = jiffyFormattedDate;
       notifyListeners();
     }
   }

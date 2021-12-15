@@ -24,7 +24,8 @@ class DiscoverInterestView extends StatelessWidget {
           DiscoverInterestViewModel(interestName: interestName),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
-        appBar: cwAuthAppBar(context, title: interestName),
+        appBar: cwAuthAppBar(context,
+            title: interestName, onPressed: () => Navigator.pop(context)),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: CustomScrollView(

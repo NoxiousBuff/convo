@@ -80,30 +80,30 @@ class DiscoverView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
+                  children: const [
+                    Text(
                       'Explore Interests',
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                           fontSize: 20),
                     ),
-                    const Spacer(),
-                    const Text(
-                      'See All',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    horizontalDefaultMessageSpace,
-                    GestureDetector(
-                      child: const Icon(
-                        FeatherIcons.chevronRight,
-                        color: Colors.black54,
-                        size: 28,
-                      ),
-                    ),
+                    // const Spacer(),
+                    // const Text(
+                    //   'See All',
+                    //   style: TextStyle(
+                    //     fontWeight: FontWeight.w700,
+                    //     color: Colors.black54,
+                    //   ),
+                    // ),
+                    // horizontalDefaultMessageSpace,
+                    // GestureDetector(
+                    //   child: const Icon(
+                    //     FeatherIcons.chevronRight,
+                    //     color: Colors.black54,
+                    //     size: 28,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

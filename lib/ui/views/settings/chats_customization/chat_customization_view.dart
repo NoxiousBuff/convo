@@ -1,5 +1,7 @@
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/settings/chats_customization/widgets/change_keyword_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
@@ -207,9 +209,17 @@ class ChatsCustomizationView extends StatelessWidget {
                 builder: (context, box, child) {
                   const key = AppSettingKeys.confettiAnimation;
                   const boxName = HiveApi.appSettingsBoxName;
-                  var value =
-                      Hive.box(boxName).get(key, defaultValue: 'Celelbrate');
-                  return cwEADetailsTile(context, 'Confetti', subtitle: value);
+                  var value = Hive.box(boxName).get(key, defaultValue: 'Congo');
+                  return cwEADetailsTile(context, 'Confetti', subtitle: value,
+                      onTap: () {
+                    showMaterialModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return const ChangeKeywordDialog(
+                            animationType: AnimationType.confetti,
+                          );
+                        });
+                  });
                 },
               ),
               ValueListenableBuilder<Box>(
@@ -218,8 +228,17 @@ class ChatsCustomizationView extends StatelessWidget {
                   const key = AppSettingKeys.balloonsAnimation;
                   const boxName = HiveApi.appSettingsBoxName;
                   var value = Hive.box(boxName)
-                      .get(key, defaultValue: 'Happy Birthday');
-                  return cwEADetailsTile(context, 'Balloons', subtitle: value);
+                      .get(key, defaultValue: 'Balloons');
+                  return cwEADetailsTile(context, 'Balloons', subtitle: value,
+                      onTap: () {
+                    showMaterialModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return const ChangeKeywordDialog(
+                            animationType: AnimationType.balloons,
+                          );
+                        });
+                  });
                 },
               ),
               const Divider(),
@@ -228,8 +247,8 @@ class ChatsCustomizationView extends StatelessWidget {
               verticalSpaceMedium,
               cwEADetailsTile(context, 'Customization',
                   subtitle: 'Set your settings for live chat', onTap: () {
-                    bubbleColor(context, model);
-                  }),
+                bubbleColor(context, model);
+              }),
             ],
           ),
         );

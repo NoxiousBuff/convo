@@ -20,22 +20,20 @@ class WriteLetterViewModel extends BaseViewModel {
   bool get isLetterEmpty => _isLetterEmpty;
 
   void updateLetterEmpty() {
-    _isLetterEmpty = letterTech.text.isEmpty;
+    _isLetterEmpty = writeLetterTech.text.isEmpty;
     notifyListeners();
   }
 
   bool get isActive => !_isLetterEmpty && isEdited;
 
-  final TextEditingController letterTech = TextEditingController();
+  final TextEditingController writeLetterTech = TextEditingController();
 
   Future<void> sendLetter(BuildContext context, FireUser fireUser) async {
     setBusy(true);
-    letterService.sendLetter(fireUser, letterTech.text.trim(), onComplete: () {
-      letterTech.clear();
+    letterService.sendLetter(fireUser, writeLetterTech.text.trim(), onComplete: () {
+      writeLetterTech.clear();
       updateLetterEmpty();
       updateIsEdited(false);
-      // TODO:'Fix This Bug'; 
-      Navigator.maybePop(context);
     }, onError: () {
       setBusy(false);
       customSnackbars.errorSnackbar(context,

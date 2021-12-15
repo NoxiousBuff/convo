@@ -27,66 +27,6 @@ class _ArchiveViewState extends State<ArchiveView> {
             appBar: cwAuthAppBar(context, title: 'Archives', onPressed: () {
               Navigator.of(context).pop();
             }),
-            // body: CustomScrollView(
-            //   slivers: [
-            //     Builder(builder: (context) {
-            //       final data = model.data;
-            //       if (model.hasError) {
-            //         return const SliverToBoxAdapter(
-            //           child: Center(
-            //             child: Text('Archive Has Error'),
-            //           ),
-            //         );
-            //       }
-            //       if (!model.dataReady) {
-            //         return SliverToBoxAdapter(
-            //           child: loadingUserListItem(context),
-            //         );
-            //       }
-            //       if (data != null) {
-            //         final docs = data.docs;
-            //         return docs.isNotEmpty
-            //             ? SliverList(
-            //                 delegate:
-            //                     SliverChildBuilderDelegate((context, index) {
-            //                 final doc = docs[index];
-            //                 String uid = doc[RecentUserField.userUid];
-            //                 return GestureDetector( onLongPress: () {
-            //                   model.showTileOptions(uid, context);
-            //                 }, child: UserListItem(userUid: uid));
-            //               }, childCount: docs.length))
-            //             : SliverToBoxAdapter(
-            //               child: Column(
-            //                   children: [
-            //                     SizedBox(
-            //                       height: MediaQuery.of(context).size.height * 0.2,
-            //                     ),
-            //                     const Icon(
-            //                       CupertinoIcons.archivebox,
-            //                       size: 200,
-            //                       color: AppColors.darkGrey,
-            //                     ),
-            //                     Container(
-            //                       margin:
-            //                           const EdgeInsets.symmetric(horizontal: 20),
-            //                       child: Text(
-            //                         'There is no contacts available in archive box',
-            //                         textAlign: TextAlign.center,
-            //                         style: Theme.of(context)
-            //                             .textTheme
-            //                             .bodyText2!
-            //                             .copyWith(fontSize: 20),
-            //                       ),
-            //                     ),
-            //                   ],
-            //                 ),
-            //             );
-            //       } else {
-            //         return const SliverToBoxAdapter(child: Text('Data is null.'));
-            //       }
-            //     }),
-            //   ],
-            // ),
             body: ValueListenableBuilder<Box>(
               valueListenable: hiveApi.hiveStream(HiveApi.archivedUsersHiveBox),
               builder: (context, archivedUsersBox, child) {

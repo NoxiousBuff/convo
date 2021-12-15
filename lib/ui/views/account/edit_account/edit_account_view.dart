@@ -43,7 +43,9 @@ class EditAccountView extends StatelessWidget {
             final isDobNull = dob == null;
             return Scaffold(
               backgroundColor: Colors.white,
-              appBar: cwAuthAppBar(context, title: 'Edit Profile'),
+              appBar: cwAuthAppBar(context,
+                  title: 'Edit Profile',
+                  onPressed: () => Navigator.pop(context)),
               body: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
@@ -264,13 +266,20 @@ class EditAccountView extends StatelessWidget {
                   const Divider(),
                   verticalSpaceRegular,
                   // cwEADescriptionTitle(context, 'Details'),
-                  cwEADetailsTile(context, 'Date of Birth'.toString(),
-                      descriptionTitle: !isDobNull
-                          ? model.formattedBirthDate
-                          : 'Pick Your DOB', onTap: () {
-                    navService.cupertinoPageRoute(
-                        context, const ChangeDobView());
-                  }),
+                  Builder(
+                    builder: (context) {
+                      
+                      return cwEADetailsTile(
+                          context, 'Date of Birth'.toString(),
+                          descriptionTitle: !isDobNull
+                              ? model.formattedBirthDate
+                              : 'Pick Your DOB', onTap: () {
+                        navService.cupertinoPageRoute(
+                            context, const ChangeDobView());
+                      });
+                    },
+                  ),
+
                   cwEADetailsTile(context, 'Hashtags',
                       descriptionTitle: 'Find Your HashTags', onTap: () {
                     navService.cupertinoPageRoute(

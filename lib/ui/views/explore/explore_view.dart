@@ -26,8 +26,7 @@ class ExploreView extends StatefulWidget {
 
 class _ExploreViewState extends State<ExploreView>
     with AutomaticKeepAliveClientMixin {
-  bool isLoading = false;
-  bool initialData = true;
+  bool isLoading = true;
   List<PixabayMedia> imagesList = [];
   final log = getLogger('ExploreView');
   ScrollController scrollController = ScrollController();
@@ -55,45 +54,48 @@ class _ExploreViewState extends State<ExploreView>
   ];
 
   Future<PixabayResponse?> getImages() async {
+    setState(() {
+      isLoading = true;
+    });
     String category = categoriesList[Random().nextInt(categoriesList.length)];
     log.wtf('Category:$category');
-    return picker.api?.requestImages(resultsPerPage: 25, category: category);
+    return picker.api
+        ?.requestImages(resultsPerPage: 25, category: category)
+        .whenComplete(() {
+      log.wtf('Fetching Complete');
+      setState(() {
+        isLoading = false;
+      });
+    }).timeout(const Duration(seconds: 5), onTimeout: () {
+      setState(() {
+        isLoading = false;
+      });
+    }).onError((error, stackTrace) {
+      log.wtf('getImagesError:$error');
+      setState(() {
+        Future.delayed(const Duration(seconds: 5), () {
+          setState(() {
+            isLoading = false;
+          });
+        });
+      });
+    });
   }
 
   Future<void> fetchImages() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      var response = await getImages();
-      var list = response!.hits;
-      if (list != null && list.isNotEmpty) {
-        for (var pixaBayMedia in list) {
-          imagesList.add(pixaBayMedia);
-        }
-      } else {
-        log.wtf('Image not fetched yet');
+    var response = await getImages();
+    var list = response!.hits;
+    if (list != null && list.isNotEmpty) {
+      for (var pixaBayMedia in list) {
+        imagesList.add(pixaBayMedia);
       }
-      if (initialData) {
-        setState(() {
-          initialData = false;
-        });
-      }
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      log.e('fetchImages');
+    } else {
+      log.wtf('Image not fetched yet');
     }
   }
 
   _scrollListener() {
-    if (scrollController.offset >=
-            scrollController.position.maxScrollExtent -
-                MediaQuery.of(context).size.height * 0.2 &&
+    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
         !scrollController.position.outOfRange) {
       log.wtf("reach the bottom");
       fetchImages();
@@ -126,20 +128,18 @@ class _ExploreViewState extends State<ExploreView>
   }
 
   Widget loading() {
-    return isLoading
-        ? Container(
-            alignment: Alignment.topCenter,
-            margin: const EdgeInsets.only(bottom: 20),
-            child: const SizedBox(
-              height: 40,
-              width: 40,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.0,
-                valueColor: AlwaysStoppedAnimation(AppColors.blue),
-              ),
-            ),
-          )
-        : const SizedBox.shrink();
+    return Container(
+      alignment: Alignment.topCenter,
+      margin: const EdgeInsets.all(16),
+      child: const SizedBox(
+        height: 40,
+        width: 40,
+        child: CircularProgressIndicator(
+          strokeWidth: 1.0,
+          valueColor: AlwaysStoppedAnimation(AppColors.blue),
+        ),
+      ),
+    );
   }
 
   @override
@@ -150,92 +150,107 @@ class _ExploreViewState extends State<ExploreView>
       builder: (context, model, child) => Scaffold(
         extendBodyBehindAppBar: true,
         body: OfflineBuilder(
-          child: const Text(''),
-          connectivityBuilder: (context, connection, child) {
-            bool connected = connection != ConnectivityResult.none;
-            return CustomScrollView(
-              controller: scrollController,
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  snap: true,
-                  floating: true,
-                  elevation: 0.0,
-                  backgroundColor: Colors.white,
-                  leadingWidth: 0,
-                  title: InkWell(
-                    onTap: () => navService.cupertinoPageRoute(
-                        context, const SearchView()),
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      width: screenWidth(context),
-                      child: Text('Search for someone',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                                  fontSize: 16, color: Colors.grey.shade900)),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(12.0),
+            child: const Text(''),
+            connectivityBuilder: (context, connection, child) {
+              bool connected = connection != ConnectivityResult.none;
+              return CustomScrollView(
+                controller: scrollController,
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    elevation: 0.0,
+                    backgroundColor: Colors.white,
+                    leadingWidth: 0,
+                    title: InkWell(
+                      onTap: () => navService.materialPageRoute(
+                          context, const SearchView()),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        width: screenWidth(context),
+                        child: Text(
+                          'Search for someone',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade900,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                initialData
-                    ? loadingItems()
-                    : SliverStaggeredGrid.countBuilder(
-                        crossAxisCount: 3,
-                        addAutomaticKeepAlives: false,
-                        itemCount: imagesList.length,
-                        itemBuilder: (BuildContext context, int i) {
-                          var imageUrl = imagesList[i].getThumbnailLink();
-                          return InkWell(
-                            onTap: () => navService.cupertinoPageRoute(context,
-                                ExplorePageview(pixaBayMedia: imagesList[i])),
-                            child: Container(
-                              color: Colors.grey.shade200,
-                              child: CachedNetworkImage(
-                                fit: BoxFit.cover,
-                                imageUrl: imageUrl!,
+                  imagesList.isEmpty
+                      ? loadingItems()
+                      : SliverStaggeredGrid.countBuilder(
+                          crossAxisCount: 3,
+                          addAutomaticKeepAlives: false,
+                          itemCount: imagesList.length,
+                          itemBuilder: (BuildContext context, int i) {
+                            var imageUrl = imagesList[i].getThumbnailLink();
+                            return InkWell(
+                              onTap: () => navService.cupertinoPageRoute(
+                                  context,
+                                  ExplorePageview(pixaBayMedia: imagesList[i])),
+                              child: Container(
+                                color: Colors.grey.shade200,
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  imageUrl: imageUrl!,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        staggeredTileBuilder: (int index) =>
-                            StaggeredTile.count(
-                                index % 8 == 0 ? 2 : 1, index % 8 == 0 ? 2 : 1),
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                      ),
-                SliverToBoxAdapter(
-                  child: connected
-                      ? loading()
-                      : InkWell(
-                          onTap: () {},
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                width: 1,
-                                color: AppColors.darkGrey,
-                              ),
-                            ),
+                            );
+                          },
+                          staggeredTileBuilder: (int index) =>
+                              StaggeredTile.count(index % 8 == 0 ? 2 : 1,
+                                  index % 8 == 0 ? 2 : 1),
+                          mainAxisSpacing: 4.0,
+                          crossAxisSpacing: 4.0,
+                        ),
+                  SliverToBoxAdapter(
+                    child: connected
+                        ? isLoading
+                            ? loading()
+                            : InkWell(
+                                onTap: () => fetchImages(),
+                                child: Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: 1,
+                                      color: AppColors.darkGrey,
+                                    ),
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      FeatherIcons.plus,
+                                      size: 40,
+                                    ),
+                                  ),
+                                ),
+                              )
+                        : Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                            width: screenWidth(context),
+                            color: Colors.orange,
                             child: const Center(
-                              child: Icon(
-                                FeatherIcons.plus,
-                                size: 40,
-                              ),
+                              child: Text('Not Connected',style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.white
+                              ),),
                             ),
                           ),
-                        ),
-                ),
-              ],
-            );
-          },
-        ),
+                  ),
+                ],
+              );
+            }),
       ),
     );
   }

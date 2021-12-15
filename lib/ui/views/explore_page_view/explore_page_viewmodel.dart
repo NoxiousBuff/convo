@@ -1,10 +1,9 @@
 import 'dart:math';
-
+import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/app_keys.dart';
-import 'package:pixabay_picker/model/pixabay_media.dart';
 import 'package:pixabay_picker/pixabay_picker.dart';
-import 'package:stacked/stacked.dart';
+import 'package:pixabay_picker/model/pixabay_media.dart';
 
 class ExplorePageViewViewModel extends BaseViewModel {
   final log = getLogger('ExplorePageViewViewModel');

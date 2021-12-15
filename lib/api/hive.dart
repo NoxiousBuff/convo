@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:device_info/device_info.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 final hiveApi = HiveApi();
@@ -14,7 +16,9 @@ class HiveApi {
   static const String recentSearchesHiveBox = 'recentSearches';
   static const String pinnedUsersHiveBox = 'pinnedUsers';
   static const String archivedUsersHiveBox = 'archiveUsers';
+  static const String deviceInfoHiveBox = 'deviceInfo';
   Future<void> initialiseHive() async {
+    await Hive.openBox(deviceInfoHiveBox);
     await Hive.openBox(appSettingsBoxName);
     await Hive.openBox(pinnedUsersHiveBox);
     await Hive.openBox(userdataHiveBox);
@@ -23,6 +27,15 @@ class HiveApi {
     await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(savedPeopleHiveBox);
     await Hive.openBox(recentSearchesHiveBox);
+  }
+
+  Future<void> saveDeviceInfoInHive() async {
+    final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+    if(Platform.isAndroid) {
+      final build = await _deviceInfoPlugin.androidInfo;
+      final deviceVersion = build.version.release;
+      saveInHive(deviceInfoHiveBox, 'version', deviceVersion);
+    }
   }
 
 // -----------------------------------------------------------------------------

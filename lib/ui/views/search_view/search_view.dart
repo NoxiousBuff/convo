@@ -5,14 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/services/chat_service.dart';
-import 'package:hint/services/auth_service.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/ui/views/dule/dule_view.dart';
-import 'package:hint/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -46,6 +41,10 @@ class SearchView extends StatelessWidget {
             controller: model.searchTech,
             padding: const EdgeInsets.all(8.0),
             placeholder: 'Search for someone',
+            placeholderStyle: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade900,
+                fontWeight: FontWeight.w400,),
             suffix: model.searchTech.text.isEmpty
                 ? const SizedBox.shrink()
                 : IconButton(
@@ -54,12 +53,11 @@ class SearchView extends StatelessWidget {
                       FeatherIcons.x,
                       color: AppColors.inActiveGray,
                     )),
-            placeholderStyle: TextStyle(color: Colors.indigo.shade900),
             decoration: BoxDecoration(
-              color: Colors.indigo.shade50,
-              border: Border.all(color: CupertinoColors.lightBackgroundGray),
-              borderRadius: BorderRadius.circular(12.0),
-            ),
+                          color: Colors.grey.shade100,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
             onChanged: (value) {
               model.handleUsernameSearch(value);
 
@@ -154,50 +152,48 @@ class SearchView extends StatelessWidget {
       onDispose: (model) {
         model.searchTech.dispose();
       },
-      builder: (context, model, child) => DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          appBar: buildSearchHeader(context, model),
-          body: FutureBuilder<QuerySnapshot>(
-            future: model.usernameSearchFuture,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return buildInitialContent(model);
-              }
-              final searchResults = snapshot.data!.docs;
-              return CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  snapshot.data != null && searchResults.isNotEmpty
-                      ? SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (_, index) {
-                              var fireUser =
-                                  FireUser.fromFirestore(searchResults[index]);
-                              return UserItem(
-                                fireUser: fireUser,
-                                title: fireUser.username,
-                                onTap: () async {
-                                  String liveUserUid =
-                                      AuthService.liveUser!.uid;
-                                  String value = chatService.getConversationId(
-                                      fireUser.id, liveUserUid);
-                                  navService.cupertinoPageRoute(
-                                      context, DuleView(fireUser: fireUser));
-                                  await databaseService.updateUserDataWithKey(
-                                      DatabaseMessageField.roomUid, value);
-                                  model.addToRecentSearches(fireUser.id);
-                                },
-                              );
-                            },
-                            childCount: searchResults.length,
-                          ),
-                        )
-                      : SliverToBoxAdapter(child: buildEmptySearch('username')),
-                ],
-              );
-            },
-          ),
+      builder: (context, model, child) => Scaffold(
+        appBar: buildSearchHeader(context, model),
+        body: FutureBuilder<QuerySnapshot>(
+          future: model.usernameSearchFuture,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return buildInitialContent(model);
+            }
+            final searchResults = snapshot.data!.docs;
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                snapshot.data != null && searchResults.isNotEmpty
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) {
+                            var fireUser =
+                                FireUser.fromFirestore(searchResults[index]);
+                            return UserItem(
+                              fireUser: fireUser,
+                              title: fireUser.username,
+                              onTap: () async {
+                                // String liveUserUid =
+                                //     AuthService.liveUser!.uid;
+                                // String value = chatService.getConversationId(
+                                //     fireUser.id, liveUserUid);
+                                // navService.cupertinoPageRoute(
+                                //     context, DuleView(fireUser: fireUser));
+                                // await databaseService.updateUserDataWithKey(
+                                //     DatabaseMessageField.roomUid, value);
+                                chatService.startDuleConversation(context, fireUser);
+                                model.addToRecentSearches(fireUser.id);
+                              },
+                            );
+                          },
+                          childCount: searchResults.length,
+                        ),
+                      )
+                    : SliverToBoxAdapter(child: buildEmptySearch('username')),
+              ],
+            );
+          },
         ),
       ),
     );

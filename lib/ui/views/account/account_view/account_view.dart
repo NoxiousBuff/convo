@@ -4,11 +4,11 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/prototypes/page_view_just.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/explore_interest_chip.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/edit_account_view.dart';
-import 'package:hint/ui/views/contacts/contacts_view.dart';
 import 'package:hint/ui/views/settings/settings_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
@@ -52,7 +52,7 @@ class AccountView extends StatelessWidget {
                     IconButton(
                       onPressed: () {
                         navService.cupertinoPageRoute(
-                            context, const ContactsView());
+                            context, const JustAnotherPageView());
                       },
                       icon: const Icon(FeatherIcons.shield),
                       color: Colors.black,

@@ -1,8 +1,14 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/letter_info/letter_info_view.dart';
 import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hint/ui/views/received_letters/received_letters_view.dart';
+import 'package:hint/ui/views/search_to_write_letter/search_to_write_letter_view.dart';
 import 'package:hint/ui/views/send_letters/send_letters_view.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:stacked/stacked.dart';
 
 import 'letters_viewmodel.dart';
@@ -41,7 +47,41 @@ class _LettersViewState extends State<LettersView>
           length: 2,
           initialIndex: 0,
           child: Scaffold(
+            floatingActionButton: OpenContainer(
+              closedElevation: 0,
+              openElevation: 0,
+              closedColor: Colors.transparent,
+              closedBuilder: (context, onPressed) {
+                return FloatingActionButton(
+                  elevation: 2,
+                  onPressed: onPressed,
+                  backgroundColor: AppColors.blue,
+                  child: const Icon(FeatherIcons.edit),
+                );
+              },
+              openBuilder: (context, onPressed) {
+                return const SearchToWriteLetterView();
+              },
+            ),
             appBar: AppBar(
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    showMaterialModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return const LetterInfoView();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                    );
+                  },
+                  icon: const Icon(FeatherIcons.info),
+                  color: Colors.black54,
+                ),
+                horizontalSpaceSmall,
+              ],
               elevation: 0.0,
               title: const Text(
                 'Letters',
@@ -50,12 +90,7 @@ class _LettersViewState extends State<LettersView>
                     color: Colors.black,
                     fontSize: 18),
               ),
-              backgroundColor:
-                  MaterialStateColor.resolveWith((Set<MaterialState> states) {
-                return states.contains(MaterialState.scrolledUnder)
-                    ? Colors.grey.shade50
-                    : Colors.white;
-              }),
+              backgroundColor: AppColors.lightGrey,
               leadingWidth: 56.0,
               leading: IconButton(
                 color: Colors.black54,
@@ -71,18 +106,19 @@ class _LettersViewState extends State<LettersView>
                 indicatorColor: Colors.black45,
                 controller: lettersTab,
                 labelPadding: const EdgeInsets.symmetric(vertical: 16),
-                labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                 tabs: const [
-                   Text('Received'),
-                   Text('Sent'),
+                  Text('Received'),
+                  Text('Sent'),
                 ],
-                indicatorSize: TabBarIndicatorSize.label,
+                indicatorSize: TabBarIndicatorSize.tab,
               ),
             ),
             body: TabBarView(
-              physics:const NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               controller: lettersTab,
-              children:const [ReceivedLettersView(), SendLettersView()],
+              children: const [ReceivedLettersView(), SendLettersView()],
             ),
           ),
         ),

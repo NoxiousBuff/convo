@@ -3,9 +3,9 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/phone_contacts/phone_contacts_view.dart';
+import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hint/ui/views/settings/chats_customization/chat_customization_view.dart';
-import 'package:hint/ui/views/settings/help_view.dart';
+import 'package:hint/ui/views/settings/help/help_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 import 'package:stacked/stacked.dart';
 
@@ -22,12 +22,16 @@ class SettingsView extends StatelessWidget {
       viewModelBuilder: () => SettingsViewModel(),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Colors.white,
-        appBar: cwAuthAppBar(context, title: 'Settings'),
+        appBar: cwAuthAppBar(
+          context,
+          title: 'Settings',
+          onPressed: () => Navigator.pop(context),
+        ),
         body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           physics: const BouncingScrollPhysics(),
           children: [
-            //TODO: add what's new functionality here`
+            //TODO: add what's new functionality here
             cwEADetailsTile(context, 'Whats\'s New 🎉🎉',
                 titleColor: AppColors.blue),
             cwEADetailsTile(context, 'Account',
@@ -38,10 +42,6 @@ class SettingsView extends StatelessWidget {
                 onTap: () {
               navService.cupertinoPageRoute(
                   context, const ChatsCustomizationView());
-            }),
-            cwEADetailsTile(context, 'Contacts',
-                subtitle: 'Connect or upload your contacts', onTap: () {
-              navService.cupertinoPageRoute(context, const PhoneContactView());
             }),
             cwEADetailsTile(context, 'Notifications',
                 subtitle: 'Messages, Start Chat', onTap: () {
@@ -54,8 +54,7 @@ class SettingsView extends StatelessWidget {
             }),
             cwEADetailsTile(context, 'Invite', subtitle: 'Invites a Conatct',
                 onTap: () {
-              // TODO: add invite page
-              // navService.cupertinoPageRoute(context, const ());
+              navService.cupertinoPageRoute(context, const InVitesView());
             }),
           ],
         ),

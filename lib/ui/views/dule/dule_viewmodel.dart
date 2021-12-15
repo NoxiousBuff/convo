@@ -17,7 +17,6 @@ import 'package:hint/services/database_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:uuid/uuid.dart';
 
 class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   DuleViewModel(this.fireUser);
@@ -29,15 +28,6 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
   String _sendingMediaType = '';
   String get sendingMediaType => _sendingMediaType;
-
-  String _key = '';
-  String get key => _key;
-
-  void updateKeyValue() {
-    _key = const Uuid().v4();
-    log.d(_key);
-    notifyListeners();
-  } 
 
   String _conversationId = '';
   String get conversationId => _conversationId;
@@ -222,6 +212,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     }
   }
 
+  /// Picke Media From Gallery
   Future pickGallery(BuildContext context) async {
     String title = 'Maximum file size is 8 MB';
     const type = FileType.media;
@@ -238,8 +229,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         setBusy(false);
         customSnackbars.infoSnackbar(context, title: title);
       } else {
-        _changeControllerTextValue(path);
         setBusyForObject(controllerIsMedia, true);
+        _changeControllerTextValue(path);
         await uploadFile(filePath: path, fileName: fileName!, context: context);
       }
       return File(result.paths.first!);
@@ -250,23 +241,23 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   }
 
 
+ /// Upload File In Firebase Storage
   Future<String> uploadFile({
     required String filePath,
     required String fileName,
     required BuildContext context,
   }) async {
     var now = DateTime.now();
-    var hourPart = '${now.year}${now.month}${now.day}${now.hour}';
-    var secondPart = '${now.minute}${now.second}${now.millisecond}';
-    final firebasename = hourPart + secondPart;
+    var day = now.day;
+    var year = now.year;
+    var month = now.month;
+
     final fileType = lookupMimeType(filePath)!.split("/").first;
-    String folder = fileType == MediaType.image
-        ? 'live Chat/$fileName-$firebasename'
-        : 'live Chat/$fileName-$firebasename';
-      
-      log.wtf('FileType:$fileType');
+    var folderDate = '$year-$month-$day';
+    String folder = 'LiveChatMedia/$folderDate/$fileName';
+
     UploadTask task = storage.ref(folder).putFile(File(filePath));
-      _changeSendingMediaType(fileType);
+    _changeSendingMediaType(fileType);
     task.timeout(const Duration(seconds: 10), onTimeout: () {
       setBusy(false);
       setBusyForObject(controllerIsMedia, false);

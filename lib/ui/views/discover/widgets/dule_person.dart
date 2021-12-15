@@ -5,12 +5,13 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/discover/discover_viewmodel.dart';
 import 'package:hint/ui/views/profile/profile_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import 'dule_person_dialog.dart';
 
 Widget dulePerson(
     BuildContext context, DiscoverViewModel model, FireUser fireUser,
@@ -28,7 +29,13 @@ Widget dulePerson(
       : InkWell(
         borderRadius: BorderRadius.circular(32),
         onTap: () {
-          chatService.startDuleConversation(context, fireUser);
+          showModalBottomSheet(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32)),
+                  context: context,
+                  builder: (context) {
+                    return DulePersonDialog(fireUser: fireUser);
+                  });
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),

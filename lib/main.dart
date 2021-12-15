@@ -10,5 +10,6 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await Hive.initFlutter();
   await hiveApi.initialiseHive();
+  await hiveApi.saveDeviceInfoInHive();
   runApp(const ProviderScope(child: MyApp()));
 }

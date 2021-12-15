@@ -5,6 +5,7 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -45,9 +46,7 @@ class ChatListView extends StatelessWidget {
                       child: IconButton(
                         icon: const Icon(FeatherIcons.userPlus),
                         onPressed: () {
-                          log(Hive.box(HiveApi.pinnedUsersHiveBox)
-                              .values
-                              .toString());
+                          navService.materialPageRoute(context, const InVitesView());
                         },
                       ),
                     ),
@@ -62,7 +61,7 @@ class ChatListView extends StatelessWidget {
                               : Material(
                                   color: Colors.transparent,
                                   child: IconButton(
-                                    icon: const Icon(FeatherIcons.archive),
+                                    icon: const Icon(FeatherIcons.folder),
                                     onPressed: () {
                                       navService.cupertinoPageRoute(
                                           context, const ArchiveView());
@@ -84,7 +83,7 @@ class ChatListView extends StatelessWidget {
                   ],
                 ),
                 stretch: true,
-                largeTitle: const Text('Friends'),
+                largeTitle: const Text('Conversations'),
                 border: Border.all(width: 0.0, color: Colors.transparent),
               ),
               ValueListenableBuilder<Box>(

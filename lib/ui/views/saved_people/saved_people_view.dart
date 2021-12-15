@@ -36,7 +36,7 @@ class SavedPeopleView extends StatelessWidget {
                     Expanded(
                       child: UserListItem(
                         userUid: savedUser,
-                        onTap: () {
+                        onTap: (fireUser) {
                           log('printed');
                         },
                       ),

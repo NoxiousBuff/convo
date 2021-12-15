@@ -100,7 +100,7 @@ class WriteLetterView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: cwEATextField(
-                    context, model.letterTech, 'Type your letter here',
+                    context, model.writeLetterTech, 'Type your letter here',
                     autoFocus: false, maxLength: 400, onChanged: (value) {
                   model.updateIsEdited(true);
                   model.updateLetterEmpty();
