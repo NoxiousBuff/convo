@@ -1,19 +1,21 @@
 import 'dart:math';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/views/explore_page_view/explore_page_view.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_strings.dart';
 
 import 'explore_viewmodel.dart';
+import 'package:tenor/tenor.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:pixabay_picker/pixabay_picker.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:pixabay_picker/model/pixabay_media.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -27,11 +29,12 @@ class ExploreView extends StatefulWidget {
 class _ExploreViewState extends State<ExploreView>
     with AutomaticKeepAliveClientMixin {
   bool isLoading = true;
-  List<PixabayMedia> imagesList = [];
+  List<String> imagesList = [];
   final log = getLogger('ExploreView');
+  Tenor tenor = Tenor(apiKey: tenorKey);
   ScrollController scrollController = ScrollController();
   PixabayPicker picker = PixabayPicker(apiKey: pixaBayApiKey);
-  // String defaultImage = 'https://pixabay.com/images/id-6818683/';
+  List<dynamic> interests = hiveApi.getUserDataWithHive(FireUserField.interests);
 
   List<String> categoriesList = [
     Category.animals,
@@ -53,6 +56,49 @@ class _ExploreViewState extends State<ExploreView>
     Category.travel,
   ];
 
+  Future<List<TenorResult>?> fetchTrendingGif() async {
+    int index = Random().nextInt(interests.length);
+    var response =
+        await tenor.randomGIF(interests[index].toString(), limit: 50).catchError((e) {
+      log.e('fetchTrendingGif Error:$e');
+    });
+
+    log.wtf('Index:$index');
+
+    if (response != null) {
+      return response.results;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> fetchMedia() async {
+    try {
+      var images = await getImages();
+      var gifResponse = await fetchTrendingGif();
+      var listImages = images!.hits;
+
+      log.wtf('List of listImages:$listImages');
+      log.wtf('List Of Tenor:${gifResponse?.length}');
+      for (int i = 0; i < 20; i++) {
+        var result = gifResponse?[i].media?.gif?.url;
+        imagesList.add(result!);
+
+        if (listImages != null && listImages.isNotEmpty) {
+          if (i % 4 == 0) {
+            final gif = gifResponse?[i].media?.gif?.url;
+            imagesList.add(gif!);
+          } else {
+            imagesList.add(listImages[i].getDownloadLink()!);
+          }
+        }
+      }
+      log.wtf('ImagesListLength:${imagesList.length}');
+    } catch (e) {
+      log.e('fetchMedia Error:$e');
+    }
+  }
+
   Future<PixabayResponse?> getImages() async {
     setState(() {
       isLoading = true;
@@ -60,7 +106,7 @@ class _ExploreViewState extends State<ExploreView>
     String category = categoriesList[Random().nextInt(categoriesList.length)];
     log.wtf('Category:$category');
     return picker.api
-        ?.requestImages(resultsPerPage: 25, category: category)
+        ?.requestImages(resultsPerPage: 50, category: category)
         .whenComplete(() {
       log.wtf('Fetching Complete');
       setState(() {
@@ -82,23 +128,23 @@ class _ExploreViewState extends State<ExploreView>
     });
   }
 
-  Future<void> fetchImages() async {
-    var response = await getImages();
-    var list = response!.hits;
-    if (list != null && list.isNotEmpty) {
-      for (var pixaBayMedia in list) {
-        imagesList.add(pixaBayMedia);
-      }
-    } else {
-      log.wtf('Image not fetched yet');
-    }
-  }
+  // Future<void> fetchImages() async {
+  //   var response = await getImages();
+  //   var list = response!.hits;
+  //   if (list != null && list.isNotEmpty) {
+  //     for (var pixaBayMedia in list) {
+  //       imagesList.add(pixaBayMedia);
+  //     }
+  //   } else {
+  //     log.wtf('Image not fetched yet');
+  //   }
+  // }
 
   _scrollListener() {
     if (scrollController.offset >= scrollController.position.maxScrollExtent &&
         !scrollController.position.outOfRange) {
       log.wtf("reach the bottom");
-      fetchImages();
+      fetchMedia();
     }
     if (scrollController.offset <= scrollController.position.minScrollExtent &&
         !scrollController.position.outOfRange) {
@@ -108,7 +154,7 @@ class _ExploreViewState extends State<ExploreView>
 
   @override
   void initState() {
-    fetchImages();
+    fetchMedia();
     scrollController = ScrollController();
     scrollController.addListener(_scrollListener);
 
@@ -116,6 +162,7 @@ class _ExploreViewState extends State<ExploreView>
   }
 
   Widget loadingItems() {
+    log.wtf('Loading Items');
     return SliverStaggeredGrid.countBuilder(
       itemCount: 25,
       crossAxisCount: 3,
@@ -185,23 +232,17 @@ class _ExploreViewState extends State<ExploreView>
                     ),
                   ),
                   imagesList.isEmpty
-                      ? loadingItems()
+                      ? SliverToBoxAdapter(child: loading())
                       : SliverStaggeredGrid.countBuilder(
                           crossAxisCount: 3,
                           addAutomaticKeepAlives: false,
                           itemCount: imagesList.length,
                           itemBuilder: (BuildContext context, int i) {
-                            var imageUrl = imagesList[i].getThumbnailLink();
-                            return InkWell(
-                              onTap: () => navService.cupertinoPageRoute(
-                                  context,
-                                  ExplorePageview(pixaBayMedia: imagesList[i])),
-                              child: Container(
-                                color: Colors.grey.shade200,
-                                child: CachedNetworkImage(
-                                  fit: BoxFit.cover,
-                                  imageUrl: imageUrl!,
-                                ),
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                imageUrl: imagesList[i],
                               ),
                             );
                           },
@@ -216,7 +257,7 @@ class _ExploreViewState extends State<ExploreView>
                         ? isLoading
                             ? loading()
                             : InkWell(
-                                onTap: () => fetchImages(),
+                                onTap: () => fetchMedia(),
                                 child: Container(
                                   margin:
                                       const EdgeInsets.symmetric(vertical: 4),
@@ -236,15 +277,17 @@ class _ExploreViewState extends State<ExploreView>
                                 ),
                               )
                         : Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                             width: screenWidth(context),
                             color: Colors.orange,
                             child: const Center(
-                              child: Text('Not Connected',style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.white
-                              ),),
+                              child: Text(
+                                'Not Connected',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.white),
+                              ),
                             ),
                           ),
                   ),

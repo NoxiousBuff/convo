@@ -33,6 +33,7 @@ dependencies:
   email_validator: ^2.0.1
   jiffy: ^4.1.0
   timeago: ^3.1.0
+  tenor: ^1.0.9
   pull_to_refresh: ^2.0.0
 
   # ui

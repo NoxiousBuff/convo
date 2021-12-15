@@ -33,6 +33,17 @@ class ExploreViewModel extends BaseViewModel {
 
   PixabayPicker picker = PixabayPicker(apiKey: pixaBayApiKey, language: "en");
 
+
+// Future<TenorResponse?> requestTrendingGIF({
+//   int limit = 20,
+//   ContentFilter contentFilter = ContentFilter.off,
+//   GifSize size = GifSize.all,
+//   MediaFilter mediaFilter = MediaFilter.minimal,
+// })
+
+// fetch trending Gif
+
+
   Future<PixabayResponse?> getImagesByCategory() async {
     String category = categoriesList[Random().nextInt(categoriesList.length)];
     log.wtf('Category:$category');
