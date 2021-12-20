@@ -72,7 +72,7 @@ Widget cwAuthProceedButton(BuildContext context,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: isActive
-                        ? AppColors.blue
+                        ? AppColors.white
                         : AppColors.mediumBlack,
             ),),
         decoration: BoxDecoration(

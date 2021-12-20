@@ -10,24 +10,28 @@ class UserItem extends StatelessWidget {
   final FireUser fireUser;
   final void Function()? onTap;
   final void Function()? onLongPress;
-  const UserItem(
-      {Key? key,
-      required this.title,
-      required this.fireUser,
-      required this.onTap,
-      this.onLongPress,
-      this.trailing,
-      this.subtitle})
-      : super(key: key);
+  final EdgeInsetsGeometry? contentPadding;
+  const UserItem({
+    Key? key,
+    required this.title,
+    required this.fireUser,
+    required this.onTap,
+    this.onLongPress,
+    this.trailing,
+    this.subtitle,
+    this.contentPadding,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      enableFeedback: true,
+      contentPadding: contentPadding,
       onLongPress: onLongPress,
       onTap: onTap,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
+          topLeft: Radius.circular(15),
+          bottomLeft: Radius.circular(15),
         ),
       ),
       trailing: trailing ?? const SizedBox.shrink(),
@@ -36,7 +40,7 @@ class UserItem extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 5.0),
         child: Text(
           fireUser.displayName,
-          style:  TextStyle(
+          style: TextStyle(
             fontSize: 20,
             color: AppColors.black,
             fontWeight: FontWeight.w600,
@@ -46,7 +50,7 @@ class UserItem extends StatelessWidget {
       subtitle: subtitle ??
           Text(
             fireUser.username,
-            style:  TextStyle(
+            style: TextStyle(
               color: AppColors.black,
             ),
           ),

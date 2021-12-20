@@ -28,6 +28,8 @@ class AppColors {
   static const transparent = Colors.transparent;
   static const scaffoldColor = Colors.white;
 
+  
+
 
 
   // Color black() {

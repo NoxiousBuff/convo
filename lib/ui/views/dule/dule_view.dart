@@ -118,7 +118,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           IconButton(
             padding: const EdgeInsets.all(8),
             icon: const Icon(FeatherIcons.arrowLeft),
-            color: AppColors.white,
+            color: AppColors.black,
             onPressed: () => Navigator.pop(context),
           ),
           horizontalDefaultMessageSpace,

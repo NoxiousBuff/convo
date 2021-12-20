@@ -5,9 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //Get cached document first rather than getting server document
 extension FirestoreDocumentExtension
     on DocumentReference {
-  Future<DocumentSnapshot> getSavy() async {
+  Future<DocumentSnapshot<Object?>> getSavy() async {
     try {
-      DocumentSnapshot ds =
+      DocumentSnapshot<Object?> ds =
           await get(const GetOptions(source: Source.cache));
               
       return ds;

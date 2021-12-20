@@ -43,7 +43,7 @@ class _AccountState extends State<UserAccountView> {
                     child: Text(
                       'This is your personal information you can change here your personal details and these details are not seen in your public profile.',
                       style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: AppColors.grey,
+                            color: AppColors.mediumBlack,
                           ),
                       textAlign: TextAlign.center,
                     ),

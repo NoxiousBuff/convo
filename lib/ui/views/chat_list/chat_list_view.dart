@@ -5,7 +5,9 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
@@ -18,6 +20,7 @@ import 'package:hint/ui/views/archives/archives_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+import 'package:hint/extensions/query.dart';
 
 import 'widgets/show_tile_options.dart';
 
@@ -30,7 +33,10 @@ class ChatListView extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: Material(
           color: AppColors.transparent,
-          child: Icon(FeatherIcons.codesandbox, color: AppColors.black,),
+          child: Icon(
+            FeatherIcons.codesandbox,
+            color: AppColors.black,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -80,7 +86,12 @@ class ChatListView extends StatelessWidget {
           ],
         ),
         stretch: true,
-        largeTitle: Text('Convo', style: TextStyle(color: AppColors.black,),),
+        largeTitle: Text(
+          'Convo',
+          style: TextStyle(
+            color: AppColors.black,
+          ),
+        ),
         border: Border.all(width: 0.0, color: AppColors.transparent),
       );
 
@@ -89,112 +100,118 @@ class ChatListView extends StatelessWidget {
         valueListenable: hiveApi.hiveStream(HiveApi.pinnedUsersHiveBox),
         builder: (context, pinnedUsersBox, child) {
           final pinnedUsersList = pinnedUsersBox.values.toList();
-          return SliverGrid(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent:
-                  screenWidthPercentage(context, percentage: 0.4),
-              childAspectRatio: 1.0,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final userUid = pinnedUsersList[index];
-                return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                    future: FirebaseFirestore.instance
-                        .collection(subsFirestoreKey)
-                        .doc(userUid)
-                        .get(const GetOptions(source: Source.cache)),
-                    builder: (context, snapshot) {
-                      final data = snapshot.data;
-                      if (data != null) {
-                        final fireUser = FireUser.fromFirestore(data);
-                        return GestureDetector(
-                          onTap: () {
-                            showTileOptions(userUid, context, true);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20),
+          return SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 17),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                mainAxisExtent:
+                    screenWidthPercentage(context, percentage: 0.35),
+                maxCrossAxisExtent:
+                    screenWidthPercentage(context, percentage: 0.4),
+                childAspectRatio: 1.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  final userUid = pinnedUsersList[index];
+                  return FutureBuilder<DocumentSnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection(subsFirestoreKey)
+                          .doc(userUid)
+                          .getSavy(),
+                      builder: (context, snapshot) {
+                        final data = snapshot.data;
+                        if (data != null) {
+                          final fireUser = FireUser.fromFirestore(data);
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(40),
+                            onLongPress: () {
+                              showTileOptions(fireUser, context, true);
+                            },
+                            onTap: () => chatService.startDuleConversation(context, fireUser),
                             child: Column(
                               children: [
-                                ClipRRect(
+                                userProfilePhoto(
+                                  context,
+                                  fireUser.photoUrl,
+                                  height: screenWidthPercentage(context,
+                                      percentage: 0.25),
+                                  width: screenWidthPercentage(context,
+                                      percentage: 0.25),
                                   borderRadius: BorderRadius.circular(40),
-                                  child: SizedBox(
-                                    height: screenWidthPercentage(context,
-                                        percentage: 0.25),
-                                    width: screenWidthPercentage(context,
-                                        percentage: 0.25),
-                                    child: CachedNetworkImage(
-                                      imageUrl: fireUser.photoUrl,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
                                 ),
                                 verticalSpaceSmall,
                                 Text(
                                   fireUser.displayName,
-                                  style:  TextStyle(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
                                       color: AppColors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
                                 )
                               ],
                             ),
-                          ),
-                        );
-                      } else {
-                        return const CircularProgressIndicator.adaptive();
-                      }
-                    });
-              },
-              childCount: pinnedUsersList.length,
+                          );
+                        } else {
+                          return const CircularProgressIndicator.adaptive();
+                        }
+                      });
+                },
+                childCount: pinnedUsersList.length,
+              ),
             ),
           );
         },
       );
 
   Widget _buildChatList(BuildContext context, ChatListViewModel model) =>
-      Builder(
-        builder: (context) {
-          final data = model.data;
-          if (model.hasError) {
-            log(model.error().toString());
-            return const SliverToBoxAdapter(
-              child: Center(
-                child: Text('Model has Error'),
-              ),
-            );
-          }
-          if (!model.dataReady) {
-            return const SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator()));
-          }
-          if (data != null) {
-            return SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final doc = data.docs[index];
-                final userUid = doc[RecentUserField.userUid];
-                final archived = doc[RecentUserField.archive];
-                final pinned = doc[RecentUserField.pinned];
-                return GestureDetector(
-                  onLongPress: () {
-                    showTileOptions(userUid, context, false);
-                  },
-                  child: archived || pinned
-                      ? const SizedBox.shrink()
-                      : UserListItem(
-                          userUid: userUid,
-                          onLongPress: (fireUser) {
-                            showTileOptions(fireUser, context, pinned);
-                          },
-                        ),
-                );
-              }, childCount: data.docs.length),
-            );
-          } else {
-            return const SliverToBoxAdapter(
-              child: Text('Data is null'),
-            );
-          }
-        },
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        sliver: Builder(
+          builder: (context) {
+            final data = model.data;
+            if (model.hasError) {
+              log(model.error().toString());
+              return const SliverToBoxAdapter(
+                child: Center(
+                  child: Text('Model has Error'),
+                ),
+              );
+            }
+            if (!model.dataReady) {
+              return const SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()));
+            }
+            if (data != null) {
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final doc = data.docs[index];
+                  final userUid = doc[RecentUserField.userUid];
+                  final archived = doc[RecentUserField.archive];
+                  final pinned = doc[RecentUserField.pinned];
+                  return GestureDetector(
+                    onLongPress: () {
+                      showTileOptions(userUid, context, false);
+                    },
+                    child: archived || pinned
+                        ? const SizedBox.shrink()
+                        : UserListItem(
+                            // contentPadding: const EdgeInsets.all(0),
+                            userUid: userUid,
+                            onLongPress: (fireUser) {
+                              showTileOptions(fireUser, context, pinned);
+                            },
+                          ),
+                  );
+                }, childCount: data.docs.length),
+              );
+            } else {
+              return const SliverToBoxAdapter(
+                child: Text('Data is null'),
+              );
+            }
+          },
+        ),
       );
 
   @override

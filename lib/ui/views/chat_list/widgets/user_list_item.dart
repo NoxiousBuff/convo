@@ -17,12 +17,14 @@ class UserListItem extends StatelessWidget {
   final String userUid;
   final Function(FireUser fireUser)? onTap;
   final Function(FireUser fireUser)? onLongPress;
+  EdgeInsetsGeometry? contentPadding;
   UserListItem({
     Key? key,
     required this.userUid,
     this.pinned = false,
     this.onTap,
     this.onLongPress,
+    this.contentPadding,
   }) : super(key: key);
 
   final log = getLogger('UserListItem');
@@ -73,6 +75,7 @@ class UserListItem extends StatelessWidget {
           } else {
             FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
             child = UserItem(
+              contentPadding: contentPadding,
                 fireUser: fireUser,
                 onLongPress: () {
                   final function = onLongPress;
