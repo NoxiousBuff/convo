@@ -1,8 +1,7 @@
 import 'dart:math';
+import 'package:extended_image/extended_image.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_strings.dart';
-
-import 'explore_viewmodel.dart';
 import 'package:tenor/tenor.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,10 @@ import 'package:pixabay_picker/pixabay_picker.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:pixabay_picker/model/pixabay_media.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'explore_viewmodel.dart';
 
 class ExploreView extends StatefulWidget {
   const ExploreView({Key? key}) : super(key: key);
@@ -34,7 +34,7 @@ class _ExploreViewState extends State<ExploreView>
   Tenor tenor = Tenor(apiKey: tenorKey);
   ScrollController scrollController = ScrollController();
   PixabayPicker picker = PixabayPicker(apiKey: pixaBayApiKey);
-  List<dynamic> interests = hiveApi.getUserDataWithHive(FireUserField.interests);
+  List<dynamic> interests = hiveApi.getUserData(FireUserField.interests);
 
   List<String> categoriesList = [
     Category.animals,
@@ -58,8 +58,9 @@ class _ExploreViewState extends State<ExploreView>
 
   Future<List<TenorResult>?> fetchTrendingGif() async {
     int index = Random().nextInt(interests.length);
-    var response =
-        await tenor.randomGIF(interests[index].toString(), limit: 50).catchError((e) {
+    var response = await tenor
+        .randomGIF(interests[index].toString(), limit: 50)
+        .catchError((e) {
       log.e('fetchTrendingGif Error:$e');
     });
 
@@ -128,18 +129,6 @@ class _ExploreViewState extends State<ExploreView>
     });
   }
 
-  // Future<void> fetchImages() async {
-  //   var response = await getImages();
-  //   var list = response!.hits;
-  //   if (list != null && list.isNotEmpty) {
-  //     for (var pixaBayMedia in list) {
-  //       imagesList.add(pixaBayMedia);
-  //     }
-  //   } else {
-  //     log.wtf('Image not fetched yet');
-  //   }
-  // }
-
   _scrollListener() {
     if (scrollController.offset >= scrollController.position.maxScrollExtent &&
         !scrollController.position.outOfRange) {
@@ -166,7 +155,7 @@ class _ExploreViewState extends State<ExploreView>
     return SliverStaggeredGrid.countBuilder(
       itemCount: 25,
       crossAxisCount: 3,
-      itemBuilder: (_, i) => Container(color: Colors.grey.shade200),
+      itemBuilder: (_, i) => Container(color: AppColors.grey),
       staggeredTileBuilder: (int index) =>
           StaggeredTile.count(index % 8 == 0 ? 2 : 1, index % 8 == 0 ? 2 : 1),
       mainAxisSpacing: 4.0,
@@ -195,6 +184,7 @@ class _ExploreViewState extends State<ExploreView>
     return ViewModelBuilder<ExploreViewModel>.reactive(
       viewModelBuilder: () => ExploreViewModel(),
       builder: (context, model, child) => Scaffold(
+        backgroundColor: AppColors.scaffoldColor,
         extendBodyBehindAppBar: true,
         body: OfflineBuilder(
             child: const Text(''),
@@ -207,7 +197,7 @@ class _ExploreViewState extends State<ExploreView>
                   SliverAppBar(
                     pinned: true,
                     elevation: 0.0,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.white,
                     leadingWidth: 0,
                     title: InkWell(
                       onTap: () => navService.materialPageRoute(
@@ -215,17 +205,19 @@ class _ExploreViewState extends State<ExploreView>
                       child: Container(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                         width: screenWidth(context),
-                        child: Text(
+                        child: const Text(
                           'Search for someone',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey.shade900,
+                            color: AppColors.mediumBlack,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border.all(color: Colors.grey.shade300),
+                          color: AppColors.lightGrey,
+                          border: Border.all(
+                            color: AppColors.grey,
+                          ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                       ),
@@ -239,10 +231,10 @@ class _ExploreViewState extends State<ExploreView>
                           itemCount: imagesList.length,
                           itemBuilder: (BuildContext context, int i) {
                             return Container(
-                              color: Colors.grey.shade200,
-                              child: CachedNetworkImage(
+                              color: AppColors.lightGrey,
+                              child: ExtendedImage.network(
+                                imagesList[i],
                                 fit: BoxFit.cover,
-                                imageUrl: imagesList[i],
                               ),
                             );
                           },
@@ -280,7 +272,7 @@ class _ExploreViewState extends State<ExploreView>
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             width: screenWidth(context),
-                            color: Colors.orange,
+                            color: AppColors.black,
                             child: const Center(
                               child: Text(
                                 'Not Connected',

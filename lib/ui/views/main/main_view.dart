@@ -1,13 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/pods/page_controller_pod.dart';
 import 'package:hint/ui/views/account/account_view/account_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/discover/discover_view.dart';
+import 'package:hint/ui/views/explor/explor_view.dart';
 import 'package:hint/ui/views/explore/explore_view.dart';
 
 final PageController mainViewPageController =
@@ -26,12 +25,11 @@ class MainView extends StatelessWidget {
         final pageControllerProvider = ref.watch(pageControllerPod);
         return CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
-            activeColor: Colors.black,
+            activeColor:AppColors.black,
             iconSize: 28.0,
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.scaffoldColor,
             onTap: (currentIndex) {
               pageControllerProvider.currentIndexChanger(currentIndex);
-              log(currentIndex.toString());
             },
             items: const [
               BottomNavigationBarItem(
@@ -55,7 +53,7 @@ class MainView extends StatelessWidget {
               case 1:
                 return const ExploreView();
               case 2:
-                return const DiscoverView();
+                return const ExplorView();
               case 3:
                 return const AccountView();
               default:

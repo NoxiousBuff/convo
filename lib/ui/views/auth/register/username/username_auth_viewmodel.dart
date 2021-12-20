@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/constants/enums.dart';
+import 'package:hint/extensions/query.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -30,7 +31,7 @@ class UserNameAuthViewModel extends BaseViewModel {
     if(value.length > 3) {
       _doesExists = UserNameExists.checking;
     notifyListeners();
-    final snapshotData = await FirebaseFirestore.instance.collection(subsFirestoreKey).where(FireUserField.username, isEqualTo: value).get();
+    final snapshotData = await FirebaseFirestore.instance.collection(subsFirestoreKey).where(FireUserField.username, isEqualTo: value).getSavy();
     final doc = snapshotData.docs;
     if(doc.isNotEmpty) {
       _doesExists = UserNameExists.no;

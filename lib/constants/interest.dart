@@ -1,4 +1,4 @@
-import 'dart:core';
+/// This file is the collection of all the interest found in the app
 
 final userInterest = Interest();
 

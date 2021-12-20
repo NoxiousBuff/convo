@@ -26,7 +26,7 @@ class SearchToWriteLetterViewModel extends BaseViewModel {
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
-      ///search the user by its username
+  ///search the user by its username
   void handleUsernameSearch(String query) {
     var usernameQuery = query.toLowerCase();
     Future<QuerySnapshot>? searchResults = subsCollection
@@ -45,13 +45,12 @@ class SearchToWriteLetterViewModel extends BaseViewModel {
   }
 
   void addToRecentSearches(String uid) {
-    hiveApi.saveInHive(HiveApi.recentSearchesHiveBox, uid, uid);
+    hiveApi.save(HiveApi.recentSearchesHiveBox, uid, uid);
     log.wtf('added');
   }
 
   void deleteFromRecentSearches(String uid) {
-    hiveApi.deleteInHive(HiveApi.recentSearchesHiveBox, uid);
+    hiveApi.delete(HiveApi.recentSearchesHiveBox, uid);
     log.wtf('deleted');
   }
-
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -20,7 +21,7 @@ class ChangeHashtagsView extends StatelessWidget {
     return ViewModelBuilder<ChangeHashtagsViewModel>.reactive(
       viewModelBuilder: () => ChangeHashtagsViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         extendBodyBehindAppBar: true,
         appBar: cwAuthAppBar(
           context,
@@ -28,7 +29,7 @@ class ChangeHashtagsView extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         body: ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+          valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
           builder: (context, box, child) {
             List<dynamic> hashList = box.get(FireUserField.hashTags);
             return Padding(
@@ -40,25 +41,10 @@ class ChangeHashtagsView extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: Colors.black54,
+                        color: AppColors.mediumBlack,
                       )),
 
                   verticalSpaceRegular,
-                  // Column(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: hashList.map((e) => Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Text(e.toString(),
-                  //         style: const TextStyle(
-                  //           fontWeight: FontWeight.w600,
-                  //           fontSize: 16,
-                  //           color: Colors.black54,
-                  //         )),
-                  //       IconButton(onPressed: (){}, icon: const Icon(FeatherIcons.x)),
-                  //     ],
-                  //   ),).toList(),
-                  // ),
                   ListView.builder(
                       shrinkWrap: true,
                       itemCount: hashList.length,
@@ -70,7 +56,7 @@ class ChangeHashtagsView extends StatelessWidget {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
-                                    color: Colors.black54,
+                                    color: AppColors.mediumBlack,
                                   )),
                               IconButton(
                                   onPressed: () {

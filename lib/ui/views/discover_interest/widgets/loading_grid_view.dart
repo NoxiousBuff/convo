@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget loadingGridView(BuildContext context) {
@@ -12,7 +13,7 @@ Widget loadingGridView(BuildContext context) {
     delegate: SliverChildBuilderDelegate(
       (BuildContext context, int index) {
         return Material(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(32),
           child: Container(
             alignment: Alignment.center,

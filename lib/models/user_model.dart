@@ -15,7 +15,6 @@ class FireUser {
   final int? dob;
   final String photoUrl;
   final String displayName;
-  final Map<String, dynamic>? position;
   final List<dynamic> interests;
   final Timestamp userCreated;
   final String countryPhoneCode;
@@ -30,7 +29,6 @@ class FireUser {
     required this.hashTags,
     required this.photoUrl,
     required this.displayName,
-    required this.position,
     required this.interests,
     required this.userCreated,
     required this.countryPhoneCode,
@@ -53,7 +51,6 @@ class FireUser {
       hashTags: doc[FireUserField.hashTags],
       photoUrl: doc[FireUserField.photoUrl],
       displayName: doc[FireUserField.displayName],
-      position: doc[FireUserField.position],
       interests: doc[FireUserField.interests],
       userCreated: doc[FireUserField.userCreated],
       countryPhoneCode: doc[FireUserField.countryPhoneCode],
@@ -75,7 +72,6 @@ class FireUser {
         FireUserField.hashTags: hashTags,
         FireUserField.photoUrl: photoUrl,
         FireUserField.displayName: displayName,
-        FireUserField.position: position,
         FireUserField.interests: interests,
         FireUserField.userCreated: userCreated,
         FireUserField.countryPhoneCode: countryPhoneCode,
@@ -97,7 +93,6 @@ class FireUser {
         '${FireUserField.hashTags}: $hashTags\n'
         '${FireUserField.photoUrl}: $photoUrl\n'
         '${FireUserField.displayName}: $displayName\n'
-        '${FireUserField.position}: $position\n'
         '${FireUserField.interests}: $interests\n'
         '${FireUserField.userCreated}: $userCreated\n'
         '${FireUserField.countryPhoneCode}: $countryPhoneCode\n'

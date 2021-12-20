@@ -7,14 +7,13 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 
 class PickInterestsView extends StatelessWidget {
-  const PickInterestsView(
-      {Key? key,
-      required this.countryCode,
-      required this.displayName,
-      required this.phoneNumber,
-      required this.username,
-      })
-      : super(key: key);
+  const PickInterestsView({
+    Key? key,
+    required this.countryCode,
+    required this.displayName,
+    required this.phoneNumber,
+    required this.username,
+  }) : super(key: key);
 
   static const String id = '/PickInterestsView';
 
@@ -30,7 +29,7 @@ class PickInterestsView extends StatelessWidget {
         model.lookUpGeopoint(context);
       },
       builder: (context, model, child) => Scaffold(
-        backgroundColor: LightAppColors.background,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Pick few things you like'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -182,23 +181,25 @@ class PickInterestsView extends StatelessWidget {
                 isLoading: model.isBusy,
                 isActive: model.hasUserPickedTenInterests,
                 onTap: () async {
-                  final localGeoPoint = model.geoPoint;
-                  if(localGeoPoint == null) {
-                    await model.lookUpGeopoint(context);
-                  }
-                  if(localGeoPoint != null) {
-                    model.createUserInFirebase(context,
-                      location: localGeoPoint,
+                  model.createUserInFirebase(
+                    context,
+                    country: model.countryName,
+                    phoneNumber: phoneNumber,
+                    displayName: displayName,
+                    countryPhoneCode: countryCode,
+                    username: username,
+                  );
+
+                  model.userClickedButtonChanger();
+                  if (model.userClickedButton > 3) {
+                    model.createUserInFirebase(
+                      context,
                       country: model.countryName,
                       phoneNumber: phoneNumber,
                       displayName: displayName,
                       countryPhoneCode: countryCode,
                       username: username,
-                      );
-                  }
-                  model.userClickedButtonChanger();
-                  if(model.userClickedButton > 3) {
-                    //TODO: when ip registery is not working
+                    );
                   }
                 },
               ),

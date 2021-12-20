@@ -1,3 +1,5 @@
+/// This file is the collection of all the enums found in the app
+
 enum PhoneVerificationState {
   checkingPhoneNumber,
   checkingOtp,
@@ -6,12 +8,6 @@ enum PhoneVerificationState {
 enum ForgotPasswordState {
   writingEmail,
   emailSent,
-}
-
-enum TextFieldWidthState {
-  min,
-  reg,
-  max,
 }
 
 enum UserNameExists {

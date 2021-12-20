@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/query.dart';
 import 'package:hint/models/dule_model.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:hint/ui/shared/user_item.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
@@ -15,11 +16,13 @@ class UserListItem extends StatelessWidget {
   bool pinned;
   final String userUid;
   final Function(FireUser fireUser)? onTap;
+  final Function(FireUser fireUser)? onLongPress;
   UserListItem({
     Key? key,
     required this.userUid,
     this.pinned = false,
     this.onTap,
+    this.onLongPress,
   }) : super(key: key);
 
   final log = getLogger('UserListItem');
@@ -41,7 +44,7 @@ class UserListItem extends StatelessWidget {
           return Text(
             isOnline ? 'Online' : 'Offline',
             style: Theme.of(context).textTheme.caption!.copyWith(
-                color: isOnline ? AppColors.blue : AppColors.darkGrey),
+                color: isOnline ? AppColors.blue : AppColors.mediumBlack,),
           );
         } else {
           return const SizedBox.shrink();
@@ -56,7 +59,7 @@ class UserListItem extends StatelessWidget {
         future: FirebaseFirestore.instance
             .collection(subsFirestoreKey)
             .doc(userUid)
-            .get(),
+            .getSavy(),
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {
@@ -66,22 +69,31 @@ class UserListItem extends StatelessWidget {
             );
           }
           if (!snapshot.hasData) {
-            child = loadingUserListItem(context);
+            child = shrinkBox;
           } else {
             FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
             child = UserItem(
                 fireUser: fireUser,
+                onLongPress: () {
+                  final function = onLongPress;
+                  if (function != null) {
+                    function(fireUser);
+                  }
+                },
                 onTap: () {
                   final function = onTap;
-                  if (function != null ) {
+                  if (function != null) {
                     function(fireUser);
-                  } else {chatService.startDuleConversation(context, fireUser);}
+                  } else {
+                    chatService.startDuleConversation(context, fireUser);
+                  }
                 },
-                title: fireUser.displayName, subtitle: userStatus(fireUser));
+                title: fireUser.displayName,
+                subtitle: userStatus(fireUser),);
           }
 
           return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 100),
             child: child,
           );
         });
@@ -111,10 +123,10 @@ class UserListItem extends StatelessWidget {
         ),
         height: 56.0,
         width: 56.0,
-        child: const Text(
+        child:  Text(
           '',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.black,
             fontSize: 22,
             fontWeight: FontWeight.w600,
           ),

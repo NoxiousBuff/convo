@@ -45,7 +45,7 @@ class WriteLetterView extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Write a letter',
               leadingIcon: FeatherIcons.x,
@@ -55,9 +55,9 @@ class WriteLetterView extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Text('To : ',
+                   Text('To : ',
                       style: TextStyle(
-                          color: Colors.black,
+                          color:AppColors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w700)),
                   horizontalSpaceRegular,
@@ -65,7 +65,7 @@ class WriteLetterView extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black12),
+                        border: Border.all(color:AppColors.lightBlack),
                         borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -81,8 +81,8 @@ class WriteLetterView extends StatelessWidget {
                         ),
                         horizontalSpaceRegular,
                         Text(fireUser.username,
-                            style: const TextStyle(
-                                color: Colors.black,
+                            style:  TextStyle(
+                                color:AppColors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700))
                       ],

@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/constants/relationship_status_list.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_displayname/change_displayname_view.dart';
@@ -7,6 +6,8 @@ import 'package:hint/ui/views/account/edit_account/change_dob/change_dob_view.da
 import 'package:hint/ui/views/account/edit_account/change_hashtags/change_hashtags_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_interest/change_interest_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_username/change_username_view.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/change_gender_modal.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/change_relationship_status_model.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hive/hive.dart';
@@ -25,7 +26,7 @@ import 'edit_account_viewmodel.dart';
 class EditAccountView extends StatelessWidget {
   EditAccountView({Key? key}) : super(key: key);
   final log = getLogger('EditAccountView');
-  final liverUserUid = hiveApi.getUserDataWithHive(FireUserField.id);
+  final liverUserUid = hiveApi.getUserData(FireUserField.id);
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +37,18 @@ class EditAccountView extends StatelessWidget {
       viewModelBuilder: () => EditAccountViewModel(),
       builder: (context, model, child) {
         return ValueListenableBuilder<Box>(
-          valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+          valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
           builder: (context, box, child) {
             final profileKey = box.get(FireUserField.photoUrl);
             final dob = box.get(FireUserField.dob);
             final isDobNull = dob == null;
             return Scaffold(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.scaffoldColor,
               appBar: cwAuthAppBar(context,
                   title: 'Edit Profile',
                   onPressed: () => Navigator.pop(context)),
               body: ListView(
+                physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
                   verticalSpaceRegular,
@@ -59,7 +61,7 @@ class EditAccountView extends StatelessWidget {
                         builder: (context) {
                           return Material(
                             borderRadius: BorderRadius.circular(32),
-                            color: Colors.white,
+                            color: AppColors.white,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
@@ -137,19 +139,19 @@ class EditAccountView extends StatelessWidget {
                   ),
                   verticalSpaceLarge,
                   cwEADetailsTile(context, 'Display Name',
-                      descriptionTitle: box.get(FireUserField.displayName,
+                      subtitle: box.get(FireUserField.displayName,
                           defaultValue: 'Select Your gender'), onTap: () {
                     navService.cupertinoPageRoute(
                         context, const ChangeDisplayNameView());
                   }),
                   cwEADetailsTile(context, 'UserName',
-                      descriptionTitle: box.get(FireUserField.username,
+                      subtitle: box.get(FireUserField.username,
                           defaultValue: 'Select Your gender'), onTap: () {
                     navService.cupertinoPageRoute(
                         context, const ChangeUserNameView());
                   }),
-                  cwEADetailsTile(context, 'Bio',
-                      descriptionTitle: 'Update Your Bio', onTap: () {
+                  cwEADetailsTile(context, 'Bio', subtitle: 'Update Your Bio',
+                      onTap: () {
                     navService.cupertinoPageRoute(
                         context, const ChangeBioView());
                   }),
@@ -158,120 +160,25 @@ class EditAccountView extends StatelessWidget {
                   cwEADetailsTile(
                     context,
                     'Gender',
-                    descriptionTitle: box.get(FireUserField.gender,
+                    subtitle: box.get(FireUserField.gender,
                         defaultValue: 'Select Your gender'),
-                    onTap: () {
-                      showCupertinoModalBottomSheet(
-                        topRadius: const Radius.circular(32),
-                        context: context,
-                        builder: (context) {
-                          return Material(
-                            borderRadius: BorderRadius.circular(32),
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      cwEADescriptionTitle(
-                                        context,
-                                        'Select Your gender',
-                                      ),
-                                    ],
-                                  ),
-                                  cwEADetailsTile(context, 'Male', onTap: () {
-                                    model.updateUserProperty(
-                                        context, FireUserField.gender, 'Male');
-                                  }),
-                                  cwEADetailsTile(context, 'Female', onTap: () {
-                                    model.updateUserProperty(context,
-                                        FireUserField.gender, 'Female');
-                                  }),
-                                  cwEADetailsTile(context, 'TransGender',
-                                      onTap: () {
-                                    model.updateUserProperty(context,
-                                        FireUserField.gender, 'TransGender');
-                                  }),
-                                  cwEADetailsTile(context, 'Prefer Not To Say',
-                                      onTap: () {
-                                    model.updateUserProperty(
-                                        context,
-                                        FireUserField.gender,
-                                        'Prefer Not To Say');
-                                  }),
-                                  cwEADetailsTile(context, 'Cancel',
-                                      titleColor: Colors.red, onTap: () {
-                                    Navigator.pop(context);
-                                  }),
-                                  bottomPadding(context)
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    onTap: () => showChangeGenderModal(context, model),
                   ),
-                  cwEADetailsTile(context, 'RelationShip Status',
-                      descriptionTitle: box.get(FireUserField.romanticStatus,
-                          defaultValue: 'What\'s Your Status'), onTap: () {
-                    showCupertinoModalBottomSheet(
-                      topRadius: const Radius.circular(32),
-                      context: context,
-                      builder: (context) {
-                        return Material(
-                          borderRadius: BorderRadius.circular(32),
-                          color: Colors.white,
-                          child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              child: CustomScrollView(
-                                shrinkWrap: true,
-                                slivers: [
-                                  SliverToBoxAdapter(
-                                      child: cwEADescriptionTitle(
-                                          context, 'What\'s Your Status')),
-                                  SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                          (context, i) {
-                                    return cwEADetailsTile(
-                                        context, relationshipStatusList[i],
-                                        onTap: () {
-                                      model.updateUserProperty(
-                                          context,
-                                          FireUserField.romanticStatus,
-                                          relationshipStatusList[i]);
-                                    });
-                                  },
-                                          childCount:
-                                              relationshipStatusList.length)),
-                                  SliverToBoxAdapter(
-                                    child: cwEADetailsTile(context, 'Cancel',
-                                        titleColor: Colors.red, onTap: () {
-                                      Navigator.pop(context);
-                                    }),
-                                  ),
-                                  SliverToBoxAdapter(
-                                      child: bottomPadding(context)),
-                                ],
-                              )),
-                        );
-                      },
-                    );
-                  }),
+                  cwEADetailsTile(
+                    context,
+                    'RelationShip Status',
+                    subtitle: box.get(FireUserField.romanticStatus,
+                        defaultValue: 'What\'s Your Status'),
+                    onTap: () =>
+                        showChangeRelationshipStatusModal(context, model),
+                  ),
                   const Divider(),
                   verticalSpaceRegular,
-                  // cwEADescriptionTitle(context, 'Details'),
                   Builder(
                     builder: (context) {
-                      
                       return cwEADetailsTile(
                           context, 'Date of Birth'.toString(),
-                          descriptionTitle: !isDobNull
+                          subtitle: !isDobNull
                               ? model.formattedBirthDate
                               : 'Pick Your DOB', onTap: () {
                         navService.cupertinoPageRoute(
@@ -281,15 +188,23 @@ class EditAccountView extends StatelessWidget {
                   ),
 
                   cwEADetailsTile(context, 'Hashtags',
-                      descriptionTitle: 'Find Your HashTags', onTap: () {
+                      subtitle: 'Find Your HashTags', onTap: () {
                     navService.cupertinoPageRoute(
                         context, const ChangeHashtagsView());
                   }),
                   cwEADetailsTile(context, 'Interests',
-                      descriptionTitle: 'Choose Your Interest', onTap: () {
+                      subtitle: 'Choose Your Interest', onTap: () {
                     navService.cupertinoPageRoute(
                         context, const ChangeInterestView());
                   }),
+                  const Divider(),
+                  verticalSpaceRegular,
+                  cwEADescriptionTitle(context, 'Personal Information'),
+                  verticalSpaceRegular,
+                  cwEADetailsTile(context, 'Email',
+                      subtitle: box.get(FireUserField.email, defaultValue: 'Some error in fetching value.'), showTrailingIcon: false),
+                  verticalSpaceLarge,
+                  bottomPadding(context),
                 ],
               ),
             );

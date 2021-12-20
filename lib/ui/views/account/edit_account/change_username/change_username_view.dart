@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/constants/enums.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
+import 'package:hint/ui/shared/custom_chips.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -41,7 +45,7 @@ class ChangeUserNameView extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           extendBodyBehindAppBar: true,
           appBar: cwAuthAppBar(
             context,
@@ -49,7 +53,7 @@ class ChangeUserNameView extends StatelessWidget {
             onPressed: () => Navigator.maybePop(context),
           ),
           body: ValueListenableBuilder<Box>(
-            valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+            valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
             builder: (context, box, child) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -61,7 +65,7 @@ class ChangeUserNameView extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: Colors.black54,
+                        color: AppColors.mediumBlack,
                       ),
                     ),
                     verticalSpaceRegular,
@@ -69,13 +73,63 @@ class ChangeUserNameView extends StatelessWidget {
                     verticalSpaceRegular,
                     cwEADescriptionTitle(context, 'Type Your New UserName'),
                     verticalSpaceSmall,
-                    cwEATextField(context, model.userNameTech, 'UserName',
-                        onChanged: (value) {
-                      model.updateUserNameEmpty();
-                      if(!model.isEdited) {
-                        model.updateIsEdited(true);
-                      }
-                    }),
+                    cwEATextField(
+                      context,
+                      model.userNameTech,
+                      'UserName',
+                      onChanged: (value) {
+                        model.updateUserNameEmpty();
+                        model.findUsernameExistOrNot(value);
+                        if (!model.isEdited) {
+                          model.updateIsEdited(true);
+                        }
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter(RegExp(r'[a-z0-9_\.]'),
+                            allow: true, replacementString: ''),
+                      ],
+                    ),
+                    verticalSpaceRegular,
+                    Row(
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            Widget child;
+                            switch (model.doesExists) {
+                              case UserNameExists.tooShort:
+                                child = model.userNameTech.text.length < 4
+                                    ? customChips.errorChip('Username too short.')
+                                    : const Text('');
+                                break;
+                              case UserNameExists.yes:
+                                child = model.userNameTech.text.length > 3
+                                    ? customChips.successChip('Username exists')
+                                    : const Text('');
+                                break;
+                              case UserNameExists.no:
+                                child = model.userNameTech.text.length > 3
+                                    ? customChips
+                                        .errorChip('Username does not exists')
+                                    : const Text('');
+                                break;
+                              case UserNameExists.checking:
+                                child = model.userNameTech.text.length > 3
+                                    ? customChips.progressChip()
+                                    : const Text('');
+                                break;
+                              default:
+                                {
+                                  child = const Text('');
+                                }
+                            }
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: child,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                     verticalSpaceLarge,
                     cwAuthProceedButton(context, buttonTitle: 'Save',
                         onTap: () {

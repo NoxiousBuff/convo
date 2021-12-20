@@ -20,7 +20,7 @@ Widget cwCIInterestTopicPicker(
             child: icon ??
                 const Icon(
                   FeatherIcons.plus,
-                  color: LightAppColors.onPrimary,
+                  color: AppColors.white,
                 ),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -31,7 +31,7 @@ Widget cwCIInterestTopicPicker(
           Text(
             title,
             style: const TextStyle(
-                color: LightAppColors.secondary,
+                color: AppColors.purple,
                 fontSize: 18,
                 fontWeight: FontWeight.w700),
           ),
@@ -72,7 +72,7 @@ Widget cwCIInterestChip(String label, ChangeInterestViewModel model) {
         style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 16,
-            color: isSelected ? LightAppColors.onPrimary : Colors.black),
+            color: isSelected ? AppColors.white : AppColors.black),
       ),
     ),
   );

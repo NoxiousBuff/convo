@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -8,14 +9,14 @@ import 'package:hint/ui/views/discover/widgets/dule_person_dialog.dart';
 
 Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
   final usersInterests =
-      hiveApi.getUserDataWithHive(FireUserField.interests) as List<dynamic>;
+      hiveApi.getUserData(FireUserField.interests) as List<dynamic>;
   final lists = [
     usersInterests,
     fireUser.interests,
   ];
   final commonInterests =
       lists.fold<Set>(lists.first.toSet(), (a, b) => a.intersection(b.toSet()));
-  final currentUserId = hiveApi.getUserDataWithHive(FireUserField.id);
+  final currentUserId = hiveApi.getUserData(FireUserField.id);
 
   final compatiblePercentage =
       commonInterests.length / usersInterests.length * 100;
@@ -60,9 +61,9 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                     child: Text(
                       fireUser.username,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 20,
-                        color: Colors.black,
+                        color: AppColors.black,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -72,7 +73,7 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                     child: Text(
                       '${compatiblePercentage.toInt().toString()}% compatible',
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, color: Colors.black54),
+                          fontWeight: FontWeight.w600, color: AppColors.mediumBlack),
                     ),
                   ),
                 ],

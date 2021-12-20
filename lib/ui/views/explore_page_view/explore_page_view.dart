@@ -42,7 +42,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
       builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: false,
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Explore', onPressed: () => Navigator.pop(context)),
           body: PageView.builder(
@@ -67,8 +67,8 @@ class _ExplorePageviewState extends State<ExplorePageview>
                     ListTile(
                       title: Text(
                         title!,
-                        style: const TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                        style:  TextStyle(
+                            color:AppColors.black, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(
@@ -84,7 +84,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                            color: Colors.black54, fontWeight: FontWeight.w500),
+                            color:AppColors.mediumBlack, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],

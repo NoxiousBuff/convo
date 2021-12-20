@@ -34,7 +34,7 @@ class ChangeInterestView extends StatelessWidget {
                       secondaryButtontext: 'No',
                       primaryOnPressed: () => Navigator.pop(context, true),
                       secondaryOnPressed: () => Navigator.pop(context, false),
-                      iconBackgroundColor: Colors.red
+                      iconBackgroundColor: AppColors.red
                     );
                   });
               return shouldPop;
@@ -43,7 +43,7 @@ class ChangeInterestView extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.scaffoldColor,
             appBar: cwAuthAppBar(
               context,
               title: 'Change Interests',

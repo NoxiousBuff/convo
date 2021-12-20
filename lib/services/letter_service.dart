@@ -8,21 +8,26 @@ import 'package:hint/models/user_model.dart';
 final letterService = LetterService();
 
 class LetterService {
+
   final log = getLogger('LetterService');
+
 
   final CollectionReference _letterCollection =
       FirebaseFirestore.instance.collection(lettersFirestoreKey);
 
+
   final CollectionReference _receivedLettersCollection = FirebaseFirestore
       .instance
       .collection(lettersFirestoreKey)
-      .doc(hiveApi.getUserDataWithHive(FireUserField.id))
+      .doc(hiveApi.getUserData(FireUserField.id))
       .collection(receivedLettersFirestoreKey);
+
 
   final CollectionReference _sentLettersCollection = FirebaseFirestore.instance
       .collection(lettersFirestoreKey)
-      .doc(hiveApi.getUserDataWithHive(FireUserField.id))
+      .doc(hiveApi.getUserData(FireUserField.id))
       .collection(sentLettersFirestoreKey);
+
 
   Future<void> sendLetter(FireUser fireUser, String letterText,
       {Function? onError, Function? onComplete}) async {
@@ -30,13 +35,13 @@ class LetterService {
         .doc(fireUser.id)
         .collection(receivedLettersFirestoreKey)
         .add({
-      LetterFields.id: hiveApi.getUserDataWithHive(FireUserField.id),
+      LetterFields.id: hiveApi.getUserData(FireUserField.id),
       LetterFields.photoUrl:
-          hiveApi.getUserDataWithHive(FireUserField.photoUrl),
+          hiveApi.getUserData(FireUserField.photoUrl),
       LetterFields.displayName:
-          hiveApi.getUserDataWithHive(FireUserField.displayName),
+          hiveApi.getUserData(FireUserField.displayName),
       LetterFields.username:
-          hiveApi.getUserDataWithHive(FireUserField.username),
+          hiveApi.getUserData(FireUserField.username),
       LetterFields.letterText: letterText,
       LetterFields.timestamp: Timestamp.now(),
     }).then((value) {
@@ -61,12 +66,14 @@ class LetterService {
       if (onError != null) onError();
     });
   }
+  
 
   Stream<QuerySnapshot> getReceivedLetters() {
     return _receivedLettersCollection
         .orderBy(LetterFields.timestamp, descending: true)
         .snapshots();
   }
+
 
   Stream<QuerySnapshot> getSentLetters() {
     return _sentLettersCollection

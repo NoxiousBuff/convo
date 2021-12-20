@@ -1,3 +1,4 @@
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 class PrivacyView extends StatelessWidget {
@@ -163,7 +163,7 @@ class PrivacyView extends StatelessWidget {
       viewModelBuilder: () => PrivacyViewModel(),
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Privacy', onPressed: () => Navigator.pop(context)),
           body: ListView(
@@ -173,19 +173,6 @@ class PrivacyView extends StatelessWidget {
                 color: AppColors.white,
                 child: Column(
                   children: [
-                    // Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.only(left: 16, top: 16),
-                    //     child: Text(
-                    //       'Who can see my personal info',
-                    //       style: Theme.of(context)
-                    //           .textTheme
-                    //           .bodyText1!
-                    //           .copyWith(color: Colors.black54),
-                    //     ),
-                    //   ),
-                    // ),
                     cwEAHeading('Who can see \nmy personal info'),
                     cwEADescriptionTitle(context,
                         'If you don\'t share your username & online status, you won\'t be able to see others people details.'),
@@ -199,7 +186,7 @@ class PrivacyView extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              verticalSpaceMedium,
               ValueListenableBuilder<Box>(
                 valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
                 builder: (context, box, child) {

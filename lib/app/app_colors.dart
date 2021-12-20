@@ -1,37 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_strings.dart';
 
-class LightAppColors {
 
-  static const Color primary = Color(0xff6750A4);
-  static const Color primaryContainer = Color(0xffEADDFF);
-  static const Color secondary = Color(0xff625B71);
-  static const Color secondaryContainer = Color(0xffE8DEF8);
-  static const Color tertiary = Color(0xff7D5260);
-  static const Color tertiaryContainer = Color(0xffFFD8E4);
-  static const Color surface = Color(0xffFFFBFE);
-  static const Color surfaceVariant = Color(0xffE7E0EC);
-  static const Color background = Color(0xffFFFBFE);
-  static const Color error = Color(0xffB3261E);
-  static const Color errorContainer = Color(0xffF9DEDC);
-  static const Color onPrimary = Color(0xffFFFFFF);
-  static const Color onPrimaryContainer = Color(0xff21005E);
-  static const Color onSecondary = Color(0xffFFFFFF);
-  static const Color onSecondaryContainer = Color(0xff1E192B);
-  static const Color onTertiary = Color(0xffFFFFFF);
-  static const Color onTertiaryContainer = Color(0xff370B1E);
-  static const Color onSurafce = Color(0xff1C1B1F);
-  static const Color onSurfaceVariant = Color(0xff49454E);
-  static const Color onBackground = Color(0xff1C1B1F);
-  static const Color onError = Color(0xffFFFFFF);
-  static const Color onErrorContainer = Color(0xff370B1E);
-  static const Color outline = Color(0xff79747E);
-  static const Color shadow = Color(0xff000000);
-  static const Color inverseSurface = Color(0xff313033);
-  static const Color inverseOnSurface = Color(0xffF4EFF4);
-  static const Color inversePrimary = Color(0xffD0BCFF);
-}
 
 class AppColors {
+  final isDarkTheme = hiveApi.getFromHive(
+                    HiveApi.appSettingsBoxName, AppSettingKeys.darkTheme, defaultValue: false) as bool;
   static const blue = Color.fromRGBO(0, 132, 255, 1);
   static const blueAccent = Color.fromRGBO(192, 229, 255, 1);
   static const green = Color.fromRGBO(52,199,89, 1);
@@ -45,10 +20,23 @@ class AppColors {
   static const lightGrey = Color.fromRGBO(243,244,246, 1);
   static const grey = Color.fromRGBO(238,239,242, 1);
   static const darkGrey = Color.fromRGBO(215,217,224, 1);
-  static const black = Color.fromARGB(0, 0, 0, 1);
+  static const black = Colors.black;
+  static const lightBlack =Colors.black38;
+  static const mediumBlack =Colors.black54;
   static const white = Color.fromRGBO(255, 255, 255, 1);
-  static const inActiveGray = CupertinoColors.inactiveGray;
   static const taintedBackground = Color.fromRGBO(254, 250, 240, 1);
+  static const transparent = Colors.transparent;
+  static const scaffoldColor = Colors.white;
+
+
+
+  // Color black() {
+  //   return !isDarkTheme ? Colors.white : Colors.black;
+  // }
+
+  // Color scaffoldColor() {
+  //   return !isDarkTheme ? Colors.grey.shade900 : Colors.white;  
+  // }
 }
 
 class MaterialColorsCode {

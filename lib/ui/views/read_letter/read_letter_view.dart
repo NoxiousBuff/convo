@@ -20,7 +20,7 @@ class ReadLetterView extends StatelessWidget {
     return ViewModelBuilder<ReadLetterViewModel>.reactive(
       viewModelBuilder: () => ReadLetterViewModel(letter),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(
           context,
           title: '',
@@ -33,8 +33,8 @@ class ReadLetterView extends StatelessWidget {
             Row(
               children: [
                 Text(model.isSentByMe ? 'From : ' : 'Sent To : ',
-                    style: const TextStyle(
-                        color: Colors.black,
+                    style:  TextStyle(
+                        color:AppColors.black,
                         fontSize: 18,
                         fontWeight: FontWeight.w700)),
                 horizontalSpaceRegular,
@@ -42,7 +42,7 @@ class ReadLetterView extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black12),
+                      border: Border.all(color:AppColors.lightBlack),
                       borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -58,8 +58,8 @@ class ReadLetterView extends StatelessWidget {
                       ),
                       horizontalSpaceRegular,
                       Text(letter.username,
-                          style: const TextStyle(
-                              color: Colors.black,
+                          style:  TextStyle(
+                              color:AppColors.black,
                               fontSize: 18,
                               fontWeight: FontWeight.w700))
                     ],

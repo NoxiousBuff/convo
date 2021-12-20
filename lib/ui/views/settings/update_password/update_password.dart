@@ -30,30 +30,33 @@ class UpdatePasswordView extends StatelessWidget {
                 children: [
                   verticalSpaceLarge,
                   cwEADetailsTile(context, 'Want to update password ??',
-                      subtitle:
-                          'Enter your email, phone, or username and we\'ll send you a link to get back into your account.'),
+                      subtitle: 'Enter your password.'),
                   verticalSpaceRegular,
                   const Divider(),
                   verticalSpaceRegular,
-                  cwEATextField(context, model.emailTech, 'Email',
-                      onChanged: (value) {
-                    model.updateEmailEmpty();
-                  }, validator: (value) {
-                    if (!isEmail(value!)) {
-                      return customSnackbars.errorSnackbar(context,
-                          title: 'Provide a valid email address');
-                    }
-                  }),
+                  cwEADescriptionTitle(context, 'Type Your Current Password'),
+                  cwEATextField(context, model.passwordTech, 'Password',
+                      onChanged: (value) => model.updatePasswordEmpty()),
+                  verticalSpaceRegular,
+                  cwEADescriptionTitle(context, 'Type Your New Password'),
+                  cwEATextField(context, model.newPasswordTech, 'New Password',
+                      onChanged: (value) => model.updateNewPasswordEmpty()),
                   verticalSpaceLarge,
                   cwAuthProceedButton(
                     context,
-                    buttonTitle: 'Send Reset Link',
-                    isActive: model.emailNotEmpty,
+                    buttonTitle: 'Update Password',
+                    isActive:
+                        model.passwordNotEmpty && model.newPasswordNotEmpty,
                     isLoading: model.isBusy,
                     onTap: () {
                       if (model.resetPasswordFormKey.currentState!.validate()) {
-                        model.resetPassword(
-                            context, model.emailTech.text.trim());
+                        model
+                            .updateUserPassword(
+                                context, model.newPasswordTech.text)
+                            .whenComplete(() {
+                          model.passwordTech.clear();
+                          model.newPasswordTech.clear();
+                        });
                       }
                     },
                   ),

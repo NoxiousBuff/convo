@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:stacked/stacked.dart';
@@ -29,7 +30,7 @@ class ChangeHashtagsViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  final List<dynamic> _updatedList = hiveApi.getUserDataWithHive(FireUserField.hashTags);
+  final List<dynamic> _updatedList = hiveApi.getUserData(FireUserField.hashTags);
   List<dynamic> get updatedList => _updatedList;
 
   void addToList(String value) {
@@ -45,7 +46,7 @@ class ChangeHashtagsViewModel extends BaseViewModel {
       updatedList.remove(value);
       notifyListeners();
   }
-
+final firestoreApi = locator<FirestoreApi>();
   Future<void> updateUserProperty(
       BuildContext context, String propertyName, dynamic value) async {
     setBusy(true);
@@ -56,7 +57,7 @@ class ChangeHashtagsViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
     });
     setBusy(false);
   }

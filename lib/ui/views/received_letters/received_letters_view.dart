@@ -1,7 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/letter_model.dart';
+import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/views/read_letter/read_letter_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -18,7 +20,7 @@ class ReceivedLettersView extends StatelessWidget {
     return ViewModelBuilder<ReceivedLettersViewModel>.reactive(
       viewModelBuilder: () => ReceivedLettersViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         body: Builder(
           builder: (context) {
             if (model.hasError) {
@@ -27,7 +29,7 @@ class ReceivedLettersView extends StatelessWidget {
                   'Something bad happened. Please Try again later.');
             }
             if (!model.dataReady) {
-              return const Center(child: CircularProgressIndicator.adaptive());
+              return const Center(child: CircularProgressIndicator.adaptive(strokeWidth: 2,));
             }
             final data = model.data;
             if (data != null) {
@@ -39,6 +41,7 @@ class ReceivedLettersView extends StatelessWidget {
                       itemBuilder: (context, i) {
                         final doc = docs[i];
                         final letter = LetterModel.fromFireStore(doc);
+                        final letterText = letter.letterText.replaceAll('\n', ' ');
                         final timestamp = timeago
                             .format(letter.timestamp.toDate(), locale: 'en');
                         return OpenContainer(
@@ -46,11 +49,11 @@ class ReceivedLettersView extends StatelessWidget {
                           closedBuilder: (context, onPressed) {
                             return ListTile(
                               trailing: Text(timestamp),
-                              title: Text(letter.letterText,
+                              title: Text(letterText,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      color: Colors.black,
+                                  style:  TextStyle(
+                                      color:AppColors.black,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500)),
                               subtitle: Text(letter.username),
@@ -70,8 +73,7 @@ class ReceivedLettersView extends StatelessWidget {
                             return ReadLetterView(letter: letter);
                           },
                         );
-                      })
-                  : const Text('No one remembers you. Aww....Sad');
+                      }) : emptyState(context, heading: 'A little bit \ntoo clean.', description: 'Nobody remembers you, that\'s sad.');
             } else {
               return const Text(
                   'Something bad happened on our side. We will be in connect with you after sometime. Thank you for your patience.');

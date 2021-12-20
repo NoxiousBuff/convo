@@ -51,7 +51,7 @@ class PhoneContactsViewModel extends BaseViewModel {
                 final number = numberFormatter(phoneNumber);
                 // final code = extractCode(number);
                 final key = number;
-                await hiveApi.saveInHive(HiveApi.userContacts, key, number);
+                await hiveApi.save(HiveApi.userContacts, key, number);
                 
               }
             }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/enums.dart';
 import 'package:hint/services/nav_service.dart';
@@ -32,7 +33,7 @@ class UserNameAuthView extends StatelessWidget {
     return ViewModelBuilder<UserNameAuthViewModel>.reactive(
       viewModelBuilder: () => UserNameAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Find a username'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -72,18 +73,19 @@ class UserNameAuthView extends StatelessWidget {
                         model.updateUserNameEmpty();
                         model.findUsernameExistOrNot(value);
                       },
-                      inputFormatters: const [
-                        //TODO: add username filters
+                      inputFormatters: [
+                        FilteringTextInputFormatter(RegExp(r'[a-z0-9_\.]'),
+                            allow: true, replacementString: ''),
                       ],
                       textCapitalization: TextCapitalization.none,
                       autofocus: true,
                       autofillHints: const [AutofillHints.nickname],
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.white,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: '@username',

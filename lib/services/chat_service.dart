@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,32 +16,31 @@ import 'nav_service.dart';
 final ChatService chatService = ChatService();
 
 class ChatService {
+  final firestoreApi = locator<FirestoreApi>();
+
   static final log = getLogger('ChatService');
+
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+
   static final String liveUserUid = _auth.currentUser!.uid;
+
   static final CollectionReference subsCollection =
       _firestore.collection(subsFirestoreKey);
-  static final CollectionReference _conversationCollection =
-      _firestore.collection(convoFirestorekey);
 
-  final liveUserId = hiveApi.getUserDataWithHive(FireUserField.id);
-
-  startConversation(
-      BuildContext context, FireUser fireUser, Color randomColor) async {}
-
-  createChatRoom(String chatRoomId, chatRoomMap) {
-    _conversationCollection.doc(chatRoomId).set(chatRoomMap);
+  Future<void> updateRoomId(FireUser fireUser) async {
+    String value = chatService.getConversationId(fireUser.id, liveUserUid);
+    await databaseService.updateUserDataWithKey(
+        DatabaseMessageField.roomUid, value);
   }
 
   startDuleConversation(
     BuildContext context,
     FireUser fireUser,
-  ) async {
-    String value = chatService.getConversationId(fireUser.id, liveUserUid);
+  ) {
     navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
-    await databaseService.updateUserDataWithKey(
-        DatabaseMessageField.roomUid, value);
+    updateRoomId(fireUser);
   }
 
   getConversationId(String a, String b) {
@@ -143,74 +142,5 @@ class ChatService {
   Future<void> addToRecentList(String receiverUid) async {
     _addToRecentListForSender(receiverUid);
     _addTORecentListForReceiver(receiverUid);
-  }
-
-  Stream<QuerySnapshot> getRecentChatList() {
-    return _firestore
-        .collection(subsFirestoreKey)
-        .doc(liveUserUid)
-        .collection(recentFirestoreKey)
-        .orderBy(DocumentField.timestamp, descending: true)
-        .snapshots();
-  }
-
-  addFirestoreMessage({
-    dynamic mediaURL,
-    GeoPoint? location,
-    bool isRead = false,
-    String? messageText,
-    bool isReply = false,
-    bool uploaded = false,
-    // ---------------------//
-    required String type,
-    final Map? replyMessage,
-    required bool userBlockMe,
-    required String messageUid,
-    required String receiverUid,
-    required Timestamp timestamp,
-  }) {
-    String conversationId = getConversationId(receiverUid, liveUserUid);
-    final Map messageMap = {};
-    if (location != null) messageMap[MessageField.location] = location;
-    if (messageText != null) messageMap[MessageField.messageText] = messageText;
-    if (mediaURL != null) messageMap[MessageField.mediaURL] = mediaURL;
-
-    switch (type) {
-      case MediaType.image:
-        {
-          messageMap[MessageField.uploaded] = false;
-        }
-        break;
-      case MediaType.video:
-        {
-          messageMap[MessageField.uploaded] = false;
-        }
-        break;
-      case MediaType.canvasImage:
-        {
-          messageMap[MessageField.uploaded] = false;
-        }
-        break;
-      default:
-        {
-          null;
-        }
-    }
-
-    _conversationCollection
-        .doc(conversationId)
-        .collection(chatsFirestoreKey)
-        .doc(messageUid)
-        .set({
-      DocumentField.type: type,
-      DocumentField.isRead: isRead,
-      DocumentField.isReply: isReply,
-      DocumentField.message: messageMap,
-      DocumentField.timestamp: timestamp,
-      DocumentField.messageUid: messageUid,
-      DocumentField.senderUid: liveUserUid,
-      DocumentField.userBlockMe: userBlockMe,
-      DocumentField.replyMessage: replyMessage,
-    });
   }
 }

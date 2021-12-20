@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/constants/enums.dart';
+import 'package:hint/extensions/query.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:stacked/stacked.dart';
@@ -13,6 +19,9 @@ class ChangeUserNameViewModel extends BaseViewModel {
 
   bool _isUserNameEmpty = true;
   bool get isUserNameEmpty => _isUserNameEmpty;
+
+  UserNameExists _doesExists = UserNameExists.didNotChecked;
+  UserNameExists get doesExists => _doesExists;
 
   void updateUserNameEmpty() {
     _isUserNameEmpty = userNameTech.text.isEmpty;
@@ -28,7 +37,7 @@ class ChangeUserNameViewModel extends BaseViewModel {
     _isEdited = localIsEdited;
     notifyListeners();
   } 
-
+final firestoreApi = locator<FirestoreApi>();
   Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value) async {
     setBusy(true);
     await firestoreApi
@@ -38,12 +47,32 @@ class ChangeUserNameViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
           title: 'Succeesfully Saved !!');
     });
     setBusy(false);
     Navigator.of(context, rootNavigator: false).pop();
+  }
+
+  void findUsernameExistOrNot(String value) async {
+    if(value.length > 3) {
+      _doesExists = UserNameExists.checking;
+    notifyListeners();
+    final snapshotData = await FirebaseFirestore.instance.collection(subsFirestoreKey).where(FireUserField.username, isEqualTo: value).getSavy();
+    final doc = snapshotData.docs;
+    if(doc.isNotEmpty) {
+      _doesExists = UserNameExists.no;
+    } else {
+      _doesExists = UserNameExists.yes;
+    }
+    log.wtf(doc.toString());
+    log.wtf(_doesExists);
+    notifyListeners();
+    } else {
+      _doesExists = UserNameExists.tooShort;
+      notifyListeners();
+    }
   }
 
 }

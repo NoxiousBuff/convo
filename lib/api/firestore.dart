@@ -4,29 +4,37 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/services/auth_service.dart';
 
-final FirestoreApi firestoreApi = FirestoreApi();
-
 class FirestoreApi {
+  /// abstraction of logger for providing logs in
+  /// the console for this particular class
   final log = getLogger('FirestoreApi');
 
-  static final FirebaseAuth auth = FirebaseAuth.instance;
 
+  ///private field [_auth] to get instance of [FirebaseAuth]
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  ///private field [_auth] to get instance of [FirebaseFirestore]
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  static const url =
+
+  ///default url that would be placed as their profile photo
+  static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
-  static const String kDefaultPhotoUrl = url;
 
+  ///reference to the subsCollection - [Collections that stores the subs]
   final CollectionReference subsCollection =
       _firestore.collection(subsFirestoreKey);
 
-  User? getCurrentUser() => auth.currentUser;
+  
+  ///getter tp get the current user
+  User? get getCurrentUser => _auth.currentUser;
 
+  ///method to updateUser in [Firebase]
   Future<void> updateUser(
       {required String uid,
       required dynamic value,
@@ -34,12 +42,11 @@ class FirestoreApi {
     return subsCollection
         .doc(uid)
         .update({propertyName: value})
-        .then((instance) => getLogger('FirestoreApi')
-            .wtf("$propertyName is updated to $value"))
+        .then((instance) =>
+            getLogger('FirestoreApi').wtf("$propertyName is updated to $value"))
         .catchError((error) =>
             getLogger('FirestoreApi').e("Failed to update user: $error"));
   }
-
 
   /// Update Recent User
   Future<void> updateRecentUser({
@@ -53,21 +60,7 @@ class FirestoreApi {
         .doc(fireUserUid)
         .update({propertyName: value});
   }
-
-  /// Delete Recent User From Recent and Archive Both
-  Future<void> deleteRecentUser(String fireUserUid) async {
-    await subsCollection
-        .doc(AuthService.liveUser!.uid)
-        .collection(archivesFirestorekey)
-        .doc(fireUserUid)
-        .delete();
-    await subsCollection
-        .doc(AuthService.liveUser!.uid)
-        .collection(recentFirestoreKey)
-        .doc(fireUserUid)
-        .delete();
-  }
-
+  
   /// Delete User Only From Recent
   Future<void> deleteOnlyRecent(String fireUserUid) async {
     await subsCollection
@@ -78,10 +71,10 @@ class FirestoreApi {
   }
 
 
-  Future<void> saveUserDataInHive(String key, dynamic userData) async {
-    await hiveApi.saveInHive(HiveApi.userdataHiveBox, key, userData);
-  }
 
+  Future<void> saveUserDataInHive(String key, dynamic userData) async {
+    await hiveApi.save(HiveApi.userDataHiveBox, key, userData);
+  }
 
   Future<void> createUserInFirebase({
     Function? onError,
@@ -89,13 +82,11 @@ class FirestoreApi {
     required String country,
     required String displayName,
     required String username,
-    required GeoPoint location,
     required String phoneNumber,
     required List<String> interests,
     required String countryPhoneCode,
   }) async {
     try {
-      final position = GeoFirePoint(location.latitude, location.longitude).data;
       await subsCollection.doc(user.uid).set({
         FireUserField.bio: 'Hey I am using dule',
         FireUserField.country: country,
@@ -105,7 +96,6 @@ class FirestoreApi {
         FireUserField.id: user.uid,
         FireUserField.interests: interests,
         FireUserField.phone: phoneNumber,
-        FireUserField.position: position,
         FireUserField.photoUrl: kDefaultPhotoUrl,
         FireUserField.displayName: displayName,
         FireUserField.userCreated: Timestamp.now(),
@@ -120,14 +110,11 @@ class FirestoreApi {
       saveUserDataInHive(FireUserField.country, country);
       saveUserDataInHive(FireUserField.countryPhoneCode, countryPhoneCode);
       saveUserDataInHive(FireUserField.email, user.email);
-      saveUserDataInHive(FireUserField.hashTags, ['#duleuser', '#new' , '#available']);
+      saveUserDataInHive(
+          FireUserField.hashTags, ['#duleuser', '#new', '#available']);
       saveUserDataInHive(FireUserField.id, user.uid);
       saveUserDataInHive(FireUserField.interests, interests);
       saveUserDataInHive(FireUserField.phone, phoneNumber);
-      saveUserDataInHive(FireUserField.position, {
-        FireUserField.geohash: position[FireUserField.geohash],
-        FireUserField.geopoint: [location.latitude, location.longitude]
-      });
       saveUserDataInHive(
         FireUserField.photoUrl,
         kDefaultPhotoUrl,
@@ -188,7 +175,7 @@ class FirestoreApi {
   }
 
   Future<void> changeUserName(String userName) async {
-    final currentUser = auth.currentUser!;
+    final currentUser = _auth.currentUser!;
     await subsCollection
         .doc(currentUser.uid)
         .update({'userName': userName})
@@ -201,7 +188,7 @@ class FirestoreApi {
   }
 
   Future<void> changeUserDisplayName(String displayName) async {
-    final currentUser = auth.currentUser!;
+    final currentUser = _auth.currentUser!;
     await subsCollection
         .doc(currentUser.uid)
         .update({'displayName': displayName})
@@ -214,7 +201,7 @@ class FirestoreApi {
   }
 
   Future<void> changeUserPhoneNumber(String phoneNumber) async {
-    final currentUser = auth.currentUser!;
+    final currentUser = _auth.currentUser!;
     await subsCollection
         .doc(currentUser.uid)
         .update({'phone': phoneNumber})

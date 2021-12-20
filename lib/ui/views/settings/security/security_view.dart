@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_keys.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -14,7 +14,7 @@ class SecurityView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.scaffoldColor,
       appBar: cwAuthAppBar(
         context,
         title: 'Security',
@@ -50,7 +50,7 @@ class SecurityView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: Colors.black54,
+                color:AppColors.mediumBlack,
               ),
             ),
           ),

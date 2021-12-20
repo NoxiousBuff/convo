@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -16,187 +17,199 @@ import 'package:hint/ui/views/main/main_view.dart';
 import 'package:hint/ui/views/archives/archives_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
+
+import 'widgets/show_tile_options.dart';
 
 class ChatListView extends StatelessWidget {
   const ChatListView({Key? key}) : super(key: key);
+
+  CupertinoSliverNavigationBar _buildAppBar(BuildContext context) =>
+      CupertinoSliverNavigationBar(
+        backgroundColor: AppColors.scaffoldColor,
+        automaticallyImplyLeading: false,
+        leading: Material(
+          color: AppColors.transparent,
+          child: Icon(FeatherIcons.codesandbox, color: AppColors.black,),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Material(
+              borderRadius: BorderRadius.circular(16),
+              color: AppColors.transparent,
+              child: IconButton(
+                color: AppColors.black,
+                icon: const Icon(FeatherIcons.userPlus),
+                onPressed: () {
+                  navService.materialPageRoute(context, const InvitesView());
+                },
+              ),
+            ),
+            ValueListenableBuilder<Box>(
+                valueListenable:
+                    hiveApi.hiveStream(HiveApi.archivedUsersHiveBox),
+                builder: (context, archivedUsersBox, child) {
+                  final archivedUsersList = archivedUsersBox.values.toList();
+                  return archivedUsersList.isEmpty
+                      ? const SizedBox.shrink()
+                      : Material(
+                          color: AppColors.transparent,
+                          child: IconButton(
+                            color: AppColors.black,
+                            icon: const Icon(FeatherIcons.folder),
+                            onPressed: () {
+                              navService.cupertinoPageRoute(
+                                  context, const ArchiveView());
+                            },
+                          ),
+                        );
+                }),
+            Material(
+              color: AppColors.transparent,
+              child: IconButton(
+                color: AppColors.black,
+                icon: const Icon(FeatherIcons.send),
+                onPressed: () {
+                  mainViewPageController.animateToPage(1,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut);
+                },
+              ),
+            ),
+          ],
+        ),
+        stretch: true,
+        largeTitle: Text('Convo', style: TextStyle(color: AppColors.black,),),
+        border: Border.all(width: 0.0, color: AppColors.transparent),
+      );
+
+  Widget _buildPinnedList(BuildContext context, ChatListViewModel model) =>
+      ValueListenableBuilder<Box>(
+        valueListenable: hiveApi.hiveStream(HiveApi.pinnedUsersHiveBox),
+        builder: (context, pinnedUsersBox, child) {
+          final pinnedUsersList = pinnedUsersBox.values.toList();
+          return SliverGrid(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent:
+                  screenWidthPercentage(context, percentage: 0.4),
+              childAspectRatio: 1.0,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final userUid = pinnedUsersList[index];
+                return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    future: FirebaseFirestore.instance
+                        .collection(subsFirestoreKey)
+                        .doc(userUid)
+                        .get(const GetOptions(source: Source.cache)),
+                    builder: (context, snapshot) {
+                      final data = snapshot.data;
+                      if (data != null) {
+                        final fireUser = FireUser.fromFirestore(data);
+                        return GestureDetector(
+                          onTap: () {
+                            showTileOptions(userUid, context, true);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(40),
+                                  child: SizedBox(
+                                    height: screenWidthPercentage(context,
+                                        percentage: 0.25),
+                                    width: screenWidthPercentage(context,
+                                        percentage: 0.25),
+                                    child: CachedNetworkImage(
+                                      imageUrl: fireUser.photoUrl,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                verticalSpaceSmall,
+                                Text(
+                                  fireUser.displayName,
+                                  style:  TextStyle(
+                                      color: AppColors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const CircularProgressIndicator.adaptive();
+                      }
+                    });
+              },
+              childCount: pinnedUsersList.length,
+            ),
+          );
+        },
+      );
+
+  Widget _buildChatList(BuildContext context, ChatListViewModel model) =>
+      Builder(
+        builder: (context) {
+          final data = model.data;
+          if (model.hasError) {
+            log(model.error().toString());
+            return const SliverToBoxAdapter(
+              child: Center(
+                child: Text('Model has Error'),
+              ),
+            );
+          }
+          if (!model.dataReady) {
+            return const SliverToBoxAdapter(
+                child: Center(child: CircularProgressIndicator()));
+          }
+          if (data != null) {
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final doc = data.docs[index];
+                final userUid = doc[RecentUserField.userUid];
+                final archived = doc[RecentUserField.archive];
+                final pinned = doc[RecentUserField.pinned];
+                return GestureDetector(
+                  onLongPress: () {
+                    showTileOptions(userUid, context, false);
+                  },
+                  child: archived || pinned
+                      ? const SizedBox.shrink()
+                      : UserListItem(
+                          userUid: userUid,
+                          onLongPress: (fireUser) {
+                            showTileOptions(fireUser, context, pinned);
+                          },
+                        ),
+                );
+              }, childCount: data.docs.length),
+            );
+          } else {
+            return const SliverToBoxAdapter(
+              child: Text('Data is null'),
+            );
+          }
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatListViewModel>.reactive(
       viewModelBuilder: () => ChatListViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.scaffoldColor,
           body: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
+            scrollBehavior: const CupertinoScrollBehavior(),
             slivers: [
-              CupertinoSliverNavigationBar(
-                backgroundColor: Colors.white,
-                automaticallyImplyLeading: false,
-                leading: const Material(
-                  color: Colors.transparent,
-                  child: Icon(FeatherIcons.linkedin),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Material(
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.transparent,
-                      child: IconButton(
-                        icon: const Icon(FeatherIcons.userPlus),
-                        onPressed: () {
-                          navService.materialPageRoute(context, const InVitesView());
-                        },
-                      ),
-                    ),
-                    ValueListenableBuilder<Box>(
-                        valueListenable:
-                            hiveApi.hiveStream(HiveApi.archivedUsersHiveBox),
-                        builder: (context, archivedUsersBox, child) {
-                          final archivedUsersList =
-                              archivedUsersBox.values.toList();
-                          return archivedUsersList.isEmpty
-                              ? const SizedBox.shrink()
-                              : Material(
-                                  color: Colors.transparent,
-                                  child: IconButton(
-                                    icon: const Icon(FeatherIcons.folder),
-                                    onPressed: () {
-                                      navService.cupertinoPageRoute(
-                                          context, const ArchiveView());
-                                    },
-                                  ),
-                                );
-                        }),
-                    Material(
-                      color: Colors.transparent,
-                      child: IconButton(
-                        icon: const Icon(FeatherIcons.send),
-                        onPressed: () {
-                          mainViewPageController.animateToPage(1,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                stretch: true,
-                largeTitle: const Text('Conversations'),
-                border: Border.all(width: 0.0, color: Colors.transparent),
-              ),
-              ValueListenableBuilder<Box>(
-                valueListenable: hiveApi.hiveStream(HiveApi.pinnedUsersHiveBox),
-                builder: (context, pinnedUsersBox, child) {
-                  final pinnedUsersList = pinnedUsersBox.values.toList();
-                  return SliverGrid(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent:
-                          screenWidthPercentage(context, percentage: 0.4),
-                      childAspectRatio: 1.0,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        final userUid = pinnedUsersList[index];
-                        return FutureBuilder<
-                                DocumentSnapshot<Map<String, dynamic>>>(
-                            future: FirebaseFirestore.instance
-                                .collection(subsFirestoreKey)
-                                .doc(userUid)
-                                .get(const GetOptions(source: Source.cache)),
-                            builder: (context, snapshot) {
-                              final data = snapshot.data;
-                              if (data != null) {
-                                final fireUser = FireUser.fromFirestore(data);
-                                return GestureDetector(
-                                  onTap: () {
-                                    model.showTileOptions(
-                                        userUid, context, true);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 20),
-                                    child: Column(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(40),
-                                          child: SizedBox(
-                                            height: screenWidthPercentage(
-                                                context,
-                                                percentage: 0.25),
-                                            width: screenWidthPercentage(
-                                                context,
-                                                percentage: 0.25),
-                                            child: CachedNetworkImage(
-                                              imageUrl : fireUser.photoUrl,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        verticalSpaceSmall,
-                                        Text(
-                                          fireUser.displayName,
-                                          style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return const CircularProgressIndicator
-                                    .adaptive();
-                              }
-                            });
-                      },
-                      childCount: pinnedUsersList.length,
-                    ),
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  final data = model.data;
-                  if (model.hasError) {
-                    log(model.error().toString());
-                    return const SliverToBoxAdapter(
-                      child: Center(
-                        child: Text('Model has Error'),
-                      ),
-                    );
-                  }
-                  if (!model.dataReady) {
-                    return const SliverToBoxAdapter(
-                        child: Center(child: CircularProgressIndicator()));
-                  }
-                  if (data != null) {
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final doc = data.docs[index];
-                        final userUid = doc[RecentUserField.userUid];
-                        final archived = doc[RecentUserField.archive];
-                        final pinned = doc[RecentUserField.pinned];
-                        return GestureDetector(
-                          onLongPress: () {
-                            model.showTileOptions(userUid, context, false);
-                          },
-                          child: archived || pinned
-                              ? const SizedBox.shrink()
-                              : UserListItem(userUid: userUid),
-                          // child: UserListItem(userUid: userUid),
-                        );
-                      }, childCount: data.docs.length),
-                    );
-                  } else {
-                    return const SliverToBoxAdapter(
-                      child: Text('Data is null'),
-                    );
-                  }
-                },
-              ),
+              _buildAppBar(context),
+              _buildPinnedList(context, model),
+              _buildChatList(context, model),
             ],
           ),
         );

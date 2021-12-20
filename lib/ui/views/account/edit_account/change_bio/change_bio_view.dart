@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -42,14 +43,14 @@ class ChangeBioView extends StatelessWidget {
             }
           },
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(
             context,
             title: '',
             onPressed: () => Navigator.maybePop(context),
           ),
           body: ValueListenableBuilder<Box>(
-            valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+            valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
             builder: (context, box, child) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -60,7 +61,7 @@ class ChangeBioView extends StatelessWidget {
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
-                                color: Colors.black54,
+                                color: AppColors.mediumBlack,
                               ),
                     ),
                     verticalSpaceRegular,

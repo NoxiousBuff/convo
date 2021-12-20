@@ -24,6 +24,7 @@ class DeleteMyAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldColor,
       appBar: cwAuthAppBar(context, title:'Security',onPressed: ()=> Navigator.pop(context)),
       body: Column(
         children: [
@@ -66,7 +67,7 @@ class DeleteMyAccount extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .bodyText1!
-                    .copyWith(color: Colors.black54),
+                    .copyWith(color:AppColors.mediumBlack),
               ),
             ],
           ),

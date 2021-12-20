@@ -45,12 +45,12 @@ class SearchViewModel extends BaseViewModel {
   }
 
   void addToRecentSearches(String uid) {
-    hiveApi.saveInHive(HiveApi.recentSearchesHiveBox, uid, uid);
+    hiveApi.save(HiveApi.recentSearchesHiveBox, uid, uid);
     log.wtf('added');
   }
 
   void deleteFromRecentSearches(String uid) {
-    hiveApi.deleteInHive(HiveApi.recentSearchesHiveBox, uid);
+    hiveApi.delete(HiveApi.recentSearchesHiveBox, uid);
     log.wtf('deleted');
   }
 

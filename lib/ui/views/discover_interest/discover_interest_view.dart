@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -23,7 +24,7 @@ class DiscoverInterestView extends StatelessWidget {
       viewModelBuilder: () =>
           DiscoverInterestViewModel(interestName: interestName),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context,
             title: interestName, onPressed: () => Navigator.pop(context)),
         body: Padding(
@@ -48,7 +49,7 @@ class DiscoverInterestView extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54),
+                      color: AppColors.mediumBlack),
                 ),
               ),
               sliverVerticalSpaceLarge,

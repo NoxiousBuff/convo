@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:filesize/filesize.dart';
 import 'package:hint/api/firestore.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hive/hive.dart';
@@ -14,7 +15,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 
 class EditAccountViewModel extends BaseViewModel {
-  static const _hiveBox = HiveApi.userdataHiveBox;
+  static const _hiveBox = HiveApi.userDataHiveBox;
   final log = getLogger('EditAccountViewModel');
 
   Future<File?> pickImage() async {
@@ -34,7 +35,7 @@ class EditAccountViewModel extends BaseViewModel {
   String get formattedBirthDate => _formattedBirthDate;
 
   void birthDateFormatter() {
-    final birthDateInMilliseconds = hiveApi.getUserDataWithHive(FireUserField.dob); 
+    final birthDateInMilliseconds = hiveApi.getUserData(FireUserField.dob); 
     if(birthDateInMilliseconds != null) {
       final dobAsInt = birthDateInMilliseconds as int;
       final dobAsDateTime = DateTime.fromMillisecondsSinceEpoch(dobAsInt);
@@ -69,9 +70,9 @@ class EditAccountViewModel extends BaseViewModel {
       return downloadUrl;
     }
   }
-
-  Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value) async {
-    setBusy(true);
+final firestoreApi = locator<FirestoreApi>();
+  Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value,{bool useSetBusy = true}) async {
+    if(useSetBusy) setBusy(true);
     await firestoreApi
         .updateUser(
       uid: AuthService.liveUser!.uid,
@@ -79,10 +80,10 @@ class EditAccountViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
           title: 'Succeesfully Saved !!');
     });
-    setBusy(false);
+    if(useSetBusy) setBusy(false);
   }
 }

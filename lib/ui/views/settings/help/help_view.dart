@@ -19,7 +19,7 @@ class HelpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.scaffoldColor,
       appBar: cwAuthAppBar(context, title: 'Help', onPressed: ()=> Navigator.pop(context)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),

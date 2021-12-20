@@ -6,7 +6,8 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class VideoDisplayWidget extends StatefulWidget {
   final String videoUrl;
-  const VideoDisplayWidget({Key? key, required this.videoUrl})
+  final bool isPlayable;
+  const VideoDisplayWidget({Key? key, required this.videoUrl,  this.isPlayable = false})
       : super(key: key);
 
   @override
@@ -29,7 +30,7 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
 
     // Use the controller to loop the video.
     _controller.setLooping(true);
-
+    if (widget.isPlayable) _controller.play();
     super.initState();
   }
 
@@ -50,7 +51,7 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
           return Stack(
-            alignment: Alignment.center,
+            alignment: Alignment.topLeft,
             children: [
               AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
@@ -64,7 +65,7 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
                 width: 40,
                 padding: const EdgeInsets.only(left:4),
                 decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
+                    color:AppColors.black.withOpacity(0.8),
                     shape: BoxShape.circle),
                 alignment: Alignment.center,
                 child: const Icon(
@@ -78,7 +79,7 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
-          return const SizedBox.shrink();
+          return const Center(child: CircularProgressIndicator(),);
         }
       },
     );

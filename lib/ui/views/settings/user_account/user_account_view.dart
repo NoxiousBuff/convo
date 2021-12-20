@@ -27,13 +27,13 @@ class _AccountState extends State<UserAccountView> {
       viewModelBuilder: () => UserAccountViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar:
               cwAuthAppBar(context, title: 'Account Details', onPressed: () {
             Navigator.pop(context);
           }),
           body: ValueListenableBuilder<Box>(
-            valueListenable: hiveApi.hiveStream(HiveApi.userdataHiveBox),
+            valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
             builder: (context, box, child) {
               return Column(
                 children: [
@@ -42,10 +42,9 @@ class _AccountState extends State<UserAccountView> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       'This is your personal information you can change here your personal details and these details are not seen in your public profile.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2!
-                          .copyWith(color: AppColors.inActiveGray),
+                      style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                            color: AppColors.grey,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -65,7 +64,7 @@ class _AccountState extends State<UserAccountView> {
                         verticalSpaceRegular,
                         cwEADetailsTile(context, 'Email',
                             subtitle: box.get(FireUserField.email), onTap: () {
-                          navService.cupertinoPageRoute(
+                          navService.materialPageRoute(
                               context, const UpdateEmailView());
                         }),
                         cwEADetailsTile(context, 'Change Password',
@@ -80,7 +79,7 @@ class _AccountState extends State<UserAccountView> {
                         ),
                         verticalSpaceRegular,
                         cwEADetailsTile(context, 'Security', onTap: () {
-                          navService.cupertinoPageRoute(
+                          navService.materialPageRoute(
                               context, const SecurityView());
                         }),
                         cwEADetailsTile(context, 'Delete My User Account',

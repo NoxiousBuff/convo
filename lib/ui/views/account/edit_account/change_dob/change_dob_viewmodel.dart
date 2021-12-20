@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
@@ -19,7 +20,7 @@ class ChangeDobViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  bool get isDobNull => hiveApi.getUserDataWithHive(FireUserField.dob) == null;
+  bool get isDobNull => hiveApi.getUserData(FireUserField.dob) == null;
 
   int get dobInMilliseconds => _dob.millisecondsSinceEpoch;
 
@@ -38,7 +39,7 @@ class ChangeDobViewModel extends BaseViewModel {
   String get formattedBirthDate => _formattedBirthDate;
 
   void birthDateFormatter() {
-    final birthDateInMilliseconds = hiveApi.getUserDataWithHive(FireUserField.dob); 
+    final birthDateInMilliseconds = hiveApi.getUserData(FireUserField.dob); 
     if(birthDateInMilliseconds != null) {
       final dobAsInt = birthDateInMilliseconds as int;
       final dobAsDateTime = DateTime.fromMillisecondsSinceEpoch(dobAsInt);
@@ -55,7 +56,7 @@ class ChangeDobViewModel extends BaseViewModel {
     _isEdited = localIsEdited;
     notifyListeners();
   }
-
+final firestoreApi = locator<FirestoreApi>();
   Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value) async {
     setBusy(true);
     await firestoreApi
@@ -65,7 +66,7 @@ class ChangeDobViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
           title: 'Succeesfully Saved !!');
     });

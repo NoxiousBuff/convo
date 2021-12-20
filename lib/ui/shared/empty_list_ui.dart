@@ -49,7 +49,7 @@ Widget buildEmptyListUi(
                   buttonTitle ?? 'Add some friends.',
                   style: const TextStyle(
                     fontSize: 22,
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

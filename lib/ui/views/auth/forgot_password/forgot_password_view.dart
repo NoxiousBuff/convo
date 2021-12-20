@@ -18,7 +18,7 @@ class ForgotPasswordAuthView extends StatelessWidget {
     return ViewModelBuilder<ForgotPasswordAuthViewModel>.reactive(
       viewModelBuilder: () => ForgotPasswordAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Forgot Password'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -52,12 +52,12 @@ class ForgotPasswordAuthView extends StatelessWidget {
                       controller: model.emailTech,
                       autofocus: true,
                       autofillHints: const [AutofillHints.email],
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',

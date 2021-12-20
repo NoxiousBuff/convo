@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/constants/interest.dart';
 import 'package:hint/services/auth_service.dart';
@@ -102,11 +103,11 @@ class ChangeInterestViewModel extends BaseViewModel {
 
   void gettingInterests() {
     _userSelectedInterests =
-        Hive.box(HiveApi.userdataHiveBox).get(FireUserField.interests);
+        Hive.box(HiveApi.userDataHiveBox).get(FireUserField.interests);
     notifyListeners();
     log.wtf('UserSelectedinterests:$_userSelectedInterests');
   }
-
+final firestoreApi = locator<FirestoreApi>();
   Future<void> updateUserSelectedInterests(BuildContext context) async {
     setBusy(true);
     await firestoreApi
@@ -116,7 +117,7 @@ class ChangeInterestViewModel extends BaseViewModel {
       propertyName: FireUserField.interests,
     )
         .then((value) {
-      hiveApi.updateUserdateWithHive(
+      hiveApi.updateUserData(
           FireUserField.interests, _userSelectedInterests);
       customSnackbars.successSnackbar(context,
           title: 'You Data Was Sucessfully Saved');

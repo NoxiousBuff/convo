@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:stacked/stacked.dart';
@@ -10,6 +11,8 @@ class ChangeBioViewModel extends BaseViewModel {
   final log = getLogger('ChangeBioViewModel');
 
   final TextEditingController bioNameTech = TextEditingController();
+
+  final firestoreApi = locator<FirestoreApi>();
 
   bool _isBioNameEmpty = true;
   bool get isBioNameEmpty => _isBioNameEmpty;
@@ -38,7 +41,7 @@ class ChangeBioViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
           title: 'Succeesfully Saved !!');
     });

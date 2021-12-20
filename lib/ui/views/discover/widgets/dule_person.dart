@@ -1,15 +1,15 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:hint/ui/views/account/account_view/widgets/account_button.dart';
+import 'package:hint/ui/views/account/account_view/widgets/account_save_indicator.dart';
 import 'package:hint/ui/views/discover/discover_viewmodel.dart';
-import 'package:hint/ui/views/profile/profile_view.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 
 import 'dule_person_dialog.dart';
 
@@ -23,7 +23,7 @@ Widget dulePerson(
   final commonInterests =
       lists.fold<Set>(lists.first.toSet(), (a, b) => a.intersection(b.toSet()));
   final int interestLength = commonInterests.length;
-  final currentUserId = hiveApi.getUserDataWithHive(FireUserField.id);
+  final currentUserId = hiveApi.getUserData(FireUserField.id);
   return fireUser.id == currentUserId
       ? const SizedBox.shrink()
       : InkWell(
@@ -48,24 +48,15 @@ Widget dulePerson(
                   children: [
                     Expanded(
                       child: Row(children: [
-                        SizedBox(
-                            width: 56,
-                            height: 56,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                fireUser.photoUrl,
-                                fit: BoxFit.cover,
-                              ),
-                            )),
-                        const SizedBox(width: 10),
+                        userProfilePhoto(context, fireUser.photoUrl),
+                        horizontalSpaceSmall,
                         Flexible(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(fireUser.username,
-                                    style: const TextStyle(
-                                        color: Colors.black,
+                                    style:  TextStyle(
+                                        color: AppColors.black,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700)),
                                 const SizedBox(
@@ -73,75 +64,14 @@ Widget dulePerson(
                                 ),
                                 Text(fireUser.country ?? '',
                                     style:
-                                        TextStyle(color: Colors.grey[500])),
+                                        const TextStyle(color: AppColors.mediumBlack)),
                               ]),
                         )
                       ]),
                     ),
-                    ValueListenableBuilder<Box>(
-                        valueListenable:
-                            hiveApi.hiveStream(HiveApi.savedPeopleHiveBox),
-                        builder: (context, savedbox, child) {
-                          final bool alreadySaved = hiveApi.doesHiveContain(
-                              HiveApi.savedPeopleHiveBox, fireUser.id);
-                          return InkWell(
-                            borderRadius : BorderRadius.circular(14.2),
-                            onTap: () {
-                              log('hello');
-                              alreadySaved
-                                  ? hiveApi.deleteFromSavedPeople(fireUser.id)
-                                  : hiveApi.addToSavedPeople(fireUser.id);
-                            },
-                            child: Container(
-                              height: 40,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 7),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14.2),
-                                  border:
-                                      Border.all(color: AppColors.darkGrey)),
-                              child: Center(
-                                child: !alreadySaved
-                                    ? const Icon(
-                                        FeatherIcons.bookmark,
-                                        color: Colors.black,
-                                      )
-                                    : Text(
-                                        'Bookmarked',
-                                        style: TextStyle(
-                                            color: Colors.grey.shade600),
-                                      ),
-                              ),
-                            ),
-                          );
-                        }),
+                    cwAccountSaveIndicator(context, fireUser.id),
                     horizontalSpaceSmall,
-                    InkWell(
-                      borderRadius: BorderRadius.circular(14.2),
-                      onTap: () {
-                        navService.cupertinoPageRoute(context, ProfileView(fireUser: fireUser));
-                        // Navigator.push(
-                        //     context,
-                        //     CupertinoPageRoute(
-                        //         builder: (context) =>
-                        //             ProfileView(fireUser: fireUser)));
-                      },
-                      child: Container(
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(horizontal: 7),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14.2),
-                            border: Border.all(color: AppColors.darkGrey)),
-                        child: const Center(
-                          child: Icon(
-                            FeatherIcons.cornerUpRight,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    )
+                    cwAccountIconButton(context, onTap: ()=> navService.materialPageRoute(context, WriteLetterView(fireUser: fireUser)))
                   ],
                 ),
               ),
@@ -258,7 +188,7 @@ Widget dulePerson(
                                 child: Text(
                                   commonInterests.elementAt(6).toString(),
                                   style: const TextStyle(
-                                      color: Colors.black54,
+                                      color: AppColors.mediumBlack,
                                       fontWeight: FontWeight.w700),
                                 ),
                               ),
@@ -268,8 +198,8 @@ Widget dulePerson(
                       if (commonInterests.length > 6)
                         Text(
                           '+ ${commonInterests.length - 6} more',
-                          style: TextStyle(
-                              color: Colors.grey.shade800, fontSize: 12),
+                          style: const TextStyle(
+                              color: AppColors.mediumBlack, fontSize: 12),
                         )
                     ],
                   ),

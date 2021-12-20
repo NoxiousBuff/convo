@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -17,6 +18,7 @@ class ContactsView extends StatelessWidget {
     return ViewModelBuilder<ContactsViewModel>.reactive(
       onModelReady: (model) => model.getContacts(),
       builder: (context, model, child) => Scaffold(
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Contacts'),
         body: CustomScrollView(
           slivers: [

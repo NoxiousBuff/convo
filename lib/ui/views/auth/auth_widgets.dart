@@ -17,19 +17,19 @@ AppBar cwAuthAppBar(BuildContext context,
         const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
     title: Text(
       title,
-      style: const TextStyle(
-          fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),
+      style:  TextStyle(
+          fontWeight: FontWeight.w700, color: AppColors.black, fontSize: 18),
     ),
     backgroundColor:
         MaterialStateColor.resolveWith((Set<MaterialState> states) {
       return states.contains(MaterialState.scrolledUnder)
-          ? Colors.grey.shade50
-          : Colors.white;
+          ? AppColors.grey
+          : AppColors.white;
     }),
     leadingWidth: showLeadingIcon ? 56.0 : 0.0,
     leading: showLeadingIcon
         ? IconButton(
-            color: Colors.black54,
+            color: AppColors.mediumBlack,
             icon: Icon(leadingIcon ?? FeatherIcons.arrowLeft),
             onPressed: onPressed,
           )
@@ -52,7 +52,7 @@ Widget cwAuthProceedButton(BuildContext context,
       elevation: 8,
       borderRadius: BorderRadius.circular(16),
       shadowColor:
-          isActive ? AppColors.blue.withAlpha(100) : Colors.transparent,
+          isActive ? AppColors.blue.withAlpha(100) : AppColors.transparent,
       child: Container(
         height: 48,
         width: screenWidth(context),
@@ -63,7 +63,7 @@ Widget cwAuthProceedButton(BuildContext context,
                 width: 17,
                 child: CircularProgressIndicator(
                   strokeWidth: 1.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
                 ),
               )
             : Text(
@@ -72,9 +72,9 @@ Widget cwAuthProceedButton(BuildContext context,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: isActive
-                        ? LightAppColors.onPrimary
-                        : LightAppColors.secondary.withAlpha(125)),
-              ),
+                        ? AppColors.blue
+                        : AppColors.mediumBlack,
+            ),),
         decoration: BoxDecoration(
             color: isActive ? AppColors.blue : AppColors.lightGrey,
             borderRadius: BorderRadius.circular(16)),
@@ -88,8 +88,8 @@ Widget cwAuthCheckingTile({required String title, required bool value}) {
     mainAxisSize: MainAxisSize.min,
     children: [
       Checkbox(
-        activeColor: LightAppColors.primaryContainer,
-        checkColor: LightAppColors.onPrimaryContainer,
+        activeColor: AppColors.blueAccent.withAlpha(50),
+        checkColor: AppColors.blue,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         value: value,
         onChanged: (value) {},
@@ -114,7 +114,7 @@ Widget cwAuthDescription(BuildContext context, {required String title}) {
     style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: LightAppColors.secondary),
+        color: AppColors.mediumBlack),
   );
 }
 
@@ -131,7 +131,7 @@ Widget cwAuthInterestTopicPicker(
             child: icon ??
                 const Icon(
                   FeatherIcons.plus,
-                  color: LightAppColors.onPrimary,
+                  color: AppColors.white,
                 ),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -142,7 +142,7 @@ Widget cwAuthInterestTopicPicker(
           Text(
             title,
             style: const TextStyle(
-                color: LightAppColors.secondary,
+                color: AppColors.mediumBlack,
                 fontSize: 18,
                 fontWeight: FontWeight.w700),
           ),
@@ -181,7 +181,7 @@ Widget cwAuthInterestChip(String label, PickInterestsViewModel model) {
         style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 16,
-            color: isSelected ? LightAppColors.onPrimary : Colors.black),
+            color: isSelected ? AppColors.white :AppColors.black),
       ),
     ),
   );

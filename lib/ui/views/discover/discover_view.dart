@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
 import 'package:hint/models/user_model.dart';
@@ -20,6 +21,72 @@ import 'discover_viewmodel.dart';
 class DiscoverView extends StatelessWidget {
   const DiscoverView({Key? key}) : super(key: key);
 
+  AppBar _buildAppBar(BuildContext context, DiscoverViewModel model) {
+    return AppBar(
+      systemOverlayStyle:
+          const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
+      elevation: 0.0,
+      toolbarHeight: 60,
+      leadingWidth: 0,
+      title:  Text(
+        'Discover',
+        style: TextStyle(
+            fontWeight: FontWeight.w700, color: AppColors.black, fontSize: 32),
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            model.peopleSuggestions();
+          },
+          icon: const Icon(FeatherIcons.refreshCcw),
+          color: AppColors.black,
+          iconSize: 24,
+        ),
+        IconButton(
+          onPressed: () {
+            navService.cupertinoPageRoute(context, const SavedPeopleView());
+          },
+          icon: const Icon(FeatherIcons.pocket),
+          color: AppColors.black,
+          iconSize: 24,
+        ),
+        horizontalSpaceSmall
+      ],
+      backgroundColor:
+          MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        return states.contains(MaterialState.scrolledUnder)
+            ? AppColors.grey
+            : AppColors.white;
+      }),
+    );
+  }
+
+  Widget _buildExploreInterestList(BuildContext context, List<String> interestList) {
+    return  SliverToBoxAdapter(
+              child: SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 11),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: interestList.length,
+                  itemBuilder: (context, i) {
+                    return exploreInterestChip(
+                      interestList[i],
+                      onTap: () {
+                        navService.materialPageRoute(
+                            context,
+                            DiscoverInterestView(
+                                interestName:
+                                    interestList[i]));
+                      },
+                    );
+                  },
+                ),
+              ),
+            );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<DiscoverViewModel>.reactive(
@@ -28,130 +95,37 @@ class DiscoverView extends StatelessWidget {
       },
       viewModelBuilder: () => DiscoverViewModel(),
       builder: (context, model, child) => Scaffold(
-        appBar: AppBar(
-          // shape: RoundedRectangleBorder(side: MaterialStateBorderSide.resolveWith((states) {
-          //   return states.contains(MaterialState.scrolledUnder)
-          // ? BorderSide(color: Colors.red, width: 3)
-          // : BorderSide(color: Colors.black);
-          // })),
-          systemOverlayStyle: const SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.dark),
-          elevation: 0.0,
-          toolbarHeight: 60,
-          leadingWidth: 0,
-          title: const Text(
-            'Discover',
-            style: TextStyle(
-                fontWeight: FontWeight.w700, color: Colors.black, fontSize: 32),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                model.peopleSuggestions();
-              },
-              icon: const Icon(FeatherIcons.refreshCcw),
-              color: Colors.black,
-              iconSize: 24,
-            ),
-            IconButton(
-              onPressed: () {
-                navService.cupertinoPageRoute(context, const SavedPeopleView());
-              },
-              icon: const Icon(FeatherIcons.pocket),
-              color: Colors.black,
-              iconSize: 24,
-            ),
-            horizontalSpaceSmall
-          ],
-          backgroundColor:
-              MaterialStateColor.resolveWith((Set<MaterialState> states) {
-            return states.contains(MaterialState.scrolledUnder)
-                ? Colors.grey.shade50
-                : Colors.white;
-          }),
-        ),
-        backgroundColor: Colors.white,
+        appBar: _buildAppBar(context, model),
+        backgroundColor: AppColors.scaffoldColor,
         body: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
+          scrollBehavior: const CupertinoScrollBehavior(),
           slivers: [
             sliverVerticalSpaceMedium,
-            SliverToBoxAdapter(
+             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Explore Interests',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                          fontSize: 20),
-                    ),
-                    // const Spacer(),
-                    // const Text(
-                    //   'See All',
-                    //   style: TextStyle(
-                    //     fontWeight: FontWeight.w700,
-                    //     color: Colors.black54,
-                    //   ),
-                    // ),
-                    // horizontalDefaultMessageSpace,
-                    // GestureDetector(
-                    //   child: const Icon(
-                    //     FeatherIcons.chevronRight,
-                    //     color: Colors.black54,
-                    //     size: 28,
-                    //   ),
-                    // ),
-                  ],
+                child: Text(
+                  'Explore Interests',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black,
+                      fontSize: 20),
                 ),
               ),
             ),
             sliverVerticalSpaceRegular,
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: userInterest.moviesAndTelevision.length,
-                  itemBuilder: (context, i) {
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(100),
-                      onTap: () {
-                        navService.cupertinoPageRoute(context, DiscoverInterestView(interestName: userInterest.moviesAndTelevision[i]));
-                      },
-                      child: exploreInterestChip(
-                          userInterest.moviesAndTelevision[i]),
-                    );
-                  },
-                ),
-              ),
-            ),
+            _buildExploreInterestList(context, userInterest.activities),
             sliverVerticalSpaceTiny,
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: userInterest.automotive.length,
-                  itemBuilder: (context, i) {
-                    return exploreInterestChip(userInterest.automotive[i]);
-                  },
-                ),
-              ),
-            ),
+            _buildExploreInterestList(context, userInterest.artsAndCulture),
             sliverVerticalSpaceLarge,
-            const SliverToBoxAdapter(
+             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Text(
                   'Today\'s Top Picks',
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColors.black,
                       fontSize: 20),
                 ),
               ),

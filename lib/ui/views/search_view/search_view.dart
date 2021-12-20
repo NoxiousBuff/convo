@@ -1,4 +1,5 @@
 import 'package:hint/api/hive.dart';
+import 'package:hint/ui/shared/empty_state.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +10,9 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_item.dart';
+import 'package:hint/ui/shared/user_item.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/chat_list/widgets/user_list_item/user_list_item.dart';
+import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
 
 import 'search_viewmodel.dart';
 
@@ -21,10 +22,10 @@ class SearchView extends StatelessWidget {
   AppBar buildSearchHeader(BuildContext context, SearchViewModel model) {
     return AppBar(
       elevation: 0.0,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       leading: IconButton(
         icon: const Icon(FeatherIcons.arrowLeft),
-        color: Colors.black,
+        color:AppColors.black,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -41,9 +42,9 @@ class SearchView extends StatelessWidget {
             controller: model.searchTech,
             padding: const EdgeInsets.all(8.0),
             placeholder: 'Search for someone',
-            placeholderStyle: TextStyle(
+            placeholderStyle: const TextStyle(
                 fontSize: 16,
-                color: Colors.grey.shade900,
+                color: AppColors.mediumBlack,
                 fontWeight: FontWeight.w400,),
             suffix: model.searchTech.text.isEmpty
                 ? const SizedBox.shrink()
@@ -51,11 +52,11 @@ class SearchView extends StatelessWidget {
                     onPressed: () => model.searchTech.clear(),
                     icon: const Icon(
                       FeatherIcons.x,
-                      color: AppColors.inActiveGray,
+                      color: AppColors.mediumBlack,
                     )),
             decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border.all(color: Colors.grey.shade300),
+                          color: AppColors.lightGrey,
+                          border: Border.all(color: AppColors.grey),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
             onChanged: (value) {
@@ -70,32 +71,13 @@ class SearchView extends StatelessWidget {
     );
   }
 
-  Widget buildEmptySearch(String query) {
-    return Container(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Icon(
-              FeatherIcons.atSign,
-              size: 128.0,
-              color: CupertinoColors.inactiveGray,
-            ),
-          ),
-          Text(
-            'Sorry, nothing found.\nTry searching for another \n$query.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                color: Colors.black54,
-                fontWeight: FontWeight.w300,
-                fontSize: 24.0),
-          )
-        ],
-      ),
-    );
+  Widget buildEmptySearch(BuildContext context, String query) {
+    return Center(child: Column(
+      children: [
+        verticalSpaceLarge,
+        emptyState(context, emoji: '😞', description: 'Perhaps try again with another username.', heading: 'Nothing found for \n\'$query\'.'),
+      ],
+    ));
   }
 
   Widget buildInitialContent(SearchViewModel model) {
@@ -133,7 +115,7 @@ class SearchView extends StatelessWidget {
                       model.deleteFromRecentSearches(recentSearch);
                     },
                     icon: const Icon(FeatherIcons.x),
-                    color: Colors.black54,
+                    color:AppColors.mediumBlack,
                   ),
                   horizontalSpaceSmall,
                 ],
@@ -153,6 +135,7 @@ class SearchView extends StatelessWidget {
         model.searchTech.dispose();
       },
       builder: (context, model, child) => Scaffold(
+        backgroundColor: AppColors.scaffoldColor,
         appBar: buildSearchHeader(context, model),
         body: FutureBuilder<QuerySnapshot>(
           future: model.usernameSearchFuture,
@@ -174,14 +157,6 @@ class SearchView extends StatelessWidget {
                               fireUser: fireUser,
                               title: fireUser.username,
                               onTap: () async {
-                                // String liveUserUid =
-                                //     AuthService.liveUser!.uid;
-                                // String value = chatService.getConversationId(
-                                //     fireUser.id, liveUserUid);
-                                // navService.cupertinoPageRoute(
-                                //     context, DuleView(fireUser: fireUser));
-                                // await databaseService.updateUserDataWithKey(
-                                //     DatabaseMessageField.roomUid, value);
                                 chatService.startDuleConversation(context, fireUser);
                                 model.addToRecentSearches(fireUser.id);
                               },
@@ -190,8 +165,8 @@ class SearchView extends StatelessWidget {
                           childCount: searchResults.length,
                         ),
                       )
-                    : SliverToBoxAdapter(child: buildEmptySearch('username')),
-              ],
+                    : SliverToBoxAdapter(child: buildEmptySearch(context, model.searchTech.text),
+                    ),],
             );
           },
         ),

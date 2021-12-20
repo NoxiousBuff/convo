@@ -3,6 +3,7 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/query.dart';
 import 'package:stacked/stacked.dart';
 
 class DiscoverViewModel extends BaseViewModel {
@@ -14,12 +15,12 @@ class DiscoverViewModel extends BaseViewModel {
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
-  final usersInterests = hiveApi.getUserDataWithHive(FireUserField.interests);
+  final usersInterests = hiveApi.getUserData(FireUserField.interests);
 
   void peopleSuggestions() {
     Future<QuerySnapshot>? searchResults = subsCollection.where(
         FireUserField.interests,
-        arrayContainsAny: usersInterests.sublist(0,9)).limit(6).get();
+        arrayContainsAny: usersInterests.sublist(0,9)).limit(6).getSavy();
     _peopleSuggestionsFuture = searchResults;
     notifyListeners();
   }

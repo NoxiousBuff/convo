@@ -1,47 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/models/contact_model.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
+import 'package:hint/ui/views/invites/widgets/contact_list_item.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 
 import 'invites_viewmodel.dart';
 
-class InVitesView extends StatefulWidget {
-  const InVitesView({Key? key}) : super(key: key);
-
-  @override
-  State<InVitesView> createState() => _InVitesViewState();
-}
-
-class _InVitesViewState extends State<InVitesView> {
-  final log = getLogger('invitesView');
-  ScrollController scrollController = ScrollController();
-  @override
-  void initState() {
-    super.initState();
-    scrollController.addListener(_scrollListener);
-  }
-
-  _scrollListener() {
-    final model = InvitesViewModel();
-    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
-        !scrollController.position.outOfRange) {
-      log.wtf("reach the bottom");
-      model.changeReachIcon(FeatherIcons.arrowUp);
-    }
-    if (scrollController.offset <= scrollController.position.minScrollExtent &&
-        !scrollController.position.outOfRange) {
-      log.wtf("reach the top");
-      model.changeReachIcon(FeatherIcons.arrowDown);
-    }
-  }
+class InvitesView extends StatelessWidget {
+  const InvitesView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,100 +33,66 @@ class _InVitesViewState extends State<InVitesView> {
                 .toLowerCase()
                 .compareTo(b.displayName.toLowerCase()));
             return Scaffold(
-              backgroundColor: AppColors.white,
+              backgroundColor: AppColors.scaffoldColor,
               appBar: cwAuthAppBar(context,
                   title: 'Invite Friend\'s',
                   onPressed: () => Navigator.pop(context)),
               body: hiveList.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: cwAuthProceedButton(
-                          context,
-                          isLoading: model.isBusy,
-                          buttonTitle: 'Connect your contacts',
-                          onTap: () => model.gettingNumbers(),
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('🥳', style: TextStyle(fontSize: 80)),
+                              verticalSpaceRegular,
+                              cwEAHeading('More the\nMerrier',
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  textAlign: TextAlign.center),
+                              verticalSpaceRegular,
+                              cwEADescriptionTitle(
+                                context,
+                                'Invites your friends and family,\nbut only those who think are worth it.',
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: cwAuthProceedButton(
+                            context,
+                            isLoading: model.isBusy,
+                            buttonTitle: 'Connect your contacts',
+                            onTap: () => model.gettingNumbers(),
+                          ),
+                        ),
+                        verticalSpaceLarge,
+                        bottomPadding(context)
+                      ],
                     )
                   : CupertinoScrollbar(
                       isAlwaysShown: true,
-                      controller: scrollController,
-                      notificationPredicate: (ScrollNotification notification) {
-                        return true;
-                      },
                       child: CustomScrollView(
                         scrollBehavior: const CupertinoScrollBehavior(),
-                        controller: scrollController,
                         slivers: [
                           SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, i) {
-                                var contact = contacts[i];
-                                var number = contact.phoneNumber;
-                                var code = contact.countryPhoneCode;
-                                const padding =
-                                    EdgeInsets.fromLTRB(16, 0, 16, 0);
-                                return Row(
-                                  children: [
-                                    Expanded(
-                                      child: Padding(
-                                        padding: padding,
-                                        child: cwEADetailsTile(
-                                          context,
-                                          contact.displayName,
-                                          showTrailingIcon: false,
-                                          subtitle: '$code $number',
-                                        ),
-                                      ),
-                                    ),
-                                    horizontalSpaceRegular,
-                                    Container(
-                                      width: 80,
-                                      height: 40,
-                                      margin: const EdgeInsets.only(right: 16),
-                                      decoration: BoxDecoration(
-                                          color: AppColors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(14.2)),
-                                      child: const Center(
-                                        child: Text(
-                                          'Invite',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                );
+                                return contactListItem(
+                                    context, model, contacts[i],);
                               },
                               childCount: contacts.length,
                             ),
                           ),
+                          sliverVerticalSpaceLarge,
+                          SliverToBoxAdapter(
+                            child: bottomPadding(context),
+                          ),
                         ],
                       ),
                     ),
-              floatingActionButton: model.showReachIcon
-                  ? InkWell(
-                      onTap: () {
-                        if (model.reachIcon == FeatherIcons.arrowDown) {
-                          scrollController.jumpTo(
-                              scrollController.position.maxScrollExtent);
-                        } else {
-                          scrollController.jumpTo(
-                              scrollController.position.minScrollExtent);
-                        }
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: AppColors.blue,
-                        child: Icon(
-                          model.reachIcon,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
             );
           },
         );
@@ -162,4 +100,3 @@ class _InVitesViewState extends State<InVitesView> {
     );
   }
 }
-

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:stacked/stacked.dart';
@@ -13,6 +14,8 @@ class ChangeDisplayNameViewModel extends BaseViewModel {
 
   bool _isDisplayNameEmpty = true;
   bool get isDisplayNameEmpty => _isDisplayNameEmpty;
+
+  final firestoreApi = locator<FirestoreApi>();
 
   void updateDisplayNameEmpty() {
     _isDisplayNameEmpty = dispayNameTech.text.isEmpty;
@@ -38,7 +41,7 @@ class ChangeDisplayNameViewModel extends BaseViewModel {
       propertyName: propertyName,
     )
         .then((instance) {
-      hiveApi.updateUserdateWithHive(propertyName, value);
+      hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
           title: 'Succeesfully Saved !!');
     });

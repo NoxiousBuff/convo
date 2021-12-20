@@ -21,7 +21,7 @@ class LoginAuthView extends StatelessWidget {
     return ViewModelBuilder<LoginAuthViewModel>.reactive(
       viewModelBuilder: () => LoginAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Login'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -57,12 +57,12 @@ class LoginAuthView extends StatelessWidget {
                       controller: model.emailTech,
                       autofocus: true,
                       autofillHints: const [AutofillHints.email],
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',
@@ -89,16 +89,16 @@ class LoginAuthView extends StatelessWidget {
                         model.areFieldNotEmpty();
                       },
                       controller: model.passwordTech,
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: LightAppColors.secondary,
+                            color: AppColors.mediumBlack,
                             icon: Icon(model.isPasswordShown
                                 ? FeatherIcons.eye
                                 : FeatherIcons.eyeOff),
@@ -123,7 +123,7 @@ class LoginAuthView extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
-                            color: LightAppColors.secondary,
+                            color: AppColors.mediumBlack,
                             decoration: TextDecoration.underline),
                       ),
                     ),

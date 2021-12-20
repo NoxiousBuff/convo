@@ -14,6 +14,6 @@ class ReadLetterViewModel extends BaseViewModel {
 
   String get formaattedDate => Jiffy(letter.timestamp.toDate()).format('MMM do, yyyy');
 
-  bool get isSentByMe => letter.id == hiveApi.getUserDataWithHive(FireUserField.id);
+  bool get isSentByMe => letter.id == hiveApi.getUserData(FireUserField.id);
 
 }

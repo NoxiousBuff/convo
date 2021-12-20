@@ -1,33 +1,4 @@
-class DocumentField {
-  static const String type = 'type';
-  static const String isRead = 'isRead';
-  static const String isReply = 'isReply';
-  static const String message = 'message';
-  static const String senderUid = 'senderUid';
-  static const String timestamp = 'timestamp';
-  static const String messageUid = 'messageUid';
-  static const String userBlockMe = 'userBlockMe';
-  static const String replyMessage = 'replyMessage';
-}
-
-class MessageField {
-  static const String uploaded = 'uploaded';
-  static const String location = 'location';
-  static const String mediaURL = 'mediaURL';
-  static const String timestamp = 'timestamp';
-  static const String messageText = 'messageText';
-}
-
-class ReplyField {
-  static const String replyType = 'replyType';
-  static const String replyLocation = 'replyLocation';
-  static const String replyMediaUrl = 'replyMediaUrl';
-  static const String replyMediaList = 'replyMediaList';
-  static const String replyMediaType = 'replyMediaType';
-  static const String replySenderUid = 'replySenderUid';
-  static const String replyMessageUid = 'replyMessageUid';
-  static const String replyMessageText = 'replyMessageText';
-}
+/// This is the class that keep track of all the fields used in the app
 
 class MediaType {
   static const String url = 'URL';
@@ -40,16 +11,6 @@ class MediaType {
   static const String pixaBayImage = 'pixaBayImage';
 }
 
-class MsgRead {
-  static const String sended = 'sended';
-  static const String unread = 'unread';
-  static const String readed = 'readed';
-}
-
-class ChatRoomField {
-  static const String backgroungImage = 'backgroundImage';
-}
-
 class FireUserField {
   static const String id = 'id';
   static const String bio = 'bio';
@@ -59,7 +20,6 @@ class FireUserField {
   static const String hashTags = 'hashTags';
   static const String photoUrl = 'photoUrl';
   static const String displayName = 'displayName';
-  static const String position = 'position';
   static const String interests = 'interests';
   static const String userCreated = 'userCreated';
   static const String countryPhoneCode = 'countryPhoneCode';
@@ -103,4 +63,15 @@ class LetterFields {
   static const String displayName = 'displayName';
   static const String id = 'id';
   static const String timestamp = 'timestamp';
+}
+
+class AppSettingKeys {
+  static const String darkTheme = 'darkTheme';
+  static const String phoneContact = 'phoneContact';
+  static const String incognatedMode = 'incognatedMode';
+  static const String confettiAnimation = 'confettiAnimation';
+  static const String balloonsAnimation = 'balloonsAnimation';
+  static const String senderBubbleColor = 'senderBubbleColor';
+  static const String receiverBubbleColor = 'receiverBubbleColor';
+  static const String securityNotifications = 'securityNotifications';
 }

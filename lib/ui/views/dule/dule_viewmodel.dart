@@ -309,19 +309,6 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         .onValue;
   }
 
-  // int senderBubble() {
-  //   const hiveBox = HiveApi.appSettingsBoxName;
-  //   const key = AppSettingKeys.senderBubbleColor;
-  //   return Hive.box(hiveBox).get(key, defaultValue: MaterialColorsCode.blue300);
-  // }
-
-  // int receiverbubble() {
-  //   const box = HiveApi.appSettingsBoxName;
-  //   const key = AppSettingKeys.receiverBubbleColor;
-  //   const lightBlue200 = MaterialColorsCode.lightBlue200;
-  //   return Hive.box(box).get(key, defaultValue: lightBlue200);
-  // }
-
   void listenReceiverAnimation(
       DuleModel model,
       AnimationController balloonsController,

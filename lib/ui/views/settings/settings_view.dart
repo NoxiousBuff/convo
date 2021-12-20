@@ -21,7 +21,7 @@ class SettingsView extends StatelessWidget {
     return ViewModelBuilder<SettingsViewModel>.reactive(
       viewModelBuilder: () => SettingsViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(
           context,
           title: 'Settings',
@@ -36,25 +36,24 @@ class SettingsView extends StatelessWidget {
                 titleColor: AppColors.blue),
             cwEADetailsTile(context, 'Account',
                 subtitle: 'Personal Information,. Privacy', onTap: () {
-              navService.cupertinoPageRoute(context, const UserAccountView());
+              navService.materialPageRoute(context, const UserAccountView());
             }),
             cwEADetailsTile(context, 'Chats', subtitle: 'Chats Customization',
                 onTap: () {
-              navService.cupertinoPageRoute(
+              navService.materialPageRoute(
                   context, const ChatsCustomizationView());
             }),
             cwEADetailsTile(context, 'Notifications',
                 subtitle: 'Messages, Start Chat', onTap: () {
               // TODO: add notification page
-              // navService.cupertinoPageRoute(context, const ());
             }),
             cwEADetailsTile(context, 'Help',
                 subtitle: 'Help Center, Contact us, Privacy Policy', onTap: () {
-              navService.cupertinoPageRoute(context, const HelpView());
+              navService.materialPageRoute(context, const HelpView());
             }),
-            cwEADetailsTile(context, 'Invite', subtitle: 'Invites a Conatct',
+            cwEADetailsTile(context, 'Get Your Friends', subtitle: 'More the merrier , you know.',
                 onTap: () {
-              navService.cupertinoPageRoute(context, const InVitesView());
+              navService.materialPageRoute(context, const InvitesView());
             }),
           ],
         ),

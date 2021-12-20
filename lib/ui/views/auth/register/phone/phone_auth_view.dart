@@ -18,7 +18,7 @@ class PhoneAuthView extends StatelessWidget {
 
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
-      border: Border.all(color: LightAppColors.primary),
+      border: Border.all(color: AppColors.blue),
       borderRadius: BorderRadius.circular(15.0),
     );
   }
@@ -46,10 +46,10 @@ class PhoneAuthView extends StatelessWidget {
                         },
                         child: Text(
                           '+${model.countryCode}',
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black87,
+                            color: AppColors.black,
                           ),
                         ),
                       ),
@@ -77,15 +77,15 @@ class PhoneAuthView extends StatelessWidget {
                         ],
                         onChanged: (value) => model.phoneEmptyStateChanger(),
                         controller: model.phoneTech,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.phone,
                         autofocus: true,
                         autofillHints: const [AutofillHints.telephoneNumberNational],
-                        style: const TextStyle(
+                        style:  TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black87),
+                            color: AppColors.black),
                         showCursor: true,
-                        cursorColor: LightAppColors.primary,
+                        cursorColor: AppColors.blue,
                         cursorHeight: 32,
                         decoration: const InputDecoration(
                           hintText: 'xxxxx xxxxx',
@@ -185,7 +185,7 @@ class PhoneAuthView extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      color: LightAppColors.secondary,
+                      color: AppColors.mediumBlack,
                       decoration: TextDecoration.underline),
                 ),
               ),
@@ -240,7 +240,7 @@ class PhoneAuthView extends StatelessWidget {
           return false;
         },
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context, title: 'Phone Verification'),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

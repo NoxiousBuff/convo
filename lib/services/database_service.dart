@@ -1,11 +1,18 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/api/database.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 
 final databaseService = DatabaseService();
 
 class DatabaseService {
+
+  final log = getLogger('DatabaseService');
+
+  final databaseApi = locator<DatabaseApi>();
+
   Future<void> addUserData(String userUId) async {
     await databaseApi.addDataWithKey(userUId, {
       DatabaseMessageField.msgTxt: '',
@@ -19,14 +26,13 @@ class DatabaseService {
 
   Future<void> updateUserDataWithKey(String key, dynamic value) async {
     final String path = AuthService.liveUser!.uid;
-    await databaseApi.updateData('/$path', {key: value});
+    await databaseApi.updateDataWithKey('/$path', {key: value});
   }
 
- Future<void> updateFireUserDataWithKey(
+  Future<void> updateFireUserDataWithKey(
       String fireUserId, String key, dynamic value) async {
-    await databaseApi.updateData('/$fireUserId', {key: value});
+    await databaseApi.updateDataWithKey('/$fireUserId', {key: value});
   }
-
 
   Stream<DatabaseEvent> getUserData(String uid) {
     return databaseApi.getDataStream(uid);

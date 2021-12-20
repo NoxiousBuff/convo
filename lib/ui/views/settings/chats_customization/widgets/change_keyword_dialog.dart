@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/constants/app_keys.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
@@ -135,7 +135,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color: Colors.black54,
+              color:AppColors.mediumBlack,
             ),
           );
         }
@@ -147,7 +147,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color: Colors.black54,
+              color:AppColors.mediumBlack,
             ),
           );
         }
@@ -159,7 +159,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color: Colors.black54,
+              color:AppColors.mediumBlack,
             ),
           );
         }
@@ -172,6 +172,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
       valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
       builder: (context, appSettingsBox, child) {
         return Scaffold(
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: '', onPressed: () => Navigator.pop(context)),
           body: ListView(

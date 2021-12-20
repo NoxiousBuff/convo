@@ -1,9 +1,9 @@
 import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_keys.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -21,7 +21,7 @@ class PhoneContactView extends StatelessWidget {
       builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: true,
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Phone Contacts', onPressed: () => Navigator.pop(context)),
           body: Stack(
@@ -44,7 +44,7 @@ class PhoneContactView extends StatelessWidget {
                           'Find your contacts\non Dule',
                           mainAxisSize: MainAxisSize.min,
                           textAlign: TextAlign.center,
-                          color: Colors.black54,
+                          color:AppColors.mediumBlack,
                         ),
                         // Text(
                         //   'Find your phone contacts on Dule',
@@ -61,7 +61,7 @@ class PhoneContactView extends StatelessWidget {
                           child: const Text(
                             'Continously uploading your contacts helps Dule suggest connections help us for finding your good connection for you and, others and offer a better service.',
                             style: TextStyle(
-                              color: Colors.black54,
+                              color:AppColors.mediumBlack,
                               fontWeight: FontWeight.w600,
                             ),
                             textAlign: TextAlign.center,
@@ -107,7 +107,7 @@ class PhoneContactView extends StatelessWidget {
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
-                                          color: LightAppColors.secondary
+                                          color: AppColors.mediumBlack
                                               .withAlpha(125)),
                                     ),
                                     decoration: BoxDecoration(

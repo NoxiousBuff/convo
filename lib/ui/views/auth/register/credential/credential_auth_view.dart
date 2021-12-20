@@ -4,6 +4,7 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/auth/register/credential/widgets/terms_of_use.dart';
 import 'package:stacked/stacked.dart';
 import 'package:string_validator/string_validator.dart';
 
@@ -19,7 +20,7 @@ class CredentialAuthView extends StatelessWidget {
     return ViewModelBuilder<CredentialAuthViewModel>.reactive(
       viewModelBuilder: () => CredentialAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'SignUp'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -54,12 +55,12 @@ class CredentialAuthView extends StatelessWidget {
                       controller: model.emailTech,
                       autofocus: true,
                       autofillHints: const [AutofillHints.email],
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
@@ -90,16 +91,16 @@ class CredentialAuthView extends StatelessWidget {
                         model.areFieldNotEmpty();
                       },
                       controller: model.passwordTech,
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: LightAppColors.secondary,
+                            color: AppColors.mediumBlack,
                             icon: Icon(model.isPasswordShown
                                 ? FeatherIcons.eye
                                 : FeatherIcons.eyeOff),
@@ -131,6 +132,8 @@ class CredentialAuthView extends StatelessWidget {
                             title: 'Min 8 letters', value: model.hasMinLength),
                       ],
                     ),
+                    verticalSpaceLarge,
+                    const TermsOfUse(),
                     bottomPadding(context)
                   ],
                 ),

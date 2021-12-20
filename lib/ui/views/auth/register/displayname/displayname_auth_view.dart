@@ -23,7 +23,7 @@ class DisplayNameAuthView extends StatelessWidget {
     return ViewModelBuilder<DisplayNameAuthViewModel>.reactive(
       viewModelBuilder: () => DisplayNameAuthViewModel(countryCode, phoneNumber),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Choose a Display Name'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -62,12 +62,12 @@ class DisplayNameAuthView extends StatelessWidget {
                       textCapitalization: TextCapitalization.none,
                       autofocus: true,
                       autofillHints: const [AutofillHints.name],
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87),
+                          color: AppColors.black),
                       showCursor: true,
-                      cursorColor: LightAppColors.primary,
+                      cursorColor: AppColors.blue,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: 'Name',

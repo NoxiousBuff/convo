@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false}) {
   return Column(
+    mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       ListTile(
@@ -33,7 +35,7 @@ Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false
           child: const Text(
             '',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.black,
               fontSize: 22,
               fontWeight: FontWeight.w600,
             ),
@@ -81,7 +83,7 @@ Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false
                       child: Text(
                         e,
                         style: const TextStyle(
-                            color: Colors.transparent,
+                            color: AppColors.transparent,
                             fontWeight: FontWeight.w700),
                       ),
                     ),

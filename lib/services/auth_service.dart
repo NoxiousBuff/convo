@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
@@ -10,11 +10,17 @@ import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
 final authService = AuthService();
 
 class AuthService {
+  
+
+  final log = getLogger('AuthService');
+
+  final firestoreApi = locator<FirestoreApi>();
+
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
-  final log = getLogger('AuthService');
 
   static User? liveUser = FirebaseAuth.instance.currentUser;
 
@@ -71,8 +77,6 @@ class AuthService {
         FireUser? fireuser =
             await firestoreApi.getUserFromFirebase(value.user!.uid);
         if (fireuser != null) {
-          final fireUserGeoPoint =
-              fireuser.position![FireUserField.geopoint] as GeoPoint;
           await firestoreApi.saveUserDataInHive(
               FireUserField.bio, fireuser.bio);
           await firestoreApi.saveUserDataInHive(
@@ -88,13 +92,6 @@ class AuthService {
               FireUserField.interests, fireuser.interests);
           await firestoreApi.saveUserDataInHive(
               FireUserField.phone, fireuser.phone);
-          await firestoreApi.saveUserDataInHive(FireUserField.position, {
-            FireUserField.geohash: fireuser.position![FireUserField.geohash],
-            FireUserField.geopoint: [
-              fireUserGeoPoint.latitude,
-              fireUserGeoPoint.longitude
-            ]
-          });
           await firestoreApi.saveUserDataInHive(
             FireUserField.photoUrl,
             fireuser.photoUrl,
@@ -194,5 +191,22 @@ class AuthService {
       getLogger('Auth Service')
           .w('Error occurred in changing display name. Error : $err');
     });
+  }
+
+  Future<void> changeUserEmail(String value, {Function? onError}) async {
+    try {
+      getLogger('AuthService').i('Initiating Changing User Display Name');
+    await _auth.currentUser!.updateEmail(value).then((e) {
+      getLogger('Auth Service')
+          .i('User Display Name is successfully changed to : $value');
+    });
+    } on FirebaseAuthException catch (e) {
+       if (onError != null) onError();
+      getLogger('Auth Service')
+          .w('Error occurred in changing display name. Error : ${e.message}');
+    }
+
+     
+
   }
 }
