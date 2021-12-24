@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/contact_model.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/invites/widgets/contact_list_item.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -33,7 +33,7 @@ class InvitesView extends StatelessWidget {
                 .toLowerCase()
                 .compareTo(b.displayName.toLowerCase()));
             return Scaffold(
-              backgroundColor: AppColors.scaffoldColor,
+              backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
               appBar: cwAuthAppBar(context,
                   title: 'Invite Friend\'s',
                   onPressed: () => Navigator.pop(context)),
@@ -47,7 +47,7 @@ class InvitesView extends StatelessWidget {
                             children: [
                               const Text('🥳', style: TextStyle(fontSize: 80)),
                               verticalSpaceRegular,
-                              cwEAHeading('More the\nMerrier',
+                              const CWEAHeading('More the\nMerrier',
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   textAlign: TextAlign.center),
                               verticalSpaceRegular,

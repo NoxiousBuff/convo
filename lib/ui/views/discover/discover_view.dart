@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/loading_list_item.dart';
@@ -12,7 +12,6 @@ import 'package:hint/ui/views/discover_interest/discover_interest_view.dart';
 import 'package:hint/ui/views/saved_people/saved_people_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -23,15 +22,13 @@ class DiscoverView extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context, DiscoverViewModel model) {
     return AppBar(
-      systemOverlayStyle:
-          const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
       elevation: 0.0,
       toolbarHeight: 60,
       leadingWidth: 0,
       title:  Text(
         'Discover',
         style: TextStyle(
-            fontWeight: FontWeight.w700, color: AppColors.black, fontSize: 32),
+            fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.black, fontSize: 32),
       ),
       actions: [
         IconButton(
@@ -39,7 +36,7 @@ class DiscoverView extends StatelessWidget {
             model.peopleSuggestions();
           },
           icon: const Icon(FeatherIcons.refreshCcw),
-          color: AppColors.black,
+          color: Theme.of(context).colorScheme.black,
           iconSize: 24,
         ),
         IconButton(
@@ -47,7 +44,7 @@ class DiscoverView extends StatelessWidget {
             navService.cupertinoPageRoute(context, const SavedPeopleView());
           },
           icon: const Icon(FeatherIcons.pocket),
-          color: AppColors.black,
+          color: Theme.of(context).colorScheme.black,
           iconSize: 24,
         ),
         horizontalSpaceSmall
@@ -55,8 +52,8 @@ class DiscoverView extends StatelessWidget {
       backgroundColor:
           MaterialStateColor.resolveWith((Set<MaterialState> states) {
         return states.contains(MaterialState.scrolledUnder)
-            ? AppColors.grey
-            : AppColors.white;
+            ? Theme.of(context).colorScheme.lightGrey
+            : Theme.of(context).colorScheme.scaffoldColor;
       }),
     );
   }
@@ -72,6 +69,7 @@ class DiscoverView extends StatelessWidget {
                   itemCount: interestList.length,
                   itemBuilder: (context, i) {
                     return exploreInterestChip(
+                      context,
                       interestList[i],
                       onTap: () {
                         navService.materialPageRoute(
@@ -96,7 +94,7 @@ class DiscoverView extends StatelessWidget {
       viewModelBuilder: () => DiscoverViewModel(),
       builder: (context, model, child) => Scaffold(
         appBar: _buildAppBar(context, model),
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         body: CustomScrollView(
           scrollBehavior: const CupertinoScrollBehavior(),
           slivers: [
@@ -108,7 +106,7 @@ class DiscoverView extends StatelessWidget {
                   'Explore Interests',
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.black,
+                      color: Theme.of(context).colorScheme.black,
                       fontSize: 20),
                 ),
               ),
@@ -125,7 +123,7 @@ class DiscoverView extends StatelessWidget {
                   'Today\'s Top Picks',
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.black,
+                      color: Theme.of(context).colorScheme.black,
                       fontSize: 20),
                 ),
               ),
@@ -155,7 +153,7 @@ class DiscoverView extends StatelessWidget {
                           child: buildEmptyListUi(context,
                               title: 'More interest\n More friends',
                               buttonTitle: 'Add interests',
-                              color: AppColors.taintedBackground),
+                              color: Theme.of(context).colorScheme.yellowAccent.withAlpha(80),),
                         ),
                       );
               },

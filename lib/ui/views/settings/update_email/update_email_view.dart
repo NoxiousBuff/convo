@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
@@ -21,7 +21,7 @@ class UpdateEmailView extends StatelessWidget {
       viewModelBuilder: () => UpdateEmailViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Update Email', onPressed: () => Navigator.pop(context)),
           body: ValueListenableBuilder<Box>(
@@ -32,14 +32,15 @@ class UpdateEmailView extends StatelessWidget {
                 child: Form(
                   key: model.updateEmailFormKey,
                   child: ListView(
+                    physics: const BouncingScrollPhysics(),
                     children: [
                       cwEADetailsTile(context, 'Your Current Email'),
                       Text(
                         userDataHiveBox.get(FireUserField.email),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.mediumBlack,
                         ),
                       ),
                       verticalSpaceRegular,

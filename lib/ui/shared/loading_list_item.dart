@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false}) {
@@ -32,10 +32,10 @@ Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false
 
           height: 56.0,
           width: 56.0,
-          child: const Text(
+          child:  Text(
             '',
             style: TextStyle(
-              color: AppColors.black,
+              color: Theme.of(context).colorScheme.black,
               fontSize: 22,
               fontWeight: FontWeight.w600,
             ),
@@ -83,7 +83,7 @@ Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false
                       child: Text(
                         e,
                         style: const TextStyle(
-                            color: AppColors.transparent,
+                            color: Colors.transparent,
                             fontWeight: FontWeight.w700),
                       ),
                     ),

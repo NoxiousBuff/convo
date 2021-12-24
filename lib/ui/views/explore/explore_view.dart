@@ -2,11 +2,11 @@ import 'dart:math';
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:tenor/tenor.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/nav_service.dart';
@@ -155,7 +155,7 @@ class _ExploreViewState extends State<ExploreView>
     return SliverStaggeredGrid.countBuilder(
       itemCount: 25,
       crossAxisCount: 3,
-      itemBuilder: (_, i) => Container(color: AppColors.grey),
+      itemBuilder: (_, i) => Container(color: Theme.of(context).colorScheme.grey),
       staggeredTileBuilder: (int index) =>
           StaggeredTile.count(index % 8 == 0 ? 2 : 1, index % 8 == 0 ? 2 : 1),
       mainAxisSpacing: 4.0,
@@ -167,12 +167,12 @@ class _ExploreViewState extends State<ExploreView>
     return Container(
       alignment: Alignment.topCenter,
       margin: const EdgeInsets.all(16),
-      child: const SizedBox(
+      child: SizedBox(
         height: 40,
         width: 40,
         child: CircularProgressIndicator(
           strokeWidth: 1.0,
-          valueColor: AlwaysStoppedAnimation(AppColors.blue),
+          valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.blue),
         ),
       ),
     );
@@ -184,7 +184,7 @@ class _ExploreViewState extends State<ExploreView>
     return ViewModelBuilder<ExploreViewModel>.reactive(
       viewModelBuilder: () => ExploreViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         extendBodyBehindAppBar: true,
         body: OfflineBuilder(
             child: const Text(''),
@@ -197,7 +197,7 @@ class _ExploreViewState extends State<ExploreView>
                   SliverAppBar(
                     pinned: true,
                     elevation: 0.0,
-                    backgroundColor: AppColors.white,
+                    backgroundColor: Theme.of(context).colorScheme.white,
                     leadingWidth: 0,
                     title: InkWell(
                       onTap: () => navService.materialPageRoute(
@@ -205,18 +205,18 @@ class _ExploreViewState extends State<ExploreView>
                       child: Container(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                         width: screenWidth(context),
-                        child: const Text(
+                        child:  Text(
                           'Search for someone',
                           style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.lightGrey,
+                          color: Theme.of(context).colorScheme.lightGrey,
                           border: Border.all(
-                            color: AppColors.grey,
+                            color: Theme.of(context).colorScheme.grey,
                           ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -231,7 +231,7 @@ class _ExploreViewState extends State<ExploreView>
                           itemCount: imagesList.length,
                           itemBuilder: (BuildContext context, int i) {
                             return Container(
-                              color: AppColors.lightGrey,
+                              color: Theme.of(context).colorScheme.lightGrey,
                               child: ExtendedImage.network(
                                 imagesList[i],
                                 fit: BoxFit.cover,
@@ -257,7 +257,7 @@ class _ExploreViewState extends State<ExploreView>
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       width: 1,
-                                      color: AppColors.darkGrey,
+                                      color: Theme.of(context).colorScheme.darkGrey,
                                     ),
                                   ),
                                   child: const Center(
@@ -272,13 +272,13 @@ class _ExploreViewState extends State<ExploreView>
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             width: screenWidth(context),
-                            color: AppColors.black,
-                            child: const Center(
+                            color: Theme.of(context).colorScheme.black,
+                            child:   Center(
                               child: Text(
                                 'Not Connected',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.white),
+                                    color: Theme.of(context).colorScheme.white),
                               ),
                             ),
                           ),

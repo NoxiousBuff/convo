@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget cwEADescriptionTitle(BuildContext context, String title,
@@ -9,9 +9,9 @@ Widget cwEADescriptionTitle(BuildContext context, String title,
   return Text(
     title,
     textAlign: textAlign,
-    style: const TextStyle(
+    style:  TextStyle(
       fontSize: 14,
-      color: AppColors.mediumBlack,
+      color: Theme.of(context).colorScheme.mediumBlack,
       fontWeight: FontWeight.w600,
     ),
   );
@@ -35,9 +35,9 @@ Widget cwEATextField(
     autofocus: autoFocus,
     maxLengthEnforcement: MaxLengthEnforcement.enforced,
     style:  TextStyle(
-        fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.black),
+        fontSize: 28, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.black),
     showCursor: true,
-    cursorColor: AppColors.blue,
+    cursorColor: Theme.of(context).colorScheme.blue,
     cursorHeight: 32,
     onChanged: onChanged,
     decoration: InputDecoration(
@@ -79,16 +79,16 @@ Widget cwEADetailsTile(
                     title,
                     style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: titleColor ?? AppColors.black,
+                        color: titleColor ?? Theme.of(context).colorScheme.black,
                         fontSize: 20),
                   ),
                   subtitle != null ? verticalSpaceTiny : shrinkBox,
                   subtitle != null
                       ? Text(
                           subtitle,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                           ),
                         )
                       : shrinkBox,
@@ -97,22 +97,22 @@ Widget cwEADetailsTile(
             ),
             horizontalDefaultMessageSpace,
             isLoading
-                ? const Center(
+                ?  Center(
                     child: SizedBox(
                       height: 15,
                       width: 15,
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation(
-                          AppColors.mediumBlack,
+                          Theme.of(context).colorScheme.mediumBlack,
                         ),
                         strokeWidth: 1.5,
                       ),
                     ),
                   )
                 : showTrailingIcon
-                    ? const Icon(
+                    ?  Icon(
                         FeatherIcons.chevronRight,
-                        color: AppColors.mediumBlack,
+                        color: Theme.of(context).colorScheme.mediumBlack,
                         size: 28,
                       )
                     : const SizedBox.shrink(),
@@ -123,12 +123,44 @@ Widget cwEADetailsTile(
   );
 }
 
-Widget cwEAHeading(String title,
-    {MainAxisSize mainAxisSize = MainAxisSize.max,
-    TextAlign textAlign = TextAlign.start,
-    Color? color,
-    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start}) {
-  return Padding(
+// Widget cwEAHeading(String title,
+//     {MainAxisSize mainAxisSize = MainAxisSize.max,
+//     TextAlign textAlign = TextAlign.start,
+//     Color? color,
+//     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start}) {
+//   return Padding(
+//     padding: const EdgeInsets.symmetric(vertical: 12),
+//     child: Row(
+//       mainAxisSize: mainAxisSize,
+//       mainAxisAlignment: mainAxisAlignment,
+//       children: [
+//         Flexible(
+//           flex: 1,
+//           child: Text(
+//             title,
+//             textAlign: textAlign,
+//             textWidthBasis: TextWidthBasis.parent,
+//             style: TextStyle(
+//                 color: color ?? Theme.of(context).colorScheme.black, fontWeight: FontWeight.w700, fontSize: 32),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+class CWEAHeading extends StatelessWidget {
+  const CWEAHeading( this.title, { Key? key , this.mainAxisSize = MainAxisSize.max, this.color, this.textAlign = TextAlign.start, this.mainAxisAlignment = MainAxisAlignment.start }) : super(key: key);
+
+  final String title;
+  final MainAxisSize mainAxisSize;
+  final TextAlign textAlign;
+  final Color? color;
+  final MainAxisAlignment mainAxisAlignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
     padding: const EdgeInsets.symmetric(vertical: 12),
     child: Row(
       mainAxisSize: mainAxisSize,
@@ -141,10 +173,11 @@ Widget cwEAHeading(String title,
             textAlign: textAlign,
             textWidthBasis: TextWidthBasis.parent,
             style: TextStyle(
-                color: color ?? AppColors.black, fontWeight: FontWeight.w700, fontSize: 32),
+                color: color ?? Theme.of(context).colorScheme.black, fontWeight: FontWeight.w700, fontSize: 32),
           ),
         ),
       ],
     ),
   );
+  }
 }

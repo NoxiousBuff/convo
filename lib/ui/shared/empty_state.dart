@@ -9,7 +9,7 @@ Widget emptyState(BuildContext context, {String emoji = '😅', String heading =
     children: [
       Text(emoji, style: const TextStyle(fontSize: 80)),
       verticalSpaceRegular,
-      cwEAHeading(heading,
+      CWEAHeading(heading,
           mainAxisAlignment: MainAxisAlignment.center,
           textAlign: TextAlign.center),
       verticalSpaceRegular,

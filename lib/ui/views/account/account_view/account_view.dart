@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/account_view/widgets/account_appbar.dart';
@@ -33,7 +33,7 @@ class AccountView extends StatelessWidget {
             valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
             builder: (context, box, child) {
               return Scaffold(
-                backgroundColor: AppColors.scaffoldColor,
+                backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
                 appBar: cwAccountAppBar(
                   context,
                   box.get(FireUserField.username),
@@ -42,7 +42,7 @@ class AccountView extends StatelessWidget {
                       onPressed: () => navService.materialPageRoute(
                           context, const SettingsView()),
                       icon: const Icon(FeatherIcons.settings),
-                      color: AppColors.black,
+                      color: Theme.of(context).colorScheme.black,
                       iconSize: 24,
                     ),
                     horizontalSpaceSmall

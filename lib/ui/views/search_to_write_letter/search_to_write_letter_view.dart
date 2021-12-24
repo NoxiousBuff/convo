@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -71,7 +71,7 @@ class SearchToWriteLetterView extends StatelessWidget {
                             model.deleteFromRecentSearches(recentSearch);
                           },
                           icon: const Icon(FeatherIcons.x),
-                          color:AppColors.mediumBlack,
+                          color:Theme.of(context).colorScheme.mediumBlack,
                         ),
                         horizontalSpaceSmall,
                       ],
@@ -156,7 +156,7 @@ class SearchToWriteLetterView extends StatelessWidget {
     return ViewModelBuilder<SearchToWriteLetterViewModel>.reactive(
       viewModelBuilder: () => SearchToWriteLetterViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context,
             title: '', onPressed: () => Navigator.pop(context)),
         body: Column(

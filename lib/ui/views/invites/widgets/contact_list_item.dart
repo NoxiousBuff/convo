@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/contact_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
@@ -22,15 +20,15 @@ Widget contactListItem(
           alignment: Alignment.center,
           child: Text(
             contact.displayName[0],
-            style: const TextStyle(
+            style:  TextStyle(
                 fontWeight: FontWeight.w700,
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.black,
                 fontSize: 20),
           ),
           height: 56,
           width: 56,
           decoration: BoxDecoration(
-            color: AppColors.grey,
+            color: Theme.of(context).colorScheme.grey,
             borderRadius: BorderRadius.circular(20),
           ),
         ),
@@ -50,15 +48,15 @@ Widget contactListItem(
             width: 80,
             height: 40,
             decoration: BoxDecoration(
-              color: AppColors.blue,
+              color: Theme.of(context).colorScheme.blue,
               borderRadius: BorderRadius.circular(14.2),
             ),
-            child: const Center(
+            child:   Center(
               child: Text(
                 'Invite',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  color: AppColors.white,
+                  color: Theme.of(context).colorScheme.white,
                 ),
               ),
             ),

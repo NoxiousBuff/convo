@@ -1,4 +1,5 @@
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 
@@ -9,7 +10,6 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 class PrivacyView extends StatelessWidget {
@@ -74,7 +74,7 @@ class PrivacyView extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: AppColors.blue,
+              activeColor: Theme.of(context).colorScheme.blue,
               groupValue: model.lastSeenValue,
               title: Text(
                 model.dialogptions[index],
@@ -107,7 +107,7 @@ class PrivacyView extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: AppColors.blue,
+              activeColor: Theme.of(context).colorScheme.blue,
               groupValue: model.profileValue,
               title: Text(
                 model.dialogptions[index],
@@ -139,7 +139,7 @@ class PrivacyView extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: RadioListTile(
               value: index,
-              activeColor: AppColors.blue,
+              activeColor: Theme.of(context).colorScheme.blue,
               groupValue: model.aboutValue,
               title: Text(
                 model.dialogptions[index],
@@ -163,17 +163,17 @@ class PrivacyView extends StatelessWidget {
       viewModelBuilder: () => PrivacyViewModel(),
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Privacy', onPressed: () => Navigator.pop(context)),
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
               Container(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.white,
                 child: Column(
                   children: [
-                    cwEAHeading('Who can see \nmy personal info'),
+                    const CWEAHeading('Who can see \nmy personal info'),
                     cwEADescriptionTitle(context,
                         'If you don\'t share your username & online status, you won\'t be able to see others people details.'),
                     verticalSpaceRegular,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
@@ -19,7 +19,7 @@ class SavedPeopleView extends StatelessWidget {
     return ViewModelBuilder<SavedPeopleViewModel>.reactive(
       viewModelBuilder: () => SavedPeopleViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Saved People', onPressed: () {
           Navigator.pop(context);
         }),

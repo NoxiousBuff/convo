@@ -1,10 +1,10 @@
 import 'package:hint/api/hive.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -22,10 +22,10 @@ class SearchView extends StatelessWidget {
   AppBar buildSearchHeader(BuildContext context, SearchViewModel model) {
     return AppBar(
       elevation: 0.0,
-      backgroundColor: AppColors.transparent,
+      backgroundColor: Colors.transparent,
       leading: IconButton(
         icon: const Icon(FeatherIcons.arrowLeft),
-        color:AppColors.black,
+        color:Theme.of(context).colorScheme.black,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -40,23 +40,23 @@ class SearchView extends StatelessWidget {
             autofocus: true,
             textInputAction: TextInputAction.search,
             controller: model.searchTech,
-            padding: const EdgeInsets.all(8.0),
+            padding:  const EdgeInsets.all(8.0),
             placeholder: 'Search for someone',
-            placeholderStyle: const TextStyle(
+            placeholderStyle:  TextStyle(
                 fontSize: 16,
-                color: AppColors.mediumBlack,
+                color: Theme.of(context).colorScheme.mediumBlack,
                 fontWeight: FontWeight.w400,),
             suffix: model.searchTech.text.isEmpty
                 ? const SizedBox.shrink()
                 : IconButton(
                     onPressed: () => model.searchTech.clear(),
-                    icon: const Icon(
+                    icon:  Icon(
                       FeatherIcons.x,
-                      color: AppColors.mediumBlack,
+                      color: Theme.of(context).colorScheme.mediumBlack,
                     )),
             decoration: BoxDecoration(
-                          color: AppColors.lightGrey,
-                          border: Border.all(color: AppColors.grey),
+                          color: Theme.of(context).colorScheme.lightGrey,
+                          border: Border.all(color: Theme.of(context).colorScheme.grey),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
             onChanged: (value) {
@@ -115,7 +115,7 @@ class SearchView extends StatelessWidget {
                       model.deleteFromRecentSearches(recentSearch);
                     },
                     icon: const Icon(FeatherIcons.x),
-                    color:AppColors.mediumBlack,
+                    color:Theme.of(context).colorScheme.mediumBlack,
                   ),
                   horizontalSpaceSmall,
                 ],
@@ -135,7 +135,7 @@ class SearchView extends StatelessWidget {
         model.searchTech.dispose();
       },
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: buildSearchHeader(context, model),
         body: FutureBuilder<QuerySnapshot>(
           future: model.usernameSearchFuture,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -27,7 +27,7 @@ class _AccountState extends State<UserAccountView> {
       viewModelBuilder: () => UserAccountViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar:
               cwAuthAppBar(context, title: 'Account Details', onPressed: () {
             Navigator.pop(context);
@@ -43,7 +43,7 @@ class _AccountState extends State<UserAccountView> {
                     child: Text(
                       'This is your personal information you can change here your personal details and these details are not seen in your public profile.',
                       style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -51,7 +51,6 @@ class _AccountState extends State<UserAccountView> {
                   const Divider(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    color: AppColors.white,
                     child: Column(
                       children: [
                         verticalSpaceRegular,

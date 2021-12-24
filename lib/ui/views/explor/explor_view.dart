@@ -1,7 +1,7 @@
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
@@ -24,9 +24,10 @@ class ExplorView extends StatelessWidget {
       },
       viewModelBuilder: () => ExplorViewModel(),
       builder: (context, model, child) => Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: AppBar(
           elevation: 0.0,
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           leadingWidth: 0,
           title: InkWell(
             onTap: () =>
@@ -34,18 +35,18 @@ class ExplorView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               width: screenWidth(context),
-              child: const Text(
+              child:  Text(
                 'Search for someone',
                 style: TextStyle(
                   fontSize: 16,
-                  color: AppColors.mediumBlack,
+                  color: Theme.of(context).colorScheme.mediumBlack,
                   fontWeight: FontWeight.w400,
                 ),
               ),
               decoration: BoxDecoration(
-                color: AppColors.lightGrey,
+                color: Theme.of(context).colorScheme.lightGrey,
                 border: Border.all(
-                  color: AppColors.grey,
+                  color: Theme.of(context).colorScheme.grey,
                 ),
                 borderRadius: BorderRadius.circular(12.0),
               ),
@@ -57,7 +58,7 @@ class ExplorView extends StatelessWidget {
                 model.fetchImages();
               },
               icon: const Icon(FeatherIcons.activity),
-              color: AppColors.black,
+              color: Theme.of(context).colorScheme.black,
             )
           ],
         ),

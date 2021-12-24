@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_displayname/change_displayname_view.dart';
@@ -12,11 +13,9 @@ import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
@@ -43,7 +42,7 @@ class EditAccountView extends StatelessWidget {
             final dob = box.get(FireUserField.dob);
             final isDobNull = dob == null;
             return Scaffold(
-              backgroundColor: AppColors.scaffoldColor,
+              backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
               appBar: cwAuthAppBar(context,
                   title: 'Edit Profile',
                   onPressed: () => Navigator.pop(context)),
@@ -55,49 +54,45 @@ class EditAccountView extends StatelessWidget {
                   InkWell(
                     borderRadius: BorderRadius.circular(32),
                     onTap: () {
-                      showCupertinoModalBottomSheet(
-                        topRadius: const Radius.circular(32),
+                      showModalBottomSheet(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                         context: context,
                         builder: (context) {
-                          return Material(
-                            borderRadius: BorderRadius.circular(32),
-                            color: AppColors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      cwEADescriptionTitle(
-                                          context, 'Change Your Photo'),
-                                    ],
-                                  ),
-                                  cwEADetailsTile(context, 'New Profile Photo',
-                                      onTap: () {
-                                    model.pickImage().then((value) async {
-                                      Navigator.pop(context);
-                                      final file = value;
-                                      if (file != null) {
-                                        final String? downloadUrl = await model
-                                            .uploadFile(file.path, context);
-                                        model.updateUserProperty(
-                                            context,
-                                            FireUserField.photoUrl,
-                                            downloadUrl);
-                                        model.setBusy(false);
-                                      }
-                                    });
-                                  }),
-                                  cwEADetailsTile(context, 'Cancel',
-                                      titleColor: Colors.red, onTap: () {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    cwEADescriptionTitle(
+                                        context, 'Change Your Photo'),
+                                  ],
+                                ),
+                                cwEADetailsTile(context, 'New Profile Photo',
+                                    onTap: () {
+                                  model.pickImage().then((value) async {
                                     Navigator.pop(context);
-                                  }),
-                                  bottomPadding(context)
-                                ],
-                              ),
+                                    final file = value;
+                                    if (file != null) {
+                                      final String? downloadUrl = await model
+                                          .uploadFile(file.path, context);
+                                      model.updateUserProperty(
+                                          context,
+                                          FireUserField.photoUrl,
+                                          downloadUrl);
+                                      model.setBusy(false);
+                                    }
+                                  });
+                                }),
+                                cwEADetailsTile(context, 'Cancel',
+                                    titleColor: Colors.red, onTap: () {
+                                  Navigator.pop(context);
+                                }),
+                                bottomPadding(context)
+                              ],
                             ),
                           );
                         },
@@ -127,10 +122,10 @@ class EditAccountView extends StatelessWidget {
                         verticalSpaceSmall,
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Text(
                               'Change profile photo',
-                              style: TextStyle(color: AppColors.blue),
+                              style: TextStyle(color: Theme.of(context).colorScheme.blue),
                             ),
                           ],
                         ),

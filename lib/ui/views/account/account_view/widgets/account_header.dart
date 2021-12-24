@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName, String relationShipStatus, List<dynamic> hashtags) {
@@ -33,8 +33,8 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
                     children: [
                       Text(
                         displayName,
-                        style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.black),
                       ),
                       horizontalSpaceTiny,
                       Container(
@@ -42,11 +42,11 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
                             horizontal: 8, vertical: 4.0),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.darkGrey)),
+                            border: Border.all(color: Theme.of(context).colorScheme.lightBlack)),
                         child: Text(
                           relationShipStatus,
                           style:  TextStyle(
-                              color: AppColors.black, fontWeight: FontWeight.w600),
+                              color: Theme.of(context).colorScheme.black, fontWeight: FontWeight.w600),
                         ),
                       )
                     ],
@@ -59,10 +59,10 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
                     hashtags.length,
                     (index) => Text(
                       hashtags[index],
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: AppColors.mediumBlack,
+                        color: Theme.of(context).colorScheme.mediumBlack,
                       ),
                     ),
                   ),

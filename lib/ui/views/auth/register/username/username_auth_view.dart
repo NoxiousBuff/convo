@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/enums.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_chips.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
@@ -33,7 +33,7 @@ class UserNameAuthView extends StatelessWidget {
     return ViewModelBuilder<UserNameAuthViewModel>.reactive(
       viewModelBuilder: () => UserNameAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Find a username'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,9 +83,9 @@ class UserNameAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.white,
+                      cursorColor: Theme.of(context).colorScheme.white,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: '@username',
@@ -103,23 +103,23 @@ class UserNameAuthView extends StatelessWidget {
                         switch (model.doesExists) {
                           case UserNameExists.tooShort:
                             child = model.userNameTech.text.length < 4
-                                ? customChips.errorChip('Username too short.')
+                                ? customChips.errorChip(context, 'Username too short.')
                                 : const Text('');
                             break;
                           case UserNameExists.yes:
                             child = model.userNameTech.text.length > 3
-                                ? customChips.successChip('Username exists')
+                                ? customChips.successChip(context, 'Username exists')
                                 : const Text('');
                             break;
                           case UserNameExists.no:
                             child = model.userNameTech.text.length > 3
                                 ? customChips
-                                    .errorChip('Username does not exists')
+                                    .errorChip(context, 'Username does not exists')
                                 : const Text('');
                             break;
                           case UserNameExists.checking:
                             child = model.userNameTech.text.length > 3
-                                ? customChips.progressChip()
+                                ? customChips.progressChip(context)
                                 : const Text('');
                             break;
                           default:

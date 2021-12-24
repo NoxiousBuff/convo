@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -132,10 +132,10 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.confettiAnimation,
                 defaultValue: 'Congo'),
-            style: const TextStyle(
+            style:  TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:AppColors.mediumBlack,
+              color:Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -144,10 +144,10 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.balloonsAnimation,
                 defaultValue: 'Balloons'),
-            style: const TextStyle(
+            style:  TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:AppColors.mediumBlack,
+              color:Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -156,10 +156,10 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.confettiAnimation,
                 defaultValue: 'Congo'),
-            style: const TextStyle(
+            style:  TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:AppColors.mediumBlack,
+              color:Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -172,7 +172,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
       valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
       builder: (context, appSettingsBox, child) {
         return Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: '', onPressed: () => Navigator.pop(context)),
           body: ListView(

@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'dart:async';
+import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/dule/widget/animation_widgets.dart';
 import 'package:hint/ui/views/dule/widget/receiver_widgets.dart';
@@ -10,7 +12,6 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -108,7 +109,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       elevation: 0,
       leadingWidth: 100,
       centerTitle: true,
-      backgroundColor: AppColors.transparent,
+      backgroundColor: Colors.transparent,
       automaticallyImplyLeading: false,
       systemOverlayStyle: systemUIOverlay,
       leading: Row(
@@ -118,7 +119,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           IconButton(
             padding: const EdgeInsets.all(8),
             icon: const Icon(FeatherIcons.arrowLeft),
-            color: AppColors.black,
+            color: Theme.of(context).colorScheme.black,
             onPressed: () => Navigator.pop(context),
           ),
           horizontalDefaultMessageSpace,
@@ -134,14 +135,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             style: Theme.of(context)
                 .textTheme
                 .bodyText1!
-                .copyWith(fontSize: 18, color: AppColors.black),
+                .copyWith(fontSize: 18, color: Theme.of(context).colorScheme.black),
           ),
           data != null
               ? DuleModel.fromJson(data.snapshot.value).online
-                  ? const Text(
+                  ?  Text(
                       'Online',
                       style:
-                          TextStyle(color: AppColors.mediumBlack, fontSize: 12),
+                          TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontSize: 12),
                     )
                   : shrinkBox
               : shrinkBox,
@@ -161,13 +162,13 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             icon: const Icon(FeatherIcons.edit3),
             color: model.duleFocusNode.hasFocus
                 ? Color(senderBubbleCode)
-                : AppColors.darkGrey,
+                : Colors.grey.shade500,
             iconSize: 32,
           ),
           IconButton(
             onPressed: () => showModalBottomSheet(
               elevation: 0,
-              backgroundColor: AppColors.transparent,
+              backgroundColor: Colors.transparent,
               context: context,
               builder: (context) {
                 return SizedBox(
@@ -208,31 +209,31 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               },
             ),
             icon: const Icon(FeatherIcons.loader),
-            color: AppColors.darkGrey,
+            color: Theme.of(context).colorScheme.darkGrey,
             iconSize: 32,
           ),
           IconButton(
             onPressed: () => model.pickImage(context),
             icon: const Icon(FeatherIcons.camera),
-            color: AppColors.darkGrey,
+            color: Theme.of(context).colorScheme.darkGrey,
             iconSize: 32,
           ),
           !model.isBusy
               ? IconButton(
                   onPressed: () => model.pickGallery(context),
                   icon: const Icon(FeatherIcons.image),
-                  color: AppColors.darkGrey,
+                  color: Theme.of(context).colorScheme.darkGrey,
                   iconSize: 32,
                 )
-              : const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: SizedBox(
                     height: 16,
                     width: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation(
-                        AppColors.blue,
+                        Theme.of(context).colorScheme.blue,
                       ),
                     ),
                   ),
@@ -241,14 +242,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             onPressed: () => navService.materialPageRoute(
                 context, WriteLetterView(fireUser: widget.fireUser)),
             icon: const Icon(FeatherIcons.send),
-            color: AppColors.darkGrey,
+            color: Theme.of(context).colorScheme.darkGrey,
             iconSize: 32,
           ),
           const Spacer(),
           Text(
             model.wordLengthLeft,
             style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                  color: AppColors.darkGrey,
+                  color: Theme.of(context).colorScheme.darkGrey,
                 ),
           ),
           IconButton(
@@ -256,7 +257,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               model.clearMessage();
             },
             icon: const Icon((FeatherIcons.refreshCcw)),
-            color: model.isDuleEmpty ? AppColors.darkGrey : AppColors.red,
+            color: model.isDuleEmpty ? Theme.of(context).colorScheme.darkGrey : Theme.of(context).colorScheme.red,
             iconSize: 32,
           ),
           horizontalSpaceTiny,
@@ -282,7 +283,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         }
 
         return Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           extendBodyBehindAppBar: true,
           appBar: _buildAppBar(context, data),
           body: Stack(

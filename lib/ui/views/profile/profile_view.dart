@@ -1,5 +1,5 @@
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/nav_service.dart';
@@ -34,7 +34,7 @@ class ProfileView extends StatelessWidget {
         valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
         builder: (context, model, child) {
           return Scaffold(
-            backgroundColor: AppColors.scaffoldColor,
+            backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
             appBar: cwAccountAppBar(
               context,
               fireUser.username,
@@ -42,7 +42,7 @@ class ProfileView extends StatelessWidget {
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(FeatherIcons.moreVertical),
-                  color:AppColors.black,
+                  color:Theme.of(context).colorScheme.black,
                   iconSize: 24,
                 ),
                 horizontalSpaceSmall

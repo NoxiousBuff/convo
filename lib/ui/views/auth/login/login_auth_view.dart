@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -21,7 +21,7 @@ class LoginAuthView extends StatelessWidget {
     return ViewModelBuilder<LoginAuthViewModel>.reactive(
       viewModelBuilder: () => LoginAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Login'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -60,9 +60,9 @@ class LoginAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.blue,
+                      cursorColor: Theme.of(context).colorScheme.blue,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',
@@ -92,13 +92,13 @@ class LoginAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.blue,
+                      cursorColor: Theme.of(context).colorScheme.blue,
                       cursorHeight: 32,
                       decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                             icon: Icon(model.isPasswordShown
                                 ? FeatherIcons.eye
                                 : FeatherIcons.eyeOff),
@@ -118,12 +118,12 @@ class LoginAuthView extends StatelessWidget {
                       onTap: () {
                         navService.cupertinoPageRoute(context, const ForgotPasswordAuthView());
                       },
-                      child: const Text(
+                      child:  Text(
                         'Forgot Password',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                             decoration: TextDecoration.underline),
                       ),
                     ),

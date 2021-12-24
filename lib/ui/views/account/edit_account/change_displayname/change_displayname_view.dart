@@ -1,7 +1,7 @@
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -43,7 +43,7 @@ class ChangeDisplayNameView extends StatelessWidget {
             }
           },
         child: Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           extendBodyBehindAppBar: true,
           appBar: cwAuthAppBar(
             context,
@@ -59,10 +59,10 @@ class ChangeDisplayNameView extends StatelessWidget {
                   children: [
                     cwEADetailsTile(context, 'Your Current Display Name'),
                     Text(box.get(FireUserField.displayName),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
-                                color: AppColors.mediumBlack,
+                                color: Theme.of(context).colorScheme.mediumBlack,
                               ),
                     ),
                     verticalSpaceRegular,

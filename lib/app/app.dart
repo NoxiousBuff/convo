@@ -3,6 +3,7 @@ import 'package:hint/app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/ui/views/home/home_view.dart';
@@ -10,7 +11,9 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
 
-bool isDarkTheme = false;
+bool isDarkTheme = hiveApi.getFromHive(
+            HiveApi.appSettingsBoxName, AppSettingKeys.darkTheme,
+            defaultValue: false) as bool;
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -46,8 +49,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-
-
   Future<void> goOffline() async {
     try {
       await FirebaseDatabase.instance
@@ -63,7 +64,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> goOnline() async {
     try {
-      await FirebaseDatabase.instance.goOnline()  .whenComplete(() => log.wtf('Database Go Online'));
+      await FirebaseDatabase.instance
+          .goOnline()
+          .whenComplete(() => log.wtf('Database Go Online'));
       DatabaseReference ref = _databaseReference();
       ref.set(true);
     } catch (e) {
@@ -83,29 +86,37 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     systemUiModeChanger();
-
-    return MaterialApp(
-      restorationScopeId: 'Dule',
-      debugShowCheckedModeBanner: false,
-      title: 'Dule',
-      home: OfflineBuilder(
-        child: const Text(''),
-        connectivityBuilder: (context, connection, child) {
-          bool connected = connection != ConnectivityResult.none;
-          if (connected) {
-            log.v('User Is Online');
-            return FirebaseAuth.instance.currentUser != null
-                ? const HomeView()
-                : const WelcomeView();
-          } else {
-            log.v('User Is Offline');
-            return FirebaseAuth.instance.currentUser != null
-                ? const HomeView()
-                : const WelcomeView();
-          }
-        },
-      ),
-      routes: appRoutes,
+    return ValueListenableBuilder(
+      valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
+      builder: (context,appSettings, child) {
+        
+        return MaterialApp(
+          restorationScopeId: 'Dule',
+          debugShowCheckedModeBanner: false,
+          title: 'Dule',
+          themeMode: ThemeMode.system,
+          theme: ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white),
+          darkTheme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xff121212)),
+          home: OfflineBuilder(
+            child: const Text(''),
+            connectivityBuilder: (context, connection, child) {
+              bool connected = connection != ConnectivityResult.none;
+              if (connected) {
+                log.v('User Is Online');
+                return FirebaseAuth.instance.currentUser != null
+                    ? const HomeView()
+                    : const WelcomeView();
+              } else {
+                log.v('User Is Offline');
+                return FirebaseAuth.instance.currentUser != null
+                    ? const HomeView()
+                    : const WelcomeView();
+              }
+            },
+          ),
+          routes: appRoutes,
+        );
+      },
     );
   }
 }

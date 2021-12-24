@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -65,13 +65,13 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
                 width: 40,
                 padding: const EdgeInsets.only(left:4),
                 decoration: BoxDecoration(
-                    color:AppColors.black.withOpacity(0.8),
+                    color:Theme.of(context).colorScheme.black.withOpacity(0.8),
                     shape: BoxShape.circle),
                 alignment: Alignment.center,
-                child: const Icon(
+                child:   Icon(
                   FeatherIcons.play,
                   size: 16,
-                  color: AppColors.white,
+                  color: Theme.of(context).colorScheme.white,
                 ),
               ),
             ],

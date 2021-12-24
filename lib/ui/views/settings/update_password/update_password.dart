@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
-import 'package:hint/ui/shared/custom_snackbars.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:stacked/stacked.dart';
-import 'package:string_validator/string_validator.dart';
-
 import 'update_password_viewmodel.dart';
 
 class UpdatePasswordView extends StatelessWidget {
@@ -18,7 +15,7 @@ class UpdatePasswordView extends StatelessWidget {
       viewModelBuilder: () => UpdatePasswordViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Update Password',
               onPressed: () => Navigator.pop(context)),
@@ -27,6 +24,7 @@ class UpdatePasswordView extends StatelessWidget {
             child: Form(
               key: model.resetPasswordFormKey,
               child: ListView(
+                physics: const BouncingScrollPhysics(),
                 children: [
                   verticalSpaceLarge,
                   cwEADetailsTile(context, 'Want to update password ??',

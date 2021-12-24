@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 
 final CustomChips customChips = CustomChips();
 
 class CustomChips {
-  errorChip(String title) {
+  errorChip(BuildContext context, String title) {
     return Chip(
       label: Text(title),
-      labelStyle: const TextStyle(
-          color: AppColors.red, fontSize: 18, fontWeight: FontWeight.w700),
-      backgroundColor: AppColors.redAccent.withAlpha(100),
+      labelStyle:  TextStyle(
+          color: Theme.of(context).colorScheme.red, fontSize: 18, fontWeight: FontWeight.w700),
+      backgroundColor: Theme.of(context).colorScheme.redAccent.withAlpha(100),
     );
   }
 
-  successChip(String title) {
+  successChip(BuildContext context, String title) {
     return Chip(
       label: Text(title),
-      labelStyle: const TextStyle(
-          color: AppColors.blue, fontSize: 18, fontWeight: FontWeight.w700),
-      backgroundColor: AppColors.blueAccent.withAlpha(100),
+      labelStyle: TextStyle(
+          color: Theme.of(context).colorScheme.blue, fontSize: 18, fontWeight: FontWeight.w700),
+      backgroundColor: Theme.of(context).colorScheme.blueAccent.withAlpha(100),
     );
   }
 
-  progressChip({int? size, EdgeInsets? padding}) {
+  progressChip(BuildContext context, {int? size, EdgeInsets? padding}) {
     return Chip(
-      backgroundColor: AppColors.blueAccent.withAlpha(100),
+      backgroundColor: Theme.of(context).colorScheme.blueAccent.withAlpha(100),
       padding: const EdgeInsets.symmetric(vertical: 8),
-      label: const SizedBox(
+      label: SizedBox(
         height: 18,
         width: 18,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.blue),
+          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.blue),
         ),
       ),
     );

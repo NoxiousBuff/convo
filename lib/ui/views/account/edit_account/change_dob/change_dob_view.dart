@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
@@ -46,7 +46,7 @@ class ChangeDobView extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(
             context,
             title: '',
@@ -67,10 +67,10 @@ class ChangeDobView extends StatelessWidget {
                     model.isDobNull
                         ? 'Please add your date of birth carefully. \nIt cannot be changed later.'
                         : model.formattedBirthDate,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
-                      color: AppColors.mediumBlack,
+                      color: Theme.of(context).colorScheme.mediumBlack,
                     ),
                   ),
                   verticalSpaceRegular,

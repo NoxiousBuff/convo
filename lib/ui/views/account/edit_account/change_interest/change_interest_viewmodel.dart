@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/constants/interest.dart';
@@ -64,32 +63,32 @@ class ChangeInterestViewModel extends BaseViewModel {
     userInterest.travel
   ];
 
-  final List<Color> _colorListForInterest = [
-    AppColors.yellow,
-    AppColors.green,
-    AppColors.blue,
-    AppColors.purple,
-    AppColors.red,
-    AppColors.yellow,
-    AppColors.green,
-    AppColors.blue,
-    AppColors.purple,
-    AppColors.red,
-    AppColors.yellow,
-    AppColors.green,
-    AppColors.blue,
-    AppColors.purple,
-    AppColors.red,
-    AppColors.yellow,
-    AppColors.green,
-    AppColors.blue,
-    AppColors.purple,
-    AppColors.red,
-  ];
+  // final List<Color> _colorListForInterest = [
+  //   Theme.of(context).colorScheme.yellow,
+  //   Theme.of(context).colorScheme.green,
+  //   Theme.of(context).colorScheme.blue,
+  //   Theme.of(context).colorScheme.purple,
+  //   Theme.of(context).colorScheme.red,
+  //   Theme.of(context).colorScheme.yellow,
+  //   Theme.of(context).colorScheme.green,
+  //   Theme.of(context).colorScheme.blue,
+  //   Theme.of(context).colorScheme.purple,
+  //   Theme.of(context).colorScheme.red,
+  //   Theme.of(context).colorScheme.yellow,
+  //   Theme.of(context).colorScheme.green,
+  //   Theme.of(context).colorScheme.blue,
+  //   Theme.of(context).colorScheme.purple,
+  //   Theme.of(context).colorScheme.red,
+  //   Theme.of(context).colorScheme.yellow,
+  //   Theme.of(context).colorScheme.green,
+  //   Theme.of(context).colorScheme.blue,
+  //   Theme.of(context).colorScheme.purple,
+  //   Theme.of(context).colorScheme.red,
+  // ];
 
   List<List<String>> get allInterestList => _allInterestLists;
 
-  List<Color> get colorListForInterest => _colorListForInterest;
+  // List<Color> get colorListForInterest => _colorListForInterest;
 
   List<String> get interestNames => _interestNames;
 

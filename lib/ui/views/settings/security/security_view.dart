@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -14,13 +14,14 @@ class SecurityView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldColor,
+      backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
       appBar: cwAuthAppBar(
         context,
         title: 'Security',
         onPressed: () => Navigator.pop(context),
       ),
       body: ListView(
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
           verticalSpaceRegular,
@@ -28,15 +29,15 @@ class SecurityView extends StatelessWidget {
             alignment: Alignment.center,
             child: CircleAvatar(
               maxRadius: 70,
-              backgroundColor: AppColors.blueAccent,
+              backgroundColor: Theme.of(context).colorScheme.blueAccent,
               child: Center(
                 child: Stack(
                   alignment: Alignment.center,
-                  children: const [
+                  children:   [
                     Icon(CupertinoIcons.shield_fill,
-                        color: AppColors.blue, size: 90),
+                        color: Theme.of(context).colorScheme.blue, size: 90),
                     Icon(CupertinoIcons.lock_fill,
-                        color: AppColors.white, size: 40)
+                        color: Theme.of(context).colorScheme.white, size: 40)
                   ],
                 ),
               ),
@@ -45,12 +46,12 @@ class SecurityView extends StatelessWidget {
           verticalSpaceMedium,
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 30),
-            child: const Text(
+            child:  Text(
               'Messages in end-to-end encrypted chats stay between you and the people you choose. Not even Dule can read them.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color:AppColors.mediumBlack,
+                color:Theme.of(context).colorScheme.mediumBlack,
               ),
             ),
           ),

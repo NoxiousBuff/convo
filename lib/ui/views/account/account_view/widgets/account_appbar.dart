@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 
 AppBar cwAccountAppBar(BuildContext context, String title,
     {List<Widget>? actions, bool showLeadingIcon = true}) {
@@ -19,7 +19,7 @@ AppBar cwAccountAppBar(BuildContext context, String title,
             overflow: TextOverflow.ellipsis,
             style:  TextStyle(
               fontSize: 32,
-              color: AppColors.black,
+              color: Theme.of(context).colorScheme.black,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -29,13 +29,13 @@ AppBar cwAccountAppBar(BuildContext context, String title,
     backgroundColor:
         MaterialStateColor.resolveWith((Set<MaterialState> states) {
       return states.contains(MaterialState.scrolledUnder)
-          ? AppColors.lightGrey
-          : AppColors.white;
+          ? Theme.of(context).colorScheme.lightGrey
+          : Theme.of(context).colorScheme.scaffoldColor;
     }),
     leadingWidth: showLeadingIcon ? 56.0 : 0.0,
     leading: showLeadingIcon
         ? IconButton(
-            color: AppColors.mediumBlack,
+            color: Theme.of(context).colorScheme.mediumBlack,
             icon: const Icon(FeatherIcons.arrowLeft),
             onPressed: () => Navigator.pop(context),
           )

@@ -7,6 +7,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -91,13 +92,13 @@ Widget senderMessageContent(
             cursorHeight: 28,
             controller: model.duleTech,
             textAlign: TextAlign.center,
-            cursorColor: AppColors.white,
+            cursorColor: Theme.of(context).colorScheme.white,
             cursorRadius: const Radius.circular(100),
-            style: const TextStyle(color: AppColors.white, fontSize: 24),
+            style:  TextStyle(color: Theme.of(context).colorScheme.white, fontSize: 24),
             decoration: InputDecoration(
                 hintText: 'Type your message',
                 hintStyle:
-                    TextStyle(color: AppColors.white.withAlpha(200), fontSize: 24),
+                    TextStyle(color: Theme.of(context).colorScheme.white.withAlpha(200), fontSize: 24),
                 border: const OutlineInputBorder(borderSide: BorderSide.none)),
           );
         });
@@ -151,10 +152,10 @@ Widget senderMessageBubble(
                     fireUser: fireUser,
                   ),
                 ),
-                icon: const Icon(FeatherIcons.send, color: AppColors.mediumBlack),
-                label: const Text(
+                icon:  Icon(FeatherIcons.send, color: Theme.of(context).colorScheme.mediumBlack),
+                label:  Text(
                   'Send a letter',
-                  style: TextStyle(color: AppColors.mediumBlack, fontSize: 24, decoration: TextDecoration.underline),
+                  style: TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontSize: 24, decoration: TextDecoration.underline),
                 ),
               )
             : TextButton.icon(
@@ -167,10 +168,10 @@ Widget senderMessageBubble(
                     fireUser: fireUser,
                   ),
                 ),
-                icon: const Icon(FeatherIcons.send, color:AppColors.mediumBlack),
-                label: const Text(
+                icon:  Icon(FeatherIcons.send, color:Theme.of(context).colorScheme.mediumBlack),
+                label:  Text(
                   'Send a letter',
-                  style: TextStyle(color:AppColors.mediumBlack, fontSize: 24, decoration: TextDecoration.underline),
+                  style: TextStyle(color:Theme.of(context).colorScheme.mediumBlack, fontSize: 24, decoration: TextDecoration.underline),
                 ),
               ),
       ),

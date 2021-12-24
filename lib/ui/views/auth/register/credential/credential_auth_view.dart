@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -20,7 +20,7 @@ class CredentialAuthView extends StatelessWidget {
     return ViewModelBuilder<CredentialAuthViewModel>.reactive(
       viewModelBuilder: () => CredentialAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'SignUp'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -58,9 +58,9 @@ class CredentialAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.blue,
+                      cursorColor: Theme.of(context).colorScheme.blue,
                       cursorHeight: 32,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
@@ -94,13 +94,13 @@ class CredentialAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.blue,
+                      cursorColor: Theme.of(context).colorScheme.blue,
                       cursorHeight: 32,
                       decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: AppColors.mediumBlack,
+                            color: Theme.of(context).colorScheme.mediumBlack,
                             icon: Icon(model.isPasswordShown
                                 ? FeatherIcons.eye
                                 : FeatherIcons.eyeOff),
@@ -119,16 +119,16 @@ class CredentialAuthView extends StatelessWidget {
                     Wrap(
                       spacing: 0.0,
                       children: [
-                        cwAuthCheckingTile(
+                        cwAuthCheckingTile(context, 
                             title: 'Lower Case', value: model.hasLowercase),
-                        cwAuthCheckingTile(
+                        cwAuthCheckingTile(context, 
                             title: 'Upper Case', value: model.hasUppercase),
-                        cwAuthCheckingTile(
+                        cwAuthCheckingTile(context, 
                             title: 'Numbers', value: model.hasDigits),
-                        cwAuthCheckingTile(
+                        cwAuthCheckingTile(context, 
                             title: 'Special Characters',
                             value: model.hasSpecialCharacters),
-                        cwAuthCheckingTile(
+                        cwAuthCheckingTile(context,
                             title: 'Min 8 letters', value: model.hasMinLength),
                       ],
                     ),

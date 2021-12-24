@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/nav_service.dart';
@@ -24,70 +24,72 @@ class DulePersonDialog extends StatelessWidget {
         child: Row(mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(64),
-                    child: Container(
-                      height: screenWidthPercentage(context, percentage: 0.4),
-                      width: screenWidthPercentage(context, percentage: 0.4),
-                      child: CachedNetworkImage(
-                        imageUrl: fireUser.photoUrl,
-                        fit: BoxFit.cover,
-                      ),
-                      color: Colors.indigo.shade200.withAlpha(50),
-                    )),
-                verticalSpaceRegular,
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      Text(
-                        fireUser.username,
-                        style:
-                            const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                      ),
-                      horizontalSpaceTiny,
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.darkGrey)),
-                        child: Text(
-                          fireUser.romanticStatus ?? '',
-                          style:  TextStyle(
-                              color: AppColors.black, fontWeight: FontWeight.w600),
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(64),
+                      child: Container(
+                        height: screenWidthPercentage(context, percentage: 0.4),
+                        width: screenWidthPercentage(context, percentage: 0.4),
+                        child: CachedNetworkImage(
+                          imageUrl: fireUser.photoUrl,
+                          fit: BoxFit.cover,
                         ),
-                      )
-                    ],
+                        color: Colors.indigo.shade200.withAlpha(50),
+                      )),
+                  verticalSpaceRegular,
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        Text(
+                          fireUser.username,
+                          style:
+                              const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                        ),
+                        horizontalSpaceTiny,
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Theme.of(context).colorScheme.darkGrey)),
+                          child: Text(
+                            fireUser.romanticStatus ?? '',
+                            style:  TextStyle(
+                                color: Theme.of(context).colorScheme.black, fontWeight: FontWeight.w600),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                verticalSpaceRegular,
-                SizedBox(
-                  width: screenWidthPercentage(context, percentage: 0.9),
-                  child: 
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      direction: Axis.horizontal,
-                      children: List.generate(
-                        fireUser.hashTags.length,
-                        (index) => Text(
-                          fireUser.hashTags[index],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color:AppColors.mediumBlack,
+                  verticalSpaceRegular,
+                  SizedBox(
+                    width: screenWidthPercentage(context, percentage: 0.9),
+                    child: 
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        direction: Axis.horizontal,
+                        children: List.generate(
+                          fireUser.hashTags.length,
+                          (index) => Text(
+                            fireUser.hashTags[index],
+                            style:  TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color:Theme.of(context).colorScheme.mediumBlack,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  
-                ),
-              ],
+                    
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -125,23 +127,19 @@ class DulePersonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(32),
-      color: AppColors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            verticalSpaceMedium,
-            _buildDialogHeader(context),
-            verticalSpaceLarge,
-            _buildDialogFooter(context),
-            verticalSpaceLarge,
-            bottomPadding(context)
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          verticalSpaceMedium,
+          _buildDialogHeader(context),
+          verticalSpaceLarge,
+          _buildDialogFooter(context),
+          const Flexible(child: verticalSpaceLarge),
+          bottomPadding(context)
+        ],
       ),
     );
   }

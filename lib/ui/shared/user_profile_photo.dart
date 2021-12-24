@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import 'package:hint/app/app_colors.dart';
 
 Widget userProfilePhoto(BuildContext context, String imageUrl,
     {double height = 56, double width = 56, BorderRadius? borderRadius}) {
@@ -39,7 +38,7 @@ class SmileyPainter extends CustomPainter {
     final radius = math.min(size.width, size.height) / 2;
     final center = Offset(size.width / 2, size.height / 2);
     // Draw the body
-    final paint = Paint()..color = AppColors.grey;
+    final paint = Paint()..color = Colors.grey.shade700;
     canvas.drawCircle(center, radius, paint);
     // Draw the mouth
     final smilePaint = Paint()

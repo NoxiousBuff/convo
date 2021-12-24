@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 
 Widget cwAccountButton(
   BuildContext context,
@@ -20,21 +20,21 @@ Widget cwAccountButton(
       alignment: Alignment.center,
       decoration: isPrimaryFocus
           ? BoxDecoration(
-              color: AppColors.blue, borderRadius: BorderRadius.circular(14.2))
+              color: Theme.of(context).colorScheme.blue, borderRadius: BorderRadius.circular(14.2))
           : BoxDecoration(
               borderRadius: BorderRadius.circular(14.2),
-              border: Border.all(color: AppColors.darkGrey),
+              border: Border.all(color: Theme.of(context).colorScheme.darkGrey),
             ),
       child: Text(
         title,
         style: isPrimaryFocus
             ? TextStyle(
                 fontSize: fontSize,
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.white,
                 fontWeight: FontWeight.w600,
               )
             : TextStyle(
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.black,
                 fontWeight: FontWeight.w600,
                 fontSize: fontSize),
       ),
@@ -53,7 +53,7 @@ Widget cwAccountIconButton(
         alignment: Alignment.center,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.2),
-            border: Border.all(color: AppColors.darkGrey)),
-        child: icon ?? const Icon(FeatherIcons.send)),
+            border: Border.all(color: Theme.of(context).colorScheme.mediumBlack)),
+        child: icon ?? Icon(FeatherIcons.send, color: Theme.of(context).colorScheme.black,)),
   );
 }

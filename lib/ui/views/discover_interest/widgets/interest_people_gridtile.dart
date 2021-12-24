@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/discover/widgets/dule_person_dialog.dart';
@@ -63,7 +63,7 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                       textAlign: TextAlign.center,
                       style:  TextStyle(
                         fontSize: 20,
-                        color: AppColors.black,
+                        color: Theme.of(context).colorScheme.black,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -72,8 +72,8 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
                   SizedBox(
                     child: Text(
                       '${compatiblePercentage.toInt().toString()}% compatible',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, color: AppColors.mediumBlack),
+                      style:  TextStyle(
+                          fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.mediumBlack),
                     ),
                   ),
                 ],

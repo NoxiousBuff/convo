@@ -1,5 +1,5 @@
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -23,7 +23,7 @@ class _ArchiveViewState extends State<ArchiveView> {
       viewModelBuilder: () => ArchiveViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-            backgroundColor: AppColors.scaffoldColor,
+            backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
             appBar: cwAuthAppBar(context, title: 'Archives', onPressed: () {
               Navigator.of(context).pop();
             }),

@@ -1,9 +1,9 @@
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -21,7 +21,7 @@ class PhoneContactView extends StatelessWidget {
       builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: true,
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Phone Contacts', onPressed: () => Navigator.pop(context)),
           body: Stack(
@@ -34,17 +34,17 @@ class PhoneContactView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                         Icon(
                           FeatherIcons.search,
                           size: 100,
-                          color: AppColors.darkGrey,
+                          color: Theme.of(context).colorScheme.darkGrey,
                         ),
                         verticalSpaceLarge,
-                        cwEAHeading(
+                        CWEAHeading(
                           'Find your contacts\non Dule',
                           mainAxisSize: MainAxisSize.min,
                           textAlign: TextAlign.center,
-                          color:AppColors.mediumBlack,
+                          color: Theme.of(context).colorScheme.mediumBlack,
                         ),
                         // Text(
                         //   'Find your phone contacts on Dule',
@@ -58,10 +58,10 @@ class PhoneContactView extends StatelessWidget {
                         Container(
                           margin: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
-                          child: const Text(
+                          child:  Text(
                             'Continously uploading your contacts helps Dule suggest connections help us for finding your good connection for you and, others and offer a better service.',
                             style: TextStyle(
-                              color:AppColors.mediumBlack,
+                              color:Theme.of(context).colorScheme.mediumBlack,
                               fontWeight: FontWeight.w600,
                             ),
                             textAlign: TextAlign.center,
@@ -107,11 +107,11 @@ class PhoneContactView extends StatelessWidget {
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.mediumBlack
+                                          color: Theme.of(context).colorScheme.mediumBlack
                                               .withAlpha(125)),
                                     ),
                                     decoration: BoxDecoration(
-                                        color: AppColors.lightGrey,
+                                        color: Theme.of(context).colorScheme.lightGrey,
                                         borderRadius: BorderRadius.circular(16)),
                                   ),
                                 ),

@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 class Confetti extends StatefulWidget {
@@ -41,7 +41,7 @@ class _ConfettiState extends State<Confetti>
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.white,
       height: screenHeight(context),
       child: Stack(
         children: <Widget>[
@@ -52,7 +52,7 @@ class _ConfettiState extends State<Confetti>
                 Flexible(
                   child: Container(
                     decoration: BoxDecoration(
-                        color: AppColors.lightGrey,
+                        color: Theme.of(context).colorScheme.lightGrey,
                         borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
@@ -66,13 +66,13 @@ class _ConfettiState extends State<Confetti>
                 Flexible(
                   child: Container(
                     decoration: BoxDecoration(
-                        color: AppColors.blue,
+                        color: Theme.of(context).colorScheme.blue,
                         borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
                         'Sender Message',
                         style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                          color: AppColors.white
+                          color: Theme.of(context).colorScheme.white
                         ),
                       ),
                     ),

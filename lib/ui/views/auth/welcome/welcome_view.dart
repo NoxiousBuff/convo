@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -22,7 +22,7 @@ class WelcomeView extends StatelessWidget {
       builder: (context, model, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
         child: Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           body: Column(
             children: [
               const Spacer(),

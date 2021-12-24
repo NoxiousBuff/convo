@@ -1,9 +1,8 @@
 import 'dart:developer';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -29,13 +28,13 @@ class ChatListView extends StatelessWidget {
 
   CupertinoSliverNavigationBar _buildAppBar(BuildContext context) =>
       CupertinoSliverNavigationBar(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         automaticallyImplyLeading: false,
         leading: Material(
-          color: AppColors.transparent,
+          color: Colors.transparent,
           child: Icon(
             FeatherIcons.codesandbox,
-            color: AppColors.black,
+            color: Theme.of(context).colorScheme.black,
           ),
         ),
         trailing: Row(
@@ -43,9 +42,9 @@ class ChatListView extends StatelessWidget {
           children: [
             Material(
               borderRadius: BorderRadius.circular(16),
-              color: AppColors.transparent,
+              color: Colors.transparent,
               child: IconButton(
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.black,
                 icon: const Icon(FeatherIcons.userPlus),
                 onPressed: () {
                   navService.materialPageRoute(context, const InvitesView());
@@ -60,9 +59,9 @@ class ChatListView extends StatelessWidget {
                   return archivedUsersList.isEmpty
                       ? const SizedBox.shrink()
                       : Material(
-                          color: AppColors.transparent,
+                          color: Colors.transparent,
                           child: IconButton(
-                            color: AppColors.black,
+                            color: Theme.of(context).colorScheme.black,
                             icon: const Icon(FeatherIcons.folder),
                             onPressed: () {
                               navService.cupertinoPageRoute(
@@ -72,9 +71,9 @@ class ChatListView extends StatelessWidget {
                         );
                 }),
             Material(
-              color: AppColors.transparent,
+              color: Colors.transparent,
               child: IconButton(
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.black,
                 icon: const Icon(FeatherIcons.send),
                 onPressed: () {
                   mainViewPageController.animateToPage(1,
@@ -89,10 +88,10 @@ class ChatListView extends StatelessWidget {
         largeTitle: Text(
           'Convo',
           style: TextStyle(
-            color: AppColors.black,
+            color: Theme.of(context).colorScheme.black,
           ),
         ),
-        border: Border.all(width: 0.0, color: AppColors.transparent),
+        border: Border.all(width: 0.0, color: Colors.transparent),
       );
 
   Widget _buildPinnedList(BuildContext context, ChatListViewModel model) =>
@@ -127,7 +126,8 @@ class ChatListView extends StatelessWidget {
                             onLongPress: () {
                               showTileOptions(fireUser, context, true);
                             },
-                            onTap: () => chatService.startDuleConversation(context, fireUser),
+                            onTap: () => chatService.startDuleConversation(
+                                context, fireUser),
                             child: Column(
                               children: [
                                 userProfilePhoto(
@@ -144,8 +144,8 @@ class ChatListView extends StatelessWidget {
                                   fireUser.displayName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      color: AppColors.black,
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.black,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
                                 )
@@ -220,7 +220,7 @@ class ChatListView extends StatelessWidget {
       viewModelBuilder: () => ChatListViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           body: CustomScrollView(
             scrollBehavior: const CupertinoScrollBehavior(),
             slivers: [

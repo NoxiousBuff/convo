@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 Widget buildEmptyListUi(
@@ -13,7 +13,7 @@ Widget buildEmptyListUi(
 }) {
   return Container(
     decoration: BoxDecoration(
-        color: color ?? AppColors.blueAccent.withAlpha(100),
+        color: color ?? Theme.of(context).colorScheme.blueAccent.withAlpha(100),
         borderRadius: BorderRadius.circular(32)),
     alignment: Alignment.center,
     height: height ?? 400,
@@ -41,15 +41,15 @@ Widget buildEmptyListUi(
               },
               child: Container(
                 decoration: BoxDecoration(
-                    color: AppColors.blue,
+                    color: Theme.of(context).colorScheme.blue,
                     borderRadius: BorderRadius.circular(24)),
                 padding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                 child: Text(
                   buttonTitle ?? 'Add some friends.',
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 22,
-                    color: AppColors.white,
+                    color: Theme.of(context).colorScheme.white,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -18,7 +18,7 @@ class ForgotPasswordAuthView extends StatelessWidget {
     return ViewModelBuilder<ForgotPasswordAuthViewModel>.reactive(
       viewModelBuilder: () => ForgotPasswordAuthViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Forgot Password'),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -55,9 +55,9 @@ class ForgotPasswordAuthView extends StatelessWidget {
                       style:  TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.black),
+                          color: Theme.of(context).colorScheme.black),
                       showCursor: true,
-                      cursorColor: AppColors.blue,
+                      cursorColor: Theme.of(context).colorScheme.blue,
                       cursorHeight: 32,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',

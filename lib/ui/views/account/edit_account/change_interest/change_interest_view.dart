@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/interest.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -34,7 +34,7 @@ class ChangeInterestView extends StatelessWidget {
                       secondaryButtontext: 'No',
                       primaryOnPressed: () => Navigator.pop(context, true),
                       secondaryOnPressed: () => Navigator.pop(context, false),
-                      iconBackgroundColor: AppColors.red
+                      iconBackgroundColor: Theme.of(context).colorScheme.red
                     );
                   });
               return shouldPop;
@@ -43,7 +43,7 @@ class ChangeInterestView extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: AppColors.scaffoldColor,
+            backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
             appBar: cwAuthAppBar(
               context,
               title: 'Change Interests',
@@ -60,124 +60,144 @@ class ChangeInterestView extends StatelessWidget {
                     children: [
                       verticalSpaceRegular,
                       cwCIInterestTopicPicker(
+                        context,
                         'Movies & Telvision',
                         userInterest.moviesAndTelevision,
                         model,
-                        color: AppColors.yellow,
+                        color: Theme.of(context).colorScheme.yellow,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Activities',
                         userInterest.activities,
                         model,
-                        color: AppColors.green,
+                        color: Theme.of(context).colorScheme.green,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Arts & Culture',
                         userInterest.artsAndCulture,
                         model,
-                        color: AppColors.blue,
+                        color: Theme.of(context).colorScheme.blue,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Automotive',
                         userInterest.automotive,
                         model,
-                        color: AppColors.purple,
+                        color: Theme.of(context).colorScheme.purple,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Business',
                         userInterest.business,
                         model,
-                        color: AppColors.red,
+                        color: Theme.of(context).colorScheme.red,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Career',
                         userInterest.careers,
                         model,
-                        color: AppColors.yellow,
+                        color: Theme.of(context).colorScheme.yellow,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Programming',
                         userInterest.codingLanguages,
                         model,
-                        color: AppColors.green,
+                        color: Theme.of(context).colorScheme.green,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Education',
                         userInterest.education,
                         model,
-                        color: AppColors.blue,
+                        color: Theme.of(context).colorScheme.blue,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Food & Drink',
                         userInterest.foodAndDrink,
                         model,
-                        color: AppColors.purple,
+                        color: Theme.of(context).colorScheme.purple,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Gaming',
                         userInterest.gaming,
                         model,
-                        color: AppColors.red,
+                        color: Theme.of(context).colorScheme.red,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Health & Fitness',
                         userInterest.healthAndFitness,
                         model,
-                        color: AppColors.yellow,
+                        color: Theme.of(context).colorScheme.yellow,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Life Stages',
                         userInterest.lifeStages,
                         model,
-                        color: AppColors.green,
+                        color: Theme.of(context).colorScheme.green,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Personal Finance',
                         userInterest.personalFinance,
                         model,
-                        color: AppColors.blue,
+                        color: Theme.of(context).colorScheme.blue,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Pets',
                         userInterest.pets,
                         model,
-                        color: AppColors.purple,
+                        color: Theme.of(context).colorScheme.purple,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Science',
                         userInterest.science,
                         model,
-                        color: AppColors.red,
+                        color: Theme.of(context).colorScheme.red,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Social Issues',
                         userInterest.socialIssues,
                         model,
-                        color: AppColors.yellow,
+                        color: Theme.of(context).colorScheme.yellow,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Sports',
                         userInterest.sports,
                         model,
-                        color: AppColors.green,
+                        color: Theme.of(context).colorScheme.green,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Style & Fashion',
                         userInterest.styleAndFashion,
                         model,
-                        color: AppColors.blue,
+                        color: Theme.of(context).colorScheme.blue,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Technology & Computing',
                         userInterest.technologyAndComputing,
                         model,
-                        color: AppColors.purple,
+                        color: Theme.of(context).colorScheme.purple,
                       ),
                       cwCIInterestTopicPicker(
+                        context,
                         'Travel',
                         userInterest.travel,
                         model,
-                        color: AppColors.red,
+                        color: Theme.of(context).colorScheme.red,
                       ),
                     ],
                   ),

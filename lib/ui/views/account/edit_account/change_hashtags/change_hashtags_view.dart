@@ -1,7 +1,7 @@
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -21,7 +21,7 @@ class ChangeHashtagsView extends StatelessWidget {
     return ViewModelBuilder<ChangeHashtagsViewModel>.reactive(
       viewModelBuilder: () => ChangeHashtagsViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         extendBodyBehindAppBar: true,
         appBar: cwAuthAppBar(
           context,
@@ -37,11 +37,11 @@ class ChangeHashtagsView extends StatelessWidget {
               child: ListView(
                 children: [
                   cwEADetailsTile(context, 'Your HashTags'),
-                  const Text('Add upto 3 hashtags to describe yourself.',
+                   Text('Add upto 3 hashtags to describe yourself.',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: AppColors.mediumBlack,
+                        color: Theme.of(context).colorScheme.mediumBlack,
                       )),
 
                   verticalSpaceRegular,
@@ -53,10 +53,10 @@ class ChangeHashtagsView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(hashList[i],
-                                  style: const TextStyle(
+                                  style:  TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
-                                    color: AppColors.mediumBlack,
+                                    color: Theme.of(context).colorScheme.mediumBlack,
                                   )),
                               IconButton(
                                   onPressed: () {

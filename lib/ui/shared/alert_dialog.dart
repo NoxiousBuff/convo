@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 class DuleAlertDialog extends StatelessWidget {
@@ -55,7 +55,7 @@ class DuleAlertDialog extends StatelessWidget {
                 bottom: 12,
               ),
               decoration: BoxDecoration(
-                color: backgroundColor ?? AppColors.white,
+                color: backgroundColor ?? Theme.of(context).colorScheme.lightGrey,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
@@ -66,6 +66,7 @@ class DuleAlertDialog extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Material(
+                      color: Colors.transparent,
                         child: Text(
                       title,
                       style: titleTextStyle ??
@@ -80,21 +81,23 @@ class DuleAlertDialog extends StatelessWidget {
                       ? Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Material(
+                            color: Colors.transparent,
                               child: Text(
                             description!,
                             style: descriptionTextStyle ??
-                                const TextStyle(
+                                 TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.mediumBlack,),
+                                    color: Theme.of(context).colorScheme.mediumBlack,),
                           )),
                         )
                       : const SizedBox.shrink(),
                   verticalSpaceMedium,
                   Material(
-                    color: AppColors.transparent,
+                    color: Colors.transparent,
                     child: InkWell(
                       onTap: primaryOnPressed,
+                      borderRadius: BorderRadius.circular(16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -104,7 +107,7 @@ class DuleAlertDialog extends StatelessWidget {
                             child: Text(
                               primaryButtonText,
                               style: primaryButtonTextStyle ??
-                                  const TextStyle(color: AppColors.blue, fontSize: 18, fontWeight: FontWeight.w700),
+                                  TextStyle(color: Theme.of(context).colorScheme.blue, fontSize: 18, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ],
@@ -116,8 +119,9 @@ class DuleAlertDialog extends StatelessWidget {
                   ),
                   secondaryButtontext != null
                       ? Material(
-                          color: AppColors.transparent,
+                          color: Colors.transparent,
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
                             onTap: secondaryOnPressed,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +132,7 @@ class DuleAlertDialog extends StatelessWidget {
                                   child: Text(
                                     secondaryButtontext!,
                                     style: secondaryButtonTextStyle ??
-                                        const TextStyle(color: AppColors.blue, fontSize: 18, fontWeight: FontWeight.w700),
+                                        TextStyle(color: Theme.of(context).colorScheme.blue, fontSize: 18, fontWeight: FontWeight.w700),
                                   ),
                                 ),
                               ],
@@ -145,11 +149,11 @@ class DuleAlertDialog extends StatelessWidget {
               child: CircleAvatar(
                 minRadius: 16,
                 maxRadius: 28,
-                backgroundColor: iconBackgroundColor ?? AppColors.blue,
+                backgroundColor: iconBackgroundColor ?? Theme.of(context).colorScheme.blue,
                 child: Icon(
                   icon,
                   size: 28,
-                  color: iconColor ?? AppColors.white,
+                  color: iconColor ?? Theme.of(context).colorScheme.white,
                 ),
               ),
             )

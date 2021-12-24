@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/letter_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -20,7 +20,7 @@ class ReadLetterView extends StatelessWidget {
     return ViewModelBuilder<ReadLetterViewModel>.reactive(
       viewModelBuilder: () => ReadLetterViewModel(letter),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(
           context,
           title: '',
@@ -34,7 +34,7 @@ class ReadLetterView extends StatelessWidget {
               children: [
                 Text(model.isSentByMe ? 'From : ' : 'Sent To : ',
                     style:  TextStyle(
-                        color:AppColors.black,
+                        color:Theme.of(context).colorScheme.black,
                         fontSize: 18,
                         fontWeight: FontWeight.w700)),
                 horizontalSpaceRegular,
@@ -42,7 +42,7 @@ class ReadLetterView extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   decoration: BoxDecoration(
-                      border: Border.all(color:AppColors.lightBlack),
+                      border: Border.all(color:Theme.of(context).colorScheme.lightBlack),
                       borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -59,7 +59,7 @@ class ReadLetterView extends StatelessWidget {
                       horizontalSpaceRegular,
                       Text(letter.username,
                           style:  TextStyle(
-                              color:AppColors.black,
+                              color:Theme.of(context).colorScheme.black,
                               fontSize: 18,
                               fontWeight: FontWeight.w700))
                     ],
@@ -72,7 +72,7 @@ class ReadLetterView extends StatelessWidget {
             verticalSpaceRegular,
             Container(
               decoration: BoxDecoration(
-                  color: AppColors.lightGrey,
+                  color: Theme.of(context).colorScheme.lightGrey,
                   borderRadius: BorderRadius.circular(30)),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(

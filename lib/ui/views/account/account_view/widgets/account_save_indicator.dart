@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 Widget cwAccountSaveIndicator(BuildContext context, String userId) {
@@ -28,17 +28,17 @@ Widget cwAccountSaveIndicator(BuildContext context, String userId) {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14.2),
                                   border:
-                                      Border.all(color: AppColors.darkGrey)),
+                                      Border.all(color: Theme.of(context).colorScheme.mediumBlack)),
                               child: Center(
                                 child: !alreadySaved
                                     ?  Icon(
                                         FeatherIcons.bookmark,
-                                        color: AppColors.black,
+                                        color: Theme.of(context).colorScheme.black,
                                       )
-                                    : const Text(
+                                    :  Text(
                                         'Bookmarked',
                                         style: TextStyle(
-                                            color: AppColors.mediumBlack),
+                                            color: Theme.of(context).colorScheme.mediumBlack),
                                       ),
                               ),
                             ),

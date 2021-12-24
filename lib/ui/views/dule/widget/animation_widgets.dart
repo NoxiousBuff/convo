@@ -1,6 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/animations/light_clipper.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:lottie/lottie.dart';
@@ -17,8 +17,8 @@ Widget lightClipperAnimation(BuildContext context) {
           radius: 0.5,
           center: const Alignment(0.0, -0.3),
           colors: [
-            AppColors.white,
-            AppColors.black,
+            Theme.of(context).colorScheme.white,
+            Theme.of(context).colorScheme.black,
           ],
         ),
       ),

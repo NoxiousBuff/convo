@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
@@ -45,7 +45,7 @@ class WriteLetterView extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Write a letter',
               leadingIcon: FeatherIcons.x,
@@ -57,7 +57,7 @@ class WriteLetterView extends StatelessWidget {
                 children: [
                    Text('To : ',
                       style: TextStyle(
-                          color:AppColors.black,
+                          color:Theme.of(context).colorScheme.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w700)),
                   horizontalSpaceRegular,
@@ -65,7 +65,7 @@ class WriteLetterView extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     decoration: BoxDecoration(
-                        border: Border.all(color:AppColors.lightBlack),
+                        border: Border.all(color:Theme.of(context).colorScheme.lightBlack),
                         borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -82,7 +82,7 @@ class WriteLetterView extends StatelessWidget {
                         horizontalSpaceRegular,
                         Text(fireUser.username,
                             style:  TextStyle(
-                                color:AppColors.black,
+                                color:Theme.of(context).colorScheme.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700))
                       ],
@@ -95,7 +95,7 @@ class WriteLetterView extends StatelessWidget {
               verticalSpaceRegular,
               Container(
                 decoration: BoxDecoration(
-                    color: AppColors.lightGrey,
+                    color: Theme.of(context).colorScheme.lightGrey,
                     borderRadius: BorderRadius.circular(30)),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

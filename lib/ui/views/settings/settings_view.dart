@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -21,7 +21,7 @@ class SettingsView extends StatelessWidget {
     return ViewModelBuilder<SettingsViewModel>.reactive(
       viewModelBuilder: () => SettingsViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: AppColors.scaffoldColor,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(
           context,
           title: 'Settings',
@@ -32,8 +32,8 @@ class SettingsView extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             //TODO: add what's new functionality here
-            cwEADetailsTile(context, 'Whats\'s New 🎉🎉',
-                titleColor: AppColors.blue),
+            cwEADetailsTile(context, 'Coming Soon 🎉🎉',
+                titleColor: Theme.of(context).colorScheme.blue),
             cwEADetailsTile(context, 'Account',
                 subtitle: 'Personal Information,. Privacy', onTap: () {
               navService.materialPageRoute(context, const UserAccountView());

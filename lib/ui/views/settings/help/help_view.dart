@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 
@@ -12,14 +12,14 @@ class HelpView extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 16),
       ),
-      leading: Icon(icon, color: AppColors.darkGrey),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.darkGrey),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldColor,
+      backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
       appBar: cwAuthAppBar(context, title: 'Help', onPressed: ()=> Navigator.pop(context)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),

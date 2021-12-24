@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:pixabay_picker/pixabay_picker.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -42,7 +42,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
       builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: false,
-          backgroundColor: AppColors.scaffoldColor,
+          backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(context,
               title: 'Explore', onPressed: () => Navigator.pop(context)),
           body: PageView.builder(
@@ -60,7 +60,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
               var title = model.imagesList[index].user;
               var tags = model.imagesList[index].tags;
               return Container(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.white,
                 child: Column(
                   children: [
                     const Divider(height: 0),
@@ -68,7 +68,7 @@ class _ExplorePageviewState extends State<ExplorePageview>
                       title: Text(
                         title!,
                         style:  TextStyle(
-                            color:AppColors.black, fontWeight: FontWeight.bold),
+                            color:Theme.of(context).colorScheme.black, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(
@@ -83,8 +83,8 @@ class _ExplorePageviewState extends State<ExplorePageview>
                         tags!,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color:AppColors.mediumBlack, fontWeight: FontWeight.w500),
+                        style:  TextStyle(
+                            color:Theme.of(context).colorScheme.mediumBlack, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],

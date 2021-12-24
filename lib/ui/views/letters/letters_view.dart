@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/app/app_colors.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/letter_info/letter_info_view.dart';
@@ -40,7 +40,7 @@ class _LettersViewState extends State<LettersView>
             navService.materialPageRoute(context, const LetterInfoView());
           },
           icon: const Icon(FeatherIcons.info),
-          color:AppColors.mediumBlack,
+          color:Theme.of(context).colorScheme.mediumBlack,
         ),
         horizontalSpaceSmall,
       ],
@@ -48,12 +48,12 @@ class _LettersViewState extends State<LettersView>
       title:  Text(
         'Letters',
         style: TextStyle(
-            fontWeight: FontWeight.w700, color:AppColors.black, fontSize: 18),
+            fontWeight: FontWeight.w700, color:Theme.of(context).colorScheme.black, fontSize: 18),
       ),
-      backgroundColor: AppColors.lightGrey,
+      backgroundColor: Theme.of(context).colorScheme.lightGrey,
       leadingWidth: 56.0,
       leading: IconButton(
-        color:AppColors.mediumBlack,
+        color:Theme.of(context).colorScheme.mediumBlack,
         icon: const Icon(FeatherIcons.arrowLeft),
         onPressed: () {
           mainViewPageController.animateToPage(0,
@@ -62,8 +62,8 @@ class _LettersViewState extends State<LettersView>
         },
       ),
       bottom: TabBar(
-        labelColor:AppColors.black,
-        indicatorColor:AppColors.mediumBlack,
+        labelColor:Theme.of(context).colorScheme.black,
+        indicatorColor:Theme.of(context).colorScheme.mediumBlack,
         controller: lettersTab,
         labelPadding: const EdgeInsets.symmetric(vertical: 16),
         labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -88,13 +88,13 @@ class _LettersViewState extends State<LettersView>
     return OpenContainer(
               closedElevation: 0,
               openElevation: 0,
-              closedColor: AppColors.transparent,
+              closedColor: Colors.transparent,
               closedBuilder: (context, onPressed) {
                 return FloatingActionButton(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   elevation: 2,
                   onPressed: onPressed,
-                  backgroundColor: AppColors.blue,
+                  backgroundColor: Theme.of(context).colorScheme.blue,
                   child: const Icon(FeatherIcons.edit),
                 );
               },

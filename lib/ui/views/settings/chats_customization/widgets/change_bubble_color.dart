@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/settings/chats_customization/chat_customization_viewmodel.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -47,7 +48,7 @@ class ChangebubbleColor extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .headline6!
-                                .copyWith(color: AppColors.white),
+                                .copyWith(color: Theme.of(context).colorScheme.white),
                           ),
                         ),
                       ),
@@ -65,7 +66,7 @@ class ChangebubbleColor extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .headline6!
-                                .copyWith(color: AppColors.white),
+                                .copyWith(color: Theme.of(context).colorScheme.white),
                           ),
                         ),
                       ),

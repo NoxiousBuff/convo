@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -46,7 +47,6 @@ Widget receiverMediaWidget(
                 duleModel.url!,
                 fit: BoxFit.cover,
                 enableSlideOutPage: true,
-                heroBuilderForSlidingPage: (widget) => Text('hero builder'),
                 loadStateChanged: (state) {
                   state;
                   switch (state.extendedImageLoadState) {
@@ -178,20 +178,20 @@ Widget receiverMessageBubble(
                           return const SizedBox.shrink();
                         },
                         controller: model.otherTech,
-                        cursorColor: AppColors.blue,
+                        cursorColor: Theme.of(context).colorScheme.blue,
                         textAlign: TextAlign.center,
                         cursorRadius: const Radius.circular(100),
                         onChanged: (value) {
                           model.updatTextFieldWidth();
                           model.updateOtherField(duleModel.msgTxt);
                         },
-                        style: TextStyle(color: AppColors.black, fontSize: 24),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: Theme.of(context).colorScheme.black, fontSize: 24),
+                        decoration:  InputDecoration(
                           hintText: 'Message Received',
                           hintStyle: TextStyle(
-                              color: AppColors.mediumBlack, fontSize: 24),
+                              color: Theme.of(context).colorScheme.mediumBlack, fontSize: 24),
                           border:
-                              OutlineInputBorder(borderSide: BorderSide.none),
+                              const OutlineInputBorder(borderSide: BorderSide.none),
                         ),
                       ),
                 // : Text(duleModel.msgTxt),
@@ -199,9 +199,9 @@ Widget receiverMessageBubble(
               break;
             case false:
               {
-                switcherChild = const Text(
+                switcherChild =  Text(
                   'User Not In The ChatRoom',
-                  style: TextStyle(color: AppColors.mediumBlack, fontSize: 24),
+                  style: TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontSize: 24),
                 );
               }
               break;
