@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
 
 class DisplayFullMedia extends StatefulWidget {
@@ -22,14 +26,11 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
     switch (widget.mediaType) {
       case MediaType.image:
         {
-          return ExtendedImage.network(widget.mediaUrl);
+          return Center(child: ExtendedImage.network(widget.mediaUrl));
         }
       case MediaType.video:
         {
-          return VideoDisplayWidget(
-            videoUrl: widget.mediaUrl,
-            isPlayable: true,
-          );
+          return Center(child: VideoDisplayWidget(videoUrl: widget.mediaUrl));
         }
       default:
         {
@@ -46,9 +47,15 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: mediaHandler(),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Theme.of(context).colorScheme.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close)),
       ),
+      body: mediaHandler(),
     );
   }
 }

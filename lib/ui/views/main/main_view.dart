@@ -55,7 +55,7 @@ class MainView extends StatelessWidget {
               case 0:
                 return const ChatListView();
               case 1:
-                return const ExplorView();
+                return  const ExplorView();
               case 2:
                 return const DiscoverView();
               case 3:

@@ -24,20 +24,23 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   final FireUser fireUser;
   final log = getLogger('DuleViewModel');
 
-  bool controllerIsMedia = false;
+  /// Type of sending media to other user
+  String? _sendingMediaType = '';
+  String? get sendingMediaType => _sendingMediaType;
 
-  String _sendingMediaType = '';
-  String get sendingMediaType => _sendingMediaType;
+  /// Path of sending media to user
+  String? _sendingMediaPath;
+  String? get sendingMediaPath => _sendingMediaPath;
 
+  /// conversationIs of this live chat
   String _conversationId = '';
   String get conversationId => _conversationId;
 
+  /// uploading progress od media which is uploading in firebase storage
   double _uploadingProgress = 0.0;
   double get uploadingProgress => _uploadingProgress;
 
-  TaskState _state = TaskState.success;
-  TaskState get state => _state;
-
+  /// Instance od Firebase Storage
   FirebaseStorage storage = FirebaseStorage.instance;
 
   void createGetConversationId() {
@@ -107,6 +110,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     return databaseService.updateFireUserDataWithKey(fireUserId, key, value);
   }
 
+  /// clear the type message
   void clearMessage() {
     if (!isDuleEmpty) {
       duleTech.clear();
@@ -135,17 +139,23 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     otherTech.dispose();
   }
 
-  /// Change the controller text value
-  void _changeControllerTextValue(String value) {
-    duleTech.text = value;
+  /// change sender media path
+  void _changeSenderMediaPath(String? path) {
+    _sendingMediaPath = path;
     notifyListeners();
   }
 
-  /// Change the value of sendingMediaType variable
-  void _changeSendingMediaType(String value) {
-    _sendingMediaType = value;
+  /// change sender media type
+  void _changeSenderMediaType(String? type) {
+    _sendingMediaType = type;
     notifyListeners();
-    log.wtf(_sendingMediaType);
+    log.v('MediaType:$_sendingMediaType');
+  }
+
+  /// Get uploading progress of media
+  void _getMediaUploadingProgress(double value) {
+    _uploadingProgress = value;
+    notifyListeners();
   }
 
   /// Clicking Image from camera
@@ -157,9 +167,9 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       final file = File(selectedImage.path);
       final size = file.lengthSync();
       final sizeInMB = size / (1024 * 1024);
-      final fileSize = sizeInMB.toInt();
+      final fileSize = sizeInMB;
       log.wtf('Image Size:$fileSize');
-      if (fileSize > 8) {
+      if (fileSize > 8.0) {
         customSnackbars.errorSnackbar(context,
             title: 'Maximum size of upload is 8 MB.');
       } else {
@@ -217,20 +227,24 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     String title = 'Maximum file size is 8 MB';
     const type = FileType.media;
     final picker = FilePicker.platform;
-    final result = await picker.pickFiles(type: type, withData: true);
+    final result = await picker.pickFiles(
+        type: type, withData: true, dialogTitle: 'Pick Media');
     if (result != null) {
       final path = result.paths.first;
       final fileName = result.names.first;
-      final size = File(path!).lengthSync();
-      final sizeInMB = size / (1024 * 1024);
-      final fileSize = sizeInMB.toInt();
+      final fileSizeInBytes = File(path!).lengthSync();
+      // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+      double fileSizeInKB = fileSizeInBytes / 1024;
+      // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+      double fileSizeInMB = fileSizeInKB / 1024;
+      final fileSize = fileSizeInMB.toInt();
       log.wtf('File Size: $fileSize MB');
       if (fileSize > 8) {
         setBusy(false);
         customSnackbars.infoSnackbar(context, title: title);
       } else {
-        setBusyForObject(controllerIsMedia, true);
-        _changeControllerTextValue(path);
+        _changeSenderMediaPath(path);
+        log.v('MediaPath:$_sendingMediaPath');
         await uploadFile(filePath: path, fileName: fileName!, context: context);
       }
       return File(result.paths.first!);
@@ -240,8 +254,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     }
   }
 
-
- /// Upload File In Firebase Storage
+  /// Upload File In Firebase Storage
   Future<String> uploadFile({
     required String filePath,
     required String fileName,
@@ -253,16 +266,15 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     var month = now.month;
 
     final fileType = lookupMimeType(filePath)!.split("/").first;
-    var folderDate = '$year-$month-$day';
+    var folderDate = '$day-$month-$year';
     String folder = 'LiveChatMedia/$folderDate/$fileName';
 
     UploadTask task = storage.ref(folder).putFile(File(filePath));
-    _changeSendingMediaType(fileType);
+    _changeSenderMediaType(fileType);
     task.timeout(const Duration(seconds: 10), onTimeout: () {
       setBusy(false);
-      setBusyForObject(controllerIsMedia, false);
-      _changeControllerTextValue('');
-      _changeSendingMediaType('');
+      _changeSenderMediaPath(null);
+      _changeSenderMediaType(null);
       return task;
     });
     setBusy(true);
@@ -272,21 +284,18 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         final progress = snapshot.bytesTransferred.toDouble() /
             snapshot.totalBytes.toDouble();
 
-        _state = snapshot.state;
-        _uploadingProgress = progress;
-        notifyListeners();
+        _getMediaUploadingProgress(progress);
+
         log.wtf(_uploadingProgress);
       },
       onError: (e) {
         setBusy(false);
-        setBusyForObject(controllerIsMedia, false);
-        _changeControllerTextValue('');
-        _changeSendingMediaType('');
+        _changeSenderMediaPath(null);
+        _changeSenderMediaType(null);
 
         task.cancel();
         customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
-      onDone: () => _changeSendingMediaType(fileType),
     );
     await task;
     String downloadURL = await storage.ref(folder).getDownloadURL();
@@ -294,9 +303,9 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
 
     setBusy(false);
-    _changeControllerTextValue('');
-    _changeSendingMediaType('');
-    setBusyForObject(controllerIsMedia, false);
+    _changeSenderMediaPath(null);
+    _changeSenderMediaType(null);
+    log.v('MediaPath:$_sendingMediaPath');
 
     return downloadURL;
   }

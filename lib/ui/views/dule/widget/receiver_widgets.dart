@@ -12,8 +12,103 @@ import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/dule/dule_viewmodel.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:hint/ui/views/dule/widget/display_receiver_media.dart';
+import 'package:hint/ui/views/dule/widget/receiver_video_display_widget.dart';
 import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+Widget appBarMediaVisibility(
+  BuildContext context,
+  FireUser fireUser,
+  Stream<DatabaseEvent> stream,
+) {
+  return StreamBuilder<DatabaseEvent>(
+    stream: stream,
+    builder: (context, snapshot) {
+      final data = snapshot.data;
+
+      if (!snapshot.hasData) {
+        return const SizedBox.shrink();
+      } else {
+        final duleModel = DuleModel.fromJson(data!.snapshot.value);
+        switch (duleModel.urlType) {
+          case MediaType.image:
+            {
+              String? url = duleModel.url;
+              String type = duleModel.urlType;
+              return InkWell(
+                onTap: () => navService.materialPageRoute(
+                    context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ExtendedImage.network(
+                    url!,
+                    enableSlideOutPage: true,
+                    loadStateChanged: (state) {
+                      state;
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.loading:
+                          {
+                            return Container(
+                              width: 40,
+                              height: 40,
+                              padding: const EdgeInsets.all(8),
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          }
+                        case LoadState.completed:
+                          {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: ExtendedRawImage(
+                                image: state.extendedImageInfo?.image,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }
+                        case LoadState.failed:
+                          {
+                            return const Text('Failed To Load Image');
+                          }
+                        default:
+                          {
+                            return const Text('Error');
+                          }
+                      }
+                    },
+                  ),
+                ),
+              );
+            }
+          case MediaType.video:
+            {
+              String? url = duleModel.url;
+              String type = duleModel.urlType;
+              return InkWell(
+                onTap: () => navService.materialPageRoute(
+                    context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ReceiverVideoDisplayWidget(videoUrl: url!),
+                ),
+              );
+            }
+          default:
+            {
+              return const SizedBox.shrink();
+            }
+        }
+      }
+    },
+  );
+}
 
 Widget receiverMediaWidget(
   BuildContext context,
@@ -80,6 +175,7 @@ Widget receiverMediaWidget(
       }
     case MediaType.video:
       {
+        String? url = duleModel.url;
         return Dismissible(
           onDismissed: (dissmissDirection) async {
             final fireUserId = fireUser.id;
@@ -90,16 +186,11 @@ Widget receiverMediaWidget(
           },
           key: UniqueKey(),
           child: InkWell(
-            onTap: () => navService.materialPageRoute(
-                context,
-                DisplayFullMedia(
-                    mediaType: duleModel.urlType, mediaUrl: duleModel.url!)),
+            onTap: () => navService.materialPageRoute(context,
+                DisplayFullMedia(mediaType: duleModel.urlType, mediaUrl: url!)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: VideoDisplayWidget(
-                videoUrl: duleModel.url!,
-                isPlayable: false,
-              ),
+              child: VideoDisplayWidget(videoUrl: duleModel.url!),
             ),
           ),
         );
@@ -152,49 +243,43 @@ Widget receiverMessageBubble(
           final json = data.snapshot.value;
           final DuleModel duleModel = DuleModel.fromJson(json);
           bool isInChatRoom = model.conversationId == duleModel.roomUid;
-          var mediaUrl = duleModel.url;
-          bool isMediaUrlNotNull = mediaUrl != null && mediaUrl.isNotEmpty;
           Widget switcherChild;
           switch (isInChatRoom) {
             case true:
               model.updateOtherField(duleModel.msgTxt);
               switcherChild = AnimatedSwitcher(
                 duration: const Duration(milliseconds: 10),
-                child: isMediaUrlNotNull
-                    ? receiverMediaWidget(context, duleModel, model, fireUser)
-                    : TextFormField(
-                        key: UniqueKey(),
-                        expands: true,
-                        minLines: null,
-                        maxLines: null,
-                        readOnly: true,
-                        maxLength: 160,
-                        cursorHeight: 28,
-                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                        buildCounter: (_,
-                            {required currentLength,
-                            maxLength,
-                            required isFocused}) {
-                          return const SizedBox.shrink();
-                        },
-                        controller: model.otherTech,
-                        cursorColor: Theme.of(context).colorScheme.blue,
-                        textAlign: TextAlign.center,
-                        cursorRadius: const Radius.circular(100),
-                        onChanged: (value) {
-                          model.updatTextFieldWidth();
-                          model.updateOtherField(duleModel.msgTxt);
-                        },
-                        style: TextStyle(color: Theme.of(context).colorScheme.black, fontSize: 24),
-                        decoration:  InputDecoration(
-                          hintText: 'Message Received',
-                          hintStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.mediumBlack, fontSize: 24),
-                          border:
-                              const OutlineInputBorder(borderSide: BorderSide.none),
-                        ),
-                      ),
-                // : Text(duleModel.msgTxt),
+                child: TextFormField(
+                  key: UniqueKey(),
+                  expands: true,
+                  minLines: null,
+                  maxLines: null,
+                  readOnly: true,
+                  maxLength: 160,
+                  cursorHeight: 28,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  buildCounter: (_,
+                      {required currentLength, maxLength, required isFocused}) {
+                    return const SizedBox.shrink();
+                  },
+                  controller: model.otherTech,
+                  cursorColor: Theme.of(context).colorScheme.blue,
+                  textAlign: TextAlign.center,
+                  cursorRadius: const Radius.circular(100),
+                  onChanged: (value) {
+                    model.updatTextFieldWidth();
+                    model.updateOtherField(duleModel.msgTxt);
+                  },
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.black, fontSize: 24),
+                  decoration: InputDecoration(
+                    hintText: 'Message Received',
+                    hintStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.mediumBlack,
+                        fontSize: 24),
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                  ),
+                ),
               );
               break;
             case false:

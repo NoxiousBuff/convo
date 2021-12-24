@@ -1,9 +1,9 @@
-import 'package:confetti/confetti.dart';
-import 'package:flutter/material.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/ui/animations/light_clipper.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter/material.dart';
+import 'package:confetti/confetti.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/animations/light_clipper.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 
 Widget lightClipperAnimation(BuildContext context) {
   const radius = 0.0;

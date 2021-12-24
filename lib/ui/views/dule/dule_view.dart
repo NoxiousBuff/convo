@@ -1,17 +1,18 @@
 import 'dart:math';
 import 'dart:async';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/dule/widget/animation_widgets.dart';
 import 'package:hint/ui/views/dule/widget/receiver_widgets.dart';
 import 'package:hint/ui/views/dule/widget/sender_widgets.dart';
+import 'package:hint/ui/views/profile/profile_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
+import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -53,6 +54,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
+    databaseService.updateUserDataWithKey(DatabaseMessageField.url, null);
+    databaseService.updateUserDataWithKey(DatabaseMessageField.urlType, '');
     super.initState();
   }
 
@@ -102,7 +105,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context, DatabaseEvent? data) {
+  AppBar _buildAppBar(
+      BuildContext context, DatabaseEvent? data, Stream<DatabaseEvent> stream) {
     const dark = Brightness.dark;
     const systemUIOverlay = SystemUiOverlayStyle(statusBarIconBrightness: dark);
     return AppBar(
@@ -123,8 +127,12 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             onPressed: () => Navigator.pop(context),
           ),
           horizontalDefaultMessageSpace,
-          userProfilePhoto(context, widget.fireUser.photoUrl,
-              height: 50, width: 50),
+          InkWell(
+            onTap: () => navService.materialPageRoute(
+                context, ProfileView(fireUser: widget.fireUser)),
+            child: userProfilePhoto(context, widget.fireUser.photoUrl,
+                height: 50, width: 50),
+          ),
         ],
       ),
       title: Column(
@@ -132,22 +140,26 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         children: [
           Text(
             widget.fireUser.displayName,
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1!
-                .copyWith(fontSize: 18, color: Theme.of(context).colorScheme.black),
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontSize: 18, color: Theme.of(context).colorScheme.black),
           ),
           data != null
               ? DuleModel.fromJson(data.snapshot.value).online
-                  ?  Text(
+                  ? Text(
                       'Online',
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontSize: 12),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.mediumBlack,
+                          fontSize: 12),
                     )
                   : shrinkBox
               : shrinkBox,
         ],
       ),
+      actions: [
+        data != null
+            ? appBarMediaVisibility(context, widget.fireUser, stream)
+            : const SizedBox.shrink()
+      ],
     );
   }
 
@@ -162,7 +174,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             icon: const Icon(FeatherIcons.edit3),
             color: model.duleFocusNode.hasFocus
                 ? Color(senderBubbleCode)
-                : Colors.grey.shade500,
+                : Theme.of(context).colorScheme.darkGrey,
             iconSize: 32,
           ),
           IconButton(
@@ -218,26 +230,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             color: Theme.of(context).colorScheme.darkGrey,
             iconSize: 32,
           ),
-          !model.isBusy
+          model.sendingMediaPath == null
               ? IconButton(
                   onPressed: () => model.pickGallery(context),
                   icon: const Icon(FeatherIcons.image),
                   color: Theme.of(context).colorScheme.darkGrey,
                   iconSize: 32,
                 )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(
-                        Theme.of(context).colorScheme.blue,
-                      ),
-                    ),
-                  ),
-                ),
+              : senderMediaWidget(context, model, model.uploadingProgress),
           IconButton(
             onPressed: () => navService.materialPageRoute(
                 context, WriteLetterView(fireUser: widget.fireUser)),
@@ -257,7 +257,9 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
               model.clearMessage();
             },
             icon: const Icon((FeatherIcons.refreshCcw)),
-            color: model.isDuleEmpty ? Theme.of(context).colorScheme.darkGrey : Theme.of(context).colorScheme.red,
+            color: model.isDuleEmpty
+                ? Theme.of(context).colorScheme.darkGrey
+                : Theme.of(context).colorScheme.red,
             iconSize: 32,
           ),
           horizontalSpaceTiny,
@@ -276,16 +278,12 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       builder: (BuildContext context, model, child) {
         final data = model.data;
 
-        if (model.hasError) {
-          return const Center(
-            child: Text('Model has Error'),
-          );
-        }
+        if (model.hasError) const Center(child: Text('Model has Error'));
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           extendBodyBehindAppBar: true,
-          appBar: _buildAppBar(context, data),
+          appBar: _buildAppBar(context, data, model.stream),
           body: Stack(
             fit: StackFit.expand,
             children: [
@@ -298,8 +296,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   receiverMessageBubble(
                     context,
                     data: data,
-                    fireUser: widget.fireUser,
                     model: model,
+                    fireUser: widget.fireUser,
                   ),
                   verticalSpaceRegular,
                   senderMessageBubble(context,
