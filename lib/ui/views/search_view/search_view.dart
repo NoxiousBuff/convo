@@ -20,18 +20,23 @@ class SearchView extends StatelessWidget {
   const SearchView({Key? key}) : super(key: key);
 
   AppBar buildSearchHeader(BuildContext context, SearchViewModel model) {
+    final appBarBrightness =
+        Theme.of(context).colorScheme.brightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final systemUIOverlay =
+        SystemUiOverlayStyle(statusBarIconBrightness: appBarBrightness);
     return AppBar(
       elevation: 0.0,
       backgroundColor: Colors.transparent,
       leading: IconButton(
         icon: const Icon(FeatherIcons.arrowLeft),
-        color:Theme.of(context).colorScheme.black,
+        color: Theme.of(context).colorScheme.black,
         onPressed: () {
           Navigator.pop(context);
         },
       ),
-      systemOverlayStyle:
-          const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
+      systemOverlayStyle: systemUIOverlay,
       title: Padding(
         padding: const EdgeInsets.only(right: 8.0),
         child: Hero(
@@ -40,25 +45,31 @@ class SearchView extends StatelessWidget {
             autofocus: true,
             textInputAction: TextInputAction.search,
             controller: model.searchTech,
-            padding:  const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.black,
+              fontWeight: FontWeight.w400,
+            ),
             placeholder: 'Search for someone',
-            placeholderStyle:  TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.mediumBlack,
-                fontWeight: FontWeight.w400,),
+            placeholderStyle: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.mediumBlack,
+              fontWeight: FontWeight.w400,
+            ),
             suffix: model.searchTech.text.isEmpty
                 ? const SizedBox.shrink()
                 : IconButton(
                     onPressed: () => model.searchTech.clear(),
-                    icon:  Icon(
+                    icon: Icon(
                       FeatherIcons.x,
                       color: Theme.of(context).colorScheme.mediumBlack,
                     )),
             decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.lightGrey,
-                          border: Border.all(color: Theme.of(context).colorScheme.grey),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
+              color: Theme.of(context).colorScheme.lightGrey,
+              border: Border.all(color: Theme.of(context).colorScheme.grey),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
             onChanged: (value) {
               model.handleUsernameSearch(value);
 
@@ -72,10 +83,14 @@ class SearchView extends StatelessWidget {
   }
 
   Widget buildEmptySearch(BuildContext context, String query) {
-    return Center(child: Column(
+    return Center(
+        child: Column(
       children: [
         verticalSpaceLarge,
-        emptyState(context, emoji: '😞', description: 'Perhaps try again with another username.', heading: 'Nothing found for \n\'$query\'.'),
+        emptyState(context,
+            emoji: '😞',
+            description: 'Perhaps try again with another username.',
+            heading: 'Nothing found for \n\'$query\'.'),
       ],
     ));
   }
@@ -115,7 +130,7 @@ class SearchView extends StatelessWidget {
                       model.deleteFromRecentSearches(recentSearch);
                     },
                     icon: const Icon(FeatherIcons.x),
-                    color:Theme.of(context).colorScheme.mediumBlack,
+                    color: Theme.of(context).colorScheme.mediumBlack,
                   ),
                   horizontalSpaceSmall,
                 ],
@@ -157,7 +172,8 @@ class SearchView extends StatelessWidget {
                               fireUser: fireUser,
                               title: fireUser.username,
                               onTap: () async {
-                                chatService.startDuleConversation(context, fireUser);
+                                chatService.startDuleConversation(
+                                    context, fireUser);
                                 model.addToRecentSearches(fireUser.id);
                               },
                             );
@@ -165,8 +181,10 @@ class SearchView extends StatelessWidget {
                           childCount: searchResults.length,
                         ),
                       )
-                    : SliverToBoxAdapter(child: buildEmptySearch(context, model.searchTech.text),
-                    ),],
+                    : SliverToBoxAdapter(
+                        child: buildEmptySearch(context, model.searchTech.text),
+                      ),
+              ],
             );
           },
         ),

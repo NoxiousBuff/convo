@@ -10,7 +10,6 @@ import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,6 +41,17 @@ class ChatListView extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Material(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.transparent,
+              child: IconButton(
+                color: Theme.of(context).colorScheme.black,
+                icon: const Icon(FeatherIcons.userPlus),
+                onPressed: () {
+                  navService.materialPageRoute(context, const InvitesView());
+                },
+              ),
+            ),
             Material(
               borderRadius: BorderRadius.circular(16),
               color: Colors.transparent,
@@ -229,9 +239,9 @@ class ChatListView extends StatelessWidget {
               _buildAppBar(context),
               _buildPinnedList(context, model),
               _buildChatList(context, model),
-              SliverToBoxAdapter(
-                child: Lottie.asset('assets/email-sent.json'),
-              )
+              // SliverToBoxAdapter(
+              //   child: Lottie.asset('assets/email-sent.json'),
+              // )
             ],
           ),
         );

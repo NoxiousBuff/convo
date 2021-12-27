@@ -28,14 +28,14 @@ Widget lightClipperAnimation(BuildContext context) {
 
 Widget lottieAnimation(
     BuildContext context, AnimationController balloonsController) {
-  const balloonsAnimationUrl =
-      'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json';
+  // const balloonsAnimationUrl =
+  //     'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json';
   return Lottie.asset(
     // balloonsAnimationUrl,
-    'assets/email-sent.json',
+    'assets/animation.json',
     width: screenWidth(context),
     controller: balloonsController,
-    height: MediaQuery.of(context).size.height * 0.8,
+    height: MediaQuery.of(context).size.height,
   );
 }
 

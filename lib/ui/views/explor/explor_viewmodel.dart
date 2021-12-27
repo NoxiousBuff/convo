@@ -1,20 +1,25 @@
+import 'dart:async';
+import 'dart:math';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:hint/models/pixabay_api_response.dart';
-import 'package:hint/models/pixabay_image_model.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
-import 'package:hint/app/app_logger.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/pixabay_image_model.dart';
+import 'package:hint/models/pixabay_api_response.dart';
 
 List<PixabayImageModel> parsePhotos(String responseBody) {
-
   final parsed = jsonDecode(responseBody).cast<String, dynamic>();
 
   final PixabayApiResponse apiResponse = PixabayApiResponse.fromJson(parsed);
 
   final pixabayHits = apiResponse.hits.map((e) {
-    final ap = e as Map<String, dynamic>;
-    final media = PixabayImageModel.fromJson(ap);
+    final json = e as Map<String, dynamic>;
+    final media = PixabayImageModel.fromJson(json);
+
     return media;
   }).toList();
 
@@ -23,28 +28,68 @@ List<PixabayImageModel> parsePhotos(String responseBody) {
 
 class ExplorViewModel extends BaseViewModel {
   final log = getLogger('ExplorViewModel');
+  static const _key = pixaBayApiKey; // PixabayApiKey
 
-  List<PixabayImageModel> _images = [];
-  List<PixabayImageModel> get images => _images;
+  List<PixabayImageModel> _fetchedImages = [];
+  List<PixabayImageModel> get fetchedImages => _fetchedImages;
 
-  int _imagesLength = 0;
-  int get imagesLength => _imagesLength;
+  static const hiveKey = FireUserField.interests;
+  static const hiveBox = HiveApi.userDataHiveBox;
+  List currentUserInterests = hiveApi.getFromHive(hiveBox, hiveKey);
+
+  static List<String> categories = [
+    'fashion',
+    'nature',
+    'backgrounds',
+    'science',
+    'education',
+    'people',
+    'feelings',
+    'religion',
+    'health',
+    'places',
+    'animals',
+    'industry',
+    'food',
+    'computer',
+    'sports',
+    'transportation',
+    'travel',
+    'buildings',
+    'business',
+    'music'
+  ];
 
   Future<List<PixabayImageModel>> fetchImages() async {
+    List<dynamic> queries = currentUserInterests + categories;
+
+    String query = queries[Random().nextInt(queries.length)];
+    int random = Random().nextInt(10);
+
+    int page = random + 1;
+
+    log.wtf('Query:$query');
+    log.v('PageNumber:$page');
+
     setBusy(true);
-    final response = await http.get(Uri.parse(
-        'https://pixabay.com/api/?key=24560588-abd85a4f3224ed81eb7c4a1de&q=yellow+flowers&image_type=photo&pretty=true'));
+    String pixabayUrl =
+        'https://pixabay.com/api/?key=$_key&q=$query&image_type=photo&pretty=true&per_page=5&page=$page';
+
+    Timer(const Duration(seconds: 5), () => setBusy(false));
+
+    final response = await http.get(Uri.parse(pixabayUrl));
     log.wtf(jsonDecode(response.body));
     if (response.statusCode == 200) {
       final computeResult = await compute(parsePhotos, response.body);
-      log.e(computeResult);
-      _imagesLength = computeResult.length;
-      _images = _images + computeResult;
-      notifyListeners();
-      setBusy(false);
+      log.v(computeResult);
 
+      _fetchedImages = _fetchedImages + computeResult;
+      notifyListeners();
+
+      setBusy(false);
       return computeResult;
     } else {
+      setBusy(false);
       throw Exception('Failed to load album');
     }
   }

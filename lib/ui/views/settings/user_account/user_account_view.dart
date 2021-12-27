@@ -8,7 +8,7 @@ import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/settings/security/security_view.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/settings/update_email/update_email_view.dart';
-import 'package:hint/ui/views/settings/update_password/update_password.dart';
+import 'package:hint/ui/views/settings/update_password/update_password_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_viewmodel.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';

@@ -22,7 +22,7 @@ class UpdatePasswordView extends StatelessWidget {
             connectivityBuilder: (context, connectivity, child) {
               bool connected = connectivity != ConnectivityResult.none;
               return Scaffold(
-                backgroundColor: Theme.of(context).colorScheme.white,
+                backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
                 appBar: cwAuthAppBar(context,
                     title: 'Update Password',
                     onPressed: () => Navigator.pop(context)),

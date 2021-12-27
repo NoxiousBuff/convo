@@ -104,7 +104,7 @@ class WriteLetterView extends StatelessWidget {
                     autoFocus: false, maxLength: 400, onChanged: (value) {
                   model.updateIsEdited(true);
                   model.updateLetterEmpty();
-                }),
+                }, textInputAction: TextInputAction.newline,),
               ),
               verticalSpaceLarge,
               cwAuthProceedButton(context,
