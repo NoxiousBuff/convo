@@ -22,6 +22,8 @@ dependencies:
   cloud_firestore: ^2.5.3
   firebase_storage: ^10.0.5
   firebase_database: ^9.0.2
+  firebase_crashlytics: ^2.4.4
+  firebase_performance: ^0.8.0+3
 
   #resources
   uuid: ^3.0.4
@@ -71,6 +73,7 @@ dependencies:
   extended_image: ^6.0.1
   get_it: ^7.2.0
   share_plus: ^3.0.4
+  iconsax: ^0.0.8
 
 dev_dependencies:
   flutter_test:

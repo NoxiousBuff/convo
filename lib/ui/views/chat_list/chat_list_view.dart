@@ -9,6 +9,8 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -74,7 +76,7 @@ class ChatListView extends StatelessWidget {
               color: Colors.transparent,
               child: IconButton(
                 color: Theme.of(context).colorScheme.black,
-                icon: const Icon(FeatherIcons.send),
+                icon: const Icon(Iconsax.send_2),
                 onPressed: () {
                   mainViewPageController.animateToPage(1,
                       duration: const Duration(milliseconds: 300),
@@ -227,6 +229,9 @@ class ChatListView extends StatelessWidget {
               _buildAppBar(context),
               _buildPinnedList(context, model),
               _buildChatList(context, model),
+              SliverToBoxAdapter(
+                child: Lottie.asset('assets/email-sent.json'),
+              )
             ],
           ),
         );

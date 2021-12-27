@@ -35,8 +35,8 @@ class UpdateEmailViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> updateUserEmail(
-      BuildContext context, String email, String password) async {
+  Future<void> updateUserEmail(BuildContext context,
+      {required String email, required String password}) async {
     setBusy(true);
     String key = FireUserField.email;
 
@@ -81,6 +81,7 @@ class UpdateEmailViewModel extends BaseViewModel {
         default:
       }
     } catch (e) {
+      setBusy(false);
       log.e('Update Email Error:$e');
       customSnackbars.errorSnackbar(context, title: 'something went wrong');
     }

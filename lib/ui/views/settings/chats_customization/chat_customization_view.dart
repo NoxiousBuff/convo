@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/pods/settings_pod.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/settings/chats_customization/widgets/change_bubble_color.dart';
@@ -7,7 +11,6 @@ import 'package:hint/ui/views/settings/chats_customization/widgets/change_keywor
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 
@@ -53,24 +56,49 @@ class ChatsCustomizationView extends StatelessWidget {
               ValueListenableBuilder<Box>(
                 valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
                 builder: (context, box, child) {
-                  const key = AppSettingKeys.darkTheme;
-                  const boxName = HiveApi.appSettingsBoxName;
-                  bool darkTheme =
-                      Hive.box(boxName).get(key, defaultValue: false);
                   return Row(
                     children: [
                       Expanded(
                           child: cwEADetailsTile(context, 'Theme',
-                              subtitle: darkTheme
-                                  ? 'Tap to change to Light Mode'
-                                  : 'Tap to change to Dark Mode',
+                              subtitle: 'Tap to change to app theme',
                               showTrailingIcon: false)),
-                      CupertinoSwitch(
-                        value: darkTheme,
-                        onChanged: (val) {
-                          box.put(key, !darkTheme);
-                        },
-                      )
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Theme.of(context).colorScheme.lightGrey,
+                        ),
+                        padding: const EdgeInsets.only(left: 10, right: 2),
+                        child: DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(14.2),
+                          dropdownColor:
+                              Theme.of(context).colorScheme.lightGrey,
+                          underline: shrinkBox,
+                          value: settingsPod.appThemeInString,
+                          elevation: 0,
+                          onChanged: (chosenThemeMode) {
+                            if(chosenThemeMode != null) {
+                              settingsPod.updateTheme(chosenThemeMode);
+                              log(chosenThemeMode);
+                              log(settingsPod.appThemeInString);
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: AppThemes.system,
+                              child: Text('System'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemes.light,
+                              child: Text('Light'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemes.dark,
+                              child: Text('Dark'),
+                            )
+                          ],
+                        ),
+                      ),
+                      horizontalSpaceRegular,
                     ],
                   );
                 },
@@ -91,14 +119,11 @@ class ChatsCustomizationView extends StatelessWidget {
                   var value = Hive.box(boxName).get(key, defaultValue: 'Congo');
                   return cwEADetailsTile(context, 'Confetti', subtitle: value,
                       onTap: () {
-                    showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) {
-                          return const ChangeKeywordDialog(
-                            animationType: AnimationType.confetti,
-                          );
-                        });
+                    navService.materialPageRoute(
+                        context,
+                        const ChangeKeywordDialog(
+                          animationType: AnimationType.confetti,
+                        ));
                   });
                 },
               ),
@@ -111,14 +136,11 @@ class ChatsCustomizationView extends StatelessWidget {
                       Hive.box(boxName).get(key, defaultValue: 'Balloons');
                   return cwEADetailsTile(context, 'Balloons', subtitle: value,
                       onTap: () {
-                    showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) {
-                          return const ChangeKeywordDialog(
-                            animationType: AnimationType.balloons,
-                          );
-                        });
+                    navService.materialPageRoute(
+                        context,
+                        const ChangeKeywordDialog(
+                          animationType: AnimationType.confetti,
+                        ));
                   });
                 },
               ),

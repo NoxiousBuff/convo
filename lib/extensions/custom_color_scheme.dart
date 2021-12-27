@@ -68,7 +68,7 @@ extension CustomColorScheme on ColorScheme {
       dynamicColour(light: Colors.black54, dark: Colors.white54);
 
   Color get black =>
-      dynamicColour(light: Colors.black87, dark: Colors.white.withAlpha(200));
+      dynamicColour(light: Colors.black87, dark: const Color.fromRGBO(255, 255, 255, 0.87));
 
   Color get scaffoldColor =>
       dynamicColour(light: Colors.white, dark: const Color(0xff121212));

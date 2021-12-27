@@ -98,6 +98,7 @@ class UpdatePasswordViewModel extends BaseViewModel {
         default:
       }
     } catch (e) {
+      setBusy(false);
       log.e('Update Email Error:$e');
       customSnackbars.errorSnackbar(context, title: 'something went wrong');
     }

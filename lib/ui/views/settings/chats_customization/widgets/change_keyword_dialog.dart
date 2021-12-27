@@ -176,6 +176,7 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           appBar: cwAuthAppBar(context,
               title: '', onPressed: () => Navigator.pop(context)),
           body: ListView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
               verticalSpaceLarge,

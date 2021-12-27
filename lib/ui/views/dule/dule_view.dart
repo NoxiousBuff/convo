@@ -107,8 +107,9 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
   AppBar _buildAppBar(
       BuildContext context, DatabaseEvent? data, Stream<DatabaseEvent> stream) {
-    const dark = Brightness.dark;
-    const systemUIOverlay = SystemUiOverlayStyle(statusBarIconBrightness: dark);
+    // const dark = Brightness.dark;
+    final appBarBrightness = Theme.of(context).colorScheme.brightness == Brightness.light ? Brightness.dark : Brightness.light;
+    final systemUIOverlay = SystemUiOverlayStyle(statusBarIconBrightness: appBarBrightness);
     return AppBar(
       elevation: 0,
       leadingWidth: 100,

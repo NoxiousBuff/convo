@@ -30,8 +30,9 @@ Widget lottieAnimation(
     BuildContext context, AnimationController balloonsController) {
   const balloonsAnimationUrl =
       'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json';
-  return Lottie.network(
-    balloonsAnimationUrl,
+  return Lottie.asset(
+    // balloonsAnimationUrl,
+    'assets/email-sent.json',
     width: screenWidth(context),
     controller: balloonsController,
     height: MediaQuery.of(context).size.height * 0.8,

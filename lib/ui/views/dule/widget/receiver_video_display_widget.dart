@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:hint/app/app_colors.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';

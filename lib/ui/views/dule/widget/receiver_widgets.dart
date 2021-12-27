@@ -277,7 +277,7 @@ Widget receiverMessageBubble(
                     hintStyle: TextStyle(
                         color: Theme.of(context).colorScheme.mediumBlack,
                         fontSize: 24),
-                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                    border: const OutlineInputBorder(borderSide: BorderSide.none),
                   ),
                 ),
               );

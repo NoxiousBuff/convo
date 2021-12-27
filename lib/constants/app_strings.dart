@@ -66,12 +66,18 @@ class LetterFields {
 }
 
 class AppSettingKeys {
-  static const String darkTheme = 'darkTheme';
+  // static const String darkTheme = 'darkTheme';
+  static const String appTheme = 'appTheme';
   static const String phoneContact = 'phoneContact';
-  static const String incognatedMode = 'incognatedMode';
   static const String confettiAnimation = 'confettiAnimation';
   static const String balloonsAnimation = 'balloonsAnimation';
   static const String senderBubbleColor = 'senderBubbleColor';
   static const String receiverBubbleColor = 'receiverBubbleColor';
   static const String securityNotifications = 'securityNotifications';
+}
+
+class AppThemes {
+  static const String system = 'system';
+  static const String dark = 'dark';
+  static const String light = 'light';
 }

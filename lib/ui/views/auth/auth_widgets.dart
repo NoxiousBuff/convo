@@ -105,13 +105,13 @@ Widget cwAuthHeadingTitle(BuildContext context, {required String title}) {
   );
 }
 
-Widget cwAuthDescription(BuildContext context, {required String title}) {
+Widget cwAuthDescription(BuildContext context, {required String title, Color? titleColor}) {
   return Text(
     title,
     style:  TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.mediumBlack),
+        color: titleColor ?? Theme.of(context).colorScheme.mediumBlack),
   );
 }
 

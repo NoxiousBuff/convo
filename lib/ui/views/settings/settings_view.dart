@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
@@ -46,6 +47,7 @@ class SettingsView extends StatelessWidget {
             cwEADetailsTile(context, 'Notifications',
                 subtitle: 'Messages, Start Chat', onTap: () {
               // TODO: add notification page
+              
             }),
             cwEADetailsTile(context, 'Help',
                 subtitle: 'Help Center, Contact us, Privacy Policy', onTap: () {
