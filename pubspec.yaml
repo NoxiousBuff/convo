@@ -24,6 +24,7 @@ dependencies:
   firebase_database: ^9.0.2
   firebase_crashlytics: ^2.4.4
   firebase_performance: ^0.8.0+3
+  cloud_functions: ^3.2.4
 
   #resources
   uuid: ^3.0.4

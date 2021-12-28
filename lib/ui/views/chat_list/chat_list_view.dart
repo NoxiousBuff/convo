@@ -52,17 +52,6 @@ class ChatListView extends StatelessWidget {
                 },
               ),
             ),
-            Material(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.transparent,
-              child: IconButton(
-                color: Theme.of(context).colorScheme.black,
-                icon: const Icon(FeatherIcons.userPlus),
-                onPressed: () {
-                  navService.materialPageRoute(context, const InvitesView());
-                },
-              ),
-            ),
             ValueListenableBuilder<Box>(
                 valueListenable:
                     hiveApi.hiveStream(HiveApi.archivedUsersHiveBox),
