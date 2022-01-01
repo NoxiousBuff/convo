@@ -1,11 +1,11 @@
 import 'package:animations/animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/letter_model.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/read_letter/read_letter_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -41,7 +41,7 @@ class ReceivedLettersView extends StatelessWidget {
               final docs = data.docs;
               return docs.isNotEmpty
                   ? CustomScrollView(
-                    scrollBehavior: const CupertinoScrollBehavior(),
+                      scrollBehavior: const CupertinoScrollBehavior(),
                       slivers: [
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
@@ -54,36 +54,42 @@ class ReceivedLettersView extends StatelessWidget {
                                   letter.timestamp.toDate(),
                                   locale: 'en');
                               return OpenContainer(
-                                openColor: Theme.of(context).colorScheme.scaffoldColor,
-                                closedColor: Theme.of(context).colorScheme.scaffoldColor,
+                                openColor:
+                                    Theme.of(context).colorScheme.scaffoldColor,
+                                closedColor:
+                                    Theme.of(context).colorScheme.scaffoldColor,
                                 closedElevation: 0,
                                 closedBuilder: (context, onPressed) {
                                   return ListTile(
                                     trailing: Text(
                                       timestamp,
                                       style: TextStyle(
-                                          color: Theme.of(context).colorScheme.mediumBlack),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .mediumBlack),
                                     ),
                                     title: Text(letterText,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                            color: Theme.of(context).colorScheme.black,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .black,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500)),
                                     subtitle: Text(
                                       letter.username,
                                       style: TextStyle(
-                                          color: Theme.of(context).colorScheme.mediumBlack),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .mediumBlack),
                                     ),
-                                    leading: ClipRRect(
+                                    leading: userProfilePhoto(
+                                      context,
+                                      letter.photoUrl,
+                                      width: 40,
+                                      height: 40,
                                       borderRadius: BorderRadius.circular(14.2),
-                                      child: CachedNetworkImage(
-                                        imageUrl: letter.photoUrl,
-                                        height: 40,
-                                        width: 40,
-                                        fit: BoxFit.cover,
-                                      ),
                                     ),
                                   );
                                 },
@@ -97,7 +103,9 @@ class ReceivedLettersView extends StatelessWidget {
                           ),
                         ),
                         sliverVerticalSpaceLarge,
-                        SliverToBoxAdapter(child: bottomPadding(context),),
+                        SliverToBoxAdapter(
+                          child: bottomPadding(context),
+                        ),
                       ],
                     )
                   : emptyState(context,

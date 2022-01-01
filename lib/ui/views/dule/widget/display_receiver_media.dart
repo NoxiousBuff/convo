@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
 
 class DisplayFullMedia extends StatefulWidget {
@@ -19,8 +20,8 @@ class DisplayFullMedia extends StatefulWidget {
 }
 
 class _DisplayFullMediaState extends State<DisplayFullMedia> {
-  Widget mediaHandler() {
-    switch (widget.mediaType) {
+  Widget mediaHandler(String type) {
+    switch (type) {
       case MediaType.image:
         {
           return Center(child: ExtendedImage.network(widget.mediaUrl));
@@ -47,12 +48,17 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
       extendBodyBehindAppBar: true,
       backgroundColor: Theme.of(context).colorScheme.black,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close)),
       ),
-      body: mediaHandler(),
+      body: Container(
+          height: screenHeight(context),
+          width: screenWidth(context),
+          color: Theme.of(context).colorScheme.black,
+          child: mediaHandler(widget.mediaType)),
     );
   }
 }

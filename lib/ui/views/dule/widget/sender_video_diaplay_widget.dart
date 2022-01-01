@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:video_player/video_player.dart';
 import 'package:extended_image/extended_image.dart';
 
@@ -54,28 +55,33 @@ class _SenderVideoDisplayWidgetState extends State<SenderVideoDisplayWidget> {
         if (snapshot.connectionState == ConnectionState.done) {
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
-          return Stack(
-            fit: StackFit.expand,
-            alignment: Alignment.center,
-            children: [
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: VideoPlayer(_controller)),
-              Center(
-                child: Text(
-                  (widget.uploadingProgress * 100).toInt().toString(),
-                  style:  TextStyle(color: Theme.of(context).colorScheme.white),
+          return Container(
+            constraints: const BoxConstraints(maxHeight: 35, maxWidth: 60),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.center,
+              children: [
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: VideoPlayer(_controller)),
+                Center(
+                  child: Text(
+                    (widget.uploadingProgress * 100).toInt().toString(),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
-          return const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2.0));
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgress(),
+          );
         }
       },
     );

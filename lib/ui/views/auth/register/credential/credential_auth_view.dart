@@ -142,7 +142,7 @@ class CredentialAuthView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      cwAuthProceedButton(context,
+                      CWAuthProceedButton(
                           buttonTitle: 'Next',
                           isLoading: model.isBusy,
                           isActive: model.fieldNotEmpty, onTap: () async {

@@ -26,12 +26,9 @@ Widget lightClipperAnimation(BuildContext context) {
   );
 }
 
-Widget lottieAnimation(
+Widget balloonsLottieAnimation(
     BuildContext context, AnimationController balloonsController) {
-  // const balloonsAnimationUrl =
-  //     'https://assets3.lottiefiles.com/datafiles/6noNCcKTHSPTR58PUjeZyBEISORjlZceiZznmp02/balloons_animation.json';
   return Lottie.asset(
-    // balloonsAnimationUrl,
     'assets/animation.json',
     width: screenWidth(context),
     controller: balloonsController,
@@ -39,21 +36,30 @@ Widget lottieAnimation(
   );
 }
 
-Widget confettiAnimation(
-  BuildContext context,
-  ConfettiController confettiController,
-  double blastDirection,
-) {
+Widget heartsLottieAnimation(
+    BuildContext context, AnimationController heatsController) {
+  return Lottie.asset(
+    'assets/hearts.json',
+    width: screenWidth(context),
+    controller: heatsController,
+    height: MediaQuery.of(context).size.height,
+  );
+}
+
+Widget confettiAnimation(BuildContext context,
+    ConfettiController confettiController, double blastDirection,
+    {bool isLeft = false}) {
   return Positioned(
     bottom: -80,
-    left: 0,
+    left: isLeft ? 0 : null,
+    right: isLeft ? null : 0,
     child: ConfettiWidget(
       gravity: 0.2,
       minBlastForce: 300,
       maxBlastForce: 400,
       numberOfParticles: 400,
-      blastDirection: blastDirection,
       emissionFrequency: 0.01,
+      blastDirection: blastDirection,
       confettiController: confettiController,
       blastDirectionality: BlastDirectionality.explosive,
     ),

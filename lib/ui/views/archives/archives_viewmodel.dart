@@ -4,6 +4,7 @@ import 'package:hint/api/hive.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/services/push_notification_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:stacked/stacked.dart';
@@ -22,8 +23,23 @@ class ArchiveViewModel extends BaseViewModel {
               verticalSpaceMedium,
               ListTile(
                 onTap: () {
+                  pushNotificationService.sendZap(
+                    fireUser.id,
+                  );
                   Navigator.pop(context);
-                  navService.materialPageRoute(context, WriteLetterView(fireUser: fireUser));
+                },
+                leading: const Icon(FeatherIcons.zap),
+                title: Text('Send Zap',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(fontSize: 18)),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  navService.materialPageRoute(
+                      context, WriteLetterView(fireUser: fireUser));
                 },
                 leading: const Icon(FeatherIcons.send),
                 title: Text('Write a Letter',

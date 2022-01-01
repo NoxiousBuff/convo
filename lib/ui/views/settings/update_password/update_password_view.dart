@@ -49,8 +49,8 @@ class UpdatePasswordView extends StatelessWidget {
                             onChanged: (value) =>
                                 model.updateNewPasswordEmpty()),
                         verticalSpaceLarge,
-                        cwAuthProceedButton(
-                          context,
+                        CWAuthProceedButton(
+                          
                           buttonTitle: 'Update Password',
                           isActive: model.passwordNotEmpty &&
                               model.newPasswordNotEmpty,

@@ -16,13 +16,11 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
   ];
   final commonInterests =
       lists.fold<Set>(lists.first.toSet(), (a, b) => a.intersection(b.toSet()));
-  final currentUserId = hiveApi.getUserData(FireUserField.id);
 
   final compatiblePercentage =
       commonInterests.length / usersInterests.length * 100;
 
-  return fireUser.id != currentUserId
-      ? Material(
+  return Material(
           elevation: 00,
           borderRadius: BorderRadius.circular(32),
           child: InkWell(
@@ -80,6 +78,5 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
               ),
             ),
           ),
-        )
-      : const SizedBox.shrink();
+        );
 }

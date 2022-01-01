@@ -41,54 +41,31 @@ class ChangeInterestViewModel extends BaseViewModel {
   ];
 
   final List<List<String>> _allInterestLists = [
-    userInterest.moviesAndTelevision,
-    userInterest.activities,
-    userInterest.artsAndCulture,
-    userInterest.automotive,
-    userInterest.business,
-    userInterest.careers,
-    userInterest.codingLanguages,
-    userInterest.education,
-    userInterest.foodAndDrink,
-    userInterest.gaming,
-    userInterest.healthAndFitness,
-    userInterest.lifeStages,
-    userInterest.personalFinance,
-    userInterest.pets,
-    userInterest.science,
-    userInterest.socialIssues,
-    userInterest.sports,
-    userInterest.styleAndFashion,
-    userInterest.technologyAndComputing,
-    userInterest.travel
+    Interest.moviesAndTelevision,
+    Interest.activities,
+    Interest.artsAndCulture,
+    Interest.automotive,
+    Interest.business,
+    Interest.careers,
+    Interest.codingLanguages,
+    Interest.education,
+    Interest.foodAndDrink,
+    Interest.gaming,
+    Interest.healthAndFitness,
+    Interest.lifeStages,
+    Interest.personalFinance,
+    Interest.pets,
+    Interest.science,
+    Interest.socialIssues,
+    Interest.sports,
+    Interest.styleAndFashion,
+    Interest.technologyAndComputing,
+    Interest.travel
   ];
-
-  // final List<Color> _colorListForInterest = [
-  //   Theme.of(context).colorScheme.yellow,
-  //   Theme.of(context).colorScheme.green,
-  //   Theme.of(context).colorScheme.blue,
-  //   Theme.of(context).colorScheme.purple,
-  //   Theme.of(context).colorScheme.red,
-  //   Theme.of(context).colorScheme.yellow,
-  //   Theme.of(context).colorScheme.green,
-  //   Theme.of(context).colorScheme.blue,
-  //   Theme.of(context).colorScheme.purple,
-  //   Theme.of(context).colorScheme.red,
-  //   Theme.of(context).colorScheme.yellow,
-  //   Theme.of(context).colorScheme.green,
-  //   Theme.of(context).colorScheme.blue,
-  //   Theme.of(context).colorScheme.purple,
-  //   Theme.of(context).colorScheme.red,
-  //   Theme.of(context).colorScheme.yellow,
-  //   Theme.of(context).colorScheme.green,
-  //   Theme.of(context).colorScheme.blue,
-  //   Theme.of(context).colorScheme.purple,
-  //   Theme.of(context).colorScheme.red,
-  // ];
 
   List<List<String>> get allInterestList => _allInterestLists;
 
-  // List<Color> get colorListForInterest => _colorListForInterest;
+  final firestoreApi = locator<FirestoreApi>();
 
   List<String> get interestNames => _interestNames;
 
@@ -98,7 +75,7 @@ class ChangeInterestViewModel extends BaseViewModel {
   void updateIsEdited(bool localIsEdited) {
     _isEdited = localIsEdited;
     notifyListeners();
-  } 
+  }
 
   void gettingInterests() {
     _userSelectedInterests =
@@ -106,7 +83,7 @@ class ChangeInterestViewModel extends BaseViewModel {
     notifyListeners();
     log.wtf('UserSelectedinterests:$_userSelectedInterests');
   }
-final firestoreApi = locator<FirestoreApi>();
+
   Future<void> updateUserSelectedInterests(BuildContext context) async {
     setBusy(true);
     await firestoreApi
@@ -116,8 +93,7 @@ final firestoreApi = locator<FirestoreApi>();
       propertyName: FireUserField.interests,
     )
         .then((value) {
-      hiveApi.updateUserData(
-          FireUserField.interests, _userSelectedInterests);
+      hiveApi.updateUserData(FireUserField.interests, _userSelectedInterests);
       customSnackbars.successSnackbar(context,
           title: 'You Data Was Sucessfully Saved');
     });

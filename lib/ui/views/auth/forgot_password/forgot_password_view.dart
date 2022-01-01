@@ -75,8 +75,8 @@ class ForgotPasswordAuthView extends StatelessWidget {
                   child: Column(
                   mainAxisSize: MainAxisSize.min,
                     children: [
-                      cwAuthProceedButton(
-                        context,
+                      CWAuthProceedButton(
+                       
                         buttonTitle: 'Reset Password',
                         isLoading: model.isBusy,
                         onTap: () async {

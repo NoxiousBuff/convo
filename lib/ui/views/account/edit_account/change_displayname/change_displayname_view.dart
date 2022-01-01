@@ -75,7 +75,7 @@ class ChangeDisplayNameView extends StatelessWidget {
                       if(!model.isEdited) {model.updateIsEdited(true); }
                     }),
                     verticalSpaceLarge,
-                    cwAuthProceedButton(context, buttonTitle: 'Save', onTap: () {
+                    CWAuthProceedButton( buttonTitle: 'Save', onTap: () {
                       model.updateUserProperty(context, FireUserField.displayName, model.dispayNameTech.text.trim(),);
                     }, isLoading: model.isBusy, isActive: model.isActive ),
                   ],

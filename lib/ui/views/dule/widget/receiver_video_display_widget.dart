@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -30,7 +31,6 @@ class _ReceiverVideoDisplayWidgetState
     _initializeVideoPlayerFuture = _controller.initialize();
 
     // Use the controller to loop the video.
-    _controller.setLooping(true);
     super.initState();
   }
 
@@ -51,12 +51,13 @@ class _ReceiverVideoDisplayWidgetState
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
           return Stack(
+            fit: StackFit.expand,
             alignment: Alignment.center,
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: VideoPlayer(_controller)),
-               Icon(
+              Icon(
                 FeatherIcons.play,
                 size: 16,
                 color: Theme.of(context).colorScheme.white,
@@ -66,11 +67,10 @@ class _ReceiverVideoDisplayWidgetState
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
-          return Container(
-              width: 40,
-              height: 40,
-              padding: const EdgeInsets.all(8),
-              child: const CircularProgressIndicator(strokeWidth: 2));
+          return const Padding(
+            padding:  EdgeInsets.all(8.0),
+            child: CircularProgress(height: 30, width: 30),
+          );
         }
       },
     );

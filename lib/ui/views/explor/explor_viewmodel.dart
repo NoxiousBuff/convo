@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'dart:math';
+import 'dart:async';
 import 'dart:convert';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -30,12 +30,12 @@ class ExplorViewModel extends BaseViewModel {
   final log = getLogger('ExplorViewModel');
   static const _key = pixaBayApiKey; // PixabayApiKey
 
-  List<PixabayImageModel> _fetchedImages = [];
+  final List<PixabayImageModel> _fetchedImages = [];
   List<PixabayImageModel> get fetchedImages => _fetchedImages;
 
   static const hiveKey = FireUserField.interests;
   static const hiveBox = HiveApi.userDataHiveBox;
-  List currentUserInterests = hiveApi.getFromHive(hiveBox, hiveKey);
+  List currentInterests = hiveApi.getFromHive(hiveBox, hiveKey);
 
   static List<String> categories = [
     'fashion',
@@ -61,7 +61,7 @@ class ExplorViewModel extends BaseViewModel {
   ];
 
   Future<List<PixabayImageModel>> fetchImages() async {
-    List<dynamic> queries = currentUserInterests + categories;
+    List<dynamic> queries = currentInterests + categories;
 
     String query = queries[Random().nextInt(queries.length)];
     int random = Random().nextInt(10);
@@ -73,9 +73,9 @@ class ExplorViewModel extends BaseViewModel {
 
     setBusy(true);
     String pixabayUrl =
-        'https://pixabay.com/api/?key=$_key&q=$query&image_type=photo&pretty=true&per_page=5&page=$page';
+        'https://pixabay.com/api/?key=$_key&q=$query&image_type=photo&pretty=true&per_page=6&page=$page&safesearch=true';
 
-    Timer(const Duration(seconds: 5), () => setBusy(false));
+    Timer(const Duration(seconds: 4), () => setBusy(false));
 
     final response = await http.get(Uri.parse(pixabayUrl));
     log.wtf(jsonDecode(response.body));
@@ -83,13 +83,44 @@ class ExplorViewModel extends BaseViewModel {
       final computeResult = await compute(parsePhotos, response.body);
       log.v(computeResult);
 
-      _fetchedImages = _fetchedImages + computeResult;
-      notifyListeners();
+      _fetchedImages.addAll(computeResult.reversed);
+      log.wtf('Total Length Of Fetched Images:${_fetchedImages.length}');
 
-      setBusy(false);
+      computeResult.isEmpty ? null : setBusy(false);
       return computeResult;
     } else {
       setBusy(false);
+      throw Exception('Failed to load album');
+    }
+  }
+
+  Future<List<PixabayImageModel>> initialFetch() async {
+    List<dynamic> queries = currentInterests + categories;
+
+    String query = queries[Random().nextInt(queries.length)];
+    int random = Random().nextInt(10);
+
+    int page = random + 1;
+
+    log.wtf('Query:$query');
+    log.v('PageNumber:$page');
+
+    String pixabayUrl =
+        'https://pixabay.com/api/?key=$_key&q=$query&image_type=photo&pretty=true&per_page=6&page=$page&safesearch=true';
+
+    Timer(const Duration(seconds: 4), () => setBusy(false));
+
+    final response = await http.get(Uri.parse(pixabayUrl));
+    log.wtf(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final computeResult = await compute(parsePhotos, response.body);
+      log.v(computeResult);
+
+      _fetchedImages.addAll(computeResult.reversed);
+      log.wtf('Total Length Of Fetched Images:${_fetchedImages.length}');
+
+      return computeResult;
+    } else {
       throw Exception('Failed to load album');
     }
   }

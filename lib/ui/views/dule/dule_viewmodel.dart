@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:confetti/confetti.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/models/dule_model.dart';
+import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
@@ -31,6 +32,10 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   /// Path of sending media to user
   String? _sendingMediaPath;
   String? get sendingMediaPath => _sendingMediaPath;
+
+  /// ff gallery dia is uploading it return true
+  final bool _isGalleryUploading = false;
+  bool get isGalleryUploading => _isGalleryUploading;
 
   /// conversationIs of this live chat
   String _conversationId = '';
@@ -101,14 +106,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   }
 
   /// Update live user data in realtime database.
-  Future<void> updateUserDataWithKey(String key, dynamic value) {
-    return databaseService.updateUserDataWithKey(key, value);
-  }
-
-  Future<void> updateFireUserDataWithKey(
-      String fireUserId, String key, dynamic value) {
-    return databaseService.updateFireUserDataWithKey(fireUserId, key, value);
-  }
+  Future<void> updateUserDataWithKey(String key, dynamic value) =>
+      databaseService.updateUserDataWithKey(key, value);
 
   /// clear the type message
   void clearMessage() {
@@ -158,26 +157,109 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     notifyListeners();
   }
 
+  /// camera options dialog for taking picture or record a video
+  Future<void> cameraOptionDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return DuleAlertDialog(
+          title: 'What do you want ?',
+          icon: FeatherIcons.info,
+          primaryButtonText: 'Take a picture',
+          primaryOnPressed: () {
+            Navigator.pop(context);
+            pickImage(context);
+          },
+          secondaryButtontext: 'Create a video',
+          secondaryOnPressed: () => Navigator.pop(context, true),
+        );
+      },
+    );
+  }
+
   /// Clicking Image from camera
   Future<File?> pickImage(BuildContext context) async {
     final selectedImage =
         await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (selectedImage != null) {
-      final file = File(selectedImage.path);
-      final size = file.lengthSync();
-      final sizeInMB = size / (1024 * 1024);
-      final fileSize = sizeInMB;
+      const title = 'Maximum file size is 8 MB';
+      final fileSizeInBytes = File(selectedImage.path).lengthSync();
+      // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+      double fileSizeInKB = fileSizeInBytes / 1024;
+      // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+      double fileSizeInMB = fileSizeInKB / 1024;
+      final fileSize = fileSizeInMB.toInt();
+      log.wtf('File Size: $fileSizeInMB MB');
       log.wtf('Image Size:$fileSize');
       if (fileSize > 8.0) {
-        customSnackbars.errorSnackbar(context,
-            title: 'Maximum size of upload is 8 MB.');
+        setBusy(false);
+        customSnackbars.errorSnackbar(context, title: title);
       } else {
-        return file;
+        String path = File(selectedImage.path).path;
+        String name = selectedImage.name;
+        String? type = _sendingMediaType;
+        _changeSenderMediaPath(path);
+        log.w('Type:$type');
+        await uploadCamerMedia(context, filePath: path, fileName: name);
       }
+      return File(selectedImage.path);
     } else {
       log.wtf('pickImage | Image not clicked');
     }
+  }
+
+  /// Upload File In Firebase Storage
+  Future<String> uploadCamerMedia(
+    BuildContext context, {
+    required String filePath,
+    required String fileName,
+  }) async {
+    var now = DateTime.now();
+    var day = now.day;
+    var year = now.year;
+    var month = now.month;
+
+    final fileType = lookupMimeType(filePath)!.split("/").first;
+
+    var folderDate = '$day-$month-$year';
+    String folder = 'LiveChatMedia/$folderDate/$fileName';
+    _changeSenderMediaType(fileType);
+    UploadTask task = storage.ref(folder).putFile(File(filePath));
+    task.timeout(const Duration(seconds: 10), onTimeout: () {
+      setBusy(false);
+      _changeSenderMediaType(null);
+      _changeSenderMediaPath(null);
+      return task;
+    });
+    setBusy(true);
+    task.snapshotEvents.listen(
+      (TaskSnapshot snapshot) {
+        log.i('Task state: ${snapshot.state}');
+        final progress = snapshot.bytesTransferred.toDouble() /
+            snapshot.totalBytes.toDouble();
+
+        _getMediaUploadingProgress(progress);
+
+        log.wtf(_uploadingProgress);
+      },
+      onError: (e) {
+        setBusy(false);
+        task.cancel();
+        _changeSenderMediaType(null);
+        _changeSenderMediaPath(null);
+        customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
+      },
+    );
+    await task;
+    String downloadURL = await storage.ref(folder).getDownloadURL();
+    log.w('FileType:$fileType');
+    await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
+    await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
+    _changeSenderMediaType(null);
+    _changeSenderMediaPath(null);
+    setBusy(false);
+    return downloadURL;
   }
 
   /// Make a video through camera
@@ -215,6 +297,11 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
           await updateUserDataWithKey(DatabaseMessageField.aniType, value);
         }
         break;
+      case AnimationType.hearts:
+        {
+          await updateUserDataWithKey(DatabaseMessageField.aniType, value);
+        }
+        break;
       default:
         {
           await updateUserDataWithKey(DatabaseMessageField.aniType, null);
@@ -238,14 +325,14 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
       double fileSizeInMB = fileSizeInKB / 1024;
       final fileSize = fileSizeInMB.toInt();
-      log.wtf('File Size: $fileSize MB');
+      log.wtf('File Size: $fileSizeInMB MB');
       if (fileSize > 8) {
         setBusy(false);
         customSnackbars.infoSnackbar(context, title: title);
       } else {
         _changeSenderMediaPath(path);
         log.v('MediaPath:$_sendingMediaPath');
-        await uploadFile(filePath: path, fileName: fileName!, context: context);
+        await uploadFile(context, filePath: path, fileName: fileName!);
       }
       return File(result.paths.first!);
     } else {
@@ -255,10 +342,10 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   }
 
   /// Upload File In Firebase Storage
-  Future<String> uploadFile({
+  Future<String> uploadFile(
+    BuildContext context, {
     required String filePath,
     required String fileName,
-    required BuildContext context,
   }) async {
     var now = DateTime.now();
     var day = now.day;
@@ -272,12 +359,13 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     UploadTask task = storage.ref(folder).putFile(File(filePath));
     _changeSenderMediaType(fileType);
     task.timeout(const Duration(seconds: 10), onTimeout: () {
-      setBusy(false);
       _changeSenderMediaPath(null);
       _changeSenderMediaType(null);
+      setBusyForObject(_isGalleryUploading, false);
+
       return task;
     });
-    setBusy(true);
+    setBusyForObject(_isGalleryUploading, true);
     task.snapshotEvents.listen(
       (TaskSnapshot snapshot) {
         log.i('Task state: ${snapshot.state}');
@@ -289,10 +377,9 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         log.wtf(_uploadingProgress);
       },
       onError: (e) {
-        setBusy(false);
         _changeSenderMediaPath(null);
         _changeSenderMediaType(null);
-
+        setBusyForObject(_isGalleryUploading, false);
         task.cancel();
         customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
@@ -302,11 +389,10 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
     await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
 
-    setBusy(false);
     _changeSenderMediaPath(null);
     _changeSenderMediaType(null);
     log.v('MediaPath:$_sendingMediaPath');
-
+    setBusyForObject(_isGalleryUploading, false);
     return downloadURL;
   }
 

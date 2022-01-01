@@ -1,26 +1,24 @@
-import 'package:extended_image/extended_image.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:hint/ui/views/dule/dule_viewmodel.dart';
-import 'package:flutter_blurhash/flutter_blurhash.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/dule/widget/display_receiver_media.dart';
 import 'package:hint/ui/views/dule/widget/receiver_video_display_widget.dart';
-import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-Widget appBarMediaVisibility(
-  BuildContext context,
-  FireUser fireUser,
-  Stream<DatabaseEvent> stream,
-) {
+Widget appBarMediaVisibility(BuildContext context,
+    {required FireUser fireUser, required Stream<DatabaseEvent> stream}) {
   return StreamBuilder<DatabaseEvent>(
     stream: stream,
     builder: (context, snapshot) {
@@ -30,17 +28,18 @@ Widget appBarMediaVisibility(
         return const SizedBox.shrink();
       } else {
         final duleModel = DuleModel.fromJson(data!.snapshot.value);
+        String? url = duleModel.url;
+        String type = duleModel.urlType;
         switch (duleModel.urlType) {
           case MediaType.image:
             {
-              String? url = duleModel.url;
-              String type = duleModel.urlType;
               return InkWell(
                 onTap: () => navService.materialPageRoute(
                     context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
                 child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  width: 40,
+                  height: 40,
+                  margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: ExtendedImage.network(
                     url!,
                     enableSlideOutPage: true,
@@ -49,13 +48,9 @@ Widget appBarMediaVisibility(
                       switch (state.extendedImageLoadState) {
                         case LoadState.loading:
                           {
-                            return Container(
-                              width: 40,
-                              height: 40,
-                              padding: const EdgeInsets.all(8),
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                            return const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: CircularProgress(height: 30, width: 30),
                             );
                           }
                         case LoadState.completed:
@@ -63,7 +58,7 @@ Widget appBarMediaVisibility(
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: ExtendedRawImage(
-                                image: state.extendedImageInfo?.image,
+                                image: state.extendedImageInfo!.image,
                                 width: 40,
                                 height: 40,
                                 fit: BoxFit.cover,
@@ -72,7 +67,19 @@ Widget appBarMediaVisibility(
                           }
                         case LoadState.failed:
                           {
-                            return const Text('Failed To Load Image');
+                            return Container(
+                              height: 30,
+                              width: 30,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(
+                                  color:
+                                      Theme.of(context).colorScheme.mediumBlack,
+                                ),
+                              ),
+                              child: const Icon(FeatherIcons.info),
+                            );
                           }
                         default:
                           {
@@ -86,120 +93,29 @@ Widget appBarMediaVisibility(
             }
           case MediaType.video:
             {
-              String? url = duleModel.url;
-              String type = duleModel.urlType;
-              return InkWell(
-                onTap: () => navService.materialPageRoute(
-                    context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ReceiverVideoDisplayWidget(videoUrl: url!),
-                ),
-              );
+              return url != null
+                  ? InkWell(
+                      onTap: () {
+                        navService.materialPageRoute(context,
+                            DisplayFullMedia(mediaType: type, mediaUrl: url));
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: ReceiverVideoDisplayWidget(videoUrl: url),
+                      ),
+                    )
+                  : shrinkBox;
             }
           default:
             {
-              return const SizedBox.shrink();
+              return shrinkBox;
             }
         }
       }
     },
   );
-}
-
-Widget receiverMediaWidget(
-  BuildContext context,
-  DuleModel duleModel,
-  DuleViewModel model,
-  FireUser fireUser,
-) {
-  switch (duleModel.urlType) {
-    case MediaType.image:
-      {
-        const hash = 'L2I}t;RP00_N?vbHR5ni00xu^k8_';
-        var width = (MediaQuery.of(context).size.width * 0.9).toInt();
-        var height = (MediaQuery.of(context).size.height * 0.3).toInt();
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Dismissible(
-            onDismissed: (dissmissDirection) async {
-              final fireUserId = fireUser.id;
-              const urlKey = DatabaseMessageField.url;
-              const typeKey = DatabaseMessageField.urlType;
-              await model.updateFireUserDataWithKey(fireUserId, urlKey, '');
-              await model.updateFireUserDataWithKey(fireUserId, typeKey, '');
-            },
-            key: UniqueKey(),
-            child: InkWell(
-              onTap: () => navService.materialPageRoute(
-                  context,
-                  DisplayFullMedia(
-                      mediaType: duleModel.urlType, mediaUrl: duleModel.url!)),
-              child: ExtendedImage.network(
-                duleModel.url!,
-                fit: BoxFit.cover,
-                enableSlideOutPage: true,
-                loadStateChanged: (state) {
-                  state;
-                  switch (state.extendedImageLoadState) {
-                    case LoadState.loading:
-                      {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(32),
-                          child: Image(
-                            image: BlurHashImage(hash,
-                                decodingHeight: height, decodingWidth: width),
-                          ),
-                        );
-                      }
-                    case LoadState.completed:
-                      {
-                        return ExtendedRawImage(
-                          image: state.extendedImageInfo?.image,
-                        );
-                      }
-
-                    default:
-                      {
-                        return const Text('Error');
-                      }
-                  }
-                },
-              ),
-            ),
-          ),
-        );
-      }
-    case MediaType.video:
-      {
-        String? url = duleModel.url;
-        return Dismissible(
-          onDismissed: (dissmissDirection) async {
-            final fireUserId = fireUser.id;
-            const urlKey = DatabaseMessageField.url;
-            const typeKey = DatabaseMessageField.urlType;
-            await model.updateFireUserDataWithKey(fireUserId, urlKey, '');
-            await model.updateFireUserDataWithKey(fireUserId, typeKey, '');
-          },
-          key: UniqueKey(),
-          child: InkWell(
-            onTap: () => navService.materialPageRoute(context,
-                DisplayFullMedia(mediaType: duleModel.urlType, mediaUrl: url!)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: VideoDisplayWidget(videoUrl: duleModel.url!),
-            ),
-          ),
-        );
-      }
-    default:
-      {
-        return const Text('Incoming Media...');
-      }
-  }
 }
 
 Widget receiverMessageBubble(
@@ -277,16 +193,19 @@ Widget receiverMessageBubble(
                     hintStyle: TextStyle(
                         color: Theme.of(context).colorScheme.mediumBlack,
                         fontSize: 24),
-                    border: const OutlineInputBorder(borderSide: BorderSide.none),
+                    border:
+                        const OutlineInputBorder(borderSide: BorderSide.none),
                   ),
                 ),
               );
               break;
             case false:
               {
-                switcherChild =  Text(
+                switcherChild = Text(
                   'User Not In The ChatRoom',
-                  style: TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontSize: 24),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.mediumBlack,
+                      fontSize: 24),
                 );
               }
               break;

@@ -85,8 +85,8 @@ class PhoneContactView extends StatelessWidget {
                             ? Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
-                                child: cwAuthProceedButton(
-                                  context,
+                                child: CWAuthProceedButton(
+                               
                                   buttonTitle: 'Turn On',
                                   onTap: () {
                                     box.put(AppSettingKeys.phoneContact, true);

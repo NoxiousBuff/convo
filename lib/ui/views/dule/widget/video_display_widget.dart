@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -26,6 +27,8 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
 
     // Initialize the controller and store the Future for later use.
     _initializeVideoPlayerFuture = _controller.initialize();
+
+    _controller.addListener(() {});
 
     // Use the controller to loop the video.
     _controller.play();
@@ -93,7 +96,7 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
-          return const Center(child: CircularProgressIndicator());
+          return const CircularProgress();
         }
       },
     );

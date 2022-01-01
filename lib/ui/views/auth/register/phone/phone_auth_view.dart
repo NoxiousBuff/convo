@@ -110,8 +110,8 @@ class PhoneAuthView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  cwAuthProceedButton(
-                    context,
+                  CWAuthProceedButton(
+                   
                     buttonTitle: 'Send Code',
                     isLoading: model.busy(model.phoneChecking),
                     onTap: () async {
@@ -208,8 +208,8 @@ class PhoneAuthView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                cwAuthProceedButton(
-                  context,
+                CWAuthProceedButton(
+              
                   buttonTitle: 'Verify Code',
                   isLoading: model.busy(model.otpChecking),
                   onTap: () async {

@@ -131,7 +131,7 @@ class ChangeUserNameView extends StatelessWidget {
                       ],
                     ),
                     verticalSpaceLarge,
-                    cwAuthProceedButton(context, buttonTitle: 'Save',
+                    CWAuthProceedButton( buttonTitle: 'Save',
                         onTap: () {
                       model.updateUserProperty(
                         context,

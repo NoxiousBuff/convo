@@ -19,6 +19,7 @@ class FireUser {
   final Timestamp userCreated;
   final String countryPhoneCode;
   final String username;
+  final List<dynamic> tokens;
 
   FireUser({
     required this.id,
@@ -38,6 +39,7 @@ class FireUser {
     this.dob,
     required this.gender,
     this.romanticStatus,
+    required this.tokens,
   });
 
   //deserializing the user document
@@ -60,6 +62,7 @@ class FireUser {
       romanticStatus: doc[FireUserField.romanticStatus],
       dob: doc[FireUserField.dob],
       gender: doc[FireUserField.gender],
+      tokens: doc[FireUserField.tokens]
     );
   }
 
@@ -81,6 +84,7 @@ class FireUser {
         FireUserField.romanticStatus: romanticStatus,
         FireUserField.dob: dob,
         FireUserField.gender: gender,
+        FireUserField.tokens : tokens,
       };
 
   @override
@@ -101,6 +105,7 @@ class FireUser {
         '${FireUserField.blockedBy}: $blockedBy\n'
         '${FireUserField.romanticStatus}: $romanticStatus\n'
         '${FireUserField.dob}: $dob\n'
-        '${FireUserField.gender}: $gender\n';
+        '${FireUserField.gender}: $gender\n'
+        '${FireUserField.tokens} : $tokens\n ';
   }
 }

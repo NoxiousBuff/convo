@@ -106,8 +106,8 @@ class ChangeDobView extends StatelessWidget {
                   model.isDobNull
                         ? verticalSpaceSmall : const SizedBox.shrink(),
                   model.isDobNull
-                        ? cwAuthProceedButton(
-                    context,
+                        ? CWAuthProceedButton(
+                    
                     buttonTitle: 'Save',
                     onTap: () async {
                       final shouldUpdateDob = await showDialog(

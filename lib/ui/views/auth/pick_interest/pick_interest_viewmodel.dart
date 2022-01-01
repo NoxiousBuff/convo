@@ -29,7 +29,7 @@ class PickInterestsViewModel extends BaseViewModel {
   bool _hasUserPickedTenInterests = false;
   bool get hasUserPickedTenInterests => _hasUserPickedTenInterests;
 
-  void changeUserInterestLength() {
+  void changeInterestLength() {
     _hasUserPickedTenInterests = userSelectedInterests.length >= 10;
     notifyListeners();
   }

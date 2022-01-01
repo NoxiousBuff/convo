@@ -42,10 +42,16 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
             'Current Keyword for Balloon Animation',
           );
         }
-      default:
+      case AnimationType.hearts:
         {
           return cwEADetailsTile(
-              context, 'Current Keyword for Confetti Animation');
+            context,
+            'Current Keyword for Hearts Animation',
+          );
+        }
+      default:
+        {
+          return shrinkBox;
         }
     }
   }
@@ -61,6 +67,11 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
         {
           return cwEADescriptionTitle(
               context, 'Type New Keyword For Balloons Animation');
+        }
+      case AnimationType.hearts:
+        {
+          return cwEADescriptionTitle(
+              context, 'Type New Keyword For Hearts Animation');
         }
       default:
         {
@@ -82,6 +93,12 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
         {
           hiveApi.saveAndReplace(HiveApi.appSettingsBoxName,
               AppSettingKeys.balloonsAnimation, changeKeywordTech.text.trim());
+        }
+        break;
+      case AnimationType.hearts:
+        {
+          hiveApi.saveAndReplace(HiveApi.appSettingsBoxName,
+              AppSettingKeys.heartsAnimation, changeKeywordTech.text.trim());
         }
         break;
       default:
@@ -112,6 +129,16 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
             updateIsEmpty();
           }, maxLength: 30);
         }
+      case AnimationType.hearts:
+        {
+          return cwEATextField(
+              context,
+              changeKeywordTech,
+              localHiveBox.get(AppSettingKeys.heartsAnimation,
+                  defaultValue: 'Hearts'), onChanged: (value) {
+            updateIsEmpty();
+          }, maxLength: 30);
+        }
       default:
         {
           return cwEATextField(
@@ -132,10 +159,10 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.confettiAnimation,
                 defaultValue: 'Congo'),
-            style:  TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:Theme.of(context).colorScheme.mediumBlack,
+              color: Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -144,10 +171,22 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.balloonsAnimation,
                 defaultValue: 'Balloons'),
-            style:  TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:Theme.of(context).colorScheme.mediumBlack,
+              color: Theme.of(context).colorScheme.mediumBlack,
+            ),
+          );
+        }
+      case AnimationType.hearts:
+        {
+          return Text(
+            localHiveBox.get(AppSettingKeys.heartsAnimation,
+                defaultValue: 'Hearts'),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -156,10 +195,10 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
           return Text(
             localHiveBox.get(AppSettingKeys.confettiAnimation,
                 defaultValue: 'Congo'),
-            style:  TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
-              color:Theme.of(context).colorScheme.mediumBlack,
+              color: Theme.of(context).colorScheme.mediumBlack,
             ),
           );
         }
@@ -189,8 +228,8 @@ class _ChangeKeywordDialogState extends State<ChangeKeywordDialog> {
               verticalSpaceSmall,
               animationTextField(context, appSettingsBox),
               verticalSpaceLarge,
-              cwAuthProceedButton(
-                context,
+              CWAuthProceedButton(
+           
                 buttonTitle: 'Save',
                 onTap: () {
                   animationProceedFunction();

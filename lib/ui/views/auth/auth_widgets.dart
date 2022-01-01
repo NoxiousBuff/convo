@@ -8,14 +8,17 @@ AppBar cwAuthAppBar(BuildContext context,
     {required String title,
     bool showLeadingIcon = true,
     void Function()? onPressed,
-    List<Widget>? actions, IconData? leadingIcon}) {
+    List<Widget>? actions,
+    IconData? leadingIcon}) {
   return AppBar(
     actions: actions,
     elevation: 0.0,
     title: Text(
       title,
-      style:  TextStyle(
-          fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.black, fontSize: 18),
+      style: TextStyle(
+          fontWeight: FontWeight.w700,
+          color: Theme.of(context).colorScheme.black,
+          fontSize: 18),
     ),
     backgroundColor:
         MaterialStateColor.resolveWith((Set<MaterialState> states) {
@@ -34,53 +37,122 @@ AppBar cwAuthAppBar(BuildContext context,
   );
 }
 
-Widget cwAuthProceedButton(BuildContext context,
-    {required String buttonTitle,
-    void Function()? onTap,
-    bool isLoading = false,
-    bool isActive = true}) {
-  return GestureDetector(
-    onTap: isActive
-        ? isLoading
-            ? null
-            : onTap
-        : null,
-    child: Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(16),
-      shadowColor:
-          isActive ? Theme.of(context).colorScheme.blue.withAlpha(100) : Colors.transparent,
-      child: Container(
-        height: 48,
-        width: screenWidth(context),
-        alignment: Alignment.center,
-        child: isLoading
-            ?  SizedBox(
-                height: 17,
-                width: 17,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.white),
-                ),
-              )
-            : Text(
-                buttonTitle,
-                style: TextStyle(
+// Widget cwAuthProceedButton(BuildContext context,
+//     {required String buttonTitle,
+//     void Function()? onTap,
+//     bool isLoading = false,
+//     bool isActive = true}) {
+//   return GestureDetector(
+//     onTap: isActive
+//         ? isLoading
+//             ? null
+//             : onTap
+//         : null,
+//     child: Material(
+//       elevation: 8,
+//       borderRadius: BorderRadius.circular(16),
+//       shadowColor: isActive
+//           ? Theme.of(context).colorScheme.blue.withAlpha(100)
+//           : Colors.transparent,
+//       child: Container(
+//         height: 48,
+//         width: screenWidth(context),
+//         alignment: Alignment.center,
+//         child: isLoading
+//             ? SizedBox(
+//                 height: 17,
+//                 width: 17,
+//                 child: CircularProgressIndicator(
+//                   strokeWidth: 1.5,
+//                   valueColor: AlwaysStoppedAnimation<Color>(
+//                       Theme.of(context).colorScheme.white),
+//                 ),
+//               )
+//             : Text(
+//                 buttonTitle,
+//                 style: TextStyle(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.w700,
+//                   color: isActive
+//                       ? Theme.of(context).colorScheme.white
+//                       : Theme.of(context).colorScheme.mediumBlack,
+//                 ),
+//               ),
+//         decoration: BoxDecoration(
+//             color: isActive
+//                 ? Theme.of(context).colorScheme.blue
+//                 : Theme.of(context).colorScheme.lightGrey,
+//             borderRadius: BorderRadius.circular(16)),
+//       ),
+//     ),
+//   );
+// }
+
+class CWAuthProceedButton extends StatelessWidget {
+  const CWAuthProceedButton({
+    Key? key,
+    required this.buttonTitle,
+    required this.onTap,
+    this.isActive = true,
+    this.isLoading = false,
+  }) : super(key: key);
+
+  final String buttonTitle;
+  final void Function()? onTap;
+  final bool isLoading;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isActive
+          ? isLoading
+              ? null
+              : onTap
+          : null,
+      child: Material(
+        elevation: 8,
+        borderRadius: BorderRadius.circular(16),
+        shadowColor: isActive
+            ? Theme.of(context).colorScheme.blue.withAlpha(100)
+            : Colors.transparent,
+        child: Container(
+          height: 48,
+          width: screenWidth(context),
+          alignment: Alignment.center,
+          child: isLoading
+              ? SizedBox(
+                  height: 17,
+                  width: 17,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.white),
+                  ),
+                )
+              : Text(
+                  buttonTitle,
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: isActive
                         ? Theme.of(context).colorScheme.white
                         : Theme.of(context).colorScheme.mediumBlack,
-            ),),
-        decoration: BoxDecoration(
-            color: isActive ? Theme.of(context).colorScheme.blue : Theme.of(context).colorScheme.lightGrey,
-            borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+          decoration: BoxDecoration(
+              color: isActive
+                  ? Theme.of(context).colorScheme.blue
+                  : Theme.of(context).colorScheme.lightGrey,
+              borderRadius: BorderRadius.circular(16)),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
-Widget cwAuthCheckingTile(BuildContext context, {required String title, required bool value}) {
+Widget cwAuthCheckingTile(BuildContext context,
+    {required String title, required bool value}) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -105,18 +177,19 @@ Widget cwAuthHeadingTitle(BuildContext context, {required String title}) {
   );
 }
 
-Widget cwAuthDescription(BuildContext context, {required String title, Color? titleColor}) {
+Widget cwAuthDescription(BuildContext context,
+    {required String title, Color? titleColor}) {
   return Text(
     title,
-    style:  TextStyle(
+    style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: titleColor ?? Theme.of(context).colorScheme.mediumBlack),
   );
 }
 
-Widget cwAuthInterestTopicPicker(BuildContext context, 
-    String title, List<String> interestList, PickInterestsViewModel model,
+Widget cwAuthInterestTopicPicker(BuildContext context, String title,
+    List<String> interestList, PickInterestsViewModel model,
     {Color? color, Icon? icon}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +199,7 @@ Widget cwAuthInterestTopicPicker(BuildContext context,
         children: [
           Container(
             child: icon ??
-                 Icon(
+                Icon(
                   FeatherIcons.plus,
                   color: Theme.of(context).colorScheme.white,
                 ),
@@ -138,7 +211,7 @@ Widget cwAuthInterestTopicPicker(BuildContext context,
           horizontalSpaceRegular,
           Text(
             title,
-            style:  TextStyle(
+            style: TextStyle(
                 color: Theme.of(context).colorScheme.mediumBlack,
                 fontSize: 18,
                 fontWeight: FontWeight.w700),
@@ -167,7 +240,7 @@ Widget cwAuthInterestTopicPicker(BuildContext context,
 //       } else {
 //         userSelectedInterests.remove(label);
 //       }
-//       model.changeUserInterestLength();
+//       model.changeInterestLength();
 //       model.notifyListeners();
 //     },
 //     child: Chip(
@@ -185,7 +258,8 @@ Widget cwAuthInterestTopicPicker(BuildContext context,
 // }
 
 class CWAuthInterestChip extends StatelessWidget {
-  const CWAuthInterestChip( this.label, this.model, { Key? key }) : super(key: key);
+  const CWAuthInterestChip(this.label, this.model, {Key? key})
+      : super(key: key);
 
   final String label;
   final PickInterestsViewModel model;
@@ -193,27 +267,31 @@ class CWAuthInterestChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isSelected = userSelectedInterests.contains(label);
-  return GestureDetector(
-    onTap: () {
-      if (!isSelected) {
-        userSelectedInterests.add(label);
-      } else {
-        userSelectedInterests.remove(label);
-      }
-      model.changeUserInterestLength();
-      model.notifyListeners();
-    },
-    child: Chip(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      backgroundColor: isSelected ? Theme.of(context).colorScheme.blue : Theme.of(context).colorScheme.grey,
-      label: Text(
-        label,
-        style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: isSelected ? Theme.of(context).colorScheme.white :Theme.of(context).colorScheme.black),
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected) {
+          userSelectedInterests.add(label);
+        } else {
+          userSelectedInterests.remove(label);
+        }
+        model.changeInterestLength();
+        model.notifyListeners();
+      },
+      child: Chip(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        backgroundColor: isSelected
+            ? Theme.of(context).colorScheme.blue
+            : Theme.of(context).colorScheme.grey,
+        label: Text(
+          label,
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.white
+                  : Theme.of(context).colorScheme.black),
+        ),
       ),
-    ),
-  );
+    );
   }
 }

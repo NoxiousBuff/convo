@@ -141,8 +141,8 @@ class UserNameAuthView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      cwAuthProceedButton(
-                        context,
+                      CWAuthProceedButton(
+                 
                         buttonTitle: 'Got it',
                         isLoading: model.isBusy,
                         isActive: !model.isUserNameEmpty &&

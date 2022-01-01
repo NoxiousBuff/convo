@@ -98,7 +98,7 @@ class ChangeHashtagsView extends StatelessWidget {
                     ],
                   ),
                   verticalSpaceMedium,
-                  cwAuthProceedButton(context,
+                  CWAuthProceedButton(
                       buttonTitle: 'Add',
                       isActive: model.isActive,
                       isLoading: model.isBusy, onTap: () {

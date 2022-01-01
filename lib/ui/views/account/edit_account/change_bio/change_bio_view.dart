@@ -76,7 +76,7 @@ class ChangeBioView extends StatelessWidget {
                       }
                     }, maxLength: 250, expands: true),
                     verticalSpaceLarge,
-                    cwAuthProceedButton(context, buttonTitle: 'Save', onTap: () {
+                    CWAuthProceedButton( buttonTitle: 'Save', onTap: () {
                       model.updateUserProperty(context, FireUserField.bio, model.bioNameTech.text.trim(),);
                     }, isLoading: model.isBusy, isActive: model.isActive),
                   ],

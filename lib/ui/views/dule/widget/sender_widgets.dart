@@ -6,6 +6,8 @@ import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
@@ -34,10 +36,7 @@ Widget senderMediaWidget(
               switch (state.extendedImageLoadState) {
                 case LoadState.loading:
                   {
-                    return const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(strokeWidth: 2.0));
+                    return const CircularProgress(height: 30, width: 30);
                   }
                 case LoadState.completed:
                   {
@@ -58,7 +57,8 @@ Widget senderMediaWidget(
                         Center(
                           child: Text(
                             progress,
-                            style:  TextStyle(color: Theme.of(context).colorScheme.white),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.white),
                           ),
                         ),
                       ],
@@ -66,11 +66,22 @@ Widget senderMediaWidget(
                   }
                 case LoadState.failed:
                   {
-                    return const Text('Failed To Load Image');
+                    return Container(
+                      height: 30,
+                      width: 30,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.mediumBlack,
+                        ),
+                      ),
+                      child: const Icon(FeatherIcons.info),
+                    );
                   }
                 default:
                   {
-                    return const SizedBox.shrink();
+                    return shrinkBox;
                   }
               }
             },
@@ -79,13 +90,9 @@ Widget senderMediaWidget(
       }
     case MediaType.video:
       {
-        return Container(
-          constraints: const BoxConstraints(maxHeight: 35, maxWidth: 60),
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          child: SenderVideoDisplayWidget(
-            videoPath: model.sendingMediaPath!,
-            uploadingProgress: uploadingProgress,
-          ),
+        return SenderVideoDisplayWidget(
+          videoPath: model.sendingMediaPath!,
+          uploadingProgress: uploadingProgress,
         );
       }
     default:
@@ -95,46 +102,60 @@ Widget senderMediaWidget(
   }
 }
 
+/// current user message bubble textfield
 Widget senderMessageContent(
   BuildContext context, {
   required DuleViewModel model,
+  required AnimationController heartsController,
   required ConfettiController confettiController,
   required AnimationController balloonsController,
 }) {
   Widget switcherChild;
   switcherChild = ValueListenableBuilder<Box>(
       valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
-      builder: (context, appSettingsbox, child) {
-        const confettiKey = AppSettingKeys.confettiAnimation;
-        const balloonsKey = AppSettingKeys.balloonsAnimation;
-        String confettiVal =
-            appSettingsbox.get(confettiKey, defaultValue: 'Congo');
-        var balloonsVal =
-            appSettingsbox.get(balloonsKey, defaultValue: 'Balloons');
+      builder: (context, box, child) {
+        const hKey = AppSettingKeys.heartsAnimation; // hearts key
+        const cKey = AppSettingKeys.confettiAnimation; // confetti key
+        const bKey = AppSettingKeys.balloonsAnimation; // balloons key
+        final String heartsVal = box.get(hKey, defaultValue: 'Hearts');
+        final String confettiVal = box.get(cKey, defaultValue: 'Congo');
+        final String balloonsVal = box.get(bKey, defaultValue: 'Balloons');
         return TextFormField(
           focusNode: model.duleFocusNode,
           minLines: null,
           maxLines: null,
           expands: true,
-          onChanged: (value) async {
+          onChanged: (value) {
             model.updateWordLengthLeft(value);
             model.updatTextFieldWidth();
             if (value.length <= 160) {
               model.updateUserDataWithKey(DatabaseMessageField.msgTxt, value);
             }
+
             if (value == confettiVal) {
-              var value = AnimationType.confetti;
-              await model.updateAnimation(value);
-              confettiController.play();
-              await model.updateAnimation(null);
+              FocusScope.of(context).unfocus();
+              Future.delayed(const Duration(milliseconds: 300),
+                  () => confettiController.play());
+              model
+                  .updateAnimation(AnimationType.confetti)
+                  .whenComplete(() => model.updateAnimation(null));
             } else if (value == balloonsVal) {
-              var value = AnimationType.balloons;
-              await model.updateAnimation(value);
+              FocusScope.of(context).unfocus();
               balloonsController
                   .forward()
                   .whenComplete(() => balloonsController.reset());
-              await model.updateAnimation(null);
-            }
+              model
+                  .updateAnimation(AnimationType.balloons)
+                  .whenComplete(() => model.updateAnimation(null));
+            } else if (value == heartsVal) {
+              FocusScope.of(context).unfocus();
+              heartsController
+                  .forward()
+                  .whenComplete(() => heartsController.reset());
+              model
+                  .updateAnimation(AnimationType.hearts)
+                  .whenComplete(() => model.updateAnimation(null));
+            } else {}
           },
           maxLength: 160,
           maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -147,11 +168,13 @@ Widget senderMessageContent(
           textAlign: TextAlign.center,
           cursorColor: Theme.of(context).colorScheme.white,
           cursorRadius: const Radius.circular(100),
-          style:  TextStyle(color: Theme.of(context).colorScheme.white, fontSize: 24),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.white, fontSize: 24),
           decoration: InputDecoration(
               hintText: 'Type your message',
               hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.white.withAlpha(200), fontSize: 24),
+                  color: Theme.of(context).colorScheme.white.withAlpha(200),
+                  fontSize: 24),
               border: const OutlineInputBorder(borderSide: BorderSide.none)),
         );
       });
@@ -159,13 +182,15 @@ Widget senderMessageContent(
       duration: const Duration(milliseconds: 200), child: switcherChild);
 }
 
+/// Message bubble of current user
 Widget senderMessageBubble(
   BuildContext context, {
+  required FireUser fireUser,
   required DuleViewModel model,
+  required DatabaseEvent? data,
+  required AnimationController heartsController,
   required ConfettiController confettiController,
   required AnimationController balloonsController,
-  required DatabaseEvent? data,
-  required FireUser fireUser,
 }) {
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String sKey = AppSettingKeys.senderBubbleColor;
@@ -189,6 +214,7 @@ Widget senderMessageBubble(
                 ? senderMessageContent(
                     context,
                     model: model,
+                    heartsController: heartsController,
                     confettiController: confettiController,
                     balloonsController: balloonsController,
                   )
@@ -199,9 +225,7 @@ Widget senderMessageBubble(
                     ),
                     onPressed: () => navService.materialPageRoute(
                       context,
-                      WriteLetterView(
-                        fireUser: fireUser,
-                      ),
+                      WriteLetterView(fireUser: fireUser),
                     ),
                     icon: Icon(FeatherIcons.send,
                         color: Theme.of(context).colorScheme.mediumBlack),
@@ -220,18 +244,16 @@ Widget senderMessageBubble(
                 ),
                 onPressed: () => navService.materialPageRoute(
                   context,
-                  WriteLetterView(
-                    fireUser: fireUser,
-                  ),
+                  WriteLetterView(fireUser: fireUser),
                 ),
                 icon: Icon(FeatherIcons.send,
                     color: Theme.of(context).colorScheme.mediumBlack),
                 label: Text(
                   'Send a letter',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.mediumBlack,
                       fontSize: 24,
-                      decoration: TextDecoration.underline),
+                      decoration: TextDecoration.underline,
+                      color: Theme.of(context).colorScheme.mediumBlack),
                 ),
               ),
       ),

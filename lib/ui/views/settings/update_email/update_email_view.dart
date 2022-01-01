@@ -72,8 +72,8 @@ class UpdateEmailView extends StatelessWidget {
                                 onChanged: (val) =>
                                     model.updatePasswordEmpty()),
                             verticalSpaceLarge,
-                            cwAuthProceedButton(
-                              context,
+                            CWAuthProceedButton(
+                              
                               buttonTitle: 'Change Email',
                               isActive: !model.isDisplayNameEmpty &&
                                   !model.isPasswordEmpty,

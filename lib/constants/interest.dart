@@ -1,9 +1,31 @@
 /// This file is the collection of all the interest found in the app
 
-final userInterest = Interest();
-
 class Interest {
-  final interestTypes = [
+  static const List<List<String>> listOfInterestLists = [
+    science,
+    codingLanguages,
+    moviesAndTelevision,
+    gaming,
+    bookAndLiterature,
+    sports,
+    activities,
+    travel,
+    personalFinance,
+    lifeStages,
+    healthAndFitness,
+    education,
+    careers,
+    business,
+    automotive,
+    styleAndFashion,
+    pets,
+    technologyAndComputing,
+    socialIssues,
+    foodAndDrink,
+    artsAndCulture,
+  ];
+
+  static const List<String> interestTypes = [
     'Most Popular',
     'Movies & Telvision',
     'Activities',
@@ -26,7 +48,7 @@ class Interest {
     'Technology & Computing',
     'Travel',
   ];
-  final science = [
+  static const List<String> science = [
     'Animals',
     'Astronomy',
     'Biology',
@@ -41,8 +63,7 @@ class Interest {
     'Scientists & Inventors',
     'Space'
   ];
-
-  final codingLanguages = [
+  static const List<String> codingLanguages = [
     'Python',
     'JavaScript',
     'Java',
@@ -57,7 +78,7 @@ class Interest {
     'Go'
   ];
 
-  final populatInterests = [
+  static const List<String> popularInterests = [
     'Anime',
     'Cats',
     'Chilling',
@@ -71,7 +92,7 @@ class Interest {
     'Tiktok',
   ];
 
-  final moviesAndTelevision = [
+  static const List<String> moviesAndTelevision = [
     'A24',
     'Adult Swim',
     'Adventure Time',
@@ -128,7 +149,7 @@ class Interest {
     'Wanda Vision',
   ];
 
-  final gaming = [
+  static const List<String> gaming = [
     'Adorable Home',
     'Among Us',
     'Animal Crossing',
@@ -165,7 +186,7 @@ class Interest {
     'Your Turn To Die',
   ];
 
-  final bookAndLiterature = [
+  static const List<String> bookAndLiterature = [
     'Book Recommendations',
     'Business Books',
     'Fan Fiction',
@@ -182,7 +203,7 @@ class Interest {
     'Twilight',
   ];
 
-  final sports = [
+  static const List<String> sports = [
     'Baseball',
     'Basketball',
     'Cricket',
@@ -196,7 +217,7 @@ class Interest {
     'Tennis',
   ];
 
-  final activities = [
+  static const List<String> activities = [
     'ASMR',
     'Astrology',
     'Astronomy',
@@ -233,7 +254,7 @@ class Interest {
     'Writing',
   ];
 
-  final travel = [
+  static const List<String> travel = [
     'Africa',
     'Asia',
     'Canada',
@@ -243,7 +264,7 @@ class Interest {
     'World Tour'
   ];
 
-  final personalFinance = [
+  static const List<String> personalFinance = [
     'Binance Coin',
     'Bitcoin',
     'Couponing',
@@ -255,13 +276,13 @@ class Interest {
     'Stocks'
   ];
 
-  final lifeStages = [
+  static const List<String> lifeStages = [
     'Boomer',
     'Gen Z',
     'Milennial',
   ];
 
-  final healthAndFitness = [
+  static const List<String> healthAndFitness = [
     'Climbing',
     'Cycling',
     'Gymnastics',
@@ -274,7 +295,7 @@ class Interest {
     'Yoga',
   ];
 
-  final education = [
+  static const List<String> education = [
     'Exams',
     'Graduate',
     'High School',
@@ -286,20 +307,20 @@ class Interest {
     'Studying',
   ];
 
-  final careers = [
+  static const List<String> careers = [
     'Internship',
     'Job Hunt',
     'Mentorship',
   ];
 
-  final business = [
+  static const List<String> business = [
     'Investing',
     'Marketing',
     'Networking',
     'StartUps',
   ];
 
-  final automotive = [
+  static const List<String> automotive = [
     'BMW',
     'Camaro',
     'Cars',
@@ -321,7 +342,7 @@ class Interest {
     'volvo',
   ];
 
-  final styleAndFashion = [
+  static const List<String> styleAndFashion = [
     'CottageCore',
     'DIY',
     'Depop',
@@ -333,7 +354,7 @@ class Interest {
     'Thrifting',
   ];
 
-  final pets = [
+  static const List<String> pets = [
     'Amphibians',
     'Cats',
     'Dogs',
@@ -342,7 +363,7 @@ class Interest {
     'Rodents',
   ];
 
-  final technologyAndComputing = [
+  static const List<String> technologyAndComputing = [
     '3D Animation',
     'Apple',
     'Blender',
@@ -351,7 +372,7 @@ class Interest {
     'SpaceX',
   ];
 
-  final socialIssues = [
+  static const List<String> socialIssues = [
     'Air Pollution',
     'Amazon Deforestation',
     'Cimate Change',
@@ -367,7 +388,7 @@ class Interest {
     'World Fires',
   ];
 
-  final foodAndDrink = [
+  static const List<String> foodAndDrink = [
     'Dairy-free',
     'Eggitarian',
     'Fast Food',
@@ -379,7 +400,7 @@ class Interest {
     'Vegitarian',
   ];
 
-  final artsAndCulture = [
+  static const List<String> artsAndCulture = [
     '2D Art',
     '3D Art',
     'Animation',

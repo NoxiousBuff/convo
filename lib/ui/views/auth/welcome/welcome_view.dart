@@ -26,7 +26,7 @@ class WelcomeView extends StatelessWidget {
           body: Column(
             children: [
               const Spacer(),
-              cwAuthProceedButton(context,
+              CWAuthProceedButton(
                   buttonTitle: 'Get Started',
                   isLoading: false,
                   isActive: true, onTap: () {
@@ -34,14 +34,14 @@ class WelcomeView extends StatelessWidget {
                     context, const CredentialAuthView());
               }),
               verticalSpaceSmall,
-              cwAuthProceedButton(context,
+              CWAuthProceedButton(
                   buttonTitle: 'Log In',
                   isLoading: false,
                   isActive: true, onTap: () {
                 navService.cupertinoPageRoute(context, const LoginAuthView());
               }),
               verticalSpaceLarge,
-              // cwAuthProceedButton(context,
+              // CWAuthProceedButton(context,
               //     buttonTitle: 'Skip',
               //     isLoading: false,
               //     isActive: true, onTap: () {

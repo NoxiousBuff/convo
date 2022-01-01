@@ -135,7 +135,7 @@ class LoginAuthView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      cwAuthProceedButton(context,
+                      CWAuthProceedButton(
                               buttonTitle: 'Login',
                               isLoading: model.isBusy,
                               isActive: model.fieldNotEmpty, onTap: () async {

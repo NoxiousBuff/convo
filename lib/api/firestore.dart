@@ -12,25 +12,20 @@ class FirestoreApi {
   /// the console for this particular class
   final log = getLogger('FirestoreApi');
 
-
   ///private field [_auth] to get instance of [FirebaseAuth]
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
   ///private field [_auth] to get instance of [FirebaseFirestore]
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
 
   ///default url that would be placed as their profile photo
   static const String kDefaultPhotoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
-
   ///reference to the subsCollection - [Collections that stores the subs]
   final CollectionReference subsCollection =
       _firestore.collection(subsFirestoreKey);
 
-  
   ///getter tp get the current user
   User? get getCurrentUser => _auth.currentUser;
 
@@ -60,7 +55,7 @@ class FirestoreApi {
         .doc(fireUserUid)
         .update({propertyName: value});
   }
-  
+
   /// Delete User Only From Recent
   Future<void> deleteOnlyRecent(String fireUserUid) async {
     await subsCollection
@@ -69,8 +64,6 @@ class FirestoreApi {
         .doc(fireUserUid)
         .delete();
   }
-
-
 
   Future<void> saveUserDataInHive(String key, dynamic userData) async {
     await hiveApi.save(HiveApi.userDataHiveBox, key, userData);
@@ -104,7 +97,8 @@ class FirestoreApi {
         FireUserField.blockedBy: [],
         FireUserField.romanticStatus: 'Prefer Not To Say',
         FireUserField.gender: 'Prefer Not To Say',
-        FireUserField.dob: null
+        FireUserField.dob: null,
+        FireUserField.tokens: FieldValue.arrayUnion([]),
       });
       saveUserDataInHive(FireUserField.bio, 'Hey I am using dule');
       saveUserDataInHive(FireUserField.country, country);
@@ -211,5 +205,19 @@ class FirestoreApi {
           log.w(
               'There has been an error in changing user phone number : $phoneNumber in firebase.');
         });
+  }
+
+  Future<void> saveTokenToDatabase(String? token) async {
+    // Assume user is logged in for this example
+    if (token != null) {
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+
+      await subsCollection.doc(userId).update({
+        FireUserField.tokens: FieldValue.arrayUnion([token]),
+      }).then((value) {
+        log.wtf('$token has been saved');
+        hiveApi.save(HiveApi.appSettingsBoxName, AppSettingKeys.isTokenSaved, true);
+      });
+    }
   }
 }

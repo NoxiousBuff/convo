@@ -61,8 +61,8 @@ class InvitesView extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: cwAuthProceedButton(
-                            context,
+                          child: CWAuthProceedButton(
+                      
                             isLoading: model.isBusy,
                             buttonTitle: 'Connect your contacts',
                             onTap: () => model.gettingNumbers(),

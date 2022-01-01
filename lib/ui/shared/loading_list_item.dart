@@ -68,7 +68,7 @@ Widget loadingUserListItem(BuildContext context, {bool showInterestChips = false
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Wrap(
           runSpacing: 8.0,
-          children: userInterest.activities
+          children: Interest.activities
               .take(6)
               .map(
                 (e) => Row(

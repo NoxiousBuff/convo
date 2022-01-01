@@ -1,11 +1,5 @@
 import 'dart:math';
 import 'dart:async';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/ui/shared/user_profile_photo.dart';
-import 'package:hint/ui/views/dule/widget/animation_widgets.dart';
-import 'package:hint/ui/views/dule/widget/receiver_widgets.dart';
-import 'package:hint/ui/views/dule/widget/sender_widgets.dart';
-import 'package:hint/ui/views/profile/profile_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -20,7 +14,13 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/database_service.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:hint/ui/views/profile/profile_view.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/views/dule/widget/sender_widgets.dart';
+import 'package:hint/ui/views/dule/widget/receiver_widgets.dart';
+import 'package:hint/ui/views/dule/widget/animation_widgets.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 
@@ -38,8 +38,10 @@ class DuleView extends StatefulWidget {
 }
 
 class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
+  late AnimationController heartsController;
   late ConfettiController confettiController;
   late AnimationController balloonsController;
+  static const duration = Duration(seconds: 4);
   static const String hiveBox = HiveApi.appSettingsBoxName;
   static const String sKey = AppSettingKeys.senderBubbleColor;
   static const int lightBlue = MaterialColorsCode.lightBlue200;
@@ -47,13 +49,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    balloonsController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 5));
-    confettiController =
-        ConfettiController(duration: const Duration(seconds: 4));
+    confettiController = ConfettiController(duration: duration);
+    heartsController = AnimationController(vsync: this, duration: duration);
+    balloonsController = AnimationController(vsync: this, duration: duration);
 
+    heartsController.addListener(() => setState(() {}));
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
+
     databaseService.updateUserDataWithKey(DatabaseMessageField.url, null);
     databaseService.updateUserDataWithKey(DatabaseMessageField.urlType, '');
     super.initState();
@@ -61,8 +64,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    heartsController.dispose();
     confettiController.dispose();
     balloonsController.dispose();
+
     databaseService.updateUserDataWithKey(DatabaseMessageField.roomUid, null);
     databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
     databaseService.updateUserDataWithKey(DatabaseMessageField.url, null);
@@ -72,6 +77,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  /// handle animations controller for playing them
   StreamSubscription<DatabaseEvent> animationHandler() {
     final model = DuleViewModel(widget.fireUser);
     return model.stream.listen(
@@ -83,18 +89,18 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           case AnimationType.confetti:
             {
               confettiController.play();
-              databaseService.updateUserDataWithKey(
-                  DatabaseMessageField.aniType, null);
             }
             break;
           case AnimationType.balloons:
             {
-              balloonsController.forward().whenComplete(() {
-                return balloonsController.reset();
-              });
+              balloonsController.forward();
             }
             break;
-
+          case AnimationType.hearts:
+            {
+              heartsController.forward();
+            }
+            break;
           default:
             {}
         }
@@ -105,11 +111,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     );
   }
 
-  AppBar _buildAppBar(
-      BuildContext context, DatabaseEvent? data, Stream<DatabaseEvent> stream) {
-    // const dark = Brightness.dark;
-    final appBarBrightness = Theme.of(context).colorScheme.brightness == Brightness.light ? Brightness.dark : Brightness.light;
-    final systemUIOverlay = SystemUiOverlayStyle(statusBarIconBrightness: appBarBrightness);
+  AppBar _buildAppBar(BuildContext context,
+      {required DatabaseEvent? data, required Stream<DatabaseEvent> stream}) {
+    final appBarBrightness =
+        Theme.of(context).colorScheme.brightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final systemUIOverlay =
+        SystemUiOverlayStyle(statusBarIconBrightness: appBarBrightness);
     return AppBar(
       elevation: 0,
       leadingWidth: 100,
@@ -158,114 +167,128 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       ),
       actions: [
         data != null
-            ? appBarMediaVisibility(context, widget.fireUser, stream)
-            : const SizedBox.shrink()
+            ? appBarMediaVisibility(context,
+                fireUser: widget.fireUser, stream: stream)
+            : shrinkBox
       ],
     );
   }
 
   Widget _buildBottomOptions(BuildContext context, DuleViewModel model) {
-    return SizedBox(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          horizontalSpaceRegular,
-          IconButton(
-            onPressed: () => model.updateDuleFocus(),
-            icon: const Icon(FeatherIcons.edit3),
-            color: model.duleFocusNode.hasFocus
-                ? Color(senderBubbleCode)
-                : Theme.of(context).colorScheme.darkGrey,
-            iconSize: 32,
-          ),
-          IconButton(
-            onPressed: () => showModalBottomSheet(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              context: context,
-              builder: (context) {
-                return SizedBox(
-                  height: 100,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      InkWell(
-                          onTap: () async {
-                            FocusScope.of(context).unfocus();
-                            Navigator.pop(context);
-                            var value = AnimationType.confetti;
-                            await model.updateAnimation(value);
-                            confettiController.play();
-                            await model.updateAnimation(null);
-                          },
-                          child: const Chip(label: Text('Confetti'))),
-                      const SizedBox(width: 10),
-                      const Chip(label: Text('Spotlight')),
-                      const SizedBox(width: 10),
-                      InkWell(
-                        onTap: () async {
-                          Navigator.pop(context);
-                          var value = AnimationType.balloons;
-                          await model.updateAnimation(value);
-                          balloonsController
-                              .forward()
-                              .whenComplete(() => balloonsController.reset());
-                          await model.updateAnimation(null);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        horizontalSpaceRegular,
+        IconButton(
+          onPressed: () => model.updateDuleFocus(),
+          icon: const Icon(FeatherIcons.edit3),
+          color: model.duleFocusNode.hasFocus
+              ? Color(senderBubbleCode)
+              : Theme.of(context).colorScheme.darkGrey,
+          iconSize: 32,
+        ),
+        IconButton(
+          onPressed: () => showModalBottomSheet(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) {
+              return SizedBox(
+                height: 100,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    horizontalSpaceRegular,
+                    InkWell(
+                        onTap: () {
+                          Navigator.pop(context, true);
+                          var value = AnimationType.confetti;
+                          Future.delayed(const Duration(milliseconds: 150),
+                              () => confettiController.play());
+                          model
+                              .updateAnimation(value)
+                              .whenComplete(() => model.updateAnimation(null));
                         },
-                        child: const Chip(
-                          label: Text('Balloons'),
-                        ),
+                        child: const Chip(label: Text('Confetti'))),
+                    horizontalSpaceRegular,
+                    InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          var value = AnimationType.hearts;
+                          heartsController
+                              .forward()
+                              .whenComplete(() => heartsController.reset());
+                          model
+                              .updateAnimation(value)
+                              .whenComplete(() => model.updateAnimation(null));
+                        },
+                        child: const Chip(label: Text('Hearts'))),
+                    horizontalSpaceRegular,
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        var value = AnimationType.balloons;
+                        balloonsController
+                            .forward()
+                            .whenComplete(() => balloonsController.reset());
+                        model
+                            .updateAnimation(value)
+                            .whenComplete(() => model.updateAnimation(null));
+                      },
+                      child: const Chip(
+                        label: Text('Balloons'),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            icon: const Icon(FeatherIcons.loader),
-            color: Theme.of(context).colorScheme.darkGrey,
-            iconSize: 32,
-          ),
-          IconButton(
-            onPressed: () => model.pickImage(context),
-            icon: const Icon(FeatherIcons.camera),
-            color: Theme.of(context).colorScheme.darkGrey,
-            iconSize: 32,
-          ),
-          model.sendingMediaPath == null
-              ? IconButton(
-                  onPressed: () => model.pickGallery(context),
-                  icon: const Icon(FeatherIcons.image),
-                  color: Theme.of(context).colorScheme.darkGrey,
-                  iconSize: 32,
-                )
-              : senderMediaWidget(context, model, model.uploadingProgress),
-          IconButton(
-            onPressed: () => navService.materialPageRoute(
-                context, WriteLetterView(fireUser: widget.fireUser)),
-            icon: const Icon(FeatherIcons.send),
-            color: Theme.of(context).colorScheme.darkGrey,
-            iconSize: 32,
-          ),
-          const Spacer(),
-          Text(
-            model.wordLengthLeft,
-            style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                  color: Theme.of(context).colorScheme.darkGrey,
+                    ),
+                  ],
                 ),
-          ),
-          IconButton(
-            onPressed: () {
-              model.clearMessage();
+              );
             },
-            icon: const Icon((FeatherIcons.refreshCcw)),
-            color: model.isDuleEmpty
-                ? Theme.of(context).colorScheme.darkGrey
-                : Theme.of(context).colorScheme.red,
-            iconSize: 32,
           ),
-          horizontalSpaceTiny,
-        ],
-      ),
+          icon: const Icon(FeatherIcons.loader),
+          color: Theme.of(context).colorScheme.darkGrey,
+          iconSize: 32,
+        ),
+        model.isBusy
+            ? senderMediaWidget(context, model, model.uploadingProgress)
+            : IconButton(
+                onPressed: () => model.pickImage(context),
+                icon: const Icon(FeatherIcons.camera),
+                color: Theme.of(context).colorScheme.darkGrey,
+                iconSize: 32,
+              ),
+        model.busy(model.isGalleryUploading) && model.sendingMediaPath != null
+            ? senderMediaWidget(context, model, model.uploadingProgress)
+            : IconButton(
+                onPressed: () => model.pickGallery(context),
+                icon: const Icon(FeatherIcons.image),
+                color: Theme.of(context).colorScheme.darkGrey,
+                iconSize: 32,
+              ),
+        IconButton(
+          onPressed: () => navService.materialPageRoute(
+              context, WriteLetterView(fireUser: widget.fireUser)),
+          icon: const Icon(FeatherIcons.send),
+          color: Theme.of(context).colorScheme.darkGrey,
+          iconSize: 32,
+        ),
+        const Spacer(),
+        Text(
+          model.wordLengthLeft,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1!
+              .copyWith(color: Theme.of(context).colorScheme.darkGrey),
+        ),
+        IconButton(
+          onPressed: () => model.clearMessage(),
+          icon: const Icon((FeatherIcons.refreshCcw)),
+          color: model.isDuleEmpty
+              ? Theme.of(context).colorScheme.darkGrey
+              : Theme.of(context).colorScheme.red,
+          iconSize: 32,
+        ),
+        horizontalSpaceTiny,
+      ],
     );
   }
 
@@ -284,11 +307,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           extendBodyBehindAppBar: true,
-          appBar: _buildAppBar(context, data, model.stream),
+          appBar: _buildAppBar(context, data: data, stream: model.stream),
           body: Stack(
             fit: StackFit.expand,
             children: [
-              lottieAnimation(context, balloonsController),
               Column(
                 children: [
                   topPadding(context),
@@ -302,17 +324,25 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
                   ),
                   verticalSpaceRegular,
                   senderMessageBubble(context,
+                      data: data,
                       model: model,
-                      confettiController: confettiController,
-                      balloonsController: balloonsController,
                       fireUser: widget.fireUser,
-                      data: data),
+                      heartsController: heartsController,
+                      confettiController: confettiController,
+                      balloonsController: balloonsController),
                   _buildBottomOptions(context, model),
                   bottomPadding(context),
                 ],
               ),
-              confettiAnimation(context, confettiController, -pi / 4),
-              confettiAnimation(context, confettiController, pi / 4)
+              confettiAnimation(context, confettiController, pi / 4),
+              confettiAnimation(context, confettiController, -pi / 4,
+                  isLeft: true),
+              balloonsController.isAnimating
+                  ? balloonsLottieAnimation(context, balloonsController)
+                  : shrinkBox,
+              heartsController.isAnimating
+                  ? heartsLottieAnimation(context, heartsController)
+                  : shrinkBox,
             ],
           ),
         );

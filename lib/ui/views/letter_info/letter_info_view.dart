@@ -99,7 +99,7 @@ class LetterInfoView extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: cwAuthProceedButton(context, buttonTitle: 'Write a letter',
+              child: CWAuthProceedButton( buttonTitle: 'Write a letter',
                   onTap: () {
                 Navigator.pop(context);
                 navService.materialPageRoute(

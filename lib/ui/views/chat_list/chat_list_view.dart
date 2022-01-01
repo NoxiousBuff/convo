@@ -5,11 +5,12 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,9 +34,10 @@ class ChatListView extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: Material(
           color: Colors.transparent,
-          child: Icon(
-            FeatherIcons.codesandbox,
-            color: Theme.of(context).colorScheme.black,
+          child: SizedBox(
+            height: 30,
+            width: 30,
+            child: Image.asset('assets/ic_launcher.png'),
           ),
         ),
         trailing: Row(
@@ -75,7 +77,7 @@ class ChatListView extends StatelessWidget {
               color: Colors.transparent,
               child: IconButton(
                 color: Theme.of(context).colorScheme.black,
-                icon: const Icon(Iconsax.send_2),
+                icon: const Icon(FeatherIcons.send),
                 onPressed: () {
                   mainViewPageController.animateToPage(1,
                       duration: const Duration(milliseconds: 300),
@@ -146,7 +148,8 @@ class ChatListView extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                      color: Theme.of(context).colorScheme.black,
+                                      color:
+                                          Theme.of(context).colorScheme.black,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
                                 )
@@ -184,28 +187,46 @@ class ChatListView extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator()));
             }
             if (data != null) {
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final doc = data.docs[index];
-                  final userUid = doc[RecentUserField.userUid];
-                  final archived = doc[RecentUserField.archive];
-                  final pinned = doc[RecentUserField.pinned];
-                  return GestureDetector(
-                    onLongPress: () {
-                      showTileOptions(userUid, context, false);
-                    },
-                    child: archived || pinned
-                        ? const SizedBox.shrink()
-                        : UserListItem(
-                            // contentPadding: const EdgeInsets.all(0),
-                            userUid: userUid,
-                            onLongPress: (fireUser) {
-                              showTileOptions(fireUser, context, pinned);
+              return data.docs.isNotEmpty
+                  ? SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final doc = data.docs[index];
+                          final userUid = doc[RecentUserField.userUid];
+                          final archived = doc[RecentUserField.archive];
+                          final pinned = doc[RecentUserField.pinned];
+                          return GestureDetector(
+                            onLongPress: () {
+                              showTileOptions(userUid, context, false);
                             },
-                          ),
-                  );
-                }, childCount: data.docs.length),
-              );
+                            child: archived || pinned
+                                ? const SizedBox.shrink()
+                                : UserListItem(
+                                    // contentPadding: const EdgeInsets.all(0),
+                                    userUid: userUid,
+                                    onLongPress: (fireUser) {
+                                      showTileOptions(
+                                          fireUser, context, pinned);
+                                    },
+                                  ),
+                          );
+                        },
+                        childCount: data.docs.length,
+                      ),
+                    )
+                  : SliverToBoxAdapter(
+                      child: emptyState(
+                      context,
+                      lowerGap:
+                          screenHeightPercentage(context, percentage: 0.2),
+                      upperGap:
+                          screenHeightPercentage(context, percentage: 0.2),
+                      heading: 'Discover \nfriends',
+                      description: 'You got to find friends.\nWe are worried about you.',
+                      proceedButton: CWAuthProceedButton(buttonTitle: 'Go To Discover', onTap: () {
+                        //TODO: do something here
+                      })
+                    ),);
             } else {
               return const SliverToBoxAdapter(
                 child: Text('Data is null'),
@@ -226,11 +247,9 @@ class ChatListView extends StatelessWidget {
             scrollBehavior: const CupertinoScrollBehavior(),
             slivers: [
               _buildAppBar(context),
+              sliverVerticalSpaceRegular,
               _buildPinnedList(context, model),
               _buildChatList(context, model),
-              // SliverToBoxAdapter(
-              //   child: Lottie.asset('assets/email-sent.json'),
-              // )
             ],
           ),
         );

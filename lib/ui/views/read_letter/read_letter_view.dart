@@ -85,7 +85,7 @@ class ReadLetterView extends StatelessWidget {
                         fontSize: 28, fontWeight: FontWeight.w700),
                   ),
                   verticalSpaceMedium,
-                  Text(model.formaattedDate),
+                  Text(model.formattedDate),
                 ],
               ),
             ),
