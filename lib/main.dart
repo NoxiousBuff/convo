@@ -83,7 +83,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> intialiseAwesomeNotifications() async {
   AwesomeNotifications().initialize(
-    'resource://drawable/convo_notification_app_icon',
+    'resource://drawable/notification_icon_xhdpi',
     [
       NotificationChannel(
         importance: NotificationImportance.High,

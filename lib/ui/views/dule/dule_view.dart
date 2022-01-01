@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'dart:async';
+import 'package:hint/services/push_notification_service.dart';
+import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -169,7 +171,20 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         data != null
             ? appBarMediaVisibility(context,
                 fireUser: widget.fireUser, stream: stream)
-            : shrinkBox
+            : shrinkBox,
+        IconButton(
+          onPressed: () {
+            pushNotificationService.sendZap(
+                  widget.fireUser.id,
+                  // onComplete: () => customSnackbars.successSnackbar(context,
+                  //     title: 'He has been notified.'),
+                  onError: () => customSnackbars.errorSnackbar(context,
+                      title: 'There was some error in notifying.'),
+                );
+          },
+          icon: const Icon(FeatherIcons.zap),
+          color: Theme.of(context).colorScheme.black,
+        ),
       ],
     );
   }

@@ -27,6 +27,7 @@ Future<void> showTileOptions(FireUser fireUser, context, bool pinned) async {
           children: [
             verticalSpaceMedium,
             ListTile(
+              
               onTap: () {
                 pushNotificationService.sendZap(
                   fireUser.id,

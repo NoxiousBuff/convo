@@ -37,7 +37,7 @@ class ChatListView extends StatelessWidget {
           child: SizedBox(
             height: 30,
             width: 30,
-            child: Image.asset('assets/ic_launcher.png'),
+            child: Image.asset('assets/appicon_mdpi_gradient.png'),
           ),
         ),
         trailing: Row(
