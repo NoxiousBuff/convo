@@ -187,7 +187,7 @@ class ChatListView extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator()));
             }
             if (data != null) {
-              return data.docs.isNotEmpty
+              return !data.docs.isNotEmpty
                   ? SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -222,9 +222,9 @@ class ChatListView extends StatelessWidget {
                       upperGap:
                           screenHeightPercentage(context, percentage: 0.2),
                       heading: 'Discover \nfriends',
-                      description: 'You got to find friends.\nWe are worried about you.',
+                      description: 'We are worried about you.\nYou got to find friends.',
                       proceedButton: CWAuthProceedButton(buttonTitle: 'Go To Discover', onTap: () {
-                        //TODO: do something here
+                        mainViewTabController.index = 2;
                       })
                     ),);
             } else {

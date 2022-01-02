@@ -13,6 +13,8 @@ import 'package:iconsax/iconsax.dart';
 final PageController mainViewPageController =
     PageController(keepPage: true, initialPage: 0);
 
+final CupertinoTabController mainViewTabController = CupertinoTabController(initialIndex: 0);
+
 class MainView extends StatelessWidget {
   const MainView({Key? key}) : super(key: key);
 
@@ -24,6 +26,7 @@ class MainView extends StatelessWidget {
       builder: (BuildContext context, ref, Widget? child) {
         final pageControllerProvider = ref.watch(pageControllerPod);
         return CupertinoTabScaffold(
+          controller: mainViewTabController,
           tabBar: CupertinoTabBar(
             border: const Border(
                 top: BorderSide(

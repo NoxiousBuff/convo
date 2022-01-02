@@ -24,6 +24,11 @@ Widget emptyState(
           mainAxisAlignment: MainAxisAlignment.center,
           textAlign: TextAlign.center),
       verticalSpaceRegular,
+      if (proceedButton != null) Padding(
+        padding: proceedButtonPadding ?? const EdgeInsets.symmetric(horizontal: 20),
+        child: proceedButton,
+      ),
+      verticalSpaceLarge,
       description != null
           ? cwEADescriptionTitle(
               context,
@@ -31,11 +36,7 @@ Widget emptyState(
               textAlign: TextAlign.center,
             )
           : shrinkBox,
-      verticalSpaceLarge,
-      if (proceedButton != null) Padding(
-        padding: proceedButtonPadding ?? const EdgeInsets.symmetric(horizontal: 20),
-        child: proceedButton,
-      ),
+      
       SizedBox(height: lowerGap),
     ],
   );
