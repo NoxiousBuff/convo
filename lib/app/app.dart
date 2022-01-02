@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
+import 'package:hint/ui/views/welcome/welcome_view.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -37,15 +37,6 @@ class _MyAppState extends State<MyApp> {
     AwesomeNotifications().actionStream.listen(
     (ReceivedNotification receivedNotification){
       log('listening to the notification via actionStream');
-      // receivedNotification.
-        // Navigator.of(context).pushNamed(
-        //     '/NotificationPage',
-        //     arguments: {
-        //         // your page params. I recommend you to pass the
-        //         // entire *receivedNotification* object
-        //         id: receivedNotification.id
-        //     }
-        // );
     }
 );
   }

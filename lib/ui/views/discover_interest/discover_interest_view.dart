@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
@@ -47,15 +46,16 @@ class DiscoverInterestView extends StatelessWidget {
               ),
               sliverVerticalSpaceRegular,
               SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InterestToggleButton(interestName),
-                  ],
-                )
-              ),
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InterestToggleButton(interestName),
+                ],
+              )),
               sliverVerticalSpaceRegular,
-              const SliverToBoxAdapter(child: Divider(),),
+              const SliverToBoxAdapter(
+                child: Divider(),
+              ),
               sliverVerticalSpaceRegular,
               Builder(
                 builder: (context) {
@@ -68,8 +68,7 @@ class DiscoverInterestView extends StatelessWidget {
                   if (!model.dataReady) {
                     return loadingGridView(context);
                   }
-                  final fireUserList =
-                      _data.docs as List<QueryDocumentSnapshot>;
+                  final fireUserList = _data!.docs;
                   return fireUserList.isNotEmpty
                       ? SliverGrid(
                           gridDelegate:
@@ -96,7 +95,8 @@ class DiscoverInterestView extends StatelessWidget {
                             emoji: '❔',
                             // emoji: '📜',
                             heading: 'We\'re still \nfinding someone',
-                            description: 'People related to your interests \nare not in this category right now.',
+                            description:
+                                'People related to your interests \nare not in this category right now.',
                             upperGap: screenHeightPercentage(context,
                                 percentage: 0.15),
                           ),

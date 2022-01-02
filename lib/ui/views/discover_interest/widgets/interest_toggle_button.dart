@@ -81,7 +81,10 @@ class InterestToggleButton extends StatelessWidget {
             child: Text(
               isAdded ? 'Remove' : 'Add',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.black,
+              ),
             ),
           ),
         );

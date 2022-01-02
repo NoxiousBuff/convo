@@ -8,7 +8,6 @@ import 'package:hint/ui/views/account/account_view/account_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/discover/discover_view.dart';
 import 'package:hint/ui/views/explor/explor_view.dart';
-import 'package:iconsax/iconsax.dart';
 
 final PageController mainViewPageController =
     PageController(keepPage: true, initialPage: 0);
@@ -44,7 +43,7 @@ class MainView extends StatelessWidget {
                 icon: Icon(FeatherIcons.messageCircle),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Iconsax.search_normal),
+                icon: Icon(FeatherIcons.search),
               ),
               BottomNavigationBarItem(
                 icon: Icon(FeatherIcons.compass),

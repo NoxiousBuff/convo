@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/ui/views/auth/welcome/welcome_view.dart';
+import 'package:hint/ui/views/welcome/welcome_view.dart';
 
 final authService = AuthService();
 

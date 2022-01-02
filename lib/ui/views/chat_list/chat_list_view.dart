@@ -187,7 +187,7 @@ class ChatListView extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator()));
             }
             if (data != null) {
-              return !data.docs.isNotEmpty
+              return data.docs.isNotEmpty
                   ? SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {

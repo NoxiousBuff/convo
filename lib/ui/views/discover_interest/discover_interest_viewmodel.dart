@@ -4,7 +4,7 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class DiscoverInterestViewModel extends FutureViewModel {
+class DiscoverInterestViewModel extends FutureViewModel<QuerySnapshot> {
   final log = getLogger('DiscoverInterestViewModel');
 
   final String interestName;
@@ -26,7 +26,7 @@ class DiscoverInterestViewModel extends FutureViewModel {
   }
 
   @override
-  Future futureToRun() {
+  Future<QuerySnapshot> futureToRun() {
     return getSuggestedPeople();
   }
 

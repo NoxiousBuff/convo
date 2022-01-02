@@ -15,6 +15,7 @@ class LoginAuthViewModel extends BaseViewModel {
   final loginFormKey = GlobalKey<FormState>();
   final TextEditingController emailTech = TextEditingController();
   final TextEditingController passwordTech = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   void updateEmailEmpty() {
     emailEmpty = emailTech.text.isEmpty;
@@ -38,6 +39,7 @@ class LoginAuthViewModel extends BaseViewModel {
 
   Future<void> login(BuildContext context, String email, String password) async {
     setBusy(true);
+    focusNode.unfocus();
     await authService.logIn(
         email: email,
         password: password,

@@ -22,7 +22,7 @@ class LoginAuthView extends StatelessWidget {
       viewModelBuilder: () => LoginAuthViewModel(),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
-        appBar: cwAuthAppBar(context, title: 'Login'),
+        appBar: cwAuthAppBar(context, title: 'Login', onPressed: () => Navigator.pop(context)),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Form(
@@ -38,6 +38,7 @@ class LoginAuthView extends StatelessWidget {
                     cwAuthDescription(context, title: 'Email Address'),
                     verticalSpaceSmall,
                     TextFormField(
+                      keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return customSnackbars.errorSnackbar(context,
@@ -76,6 +77,7 @@ class LoginAuthView extends StatelessWidget {
                     cwAuthDescription(context, title: 'Password'),
                     verticalSpaceSmall,
                     TextFormField(
+                      focusNode: model.focusNode,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return customSnackbars.errorSnackbar(context,
