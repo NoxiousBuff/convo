@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:hint/ui/views/welcome/welcome_view.dart';
+import 'package:hint/ui/views/onboarding/onboarding_view.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
             connectivityBuilder: (context, connection, child) {
               return FirebaseAuth.instance.currentUser != null
                   ? const HomeView()
-                  : const WelcomeView();
+                  : OnBoardingView();
             },
           ),
           routes: appRoutes,

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:hint/ui/views/onboarding/onboarding_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -159,6 +160,9 @@ class ChatsCustomizationView extends StatelessWidget {
                 subtitle: 'Set your settings for live chat',
                 onTap: () => bubbleColor(context, model),
               ),
+              cwEADetailsTile(context, 'On Boarding', subtitle: 'On Boarding View', onTap: () {
+                navService.cupertinoPageRoute(context,  OnBoardingView());
+              }),
             ],
           ),
         );

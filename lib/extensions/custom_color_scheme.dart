@@ -9,6 +9,8 @@ extension CustomColorScheme on ColorScheme {
     return (brightness == Brightness.light) ? light : dark;
   }
 
+  bool get isDarkTheme => brightness != Brightness.light;
+
   Color get blue => dynamicColour(
       light: const Color.fromRGBO(0, 132, 255, 1),
       dark: const Color.fromRGBO(0, 132, 255, 1));
