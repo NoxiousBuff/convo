@@ -26,7 +26,7 @@ class InterestToggleButton extends StatelessWidget {
         .then((value) {
       hiveApi.updateUserData(FireUserField.interests, userSelectedInterests);
       customSnackbars.successSnackbar(context,
-          title: 'You Data Was Sucessfully Saved');
+          title: '$interestName is added to your interests.');
     });
   }
 
@@ -41,7 +41,7 @@ class InterestToggleButton extends StatelessWidget {
         .then((value) {
       hiveApi.updateUserData(FireUserField.interests, userSelectedInterests);
       customSnackbars.successSnackbar(context,
-          title: 'You Data Was Sucessfully Saved');
+          title: '$interestName is removed from your interests.');
     });
   }
 

@@ -15,7 +15,7 @@ class SearchViewModel extends BaseViewModel {
   bool _searchEmpty = true;
   bool get searchEmpty => _searchEmpty;
 
-  TextEditingController searchTech = TextEditingController();
+  final TextEditingController searchTech = TextEditingController();
 
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
@@ -29,9 +29,11 @@ class SearchViewModel extends BaseViewModel {
   ///search the user by its username
   void handleUsernameSearch(String query) {
     var usernameQuery = query.toLowerCase();
+    final String username = hiveApi.getUserData(FireUserField.username);
     Future<QuerySnapshot>? searchResults = subsCollection
         .where(
           FireUserField.username,
+          isNotEqualTo: username,
           isGreaterThanOrEqualTo: usernameQuery,
           isLessThan: usernameQuery.isNotEmpty
               ? usernameQuery.substring(0, usernameQuery.length - 1) +

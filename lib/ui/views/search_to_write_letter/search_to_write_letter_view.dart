@@ -25,7 +25,7 @@ class SearchToWriteLetterView extends StatelessWidget {
     return Center(child: emptyState(context, emoji: '😞', description: 'Perhaps try again with another username.', heading: 'Nothing found for \n\'$query\'.'));
   }
 
-  Widget buildInitialContent(SearchToWriteLetterViewModel model) {
+  Widget buildInitialContent(BuildContext context, SearchToWriteLetterViewModel model) {
     bool isSearchListEmpty = Hive.box(HiveApi.recentSearchesHiveBox).isEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +38,7 @@ class SearchToWriteLetterView extends StatelessWidget {
               Text(
                 isSearchListEmpty ? 'No Recent Searches' : 'Recent Searches',
                 style:
-                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+                   TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: Theme.of(context).colorScheme.mediumBlack),
               )
             ],
           ),
@@ -122,7 +122,7 @@ class SearchToWriteLetterView extends StatelessWidget {
         future: model.usernameSearchFuture,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return buildInitialContent(model);
+            return buildInitialContent(context, model);
           }
           final searchResults = snapshot.data!.docs;
           return snapshot.data != null && searchResults.isNotEmpty

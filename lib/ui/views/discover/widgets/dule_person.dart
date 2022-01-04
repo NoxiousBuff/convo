@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
@@ -23,10 +21,7 @@ Widget dulePerson(
   final commonInterests =
       lists.fold<Set>(lists.first.toSet(), (a, b) => a.intersection(b.toSet()));
   final int interestLength = commonInterests.length;
-  final currentUserId = hiveApi.getUserData(FireUserField.id);
-  return fireUser.id == currentUserId
-      ? const SizedBox.shrink()
-      : InkWell(
+  return InkWell(
           borderRadius: BorderRadius.circular(32),
           onTap: () {
             showModalBottomSheet(

@@ -46,7 +46,10 @@ class UserListItem extends StatelessWidget {
           return Text(
             isOnline ? 'Online' : 'Offline',
             style: TextStyle(
-                color: isOnline ? Theme.of(context).colorScheme.blue : Theme.of(context).colorScheme.mediumBlack, fontSize: 14),
+                color: isOnline
+                    ? Theme.of(context).colorScheme.blue
+                    : Theme.of(context).colorScheme.mediumBlack,
+                fontSize: 14),
           );
         } else {
           return shrinkBox;
@@ -76,24 +79,23 @@ class UserListItem extends StatelessWidget {
             FireUser fireUser = FireUser.fromFirestore(snapshot.data!);
             child = UserItem(
               contentPadding: contentPadding,
-                fireUser: fireUser,
-                onLongPress: () {
-                  final function = onLongPress;
-                  if (function != null) {
-                    function(fireUser);
-                  }
-                },
-                onTap: () {
-                  final function = onTap;
-                  if (function != null) {
-                    function(fireUser);
-                  } else {
-                    chatService.startDuleConversation(context, fireUser);
-                  }
-                },
-                title: fireUser.displayName,
-                subtitle: userStatus(fireUser),
-                );
+              fireUser: fireUser,
+              onLongPress: () {
+                final function = onLongPress;
+                if (function != null) {
+                  function(fireUser);
+                }
+              },
+              onTap: () {
+                final function = onTap;
+                if (function != null) {
+                  function(fireUser);
+                } else {
+                  chatService.startDuleConversation(context, fireUser);
+                }
+              },
+              title: fireUser.displayName,
+            );
           }
 
           return AnimatedSwitcher(

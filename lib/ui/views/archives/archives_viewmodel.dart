@@ -5,6 +5,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/services/push_notification_service.dart';
+import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:stacked/stacked.dart';
@@ -25,6 +26,10 @@ class ArchiveViewModel extends BaseViewModel {
                 onTap: () {
                   pushNotificationService.sendZap(
                     fireUser.id,
+                    whenComplete: () => customSnackbars.successSnackbar(context,
+                      title: 'He has been notified.'),
+                  onError: () => customSnackbars.errorSnackbar(context,
+                      title: 'There was some error in notifying. Please check your internet connection.'),
                   );
                   Navigator.pop(context);
                 },

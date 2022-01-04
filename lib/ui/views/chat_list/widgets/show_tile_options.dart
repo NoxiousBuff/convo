@@ -31,10 +31,11 @@ Future<void> showTileOptions(FireUser fireUser, context, bool pinned) async {
               onTap: () {
                 pushNotificationService.sendZap(
                   fireUser.id,
-                  // onComplete: () => customSnackbars.successSnackbar(context,
-                  //     title: 'He has been notified.'),
+                  whenComplete: () {
+                    
+                  },
                   onError: () => customSnackbars.errorSnackbar(context,
-                      title: 'There was some error in notifying.'),
+                      title: 'There was some error in notifying. Please check your internet connection.'),
                 );
                 Navigator.pop(context);
               },

@@ -41,53 +41,40 @@ dependencies:
   email_validator: ^2.0.1
   jiffy: ^4.1.0
   timeago: ^3.1.0
-  tenor: ^1.0.9
-  pull_to_refresh: ^2.0.0
 
   # ui
   animations: ^2.0.2
   pinput: ^1.2.1
   video_player: ^2.1.4
-  preload_page_view: ^0.1.6
-  modal_bottom_sheet: ^2.0.0
   confetti: ^0.6.0
   flutter_markdown: ^0.6.9
-  animated_background: ^2.0.0
-  flutter_reaction_button: ^2.0.0+1
   flutter_feather_icons: ^2.0.0+1
-  flutter_staggered_grid_view: ^0.4.1
   cached_network_image: ^3.2.0
-  motion_toast: ^1.3.0
+  video_thumbnail: ^0.4.3
 
   #functional
-  dio: ^4.0.0
   hive: ^2.0.4
   logger: ^1.0.0
+  filesize: ^2.0.1
   device_info: ^2.0.2
   hive_flutter: ^1.0.0
-  sensors_plus: ^1.0.1
-  path_provider: ^2.0.2
   pixabay_picker: ^1.0.6
-  metadata_fetch: ^0.4.1
   image_picker: ^0.8.4+3
   flutter_offline: ^2.0.0
-  json_annotation: ^4.1.0
   string_validator: ^0.3.0
   contacts_service: ^0.6.1
-  shared_preferences: ^2.0.6
   permission_handler: ^8.3.0
-  filesize: ^2.0.1
   extended_image: ^6.0.1
   get_it: ^7.2.0
   share_plus: ^3.0.4
-  iconsax: ^0.0.8
   awesome_notifications: ^0.6.19
+  file_sizes: ^1.0.6
+  path_provider: ^2.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^1.1.0
-  build_runner: ^2.0.4
   flutter_lints: ^1.0.0
   flutter_native_splash: ^1.3.3
 

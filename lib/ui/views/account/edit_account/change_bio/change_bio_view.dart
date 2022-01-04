@@ -23,25 +23,24 @@ class ChangeBioView extends StatelessWidget {
       viewModelBuilder: () => ChangeBioViewModel(),
       builder: (context, model, child) => WillPopScope(
         onWillPop: () async {
-            if (model.isEdited) {
-              bool shouldPop = await showDialog(
-                  context: context,
-                  builder: (context) {
-                    return DuleAlertDialog(
+          if (model.isEdited) {
+            bool shouldPop = await showDialog(
+                context: context,
+                builder: (context) {
+                  return DuleAlertDialog(
                       title: 'Delete the changes ?',
                       icon: FeatherIcons.alertOctagon,
                       primaryButtonText: 'Yes',
                       secondaryButtontext: 'No',
                       primaryOnPressed: () => Navigator.pop(context, true),
                       secondaryOnPressed: () => Navigator.pop(context, false),
-                      iconBackgroundColor: Colors.red
-                    );
-                  });
-              return shouldPop;
-            } else {
-              return true;
-            }
-          },
+                      iconBackgroundColor: Colors.red);
+                });
+            return shouldPop;
+          } else {
+            return true;
+          }
+        },
         child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
           appBar: cwAuthAppBar(
@@ -57,28 +56,45 @@ class ChangeBioView extends StatelessWidget {
                 child: ListView(
                   children: [
                     cwEADetailsTile(context, 'Your Current Bio'),
-                    Text(box.get(FireUserField.bio),
-                              style:  TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.mediumBlack,
-                              ),
+                    Text(
+                      box.get(FireUserField.bio),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.mediumBlack,
+                      ),
                     ),
                     verticalSpaceRegular,
                     const Divider(),
                     verticalSpaceRegular,
                     cwEADescriptionTitle(context, 'Type Your New Bio Name'),
                     verticalSpaceSmall,
-                    cwEATextField(context, model.bioNameTech, 'Bio', onChanged: (value) {
-                      model.updateBioNameEmpty();
-                      if(!model.isEdited) {
-                        model.updateIsEdited(true);
-                      }
-                    }, maxLength: 250, expands: true),
+                    cwEATextField(
+                      context,
+                      model.bioNameTech,
+                      'Bio',
+                      onChanged: (value) {
+                        model.updateBioNameEmpty();
+                        if (!model.isEdited) {
+                          model.updateIsEdited(true);
+                        }
+                      },
+                      maxLength: 250,
+                      expands: true,
+                      textInputAction: TextInputAction.newline,
+                    ),
                     verticalSpaceLarge,
-                    CWAuthProceedButton( buttonTitle: 'Save', onTap: () {
-                      model.updateUserProperty(context, FireUserField.bio, model.bioNameTech.text.trim(),);
-                    }, isLoading: model.isBusy, isActive: model.isActive),
+                    CWAuthProceedButton(
+                        buttonTitle: 'Save',
+                        onTap: () {
+                          model.updateUserProperty(
+                            context,
+                            FireUserField.bio,
+                            model.bioNameTech.text.trim(),
+                          );
+                        },
+                        isLoading: model.isBusy,
+                        isActive: model.isActive),
                   ],
                 ),
               );

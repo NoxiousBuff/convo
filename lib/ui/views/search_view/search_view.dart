@@ -171,6 +171,7 @@ class SearchView extends StatelessWidget {
                             return UserItem(
                               fireUser: fireUser,
                               title: fireUser.username,
+                              subtitle: fireUser.displayName,
                               onTap: () async {
                                 chatService.startDuleConversation(
                                     context, fireUser);

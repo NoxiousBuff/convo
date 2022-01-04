@@ -67,7 +67,7 @@ class PushNotificationService {
   }
 
   Future<void> sendZap(String userId,
-      {Function? onComplete, Function? onError}) async {
+      {required void Function() whenComplete, Function? onError}) async {
     final userName = hiveApi.getUserData(FireUserField.username);
     // final userId = hiveApi.getUserData(FireUserField.id);
     final imageUrl = hiveApi.getUserData(FireUserField.photoUrl);
@@ -80,8 +80,7 @@ class PushNotificationService {
           'imageUrl': imageUrl,
         },
       ).then((value) {
-        if (onComplete != null) onComplete();
-        return;
+        whenComplete();
       });
     } catch (e) {
       if (onError != null) onError();

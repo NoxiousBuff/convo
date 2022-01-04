@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:video_player/video_player.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class ReceiverVideoDisplayWidget extends StatefulWidget {

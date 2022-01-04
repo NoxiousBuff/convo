@@ -176,10 +176,10 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           onPressed: () {
             pushNotificationService.sendZap(
                   widget.fireUser.id,
-                  // onComplete: () => customSnackbars.successSnackbar(context,
-                  //     title: 'He has been notified.'),
+                  whenComplete: () => customSnackbars.successSnackbar(context,
+                      title: 'He has been notified.'),
                   onError: () => customSnackbars.errorSnackbar(context,
-                      title: 'There was some error in notifying.'),
+                      title: 'There was some error in notifying. Please check your internet connection.'),
                 );
           },
           icon: const Icon(FeatherIcons.zap),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
@@ -15,9 +16,11 @@ class DiscoverInterestViewModel extends FutureViewModel<QuerySnapshot> {
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
   Future<QuerySnapshot> getSuggestedPeople() async {
-    return subsCollection.where(
-        FireUserField.interests,
-        arrayContains: interestName).get(const GetOptions(source: Source.cache));
+    final String userUid = hiveApi.getUserData(FireUserField.id);
+    return subsCollection
+        .where(FireUserField.interests, arrayContains: interestName)
+        .where(FireUserField.id, isNotEqualTo: userUid)
+        .get();
   }
 
   String replaceString() {
@@ -29,5 +32,4 @@ class DiscoverInterestViewModel extends FutureViewModel<QuerySnapshot> {
   Future<QuerySnapshot> futureToRun() {
     return getSuggestedPeople();
   }
-
 }

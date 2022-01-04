@@ -42,11 +42,12 @@ class UpdateEmailView extends StatelessWidget {
                             cwEADetailsTile(context, 'Your Current Email'),
                             Text(
                               userDataHiveBox.get(FireUserField.email),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: Colors.black54,
-                              ),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .mediumBlack),
                             ),
                             verticalSpaceRegular,
                             const Divider(),
@@ -73,7 +74,6 @@ class UpdateEmailView extends StatelessWidget {
                                     model.updatePasswordEmpty()),
                             verticalSpaceLarge,
                             CWAuthProceedButton(
-                              
                               buttonTitle: 'Change Email',
                               isActive: !model.isDisplayNameEmpty &&
                                   !model.isPasswordEmpty,

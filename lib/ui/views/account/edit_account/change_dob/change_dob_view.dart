@@ -67,7 +67,7 @@ class ChangeDobView extends StatelessWidget {
                     model.isDobNull
                         ? 'Please add your date of birth carefully. \nIt cannot be changed later.'
                         : model.formattedBirthDate,
-                    style:  TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.mediumBlack,
@@ -82,66 +82,72 @@ class ChangeDobView extends StatelessWidget {
                           ? 'Select Your Date of Birth'
                           : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the support@dule.org.'),
                   verticalSpaceLarge,
-                  
                   model.isDobNull
                       ? SizedBox(
                           height:
                               screenHeightPercentage(context, percentage: 0.5),
-                          child: CupertinoDatePicker(
-                            initialDateTime:
-                                DateTime.utc(DateTime.now().year - 7),
-                            minimumYear: DateTime.now().year - 120,
-                            onDateTimeChanged: (dateTime) {
-                              model.updateDob(dateTime);
-                              model.updateAge(dateTime);
-                              if (!model.isEdited) {
-                                model.updateIsEdited(true);
-                              }
-                            },
-                            maximumYear: DateTime.now().year - 7,
-                            mode: CupertinoDatePickerMode.date,
+                          child: CupertinoTheme(
+                            data: CupertinoThemeData(
+                              brightness: Theme.of(context).brightness,
+                            ),
+                            child: CupertinoDatePicker(
+                              initialDateTime:
+                                  DateTime.utc(DateTime.now().year - 7),
+                              minimumYear: DateTime.now().year - 120,
+                              onDateTimeChanged: (dateTime) {
+                                model.updateDob(dateTime);
+                                model.updateAge(dateTime);
+                                if (!model.isEdited) {
+                                  model.updateIsEdited(true);
+                                }
+                              },
+                              maximumYear: DateTime.now().year - 7,
+                              mode: CupertinoDatePickerMode.date,
+                            ),
                           ),
                         )
                       : const SizedBox.shrink(),
                   model.isDobNull
-                        ? verticalSpaceSmall : const SizedBox.shrink(),
+                      ? verticalSpaceSmall
+                      : const SizedBox.shrink(),
                   model.isDobNull
-                        ? CWAuthProceedButton(
-                    
-                    buttonTitle: 'Save',
-                    onTap: () async {
-                      final shouldUpdateDob = await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return DuleAlertDialog(
-                            title: 'Are you sure that you are ${model.age} ?',
-                            icon: FeatherIcons.calendar,
-                            primaryButtonText: 'Save',
-                            primaryOnPressed: () {
-                              Navigator.pop(context, true);
-                            },
-                            secondaryButtontext: 'Cancel',
-                            secondaryOnPressed: () {
-                              Navigator.pop(context, false);
-                            },
-                            secondaryButtonTextStyle: const TextStyle(
-                                color: Colors.red,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700),
-                          );
-                        },
-                      );
-                      shouldUpdateDob
-                          ? model.updateUserProperty(
-                              context,
-                              FireUserField.dob,
-                              model.dobInMilliseconds,
-                            )
-                          : () {};
-                    },
-                    isLoading: model.isBusy,
-                    isActive: model.isEdited,
-                  ) : const SizedBox.shrink(),
+                      ? CWAuthProceedButton(
+                          buttonTitle: 'Save',
+                          onTap: () async {
+                            final shouldUpdateDob = await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return DuleAlertDialog(
+                                  title:
+                                      'Are you sure that you are ${model.age} ?',
+                                  icon: FeatherIcons.calendar,
+                                  primaryButtonText: 'Save',
+                                  primaryOnPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  secondaryButtontext: 'Cancel',
+                                  secondaryOnPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  secondaryButtonTextStyle: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700),
+                                );
+                              },
+                            );
+                            shouldUpdateDob
+                                ? model.updateUserProperty(
+                                    context,
+                                    FireUserField.dob,
+                                    model.dobInMilliseconds,
+                                  )
+                                : () {};
+                          },
+                          isLoading: model.isBusy,
+                          isActive: model.isEdited,
+                        )
+                      : const SizedBox.shrink(),
                 ],
               );
             },

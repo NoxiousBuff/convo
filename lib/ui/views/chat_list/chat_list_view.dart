@@ -195,6 +195,8 @@ class ChatListView extends StatelessWidget {
                           final userUid = doc[RecentUserField.userUid];
                           final archived = doc[RecentUserField.archive];
                           final pinned = doc[RecentUserField.pinned];
+                          final String currentUserUid =
+                              hiveApi.getUserData(FireUserField.id);
                           return GestureDetector(
                             onLongPress: () {
                               showTileOptions(userUid, context, false);
@@ -215,18 +217,20 @@ class ChatListView extends StatelessWidget {
                       ),
                     )
                   : SliverToBoxAdapter(
-                      child: emptyState(
-                      context,
-                      lowerGap:
-                          screenHeightPercentage(context, percentage: 0.2),
-                      upperGap:
-                          screenHeightPercentage(context, percentage: 0.2),
-                      heading: 'Discover \nfriends',
-                      description: 'We are worried about you.\nYou got to find friends.',
-                      proceedButton: CWAuthProceedButton(buttonTitle: 'Go To Discover', onTap: () {
-                        mainViewTabController.index = 2;
-                      })
-                    ),);
+                      child: emptyState(context,
+                          lowerGap:
+                              screenHeightPercentage(context, percentage: 0.2),
+                          upperGap:
+                              screenHeightPercentage(context, percentage: 0.2),
+                          heading: 'Discover \nfriends',
+                          description:
+                              'We are worried about you.\nYou got to find friends.',
+                          proceedButton: CWAuthProceedButton(
+                              buttonTitle: 'Go To Discover',
+                              onTap: () {
+                                mainViewTabController.index = 2;
+                              })),
+                    );
             } else {
               return const SliverToBoxAdapter(
                 child: Text('Data is null'),

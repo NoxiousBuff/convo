@@ -7,7 +7,7 @@ import 'package:hint/ui/shared/user_profile_photo.dart';
 class UserItem extends StatelessWidget {
   final String title;
   final Widget? trailing;
-  final Widget? subtitle;
+  final String? subtitle;
   final bool showSubtitle;
   final FireUser fireUser;
   final void Function()? onTap;
@@ -42,7 +42,7 @@ class UserItem extends StatelessWidget {
       title: Padding(
         padding: const EdgeInsets.only(bottom: 5.0),
         child: Text(
-          fireUser.displayName,
+          title,
           style: TextStyle(
             fontSize: 20,
             color: Theme.of(context).colorScheme.black,
@@ -50,9 +50,9 @@ class UserItem extends StatelessWidget {
           ),
         ),
       ),
-      subtitle: showSubtitle ? subtitle ??
+      subtitle: showSubtitle ?
           Text(
-            fireUser.username,
+            subtitle ?? fireUser.username,
             style: TextStyle(
               color: Theme.of(context).colorScheme.black,
             ),

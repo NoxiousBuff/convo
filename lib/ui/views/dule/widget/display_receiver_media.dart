@@ -46,7 +46,7 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Theme.of(context).colorScheme.black,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,

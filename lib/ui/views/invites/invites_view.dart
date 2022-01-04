@@ -19,7 +19,6 @@ class InvitesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<InvitesViewModel>.reactive(
       viewModelBuilder: () => InvitesViewModel(),
-      onModelReady: (model) => model.getContacts(),
       builder: (context, model, child) {
         return ValueListenableBuilder<Box>(
           valueListenable: hiveApi.hiveStream(HiveApi.userContacts),
@@ -62,10 +61,12 @@ class InvitesView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: CWAuthProceedButton(
-                      
                             isLoading: model.isBusy,
                             buttonTitle: 'Connect your contacts',
-                            onTap: () => model.gettingNumbers(),
+                            onTap: () async {
+                              await model.getContacts();
+                              model.gettingNumbers();
+                            },
                           ),
                         ),
                         verticalSpaceLarge,
@@ -81,7 +82,10 @@ class InvitesView extends StatelessWidget {
                             delegate: SliverChildBuilderDelegate(
                               (context, i) {
                                 return contactListItem(
-                                    context, model, contacts[i],);
+                                  context,
+                                  model,
+                                  contacts[i],
+                                );
                               },
                               childCount: contacts.length,
                             ),

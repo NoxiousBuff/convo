@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
@@ -70,10 +71,15 @@ class DiscoverViewModel extends BaseViewModel {
     final searchArray = await hiveApi.getFromHive(
         HiveApi.appSettingsBoxName, AppSettingKeys.todaysInterestsList,
         defaultValue: usersInterests.sublist(0, 9)) as List<dynamic>;
+    final id = FirebaseAuth.instance.currentUser!.uid;
     Future<QuerySnapshot>? searchResults = subsCollection
         .where(
           FireUserField.interests,
           arrayContainsAny: searchArray,
+        )
+        .where(
+          FireUserField.id,
+          isNotEqualTo: id,
         )
         .limit(6)
         .getSavy();

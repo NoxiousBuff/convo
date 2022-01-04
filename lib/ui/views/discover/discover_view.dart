@@ -107,36 +107,6 @@ class DiscoverView extends StatelessWidget {
             model.updateTodaysInterestsList();
             model.peopleSuggestions();
           },
-          // enablePullDown: true,
-          // enablePullUp: false,
-          // header: CustomHeader(
-          //     builder: (BuildContext context, RefreshStatus? mode) {
-          //   Widget body;
-          //   if (mode == RefreshStatus.idle) {
-          //     body = const Text("Drag Down To Refresh");
-          //   } else if (mode == RefreshStatus.refreshing) {
-          //     body = const CircularProgress(height: 30, width: 30);
-          //   } else if (mode == RefreshStatus.failed) {
-          //     body = const Text("Refresh Failed!Click retry!");
-          //   } else if (mode == RefreshStatus.completed) {
-          //     body = const Text("Refresh Completed");
-          //   } else {
-          //     body = const Text('Drag Down To Refresh');
-          //   }
-          //   return SizedBox(
-          //     height: 55.0,
-          //     child: Center(child: body),
-          //   );
-          // }),
-          // onRefresh: () async {
-          //   model.updateListIndices();
-          //   model.updateTodaysInterestsList();
-          //   model.peopleSuggestions();
-          //   await Future.delayed(const Duration(seconds: 2));
-          //   model.refreshController.refreshCompleted();
-          // },
-          // controller: model.refreshController,
-
           child: CustomScrollView(
             scrollBehavior: const CupertinoScrollBehavior(),
             slivers: [
@@ -169,7 +139,7 @@ class DiscoverView extends StatelessWidget {
                       hiveApi.hiveStream(HiveApi.appSettingsBoxName),
                   builder: (context, appSettingsBox, child) {
                     int secondListIndex = appSettingsBox
-                        .get(AppSettingKeys.secondListIndex, defaultValue: 0);
+                        .get(AppSettingKeys.secondListIndex, defaultValue: 1);
                     return _buildExploreInterestList(
                         context, Interest.listOfInterestLists[secondListIndex]);
                   }),

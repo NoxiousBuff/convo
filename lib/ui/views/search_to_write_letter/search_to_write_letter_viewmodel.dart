@@ -29,9 +29,11 @@ class SearchToWriteLetterViewModel extends BaseViewModel {
   ///search the user by its username
   void handleUsernameSearch(String query) {
     var usernameQuery = query.toLowerCase();
+    final String username = hiveApi.getUserData(FireUserField.username);
     Future<QuerySnapshot>? searchResults = subsCollection
         .where(
           FireUserField.username,
+          isNotEqualTo: username,
           isGreaterThanOrEqualTo: usernameQuery,
           isLessThan: usernameQuery.isNotEmpty
               ? usernameQuery.substring(0, usernameQuery.length - 1) +

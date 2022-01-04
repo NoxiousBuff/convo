@@ -31,9 +31,6 @@ class SettingsView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           physics: const BouncingScrollPhysics(),
           children: [
-            //TODO: add what's new functionality here
-            cwEADetailsTile(context, 'Coming Soon 🎉🎉',
-                titleColor: Theme.of(context).colorScheme.blue),
             cwEADetailsTile(context, 'Account',
                 subtitle: 'Personal Information,. Privacy', onTap: () {
               navService.materialPageRoute(context, const UserAccountView());
@@ -42,11 +39,6 @@ class SettingsView extends StatelessWidget {
                 onTap: () {
               navService.materialPageRoute(
                   context, const ChatsCustomizationView());
-            }),
-            cwEADetailsTile(context, 'Notifications',
-                subtitle: 'Messages, Start Chat', onTap: () {
-              // TODO: add notification page
-              
             }),
             cwEADetailsTile(context, 'Help',
                 subtitle: 'Help Center, Contact us, Privacy Policy', onTap: () {

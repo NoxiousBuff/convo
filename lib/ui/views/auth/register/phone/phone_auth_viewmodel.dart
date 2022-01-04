@@ -90,19 +90,45 @@ class PhoneAuthViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> linkPhoneToUser(BuildContext context, PhoneAuthCredential credential) async {
+  Future<void> linkPhoneToUser(
+      BuildContext context, PhoneAuthCredential credential) async {
     setBusyForObject(otpChecking, true);
-    await FirebaseAuth.instance.currentUser!.updatePhoneNumber(credential).then((value){
-      navService.materialPageRoute(context, DisplayNameAuthView(phoneNumber: phoneTech.text, countryCode: '+$countryCode',));
+    await FirebaseAuth.instance.currentUser!
+        .updatePhoneNumber(credential)
+        .then((value) {
+      navService.materialPageRoute(
+          context,
+          DisplayNameAuthView(
+            phoneNumber: phoneTech.text,
+            countryCode: '+$countryCode',
+          ));
       customSnackbars.successSnackbar(context,
-            title: 'Your phone number has been successfully linked.');
+          title: 'Your phone number has been successfully linked.');
     }).catchError((e) {
-      customSnackbars.errorSnackbar(context, title: e.toString());
-      setBusyForObject(otpChecking, false);
+      // customSnackbars.errorSnackbar(context, title: e.toString());
+      // setBusyForObject(otpChecking, false);
+      switch (e.message) {
+        case 'credential-already-in-use':
+          {
+            customSnackbars.errorSnackbar(context,
+                title: 'This phone number is already in use.');
+          }
+          break;
+        case 'invalid-verification-code':
+          {
+            customSnackbars.errorSnackbar(context,
+                title: 'Verification code is either expired or incorrect.');
+          }
+          break;
+        default:
+          {
+            customSnackbars.errorSnackbar(context,
+                title: 'Something went wrong. Please try again.');
+          }
+      }
     });
     setBusyForObject(otpChecking, false);
     log.w('Phone Auth Credential: $phoneAuthCredential');
-    
   }
 
   Future<void> verifyingPhoneNumber(BuildContext context) async {
@@ -117,13 +143,14 @@ class PhoneAuthViewModel extends BaseViewModel {
         if (e.code == 'invalid-phone-number') {
           log.e(e.message);
           customSnackbars.errorSnackbar(context,
-            title: 'Invalid phone number.');
+              title: 'Invalid phone number.');
         } else {
           log.e(
               'This was the error in creating phone auth credential : ${e.message}');
         }
         log.e(e.message);
-        changePhoneVerificationState(PhoneVerificationState.checkingPhoneNumber);
+        changePhoneVerificationState(
+            PhoneVerificationState.checkingPhoneNumber);
         customSnackbars.infoSnackbar(context,
             title: 'Type your phone number correctly.');
       },
