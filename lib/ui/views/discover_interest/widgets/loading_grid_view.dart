@@ -13,7 +13,7 @@ Widget loadingGridView(BuildContext context) {
     delegate: SliverChildBuilderDelegate(
       (BuildContext context, int index) {
         return Material(
-          color: Theme.of(context).colorScheme.white,
+          color: Theme.of(context).colorScheme.scaffoldColor,
           borderRadius: BorderRadius.circular(32),
           child: Container(
             alignment: Alignment.center,

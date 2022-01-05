@@ -68,7 +68,6 @@ class LetterFields {
 }
 
 class AppSettingKeys {
-  // static const String darkTheme = 'darkTheme';
   static const String appTheme = 'appTheme';
   static const String phoneContact = 'phoneContact';
   static const String heartsAnimation = 'heartsAnimation';
@@ -81,6 +80,10 @@ class AppSettingKeys {
   static const String firstListIndex = 'firstListIndex';
   static const String secondListIndex = 'secondListIndex';
   static const String todaysInterestsList = 'todaysInterestsList';
+  static const String isZapAllowed = 'isZapAllowed';
+  static const String isLetterAllowed = 'isLetterAllowed';
+  static const String isDiscoverAllowed = 'isDiscoverAllowed';
+  static const String isSecurityAllowed = 'isSecurityAllowed';
 }
 
 class AppThemes {

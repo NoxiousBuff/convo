@@ -195,21 +195,24 @@ class ChatListView extends StatelessWidget {
                           final userUid = doc[RecentUserField.userUid];
                           final archived = doc[RecentUserField.archive];
                           final pinned = doc[RecentUserField.pinned];
-                          final String currentUserUid = hiveApi.getUserData(FireUserField.id);
+                          final String currentUserUid =
+                              hiveApi.getUserData(FireUserField.id);
                           return GestureDetector(
                             onLongPress: () {
                               showTileOptions(userUid, context, false);
                             },
-                            child: userUid != currentUserUid ? archived || pinned
-                                ? const SizedBox.shrink()
-                                : UserListItem(
-                                    // contentPadding: const EdgeInsets.all(0),
-                                    userUid: userUid,
-                                    onLongPress: (fireUser) {
-                                      showTileOptions(
-                                          fireUser, context, pinned);
-                                    },
-                                  ) : shrinkBox,
+                            child: userUid != currentUserUid
+                                ? archived || pinned
+                                    ? const SizedBox.shrink()
+                                    : UserListItem(
+                                        // contentPadding: const EdgeInsets.all(0),
+                                        userUid: userUid,
+                                        onLongPress: (fireUser) {
+                                          showTileOptions(
+                                              fireUser, context, pinned);
+                                        },
+                                      )
+                                : shrinkBox,
                           );
                         },
                         childCount: data.docs.length,

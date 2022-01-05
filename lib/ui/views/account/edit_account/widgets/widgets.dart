@@ -59,6 +59,7 @@ Widget cwEADetailsTile(
   bool showTrailingIcon = true,
   bool isLoading = false,
   EdgeInsets? padding,
+  Color? color,
 }) {
   return InkWell(
     onTap: onTap,
@@ -66,6 +67,7 @@ Widget cwEADetailsTile(
     child: Padding(
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 0),
       child: Container(
+        color: color,
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,7 +89,7 @@ Widget cwEADetailsTile(
                       ? Text(
                           subtitle,
                           style:  TextStyle(
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.mediumBlack,
                           ),
                         )

@@ -13,8 +13,6 @@ class DiscoverViewModel extends BaseViewModel {
 
   final discoverRefreshKey = GlobalKey<RefreshIndicatorState>();
 
-  // RefreshController refreshController = RefreshController(initialRefresh: false);
-
   Future<QuerySnapshot>? _peopleSuggestionsFuture;
   Future<QuerySnapshot>? get peopleSuggestionsFuture =>
       _peopleSuggestionsFuture;
@@ -24,6 +22,12 @@ class DiscoverViewModel extends BaseViewModel {
 
   final usersInterests =
       hiveApi.getUserData(FireUserField.interests) as List<dynamic>;
+
+  void onRefresh() {
+    updateListIndices();
+    updateTodaysInterestsList();
+    peopleSuggestions();
+  }
 
   void updateTodaysInterestsList() {
     var randomPicker =

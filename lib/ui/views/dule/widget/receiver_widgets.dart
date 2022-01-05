@@ -15,107 +15,118 @@ import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/dule/widget/display_receiver_media.dart';
-import 'package:hint/ui/views/dule/widget/receiver_video_display_widget.dart';
 
-Widget appBarMediaVisibility(BuildContext context,
-    {required FireUser fireUser, required Stream<DatabaseEvent> stream}) {
-  return StreamBuilder<DatabaseEvent>(
-    stream: stream,
-    builder: (context, snapshot) {
-      final data = snapshot.data;
 
-      if (!snapshot.hasData) {
-        return const SizedBox.shrink();
-      } else {
-        final duleModel = DuleModel.fromJson(data!.snapshot.value);
-        String? url = duleModel.url;
-        String type = duleModel.urlType;
-        switch (duleModel.urlType) {
-          case MediaType.image:
-            {
-              return InkWell(
-                onTap: () => navService.materialPageRoute(
-                    context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: ExtendedImage.network(
-                    url!,
-                    enableSlideOutPage: true,
-                    loadStateChanged: (state) {
-                      state;
-                      switch (state.extendedImageLoadState) {
-                        case LoadState.loading:
-                          {
-                            return const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircularProgress(height: 30, width: 30),
-                            );
-                          }
-                        case LoadState.completed:
-                          {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: ExtendedRawImage(
-                                image: state.extendedImageInfo!.image,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          }
-                        case LoadState.failed:
-                          {
-                            return Container(
-                              height: 30,
-                              width: 30,
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.mediumBlack,
+class AppBarMediaVisibility extends StatelessWidget {
+  const AppBarMediaVisibility(this.fireUser, this.stream, {Key? key})
+      : super(key: key);
+
+  final FireUser fireUser;
+  final Stream<DatabaseEvent> stream;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DatabaseEvent>(
+      stream: stream,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        } else {
+          final duleModel = DuleModel.fromJson(data!.snapshot.value);
+          String? url = duleModel.url;
+          String type = duleModel.urlType;
+          switch (duleModel.urlType) {
+            case MediaType.image:
+              {
+                return InkWell(
+                  onTap: () => navService.materialPageRoute(context,
+                      DisplayFullMedia(mediaType: type, mediaUrl: url!)),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: ExtendedImage.network(
+                      url!,
+                      enableSlideOutPage: true,
+                      loadStateChanged: (state) {
+                        state;
+                        switch (state.extendedImageLoadState) {
+                          case LoadState.loading:
+                            {
+                              return const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CircularProgress(height: 30, width: 30),
+                              );
+                            }
+                          case LoadState.completed:
+                            {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: ExtendedRawImage(
+                                  image: state.extendedImageInfo!.image,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
                                 ),
-                              ),
-                              child: const Icon(FeatherIcons.info),
-                            );
-                          }
-                        default:
-                          {
-                            return const Text('Error');
-                          }
-                      }
-                    },
-                  ),
-                ),
-              );
-            }
-          case MediaType.video:
-            {
-              return url != null
-                  ? InkWell(
-                      onTap: () {
-                        navService.materialPageRoute(context,
-                            DisplayFullMedia(mediaType: type, mediaUrl: url));
+                              );
+                            }
+                          case LoadState.failed:
+                            {
+                              return Container(
+                                height: 30,
+                                width: 30,
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .mediumBlack,
+                                  ),
+                                ),
+                                child: const Icon(FeatherIcons.info),
+                              );
+                            }
+                          default:
+                            {
+                              return const Text('Error');
+                            }
+                        }
                       },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: ReceiverVideoDisplayWidget(videoUrl: url),
-                      ),
-                    )
-                  : shrinkBox;
-            }
-          default:
-            {
-              return shrinkBox;
-            }
+                    ),
+                  ),
+                );
+              }
+            case MediaType.video:
+              {
+                return url != null
+                    ? InkWell(
+                        onTap: () {
+                          navService.materialPageRoute(
+                              context,
+                              DisplayFullMedia(
+                                  mediaType: MediaType.video, mediaUrl: url));
+                        },
+                        child: SizedBox(
+                          width: 40,
+                          child: Icon(
+                            FeatherIcons.play,
+                            color: Theme.of(context).colorScheme.black,
+                          ),
+                        ))
+                    : shrinkBox;
+              }
+            default:
+              {
+                return shrinkBox;
+              }
+          }
         }
-      }
-    },
-  );
+      },
+    );
+  }
 }
 
 Widget receiverMessageBubble(

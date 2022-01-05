@@ -169,8 +169,8 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       ),
       actions: [
         data != null
-            ? appBarMediaVisibility(context,
-                fireUser: widget.fireUser, stream: stream)
+            ? AppBarMediaVisibility(
+                widget.fireUser, stream)
             : shrinkBox,
         IconButton(
           onPressed: () {

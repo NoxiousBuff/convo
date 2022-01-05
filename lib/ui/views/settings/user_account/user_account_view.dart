@@ -5,7 +5,6 @@ import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/settings/security/security_view.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/settings/update_email/update_email_view.dart';
 import 'package:hint/ui/views/settings/update_password/update_password_view.dart';
@@ -77,10 +76,6 @@ class _AccountState extends State<UserAccountView> {
                           ],
                         ),
                         verticalSpaceRegular,
-                        cwEADetailsTile(context, 'Security', onTap: () {
-                          navService.materialPageRoute(
-                              context, const SecurityView());
-                        }),
                         cwEADetailsTile(context, 'Delete My User Account',
                             showTrailingIcon: false,
                             titleColor: Colors.red,

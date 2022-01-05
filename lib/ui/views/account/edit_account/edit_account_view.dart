@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_displayname/change_displayname_view.dart';
 import 'package:hint/ui/views/account/edit_account/change_dob/change_dob_view.dart';
@@ -55,7 +55,8 @@ class EditAccountView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(32),
                     onTap: () {
                       showModalBottomSheet(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32)),
                         context: context,
                         builder: (context) {
                           return Padding(
@@ -79,10 +80,8 @@ class EditAccountView extends StatelessWidget {
                                     if (file != null) {
                                       final String? downloadUrl = await model
                                           .uploadFile(file.path, context);
-                                      model.updateUserProperty(
-                                          context,
-                                          FireUserField.photoUrl,
-                                          downloadUrl);
+                                      model.updateUserProperty(context,
+                                          FireUserField.photoUrl, downloadUrl);
                                       model.setBusy(false);
                                     }
                                   });
@@ -108,14 +107,12 @@ class EditAccountView extends StatelessWidget {
                                     height: 104,
                                     width: 104,
                                     child: CupertinoActivityIndicator())
-                                : ClipRRect(
+                                : userProfilePhoto(
+                                    context,
+                                    profileKey,
+                                    height: 104,
+                                    width: 104,
                                     borderRadius: BorderRadius.circular(38),
-                                    child: CachedNetworkImage(
-                                      imageUrl: profileKey,
-                                      height: 104,
-                                      width: 104,
-                                      fit: BoxFit.cover,
-                                    ),
                                   ),
                           ],
                         ),
@@ -125,7 +122,8 @@ class EditAccountView extends StatelessWidget {
                           children: [
                             Text(
                               'Change profile photo',
-                              style: TextStyle(color: Theme.of(context).colorScheme.blue),
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.blue),
                             ),
                           ],
                         ),
@@ -181,7 +179,6 @@ class EditAccountView extends StatelessWidget {
                       });
                     },
                   ),
-
                   cwEADetailsTile(context, 'Hashtags',
                       subtitle: 'Find Your HashTags', onTap: () {
                     navService.cupertinoPageRoute(
@@ -197,7 +194,9 @@ class EditAccountView extends StatelessWidget {
                   cwEADescriptionTitle(context, 'Personal Information'),
                   verticalSpaceRegular,
                   cwEADetailsTile(context, 'Email',
-                      subtitle: box.get(FireUserField.email, defaultValue: 'Some error in fetching value.'), showTrailingIcon: false),
+                      subtitle: box.get(FireUserField.email,
+                          defaultValue: 'Some error in fetching value.'),
+                      showTrailingIcon: false),
                   verticalSpaceLarge,
                   bottomPadding(context),
                 ],

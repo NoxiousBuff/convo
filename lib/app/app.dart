@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/pods/settings_pod.dart';
+import 'package:hint/ui/views/discover/discover_viewmodel.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:hint/ui/views/onboarding/onboarding_view.dart';
@@ -19,6 +20,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final discoverViewModel = DiscoverViewModel();
+
   void systemUiModeChanger() {
     final deviceVersion =
         hiveApi.getFromHive(HiveApi.deviceInfoHiveBox, 'version');
@@ -34,11 +37,21 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    AwesomeNotifications().actionStream.listen(
-    (ReceivedNotification receivedNotification){
+    AwesomeNotifications()
+        .actionStream
+        .listen((ReceivedNotification receivedNotification) {
       log('listening to the notification via actionStream');
-    }
-);
+    });
+    AwesomeNotifications()
+        .createdStream
+        .listen((ReceivedNotification receivedNotification) {
+      switch (receivedNotification.title) {
+        case '${Emojis.smile_partying_face} A very happy morning!!':
+          discoverViewModel.onRefresh();
+          break;
+        default:
+      }
+    });
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hint/ui/views/settings/chats_customization/chat_customization_view.dart';
 import 'package:hint/ui/views/settings/help/help_view.dart';
+import 'package:hint/ui/views/settings/notification/notification_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 import 'package:stacked/stacked.dart';
 
@@ -40,12 +41,16 @@ class SettingsView extends StatelessWidget {
               navService.materialPageRoute(
                   context, const ChatsCustomizationView());
             }),
+            cwEADetailsTile(context, 'Notifications',
+                subtitle: 'Zap, Letter, Discover, Security', onTap: () {
+              navService.materialPageRoute(context, const NotificationView());
+            }),
             cwEADetailsTile(context, 'Help',
                 subtitle: 'Help Center, Contact us, Privacy Policy', onTap: () {
               navService.materialPageRoute(context, const HelpView());
             }),
-            cwEADetailsTile(context, 'Get Your Friends', subtitle: 'More the merrier , you know.',
-                onTap: () {
+            cwEADetailsTile(context, 'Get Your Friends',
+                subtitle: 'More the merrier , you know.', onTap: () {
               navService.materialPageRoute(context, const InvitesView());
             }),
           ],

@@ -103,9 +103,7 @@ class DiscoverView extends StatelessWidget {
           key: model.discoverRefreshKey,
           strokeWidth: 1,
           onRefresh: () async {
-            model.updateListIndices();
-            model.updateTodaysInterestsList();
-            model.peopleSuggestions();
+            model.onRefresh();
           },
           child: CustomScrollView(
             scrollBehavior: const CupertinoScrollBehavior(),

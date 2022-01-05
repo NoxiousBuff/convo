@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,6 +21,12 @@ Future<void> main() async {
     /// initialising [firebase-core]
     await Firebase.initializeApp();
 
+    /// initialising hive for flutter
+    await Hive.initFlutter();
+
+    /// initialising hive boxes for local data
+    await hiveApi.initialiseHive();
+
     /// isolate for checking any background notifications
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -29,14 +36,11 @@ Future<void> main() async {
     /// intialising awesome notifications
     intialiseAwesomeNotifications();
 
+    ///initiasingScheduledNotifications
+    pushNotificationService.initialiseScheduledNotifications();
+
     /// seting locator for dependency injection
     setupLocator();
-
-    /// initialising hive for flutter
-    await Hive.initFlutter();
-
-    /// initialising hive boxes for local data
-    await hiveApi.initialiseHive();
 
     /// saving device info in hive for android edge to edge screen configurations
     await hiveApi.saveDeviceInfoInHive();
@@ -53,28 +57,42 @@ Future<void> main() async {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   switch (message.data['channelKey']) {
     case NotificationChannelKeys.zapChannel:
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          largeIcon: message.data['imageUrl'],
-          id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-          channelKey: NotificationChannelKeys.zapChannel,
-          notificationLayout: NotificationLayout.BigText,
-          title: message.data['title'],
-          body: message.data['body'],
-        ),
-      );
+      bool isZapNotificationsAllowed = hiveApi.getFromHive(
+          HiveApi.appSettingsBoxName, AppSettingKeys.isZapAllowed,
+          defaultValue: true);
+      if (isZapNotificationsAllowed) {
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            largeIcon: message.data['imageUrl'],
+            id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+            channelKey: NotificationChannelKeys.zapChannel,
+            notificationLayout: NotificationLayout.BigText,
+            title: message.data['title'],
+            body: message.data['body'],
+          ),
+        );
+      } else {
+        log('User has stopped zap notifications from background.');
+      }
       break;
-      case NotificationChannelKeys.letterChannel:
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          largeIcon: message.data['imageUrl'],
-          id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-          channelKey: NotificationChannelKeys.letterChannel,
-          notificationLayout: NotificationLayout.BigText,
-          title: message.data['title'],
-          body: message.data['body'],
-        ),
-      );
+    case NotificationChannelKeys.letterChannel:
+      bool isLetterNotificationsAllowed = hiveApi.getFromHive(
+          HiveApi.appSettingsBoxName, AppSettingKeys.isLetterAllowed,
+          defaultValue: true);
+      if (isLetterNotificationsAllowed) {
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            largeIcon: message.data['imageUrl'],
+            id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+            channelKey: NotificationChannelKeys.letterChannel,
+            notificationLayout: NotificationLayout.BigText,
+            title: message.data['title'],
+            body: message.data['body'],
+          ),
+        );
+      } else {
+        log('User has stopped letters notification from background.');
+      }
       break;
     default:
       {}
@@ -102,6 +120,26 @@ Future<void> intialiseAwesomeNotifications() async {
         channelKey: NotificationChannelKeys.letterChannel,
         channelName: 'Letter notifications',
         channelDescription: 'Notification channel for letters.',
+        defaultColor: Colors.white70,
+        ledColor: Colors.white,
+        channelShowBadge: true,
+      ),
+      NotificationChannel(
+        importance: NotificationImportance.Default,
+        channelGroupKey: NotificationChannelGroupKeys.discoverChannelGroup,
+        channelKey: NotificationChannelKeys.discoverChannel,
+        channelName: 'Discover notifications',
+        channelDescription: 'Notification channel for discover feed.',
+        defaultColor: Colors.white70,
+        ledColor: Colors.white,
+        channelShowBadge: true,
+      ),
+      NotificationChannel(
+        importance: NotificationImportance.Default,
+        channelGroupKey: NotificationChannelGroupKeys.securityChannelGroup,
+        channelKey: NotificationChannelKeys.securityChannel,
+        channelName: 'Security notifications',
+        channelDescription: 'Notification channel for discover feed.',
         defaultColor: Colors.white70,
         ledColor: Colors.white,
         channelShowBadge: true,
