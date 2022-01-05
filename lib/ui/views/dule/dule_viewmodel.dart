@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -179,8 +180,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
   /// Clicking Image from camera
   Future<File?> pickImage(BuildContext context) async {
-    final selectedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    final selectedImage = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 80);
 
     if (selectedImage != null) {
       const title = 'Maximum file size is 8 MB';
@@ -216,14 +217,10 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     required String fileName,
   }) async {
     var now = DateTime.now();
-    var day = now.day;
-    var year = now.year;
-    var month = now.month;
+    final date = DateFormat.yMMMMd().format(now);
 
     final fileType = lookupMimeType(filePath)!.split("/").first;
-
-    var folderDate = '$day-$month-$year';
-    String folder = 'LiveChatMedia/$folderDate/$fileName';
+    String folder = 'LiveChatMedia/$date/$fileName';
     _changeSenderMediaType(fileType);
     UploadTask task = storage.ref(folder).putFile(File(filePath));
     task.timeout(const Duration(seconds: 10), onTimeout: () {
@@ -262,28 +259,6 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     return downloadURL;
   }
 
-  /// Make a video through camera
-  Future<File?> pickVideo(BuildContext context) async {
-    final selectedVideo =
-        await ImagePicker().pickVideo(source: ImageSource.camera);
-
-    if (selectedVideo != null) {
-      final file = File(selectedVideo.path);
-      final size = file.lengthSync();
-      final sizeInMB = size / (1024 * 1024);
-      final fileSize = sizeInMB.toInt();
-      log.wtf('Video Size:$fileSize');
-      if (fileSize > 8) {
-        customSnackbars.errorSnackbar(context,
-            title: 'Maximum size of upload is 8 MB.');
-      } else {
-        return file;
-      }
-    } else {
-      log.wtf('pickVideo | Video was not recorded');
-    }
-  }
-
   Future<void> updateAnimation(String? value) async {
     switch (value) {
       case AnimationType.confetti:
@@ -320,13 +295,13 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       final path = result.paths.first;
       final fileName = result.names.first;
       final fileSizeInBytes = File(path!).lengthSync();
-      // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+      // file size in bytes
       double fileSizeInKB = fileSizeInBytes / 1024;
-      // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+      // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
       double fileSizeInMB = fileSizeInKB / 1024;
-      final fileSize = fileSizeInMB.toInt();
+      // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
       log.wtf('File Size: $fileSizeInMB MB');
-      if (fileSize > 8) {
+      if (fileSizeInMB > 8.0) {
         setBusy(false);
         customSnackbars.infoSnackbar(context, title: title);
       } else {
@@ -342,19 +317,14 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   }
 
   /// Upload File In Firebase Storage
-  Future<String> uploadFile(
-    BuildContext context, {
-    required String filePath,
-    required String fileName,
-  }) async {
+  Future<String> uploadFile(BuildContext context,
+      {required String filePath, required String fileName}) async {
     var now = DateTime.now();
-    var day = now.day;
-    var year = now.year;
-    var month = now.month;
+    final date = DateFormat.yMMMMd().format(now);
 
     final fileType = lookupMimeType(filePath)!.split("/").first;
-    var folderDate = '$day-$month-$year';
-    String folder = 'LiveChatMedia/$folderDate/$fileName';
+    String folder = 'LiveChatMedia/$date/$fileName';
+
 
     UploadTask task = storage.ref(folder).putFile(File(filePath));
     _changeSenderMediaType(fileType);
@@ -362,7 +332,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       _changeSenderMediaPath(null);
       _changeSenderMediaType(null);
       setBusyForObject(_isGalleryUploading, false);
-
+      task.cancel();
       return task;
     });
     setBusyForObject(_isGalleryUploading, true);
@@ -404,21 +374,44 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         .onValue;
   }
 
-  void listenReceiverAnimation(
-      DuleModel model,
-      AnimationController balloonsController,
-      ConfettiController confettiController) {
-    if (model.aniType == AnimationType.confetti) {
-      log.wtf('Begin Confetti');
-      confettiController.play();
-    } else if (model.aniType == AnimationType.balloons) {
-      log.wtf('Begin Balloons');
-      balloonsController.forward();
-    } else {
-      log.wtf('No animation is running now !!');
-    }
-  }
-
   @override
   Stream<DatabaseEvent> get stream => realtimeDBDocument();
 }
+
+
+// /// Make a video through camera
+//   Future<File?> pickVideo(BuildContext context) async {
+//     final selectedVideo =
+//         await ImagePicker().pickVideo(source: ImageSource.camera);
+
+//     if (selectedVideo != null) {
+//       final file = File(selectedVideo.path);
+//       final size = file.lengthSync();
+//       final sizeInMB = size / (1024 * 1024);
+//       final fileSize = sizeInMB.toInt();
+//       log.wtf('Video Size:$fileSize');
+//       if (fileSize > 8) {
+//         customSnackbars.errorSnackbar(context,
+//             title: 'Maximum size of upload is 8 MB.');
+//       } else {
+//         return file;
+//       }
+//     } else {
+//       log.wtf('pickVideo | Video was not recorded');
+//     }
+//   }
+
+  // void listenReceiverAnimation(
+  //     DuleModel model,
+  //     AnimationController balloonsController,
+  //     ConfettiController confettiController) {
+  //   if (model.aniType == AnimationType.confetti) {
+  //     log.wtf('Begin Confetti');
+  //     confettiController.play();
+  //   } else if (model.aniType == AnimationType.balloons) {
+  //     log.wtf('Begin Balloons');
+  //     balloonsController.forward();
+  //   } else {
+  //     log.wtf('No animation is running now !!');
+  //   }
+  // }
