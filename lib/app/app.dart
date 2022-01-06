@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final discoverViewModel = DiscoverViewModel();
+  final discoverViewModel = locator<DiscoverViewModel>();
 
   void systemUiModeChanger() {
     final deviceVersion =
@@ -41,10 +42,6 @@ class _MyAppState extends State<MyApp> {
         .actionStream
         .listen((ReceivedNotification receivedNotification) {
       log('listening to the notification via actionStream');
-    });
-    AwesomeNotifications()
-        .createdStream
-        .listen((ReceivedNotification receivedNotification) {
       switch (receivedNotification.title) {
         case '${Emojis.smile_partying_face} A very happy morning!!':
           discoverViewModel.onRefresh();
@@ -52,6 +49,11 @@ class _MyAppState extends State<MyApp> {
         default:
       }
     });
+    // AwesomeNotifications()
+    //     .createdStream
+    //     .listen((ReceivedNotification receivedNotification) {
+      
+    // });
   }
 
   @override
@@ -61,9 +63,9 @@ class _MyAppState extends State<MyApp> {
       animation: settingsPod,
       builder: (context, child) {
         return MaterialApp(
-          restorationScopeId: 'Dule',
+          restorationScopeId: 'Convo',
           debugShowCheckedModeBanner: false,
-          title: 'Dule',
+          title: 'Convo',
           themeMode: settingsPod.appTheme,
           theme:
               ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white),

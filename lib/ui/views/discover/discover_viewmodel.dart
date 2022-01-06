@@ -20,8 +20,10 @@ class DiscoverViewModel extends BaseViewModel {
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
-  final usersInterests =
-      hiveApi.getUserData(FireUserField.interests) as List<dynamic>;
+  final _usersInterests =
+      hiveApi.getUserData(FireUserField.interests,defaultValue: []) as List<dynamic>;
+
+  List<dynamic> get userInterests => _usersInterests;
 
   void onRefresh() {
     updateListIndices();
@@ -31,7 +33,7 @@ class DiscoverViewModel extends BaseViewModel {
 
   void updateTodaysInterestsList() {
     var randomPicker =
-        List<int>.generate(usersInterests.length - 1, (i) => i + 1)..shuffle();
+        List<int>.generate(_usersInterests.length - 1, (i) => i + 1)..shuffle();
     int random1 = randomPicker.removeLast();
     int random2 = randomPicker.removeLast();
     int random3 = randomPicker.removeLast();
@@ -44,16 +46,16 @@ class DiscoverViewModel extends BaseViewModel {
     int random10 = randomPicker.removeLast();
 
     final List<String> randomList = [
-      usersInterests[random1],
-      usersInterests[random2],
-      usersInterests[random3],
-      usersInterests[random4],
-      usersInterests[random5],
-      usersInterests[random6],
-      usersInterests[random7],
-      usersInterests[random8],
-      usersInterests[random9],
-      usersInterests[random10],
+      _usersInterests[random1],
+      _usersInterests[random2],
+      _usersInterests[random3],
+      _usersInterests[random4],
+      _usersInterests[random5],
+      _usersInterests[random6],
+      _usersInterests[random7],
+      _usersInterests[random8],
+      _usersInterests[random9],
+      _usersInterests[random10],
     ];
     hiveApi.saveAndReplace(HiveApi.appSettingsBoxName,
         AppSettingKeys.todaysInterestsList, randomList);
@@ -74,7 +76,7 @@ class DiscoverViewModel extends BaseViewModel {
   Future<void> peopleSuggestions() async {
     final searchArray = await hiveApi.getFromHive(
         HiveApi.appSettingsBoxName, AppSettingKeys.todaysInterestsList,
-        defaultValue: usersInterests.sublist(0, 9)) as List<dynamic>;
+        defaultValue: _usersInterests.sublist(0, 9)) as List<dynamic>;
     final id = FirebaseAuth.instance.currentUser!.uid;
     Future<QuerySnapshot>? searchResults = subsCollection
         .where(

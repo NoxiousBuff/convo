@@ -35,12 +35,12 @@ class FireUserField {
 }
 
 class DatabaseMessageField {
-  static const String msgTxt = 'msgTxt';
-  static const String roomUid = 'roomUid';
-  static const String url = 'url';
-  static const String urlType = 'urlType';
-  static const String online = 'online';
-  static const String aniType = 'aniType';
+  static const String msgTxt = 'mT';
+  static const String roomUid = 'rU';
+  static const String url = 'u';
+  static const String urlType = 'ut';
+  static const String online = 'o';
+  static const String aniType = 'aT';
 }
 
 class AnimationType {

@@ -15,7 +15,7 @@ Widget dulePerson(
     BuildContext context, DiscoverViewModel model, FireUser fireUser,
     {Function? onTap}) {
   final lists = [
-    model.usersInterests,
+    model.userInterests,
     fireUser.interests,
   ];
   final commonInterests =

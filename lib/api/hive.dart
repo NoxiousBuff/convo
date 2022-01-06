@@ -106,9 +106,9 @@ class HiveApi {
             'The value for the key in hiveBox:$hiveBoxName has not been deleted. Error : $error'));
   }
 
-  dynamic getUserData(String key) {
+  dynamic getUserData(String key,{ dynamic defaultValue}) {
     try {
-      return Hive.box(userDataHiveBox).get(key);
+      return Hive.box(userDataHiveBox).get(key, defaultValue: defaultValue);
     } catch (e) {
       log.e('getFromHive Error:$e');
     }
