@@ -80,7 +80,10 @@ class _SenderVideoDisplayWidgetState extends State<SenderVideoDisplayWidget> {
           // loading spinner.
           return const Padding(
             padding: EdgeInsets.all(8.0),
-            child: CircularProgress(),
+            child: CircularProgress(
+              height: 30,
+              width: 30,
+            ),
           );
         }
       },

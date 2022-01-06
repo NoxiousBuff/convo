@@ -1,24 +1,24 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
-import 'package:hint/ui/views/account/edit_account/change_displayname/change_displayname_view.dart';
-import 'package:hint/ui/views/account/edit_account/change_dob/change_dob_view.dart';
-import 'package:hint/ui/views/account/edit_account/change_hashtags/change_hashtags_view.dart';
-import 'package:hint/ui/views/account/edit_account/change_interest/change_interest_view.dart';
-import 'package:hint/ui/views/account/edit_account/change_username/change_username_view.dart';
-import 'package:hint/ui/views/account/edit_account/widgets/change_gender_modal.dart';
-import 'package:hint/ui/views/account/edit_account/widgets/change_relationship_status_model.dart';
-import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
-import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
+import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
+import 'package:hint/ui/views/account/edit_account/change_dob/change_dob_view.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/change_gender_modal.dart';
+import 'package:hint/ui/views/account/edit_account/change_hashtags/change_hashtags_view.dart';
+import 'package:hint/ui/views/account/edit_account/change_interest/change_interest_view.dart';
+import 'package:hint/ui/views/account/edit_account/change_username/change_username_view.dart';
+import 'package:hint/ui/views/account/edit_account/widgets/change_relationship_status_model.dart';
+import 'package:hint/ui/views/account/edit_account/change_displayname/change_displayname_view.dart';
 
 import 'edit_account_viewmodel.dart';
 
@@ -53,70 +53,65 @@ class EditAccountView extends StatelessWidget {
                   verticalSpaceRegular,
                   InkWell(
                     borderRadius: BorderRadius.circular(32),
-                    onTap: () {
-                      showModalBottomSheet(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                        context: context,
-                        builder: (context) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    cwEADescriptionTitle(
-                                        context, 'Change Your Photo'),
-                                  ],
-                                ),
-                                cwEADetailsTile(context, 'New Profile Photo',
-                                    onTap: () {
-                                  model.pickImage().then((value) async {
-                                    Navigator.pop(context);
-                                    final file = value;
-                                    if (file != null) {
-                                      final String? downloadUrl = await model
-                                          .uploadFile(file.path, context);
-                                      model.updateUserProperty(
-                                          context,
-                                          FireUserField.photoUrl,
-                                          downloadUrl);
-                                      model.setBusy(false);
-                                    }
-                                  });
-                                }),
-                                cwEADetailsTile(context, 'Cancel',
-                                    titleColor: Colors.red, onTap: () {
-                                  Navigator.pop(context);
-                                }),
-                                bottomPadding(context)
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    onTap: () => showModalBottomSheet(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                      ),
+                      context: context,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  cwEADescriptionTitle(
+                                      context, 'Change Your Photo'),
+                                ],
+                              ),
+                              cwEADetailsTile(context, 'New Profile Photo',
+                                  onTap: () => model.pickImage(context)),
+                              cwEADetailsTile(
+                                context,
+                                'Cancel',
+                                titleColor: Colors.red,
+                                onTap: () => Navigator.pop(context),
+                              ),
+                              bottomPadding(context)
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                     child: Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            model.isBusy
-                                ? const SizedBox(
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(38),
+                                  child: CachedNetworkImage(
+                                    imageUrl: profileKey,
                                     height: 104,
                                     width: 104,
-                                    child: CupertinoActivityIndicator())
-                                : ClipRRect(
-                                    borderRadius: BorderRadius.circular(38),
-                                    child: CachedNetworkImage(
-                                      imageUrl: profileKey,
-                                      height: 104,
-                                      width: 104,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    fit: BoxFit.cover,
                                   ),
+                                ),
+                                !model.isBusy
+                                    ? shrinkBox
+                                    : const SizedBox(
+                                        height: 104,
+                                        width: 104,
+                                        child: CupertinoActivityIndicator())
+                              ],
+                            ),
                           ],
                         ),
                         verticalSpaceSmall,
@@ -125,7 +120,8 @@ class EditAccountView extends StatelessWidget {
                           children: [
                             Text(
                               'Change profile photo',
-                              style: TextStyle(color: Theme.of(context).colorScheme.blue),
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.blue),
                             ),
                           ],
                         ),
@@ -181,7 +177,6 @@ class EditAccountView extends StatelessWidget {
                       });
                     },
                   ),
-
                   cwEADetailsTile(context, 'Hashtags',
                       subtitle: 'Find Your HashTags', onTap: () {
                     navService.cupertinoPageRoute(
@@ -197,7 +192,9 @@ class EditAccountView extends StatelessWidget {
                   cwEADescriptionTitle(context, 'Personal Information'),
                   verticalSpaceRegular,
                   cwEADetailsTile(context, 'Email',
-                      subtitle: box.get(FireUserField.email, defaultValue: 'Some error in fetching value.'), showTrailingIcon: false),
+                      subtitle: box.get(FireUserField.email,
+                          defaultValue: 'Some error in fetching value.'),
+                      showTrailingIcon: false),
                   verticalSpaceLarge,
                   bottomPadding(context),
                 ],

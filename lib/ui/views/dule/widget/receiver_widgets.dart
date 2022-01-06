@@ -15,7 +15,6 @@ import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/dule/widget/display_receiver_media.dart';
-import 'package:hint/ui/views/dule/widget/receiver_video_display_widget.dart';
 
 Widget appBarMediaVisibility(BuildContext context,
     {required FireUser fireUser, required Stream<DatabaseEvent> stream}) {
@@ -93,20 +92,25 @@ Widget appBarMediaVisibility(BuildContext context,
             }
           case MediaType.video:
             {
-              return url != null
-                  ? InkWell(
-                      onTap: () {
-                        navService.materialPageRoute(context,
-                            DisplayFullMedia(mediaType: type, mediaUrl: url));
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: ReceiverVideoDisplayWidget(videoUrl: url),
+              return InkWell(
+                onTap: () => navService.materialPageRoute(
+                    context, DisplayFullMedia(mediaType: type, mediaUrl: url!)),
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: CircleAvatar(
+                    maxRadius: 16,
+                    backgroundColor: Theme.of(context).colorScheme.mediumBlack,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        FeatherIcons.play,
+                        size: 14,
+                        color: Theme.of(context).colorScheme.white,
                       ),
-                    )
-                  : shrinkBox;
+                    ),
+                  ),
+                ),
+              );
             }
           default:
             {

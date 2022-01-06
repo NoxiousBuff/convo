@@ -195,12 +195,13 @@ class ChatListView extends StatelessWidget {
                           final userUid = doc[RecentUserField.userUid];
                           final archived = doc[RecentUserField.archive];
                           final pinned = doc[RecentUserField.pinned];
-                          final String currentUserUid = hiveApi.getUserData(FireUserField.id);
+                          final String currentUserUid =
+                              hiveApi.getUserData(FireUserField.id);
                           return GestureDetector(
                             onLongPress: () {
                               showTileOptions(userUid, context, false);
                             },
-                            child: userUid != currentUserUid ? archived || pinned
+                            child: archived || pinned
                                 ? const SizedBox.shrink()
                                 : UserListItem(
                                     // contentPadding: const EdgeInsets.all(0),
@@ -209,7 +210,7 @@ class ChatListView extends StatelessWidget {
                                       showTileOptions(
                                           fireUser, context, pinned);
                                     },
-                                  ) : shrinkBox,
+                                  ),
                           );
                         },
                         childCount: data.docs.length,

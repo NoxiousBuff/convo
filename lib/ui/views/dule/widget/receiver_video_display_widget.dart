@@ -30,6 +30,7 @@ class _ReceiverVideoDisplayWidgetState
     // Initialize the controller and store the Future for later use.
     _initializeVideoPlayerFuture = _controller.initialize();
 
+    _controller.addListener(() {});
     // Use the controller to loop the video.
     super.initState();
   }
@@ -68,7 +69,7 @@ class _ReceiverVideoDisplayWidgetState
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
           return const Padding(
-            padding:  EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: CircularProgress(height: 30, width: 30),
           );
         }

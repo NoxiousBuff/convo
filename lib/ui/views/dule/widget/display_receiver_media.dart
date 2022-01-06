@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
 
 class DisplayFullMedia extends StatefulWidget {
@@ -55,9 +54,9 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
             icon: const Icon(Icons.close)),
       ),
       body: Container(
-          height: screenHeight(context),
+          color: Colors.black,
           width: screenWidth(context),
-          color: Theme.of(context).colorScheme.black,
+          height: screenHeight(context),
           child: mediaHandler(widget.mediaType)),
     );
   }
