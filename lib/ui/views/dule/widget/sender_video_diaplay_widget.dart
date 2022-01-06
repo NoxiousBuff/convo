@@ -56,7 +56,7 @@ class _SenderVideoDisplayWidgetState extends State<SenderVideoDisplayWidget> {
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
           return Container(
-            constraints: const BoxConstraints(maxHeight: 35, maxWidth: 60),
+            constraints: const BoxConstraints(maxHeight: 35, maxWidth: 35),
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             child: Stack(
               fit: StackFit.expand,
@@ -80,7 +80,10 @@ class _SenderVideoDisplayWidgetState extends State<SenderVideoDisplayWidget> {
           // loading spinner.
           return const Padding(
             padding: EdgeInsets.all(8.0),
-            child: CircularProgress(),
+            child: CircularProgress(
+              height: 30,
+              width: 30,
+            ),
           );
         }
       },

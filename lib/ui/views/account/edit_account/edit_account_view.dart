@@ -53,67 +53,133 @@ class EditAccountView extends StatelessWidget {
                   verticalSpaceRegular,
                   InkWell(
                     borderRadius: BorderRadius.circular(32),
-                    onTap: () {
-                      showModalBottomSheet(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32)),
-                        context: context,
-                        builder: (context) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    cwEADescriptionTitle(
-                                        context, 'Change Your Photo'),
-                                  ],
-                                ),
-                                cwEADetailsTile(context, 'New Profile Photo',
-                                    onTap: () {
-                                  model.pickImage().then((value) async {
-                                    Navigator.pop(context);
-                                    final file = value;
-                                    if (file != null) {
-                                      final String? downloadUrl = await model
-                                          .uploadFile(file.path, context);
-                                      model.updateUserProperty(context,
-                                          FireUserField.photoUrl, downloadUrl);
-                                      model.setBusy(false);
-                                    }
-                                  });
-                                }),
-                                cwEADetailsTile(context, 'Cancel',
-                                    titleColor: Colors.red, onTap: () {
-                                  Navigator.pop(context);
-                                }),
-                                bottomPadding(context)
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    // onTap: () {
+                    //   showModalBottomSheet(
+                    //     shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(32)),
+                    //     context: context,
+                    //     builder: (context) {
+                    //       return Padding(
+                    //         padding: const EdgeInsets.symmetric(
+                    //             horizontal: 20, vertical: 20),
+                    //         child: Column(
+                    //           mainAxisSize: MainAxisSize.min,
+                    //           children: [
+                    //             Row(
+                    //               mainAxisAlignment: MainAxisAlignment.start,
+                    //               children: [
+                    //                 cwEADescriptionTitle(
+                    //                     context, 'Change Your Photo'),
+                    //               ],
+                    //             ),
+                    //             cwEADetailsTile(context, 'New Profile Photo',
+                    //                 onTap: () {
+                    //               model.pickImage().then((value) async {
+                    //                 Navigator.pop(context);
+                    //                 final file = value;
+                    //                 if (file != null) {
+                    //                   final String? downloadUrl = await model
+                    //                       .uploadFile(file.path, context);
+                    //                   model.updateUserProperty(context,
+                    //                       FireUserField.photoUrl, downloadUrl);
+                    //                   model.setBusy(false);
+                    //                 }
+                    //               });
+                    //             }),
+                    //             cwEADetailsTile(context, 'Cancel',
+                    //                 titleColor: Colors.red, onTap: () {
+                    //               Navigator.pop(context);
+                    //             }),
+                    //             bottomPadding(context)
+                    //           ],
+                    //         ),
+                    //       );
+                    //     },
+                    //   );
+                    // },
+                    onTap: () => showModalBottomSheet(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                      ),
+                      context: context,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  cwEADescriptionTitle(
+                                      context, 'Change Your Photo'),
+                                ],
+                              ),
+                              cwEADetailsTile(context, 'New Profile Photo',
+                                  onTap: () => model.pickImage(context)),
+                              cwEADetailsTile(
+                                context,
+                                'Cancel',
+                                titleColor: Colors.red,
+                                onTap: () => Navigator.pop(context),
+                              ),
+                              bottomPadding(context)
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                     child: Column(
                       children: [
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   children: [
+                        //     model.isBusy
+                        //         ? const SizedBox(
+                        //             height: 104,
+                        //             width: 104,
+                        //             child: CupertinoActivityIndicator())
+                        //         : userProfilePhoto(
+                        //             context,
+                        //             profileKey,
+                        //             height: 104,
+                        //             width: 104,
+                        //             borderRadius: BorderRadius.circular(38),
+                        //           ),
+                        //   ],
+                        // ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            model.isBusy
-                                ? const SizedBox(
-                                    height: 104,
-                                    width: 104,
-                                    child: CupertinoActivityIndicator())
-                                : userProfilePhoto(
-                                    context,
-                                    profileKey,
-                                    height: 104,
-                                    width: 104,
-                                    borderRadius: BorderRadius.circular(38),
-                                  ),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // ClipRRect(
+                                //   borderRadius: BorderRadius.circular(38),
+                                //   child: CachedNetworkImage(
+                                //     imageUrl: profileKey,
+                                //     height: 104,
+                                //     width: 104,
+                                //     fit: BoxFit.cover,
+                                //   ),
+                                // ),
+                                userProfilePhoto(
+                                  context,
+                                  profileKey,
+                                  height: 104,
+                                  width: 104,
+                                  borderRadius: BorderRadius.circular(38),
+                                ),
+                                !model.isBusy
+                                    ? shrinkBox
+                                    : const SizedBox(
+                                        height: 104,
+                                        width: 104,
+                                        child: CupertinoActivityIndicator())
+                              ],
+                            ),
                           ],
                         ),
                         verticalSpaceSmall,

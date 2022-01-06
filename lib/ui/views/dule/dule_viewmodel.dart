@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -177,10 +178,32 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     );
   }
 
+   /// upload task functionality
+  Future<String> _uploadFunction({
+    Function(Object)? onError,
+    void Function()? onDone,
+    required UploadTask task,
+    required String fileType,
+    required String firebasePath,
+    void Function(TaskSnapshot)? onData,
+    Future<TaskSnapshot> Function()? onTimeout,
+  }) async {
+    task.timeout(const Duration(seconds: 10), onTimeout: onTimeout);
+    task.snapshotEvents.listen(onData, onError: onError, onDone: onDone);
+    await task;
+    String downloadURL = await storage.ref(firebasePath).getDownloadURL();
+    await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
+    await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
+
+    _changeSenderMediaPath(null);
+    _changeSenderMediaType(null);
+    return downloadURL;
+  }
+
   /// Clicking Image from camera
   Future<File?> pickImage(BuildContext context) async {
     final selectedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 25, );
 
     if (selectedImage != null) {
       const title = 'Maximum file size is 8 MB';
@@ -225,39 +248,59 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     var folderDate = '$day-$month-$year';
     String folder = 'LiveChatMedia/$folderDate/$fileName';
     _changeSenderMediaType(fileType);
-    UploadTask task = storage.ref(folder).putFile(File(filePath));
-    task.timeout(const Duration(seconds: 10), onTimeout: () {
-      setBusy(false);
-      _changeSenderMediaType(null);
-      _changeSenderMediaPath(null);
-      return task;
-    });
+    // UploadTask task = storage.ref(folder).putFile(File(filePath));
+    // task.timeout(const Duration(seconds: 10), onTimeout: () {
+    //   setBusy(false);
+    //   _changeSenderMediaType(null);
+    //   _changeSenderMediaPath(null);
+    //   return task;
+    // });
+    // setBusy(true);
+    // task.snapshotEvents.listen(
+    //   (TaskSnapshot snapshot) {
+    //     log.i('Task state: ${snapshot.state}');
+    //     final progress = snapshot.bytesTransferred.toDouble() /
+    //         snapshot.totalBytes.toDouble();
+
+    //     _getMediaUploadingProgress(progress);
+
+    //     log.wtf(_uploadingProgress);
+    //   },
+    //   onError: (e) {
+    //     setBusy(false);
+    //     task.cancel();
+    //     _changeSenderMediaType(null);
+    //     _changeSenderMediaPath(null);
+    //     customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
+    //   },
+    // );
+    // await task;
+    // String downloadURL = await storage.ref(folder).getDownloadURL();
+    // log.w('FileType:$fileType');
+    // await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
+    // await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
+    // _changeSenderMediaType(null);
+    // _changeSenderMediaPath(null);
     setBusy(true);
-    task.snapshotEvents.listen(
-      (TaskSnapshot snapshot) {
-        log.i('Task state: ${snapshot.state}');
-        final progress = snapshot.bytesTransferred.toDouble() /
-            snapshot.totalBytes.toDouble();
-
-        _getMediaUploadingProgress(progress);
-
-        log.wtf(_uploadingProgress);
-      },
-      onError: (e) {
+    UploadTask task = storage.ref(folder).putFile(File(filePath));
+    final downloadURL = await _uploadFunction(
+      task: task,
+      fileType: fileType,
+      firebasePath: folder,
+      onTimeout: () {
         setBusy(false);
-        task.cancel();
         _changeSenderMediaType(null);
         _changeSenderMediaPath(null);
+        return task;
+      },
+      onData: (TaskSnapshot snapshot) {
+        log.i('Task state: ${snapshot.state}');
+        final progress = snapshot.bytesTransferred /
+            snapshot.totalBytes;
+            log.wtf(progress);
         customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
       },
     );
-    await task;
-    String downloadURL = await storage.ref(folder).getDownloadURL();
-    log.w('FileType:$fileType');
-    await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
-    await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
-    _changeSenderMediaType(null);
-    _changeSenderMediaPath(null);
     setBusy(false);
     return downloadURL;
   }
@@ -342,55 +385,46 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   }
 
   /// Upload File In Firebase Storage
-  Future<String> uploadFile(
-    BuildContext context, {
-    required String filePath,
-    required String fileName,
-  }) async {
+  Future<String> uploadFile(BuildContext context,
+      {required String filePath, required String fileName}) async {
+
     var now = DateTime.now();
-    var day = now.day;
-    var year = now.year;
-    var month = now.month;
+    final date = DateFormat.yMMMMd().format(now);
 
     final fileType = lookupMimeType(filePath)!.split("/").first;
-    var folderDate = '$day-$month-$year';
-    String folder = 'LiveChatMedia/$folderDate/$fileName';
-
+    String folder = 'LiveChatMedia/$date/$fileName';
     UploadTask task = storage.ref(folder).putFile(File(filePath));
     _changeSenderMediaType(fileType);
-    task.timeout(const Duration(seconds: 10), onTimeout: () {
-      _changeSenderMediaPath(null);
-      _changeSenderMediaType(null);
-      setBusyForObject(_isGalleryUploading, false);
-
-      return task;
-    });
     setBusyForObject(_isGalleryUploading, true);
-    task.snapshotEvents.listen(
-      (TaskSnapshot snapshot) {
+    final downloadURL = await _uploadFunction(
+      task: task,
+      fileType: fileType,
+      firebasePath: folder,
+      onTimeout: () {
+        _changeSenderMediaPath(null);
+        _changeSenderMediaType(null);
+        setBusyForObject(_isGalleryUploading, false);
+        task.cancel();
+        return task;
+      },
+      onData: (TaskSnapshot snapshot) {
         log.i('Task state: ${snapshot.state}');
-        final progress = snapshot.bytesTransferred.toDouble() /
-            snapshot.totalBytes.toDouble();
+        final progress = snapshot.bytesTransferred / snapshot.totalBytes;
 
         _getMediaUploadingProgress(progress);
 
         log.wtf(_uploadingProgress);
       },
-      onError: (e) {
+      onError: (error) {
         _changeSenderMediaPath(null);
         _changeSenderMediaType(null);
         setBusyForObject(_isGalleryUploading, false);
         task.cancel();
-        customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
+        const String errorTitle = 'Failed to upload file';
+        customSnackbars.errorSnackbar(context, title: errorTitle);
       },
     );
-    await task;
-    String downloadURL = await storage.ref(folder).getDownloadURL();
-    await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
-    await updateUserDataWithKey(DatabaseMessageField.urlType, fileType);
 
-    _changeSenderMediaPath(null);
-    _changeSenderMediaType(null);
     log.v('MediaPath:$_sendingMediaPath');
     setBusyForObject(_isGalleryUploading, false);
     return downloadURL;

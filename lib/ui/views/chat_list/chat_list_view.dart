@@ -79,9 +79,11 @@ class ChatListView extends StatelessWidget {
                 color: Theme.of(context).colorScheme.black,
                 icon: const Icon(FeatherIcons.send),
                 onPressed: () {
-                  mainViewPageController.animateToPage(1,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut);
+                  mainViewPageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
                 },
               ),
             ),

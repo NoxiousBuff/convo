@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/dule/widget/video_display_widget.dart';
 
@@ -57,7 +56,7 @@ class _DisplayFullMediaState extends State<DisplayFullMedia> {
       body: Container(
           height: screenHeight(context),
           width: screenWidth(context),
-          color: Theme.of(context).colorScheme.black,
+          color: Colors.black,
           child: mediaHandler(widget.mediaType)),
     );
   }

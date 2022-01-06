@@ -1,10 +1,7 @@
-import 'dart:developer';
-import 'package:hint/ui/views/onboarding/onboarding_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
@@ -72,64 +69,6 @@ class ChatsCustomizationView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  cwEADescriptionTitle(context, 'Display'),
-                ],
-              ),
-              verticalSpaceRegular,
-              ValueListenableBuilder<Box>(
-                valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
-                builder: (context, box, child) {
-                  return Row(
-                    children: [
-                      Expanded(
-                          child: cwEADetailsTile(context, 'Theme',
-                              subtitle: 'Tap to change to app theme',
-                              showTrailingIcon: false)),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).colorScheme.lightGrey,
-                        ),
-                        padding: const EdgeInsets.only(left: 10, right: 2),
-                        child: DropdownButton<String>(
-                          borderRadius: BorderRadius.circular(14.2),
-                          dropdownColor:
-                              Theme.of(context).colorScheme.lightGrey,
-                          underline: shrinkBox,
-                          value: settingsPod.appThemeInString,
-                          elevation: 0,
-                          onChanged: (chosenThemeMode) {
-                            if (chosenThemeMode != null) {
-                              settingsPod.updateTheme(chosenThemeMode);
-                              log(chosenThemeMode);
-                              log(settingsPod.appThemeInString);
-                            }
-                          },
-                          items: const [
-                            DropdownMenuItem(
-                              value: AppThemes.system,
-                              child: Text('System'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemes.light,
-                              child: Text('Light'),
-                            ),
-                            DropdownMenuItem(
-                              value: AppThemes.dark,
-                              child: Text('Dark'),
-                            )
-                          ],
-                        ),
-                      ),
-                      horizontalSpaceRegular,
-                    ],
-                  );
-                },
-              ),
-              verticalSpaceRegular,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
                   cwEADescriptionTitle(context, 'Magic Words'),
                 ],
               ),
@@ -156,13 +95,10 @@ class ChatsCustomizationView extends StatelessWidget {
               verticalSpaceMedium,
               cwEADetailsTile(
                 context,
-                'Customization',
-                subtitle: 'Set your settings for live chat',
+                'Message Bubble Color',
+                subtitle: 'Tap to change message bubble color',
                 onTap: () => bubbleColor(context, model),
               ),
-              cwEADetailsTile(context, 'On Boarding', subtitle: 'On Boarding View', onTap: () {
-                navService.cupertinoPageRoute(context,  OnBoardingView());
-              }),
             ],
           ),
         );

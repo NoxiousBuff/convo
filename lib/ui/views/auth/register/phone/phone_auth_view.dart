@@ -16,13 +16,6 @@ class PhoneAuthView extends StatelessWidget {
 
   static const String id = '/PhoneAuthView';
 
-  // BoxDecoration get _pinPutDecoration {
-  //   return BoxDecoration(
-  //     border: Border.all(color: Theme.of(context).colorScheme.blue),
-  //     borderRadius: BorderRadius.circular(15.0),
-  //   );
-  // }
-
   Widget forPhoneNumber(BuildContext context, PhoneAuthViewModel model) {
     return Form(
       key: model.phoneFormKey,
@@ -37,6 +30,7 @@ class PhoneAuthView extends StatelessWidget {
               SizedBox(
                 width: screenWidth(context),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: 60,
@@ -44,13 +38,18 @@ class PhoneAuthView extends StatelessWidget {
                         onTap: () {
                           model.pickedCountryCode(context);
                         },
-                        child: Text(
-                          '+${model.countryCode}',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.black,
-                          ),
+                        child: Column(
+                          children: [
+                            Text(
+                              '+${model.countryCode}',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.black,
+                              ),
+                            ),
+                            verticalSpaceSmall
+                          ],
                         ),
                       ),
                     ),

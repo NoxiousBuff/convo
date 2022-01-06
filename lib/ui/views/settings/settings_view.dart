@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
@@ -8,6 +12,7 @@ import 'package:hint/ui/views/settings/chats_customization/chat_customization_vi
 import 'package:hint/ui/views/settings/help/help_view.dart';
 import 'package:hint/ui/views/settings/notification/notification_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 
 import 'settings_viewmodel.dart';
@@ -32,6 +37,58 @@ class SettingsView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           physics: const BouncingScrollPhysics(),
           children: [
+            verticalSpaceRegular,
+            ValueListenableBuilder<Box>(
+                valueListenable: hiveApi.hiveStream(HiveApi.appSettingsBoxName),
+                builder: (context, box, child) {
+                  return Row(
+                    children: [
+                      Expanded(
+                          child: cwEADetailsTile(context, 'Theme',
+                              subtitle: 'Tap to change to app theme',
+                              showTrailingIcon: false)),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Theme.of(context).colorScheme.lightGrey,
+                        ),
+                        padding: const EdgeInsets.only(left: 10, right: 2),
+                        child: DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(14.2),
+                          dropdownColor:
+                              Theme.of(context).colorScheme.lightGrey,
+                          underline: shrinkBox,
+                          value: settingsPod.appThemeInString,
+                          elevation: 0,
+                          onChanged: (chosenThemeMode) {
+                            if (chosenThemeMode != null) {
+                              settingsPod.updateTheme(chosenThemeMode);
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: AppThemes.system,
+                              child: Text('System'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemes.light,
+                              child: Text('Light'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemes.dark,
+                              child: Text('Dark'),
+                            )
+                          ],
+                        ),
+                      ),
+                      horizontalSpaceRegular,
+                    ],
+                  );
+                },
+              ),
+              // verticalSpaceRegular,
+              const Divider(),
+              // verticalSpaceRegular,
             cwEADetailsTile(context, 'Account',
                 subtitle: 'Personal Information,. Privacy', onTap: () {
               navService.materialPageRoute(context, const UserAccountView());

@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
 import 'package:hint/app/app_colors.dart';
-import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/user_model.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,7 +13,6 @@ import 'package:hint/ui/views/dule/dule_viewmodel.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 
 import 'sender_video_diaplay_widget.dart';
 
@@ -27,7 +24,7 @@ Widget senderMediaWidget(
       {
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          constraints: const BoxConstraints(maxHeight: 35, maxWidth: 60),
+          constraints: const BoxConstraints(maxHeight: 35, maxWidth: 35),
           child: ExtendedImage.file(
             File(model.sendingMediaPath!),
             clipBehavior: Clip.antiAlias,
@@ -47,12 +44,17 @@ Widget senderMediaWidget(
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: ExtendedRawImage(
-                            width: 60,
+                            width: 35,
                             height: 35,
                             isAntiAlias: true,
                             fit: BoxFit.fitWidth,
                             image: state.extendedImageInfo?.image,
                           ),
+                        ),
+                        Container(
+                          height: 35,
+                          width: 35,
+                          color: Colors.black26,
                         ),
                         Center(
                           child: Text(
@@ -208,54 +210,61 @@ Widget senderMessageBubble(
         decoration: BoxDecoration(
             color: Color(senderBubbleCode),
             borderRadius: BorderRadius.circular(32)),
-        child: data != null
-            ? DuleModel.fromJson(data.snapshot.value).roomUid ==
-                    model.conversationId
-                ? senderMessageContent(
-                    context,
-                    model: model,
-                    heartsController: heartsController,
-                    confettiController: confettiController,
-                    balloonsController: balloonsController,
-                  )
-                : TextButton.icon(
-                    style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () => navService.materialPageRoute(
-                      context,
-                      WriteLetterView(fireUser: fireUser),
-                    ),
-                    icon: Icon(FeatherIcons.send,
-                        color: Theme.of(context).colorScheme.mediumBlack),
-                    label: Text(
-                      'Send a letter',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.mediumBlack,
-                          fontSize: 24,
-                          decoration: TextDecoration.underline),
-                    ),
-                  )
-            : TextButton.icon(
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () => navService.materialPageRoute(
-                  context,
-                  WriteLetterView(fireUser: fireUser),
-                ),
-                icon: Icon(FeatherIcons.send,
-                    color: Theme.of(context).colorScheme.mediumBlack),
-                label: Text(
-                  'Send a letter',
-                  style: TextStyle(
-                      fontSize: 24,
-                      decoration: TextDecoration.underline,
-                      color: Theme.of(context).colorScheme.mediumBlack),
-                ),
-              ),
+        // child: data != null
+        //     ? DuleModel.fromJson(data.snapshot.value).roomUid ==
+        //             model.conversationId
+        //         ? senderMessageContent(
+        //             context,
+        //             model: model,
+        //             heartsController: heartsController,
+        //             confettiController: confettiController,
+        //             balloonsController: balloonsController,
+        //           )
+        //         : TextButton.icon(
+        //             style: TextButton.styleFrom(
+        //               shape: RoundedRectangleBorder(
+        //                   borderRadius: BorderRadius.circular(12)),
+        //             ),
+        //             onPressed: () => navService.materialPageRoute(
+        //               context,
+        //               WriteLetterView(fireUser: fireUser),
+        //             ),
+        //             icon: Icon(FeatherIcons.send,
+        //                 color: Theme.of(context).colorScheme.mediumBlack),
+        //             label: Text(
+        //               'Send a letter',
+        //               style: TextStyle(
+        //                   color: Theme.of(context).colorScheme.mediumBlack,
+        //                   fontSize: 24,
+        //                   decoration: TextDecoration.underline),
+        //             ),
+        //           )
+        //     : TextButton.icon(
+        //         style: TextButton.styleFrom(
+        //           shape: RoundedRectangleBorder(
+        //               borderRadius: BorderRadius.circular(12)),
+        //         ),
+        //         onPressed: () => navService.materialPageRoute(
+        //           context,
+        //           WriteLetterView(fireUser: fireUser),
+        //         ),
+        //         icon: Icon(FeatherIcons.send,
+        //             color: Theme.of(context).colorScheme.mediumBlack),
+        //         label: Text(
+        //           'Send a letter',
+        //           style: TextStyle(
+        //               fontSize: 24,
+        //               decoration: TextDecoration.underline,
+        //               color: Theme.of(context).colorScheme.mediumBlack),
+        //         ),
+        //       ),
+        child: senderMessageContent(
+          context,
+          model: model,
+          heartsController: heartsController,
+          confettiController: confettiController,
+          balloonsController: balloonsController,
+        ),
       ),
     ),
   );

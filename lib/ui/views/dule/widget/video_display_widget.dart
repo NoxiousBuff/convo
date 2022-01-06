@@ -43,6 +43,20 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
     super.dispose();
   }
 
+  /// For playing video
+  void playVideo() {
+    setState(() {
+      _controller.play();
+    });
+  }
+
+  /// For pause the video
+  void pauseVideo() {
+    setState(() {
+      _controller.pause();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -51,36 +65,37 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
         if (snapshot.connectionState == ConnectionState.done) {
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                // Use the VideoPlayer widget to display the video.
-                child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _controller.pause();
-                      });
-                    },
-                    child: VideoPlayer(_controller)),
-              ),
-              !_controller.value.isPlaying
-                  ? InkWell(
-                      onTap: () {
-                        setState(() {
-                          _controller.play();
-                        });
-                      },
+          switch (_controller.value.isPlaying) {
+            case true:
+              {
+                return AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  // Use the VideoPlayer widget to display the video.
+                  child: InkWell(
+                      onTap: () => pauseVideo(),
+                      child: VideoPlayer(_controller)),
+                );
+              }
+            case false:
+              {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      // Use the VideoPlayer widget to display the video.
+                      child: InkWell(
+                          onTap: () => playVideo(),
+                          child: VideoPlayer(_controller)),
+                    ),
+                    InkWell(
+                      onTap: () => playVideo(),
                       child: Container(
                         height: 60,
                         width: 60,
                         padding: const EdgeInsets.only(left: 4),
                         decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .black
-                                .withOpacity(0.8),
+                            color: Colors.black.withOpacity(0.8),
                             shape: BoxShape.circle),
                         alignment: Alignment.center,
                         child: Icon(
@@ -89,10 +104,15 @@ class _VideoDisplayWidgetState extends State<VideoDisplayWidget> {
                           color: Theme.of(context).colorScheme.white,
                         ),
                       ),
-                    )
-                  : const SizedBox.shrink(),
-            ],
-          );
+                    ),
+                  ],
+                );
+              }
+            default:
+              {
+                return const CircularProgress();
+              }
+          }
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
