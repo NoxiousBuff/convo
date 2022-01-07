@@ -5,31 +5,25 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
-class DiscoverInterestViewModel extends FutureViewModel<QuerySnapshot> {
+class DiscoverInterestViewModel extends BaseViewModel {
   final log = getLogger('DiscoverInterestViewModel');
 
   final String interestName;
 
   DiscoverInterestViewModel({required this.interestName});
 
+  String get userUid => hiveApi.getUserData(FireUserField.id);
+
   static final CollectionReference subsCollection =
       FirebaseFirestore.instance.collection(subsFirestoreKey);
 
-  Future<QuerySnapshot> getSuggestedPeople() async {
-    final String userUid = hiveApi.getUserData(FireUserField.id);
-    return subsCollection
+  Query<Object?> get suggestedUsers => subsCollection
         .where(FireUserField.interests, arrayContains: interestName)
         .where(FireUserField.id, isNotEqualTo: userUid)
-        .get();
-  }
+        ;
 
   String replaceString() {
     final replacedStr = interestName.replaceAll(RegExp(r"\s\b|\b\s"), '\n');
     return replacedStr;
-  }
-
-  @override
-  Future<QuerySnapshot> futureToRun() {
-    return getSuggestedPeople();
   }
 }
