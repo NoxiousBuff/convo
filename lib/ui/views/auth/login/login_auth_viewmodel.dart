@@ -49,8 +49,8 @@ class LoginAuthViewModel extends BaseViewModel {
         context,
         CupertinoPageRoute(builder: (context) =>  const HomeView()),
         (route) => false);
-          return customSnackbars.successSnackbar(context,
-              title: 'You have been successfully logged in.');
+          // return customSnackbars.successSnackbar(context,
+          //     title: 'You have been successfully logged in.');
         },
         noAccountExists: () {
           return customSnackbars.errorSnackbar(context,
@@ -61,7 +61,7 @@ class LoginAuthViewModel extends BaseViewModel {
               title: 'Email Provided is invalid. Please check again.');
         },
         wrongPassword: () {
-          return customSnackbars.errorSnackbar(context, title: 'Wrong Passwrod');
+          return customSnackbars.errorSnackbar(context, title: 'Wrong Password');
         },
         onError: () {
           return customSnackbars.errorSnackbar(context,

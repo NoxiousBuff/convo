@@ -95,10 +95,8 @@ class _ThirdViewState extends State<ThirdView> {
                     pause: const Duration(milliseconds: 10),
                     totalRepeatCount: 1,
                     onFinished: () {
-                      Future.delayed(const Duration(milliseconds: 1000), () {
                         navService.materialPageRoute(
                             context, const WelcomeView());
-                      });
                     },
                     animatedTexts: [
                       TypewriterAnimatedText(

@@ -32,7 +32,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
   DatabaseReference _databaseReference() =>
-      FirebaseDatabase.instance.ref('dules/$uid/online');
+      FirebaseDatabase.instance.ref('dules/$uid/${DatabaseMessageField.online}');
 
   Future<void> savingUserToken() async {
     final _token = await _fcm.getToken();
@@ -76,7 +76,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       DatabaseReference ref = _databaseReference();
       ref.set(true);
     } catch (e) {
-      log.e('goonline Error:$e');
+      log.e('go online Error:$e');
     }
   }
 

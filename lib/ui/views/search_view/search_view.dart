@@ -42,6 +42,7 @@ class SearchView extends StatelessWidget {
         child: Hero(
           tag: 'search',
           child: CupertinoTextField.borderless(
+            focusNode: model.searchFocusNode,
             autofocus: true,
             textInputAction: TextInputAction.search,
             controller: model.searchTech,
@@ -160,6 +161,7 @@ class SearchView extends StatelessWidget {
             }
             final searchResults = snapshot.data!.docs;
             return CustomScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               physics: const BouncingScrollPhysics(),
               slivers: [
                 snapshot.data != null && searchResults.isNotEmpty
@@ -185,6 +187,19 @@ class SearchView extends StatelessWidget {
                     : SliverToBoxAdapter(
                         child: buildEmptySearch(context, model.searchTech.text),
                       ),
+                sliverVerticalSpaceMedium,
+                searchResults.length >= 25
+                    ? SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        sliver: SliverToBoxAdapter(
+                          child: Text(
+                            'Type More to Get Better Results',
+                            style: TextStyle(
+                            color: Theme.of(context).colorScheme.black),
+                          ),
+                        ),
+                      )
+                    : const SliverToBoxAdapter(child: shrinkBox),
               ],
             );
           },

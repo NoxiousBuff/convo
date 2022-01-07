@@ -51,6 +51,9 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    databaseService.updateUserDataWithKey(DatabaseMessageField.url, null);
+    databaseService.updateUserDataWithKey(DatabaseMessageField.urlType, '');
+
     confettiController = ConfettiController(duration: duration);
     heartsController = AnimationController(vsync: this, duration: duration);
     balloonsController = AnimationController(vsync: this, duration: duration);
@@ -59,8 +62,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
 
-    databaseService.updateUserDataWithKey(DatabaseMessageField.url, null);
-    databaseService.updateUserDataWithKey(DatabaseMessageField.urlType, '');
+
     super.initState();
   }
 

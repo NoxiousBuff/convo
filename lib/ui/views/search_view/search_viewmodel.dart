@@ -15,6 +15,9 @@ class SearchViewModel extends BaseViewModel {
   bool _searchEmpty = true;
   bool get searchEmpty => _searchEmpty;
 
+  final FocusNode _searchFocusNode = FocusNode();
+  FocusNode get searchFocusNode => _searchFocusNode;
+
   final TextEditingController searchTech = TextEditingController();
 
   static final CollectionReference subsCollection =
@@ -22,7 +25,6 @@ class SearchViewModel extends BaseViewModel {
 
   void updateSearchEmpty() {
     _searchEmpty = searchTech.text.isEmpty;
-    log.wtf(_searchEmpty);
     notifyListeners();
   }
 
@@ -41,6 +43,7 @@ class SearchViewModel extends BaseViewModel {
                       usernameQuery.codeUnitAt(usernameQuery.length - 1) + 1)
               : () {},
         )
+        .limit(25)
         .get();
     _usernameSearchFuture = searchResults;
     notifyListeners();
@@ -54,11 +57,5 @@ class SearchViewModel extends BaseViewModel {
   void deleteFromRecentSearches(String uid) {
     hiveApi.delete(HiveApi.recentSearchesHiveBox, uid);
     log.wtf('deleted');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    searchTech.dispose();
   }
 }

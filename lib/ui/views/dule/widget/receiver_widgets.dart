@@ -135,10 +135,10 @@ Widget receiverMessageBubble(
   required FireUser fireUser,
   required DuleViewModel model,
 }) {
-  const int blue300 = MaterialColorsCode.blue300;
+  const int lightDeepPurple = MaterialColorsCode.deepPurple400;
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String rKey = AppSettingKeys.receiverBubbleColor;
-  int rColorCode = Hive.box(hiveBox).get(rKey, defaultValue: blue300);
+  int rColorCode = Hive.box(hiveBox).get(rKey, defaultValue: lightDeepPurple);
   return StreamBuilder<DatabaseEvent>(
     stream: model.stream,
     builder: (context, snapshot) {
@@ -213,7 +213,7 @@ Widget receiverMessageBubble(
             case false:
               {
                 switcherChild = Text(
-                  'User Not In The ChatRoom',
+                  'User is Busy',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.mediumBlack,
                       fontSize: 24),

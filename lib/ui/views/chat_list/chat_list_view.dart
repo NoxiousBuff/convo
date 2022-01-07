@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
@@ -186,7 +188,7 @@ class ChatListView extends StatelessWidget {
             }
             if (!model.dataReady) {
               return const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()));
+                  child: Center(child: CircularProgress()));
             }
             if (data != null) {
               return data.docs.isNotEmpty
@@ -226,11 +228,14 @@ class ChatListView extends StatelessWidget {
                               screenHeightPercentage(context, percentage: 0.2),
                           upperGap:
                               screenHeightPercentage(context, percentage: 0.2),
-                          heading: 'Discover \nfriends',
+                          emoji: '🙂',
+                          heading:
+                              'It\'s pretty quiet in here\ndon\'t you think?',
                           description:
-                              'We are worried about you.\nYou got to find friends.',
+                              'Find friends to begin a\nconversation.',
                           proceedButton: CWAuthProceedButton(
-                              buttonTitle: 'Go To Discover',
+                              buttonTitle:
+                                  'Discover Friends',
                               onTap: () {
                                 mainViewTabController.index = 2;
                               })),
@@ -258,6 +263,24 @@ class ChatListView extends StatelessWidget {
               sliverVerticalSpaceRegular,
               _buildPinnedList(context, model),
               _buildChatList(context, model),
+              SliverToBoxAdapter(
+                child: TextButton(
+                  onPressed: () {
+                    AwesomeNotifications().createNotification(
+                      content: NotificationContent(
+                          id: 20,
+                          channelKey: NotificationChannelKeys.discoverChannel,
+                          title:
+                              '${Emojis.smile_partying_face} A very happy morning!!',
+                          body:
+                              'Today\'s Top Picks have been changed. Interesting conversations are waiting for you, don\'t be lazy. ',
+                          notificationLayout: NotificationLayout.BigText,
+                          autoDismissible: true),
+                    );
+                  },
+                  child: const Text('Discover Notification'),
+                ),
+              )
             ],
           ),
         );
