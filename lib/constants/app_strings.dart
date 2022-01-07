@@ -38,7 +38,7 @@ class DatabaseMessageField {
   static const String msgTxt = 'mT';
   static const String roomUid = 'rU';
   static const String url = 'u';
-  static const String urlType = 'ut';
+  static const String urlType = 'uT';
   static const String online = 'o';
   static const String aniType = 'aT';
 }
