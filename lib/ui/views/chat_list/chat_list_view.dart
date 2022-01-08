@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app.dart';
@@ -232,11 +231,9 @@ class ChatListView extends StatelessWidget {
                           emoji: '🙂',
                           heading:
                               'It\'s pretty quiet in here\ndon\'t you think?',
-                          description:
-                              'Find friends to begin a\nconversation.',
+                          description: 'Find friends to begin a\nconversation.',
                           proceedButton: CWAuthProceedButton(
-                              buttonTitle:
-                                  'Discover Friends',
+                              buttonTitle: 'Discover Friends',
                               onTap: () {
                                 mainViewTabController.index = 2;
                               })),
@@ -264,24 +261,6 @@ class ChatListView extends StatelessWidget {
               sliverVerticalSpaceRegular,
               _buildPinnedList(context, model),
               _buildChatList(context, model),
-              SliverToBoxAdapter(
-                child: TextButton(
-                  onPressed: () {
-                    AwesomeNotifications().createNotification(
-                      content: NotificationContent(
-                          id: 20,
-                          channelKey: NotificationChannelKeys.discoverChannel,
-                          title:
-                              '${Emojis.smile_partying_face} A very happy morning!!',
-                          body:
-                              'Today\'s Top Picks have been changed. Interesting conversations are waiting for you, don\'t be lazy. ',
-                          notificationLayout: NotificationLayout.BigText,
-                          autoDismissible: true),
-                    );
-                  },
-                  child: const Text('Discover Notification'),
-                ),
-              )
             ],
           ),
         );

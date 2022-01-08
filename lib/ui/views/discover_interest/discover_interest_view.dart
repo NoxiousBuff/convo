@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
+import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/discover_interest/widgets/interest_people_gridtile.dart';
@@ -58,31 +59,55 @@ class DiscoverInterestView extends StatelessWidget {
               ),
               sliverVerticalSpaceRegular,
               FirestoreQueryBuilder(
+                pageSize: 10,
                 query: model.suggestedUsers,
                 builder: (context, snapshot, _) {
                   if (snapshot.isFetching) {
                     return loadingGridView(context);
                   }
                   if (snapshot.hasError) {
-                    return SliverToBoxAdapter(child: Text('error ${snapshot.error}'));
+                    return SliverToBoxAdapter(
+                        child: Text('error ${snapshot.error}'));
                   }
-                  return SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        final fireUser =
-                            FireUser.fromFirestore(snapshot.docs[index]);
-                        return interestedPeopleGridTile(context, fireUser);
-                      },
-                      childCount: snapshot.docs.length,
-                    ),
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent:
-                          screenWidthPercentage(context, percentage: 0.5),
-                      mainAxisSpacing: 10.0,
-                      crossAxisSpacing: 10.0,
-                      childAspectRatio: 1.0,
-                    ),
-                  );
+                  final isListEmpty = snapshot.docs.isEmpty;
+                  return isListEmpty
+                      ? SliverToBoxAdapter(
+                          child: emptyState(
+                            context,
+                            emoji: '❔',
+                            // emoji: '📜',
+                            heading: 'We\'re still \nfinding someone',
+                            description:
+                                'People related to your interests \nare not in this category right now.',
+                            upperGap: screenHeightPercentage(context,
+                                percentage: 0.1),
+                          ),
+                        )
+                      : SliverGrid(
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              final hasEndReached = snapshot.hasMore &&
+                                  index + 1 == snapshot.docs.length &&
+                                  !snapshot.isFetchingMore;
+                              if (hasEndReached) {
+                                snapshot.fetchMore();
+                              }
+                              final fireUser =
+                                  FireUser.fromFirestore(snapshot.docs[index]);
+                              return interestedPeopleGridTile(
+                                  context, fireUser);
+                            },
+                            childCount: snapshot.docs.length,
+                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent:
+                                screenWidthPercentage(context, percentage: 0.5),
+                            mainAxisSpacing: 10.0,
+                            crossAxisSpacing: 10.0,
+                            childAspectRatio: 1.0,
+                          ),
+                        );
                 },
               ),
             ],
@@ -92,5 +117,3 @@ class DiscoverInterestView extends StatelessWidget {
     );
   }
 }
-
-class FirebaseQueryBuilder {}

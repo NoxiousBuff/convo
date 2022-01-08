@@ -45,7 +45,7 @@ class _ExplorViewState extends State<ExplorView>
                 width: 100,
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(30),
+                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(80),
                     borderRadius: BorderRadius.circular(16)),
               ),
               verticalSpaceSmall,
@@ -60,7 +60,7 @@ class _ExplorViewState extends State<ExplorView>
                 width: 200,
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(30),
+                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(80),
                     borderRadius: BorderRadius.circular(16)),
               ),
               verticalSpaceSmall,
