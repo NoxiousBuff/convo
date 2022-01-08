@@ -84,6 +84,8 @@ class AppSettingKeys {
   static const String isLetterAllowed = 'isLetterAllowed';
   static const String isDiscoverAllowed = 'isDiscoverAllowed';
   static const String isSecurityAllowed = 'isSecurityAllowed';
+  static const String hasDiscoverNotificationScheduled = 'hasDiscoverNotificationScheduled';
+  static const String hasSecurityNotificationAllowed = 'hasSecurityNotificationAllowed';
 }
 
 class AppThemes {
