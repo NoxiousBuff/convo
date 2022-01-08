@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hint/app/app.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/pods/page_controller_pod.dart';
 import 'package:hint/ui/views/account/account_view/account_view.dart';
@@ -12,7 +13,7 @@ import 'package:hint/ui/views/explor/explor_view.dart';
 final PageController mainViewPageController =
     PageController(keepPage: true, initialPage: 0);
 
-final CupertinoTabController mainViewTabController = CupertinoTabController(initialIndex: 0);
+
 
 class MainView extends StatelessWidget {
   const MainView({Key? key}) : super(key: key);

@@ -33,8 +33,8 @@ class ReadLetterView extends StatelessWidget {
             Row(
               children: [
                 Text(model.isSentByMe ? 'From : ' : 'Sent To : ',
-                    style:  TextStyle(
-                        color:Theme.of(context).colorScheme.black,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.black,
                         fontSize: 18,
                         fontWeight: FontWeight.w700)),
                 horizontalSpaceRegular,
@@ -42,7 +42,8 @@ class ReadLetterView extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   decoration: BoxDecoration(
-                      border: Border.all(color:Theme.of(context).colorScheme.lightBlack),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.lightBlack),
                       borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -58,8 +59,8 @@ class ReadLetterView extends StatelessWidget {
                       ),
                       horizontalSpaceRegular,
                       Text(letter.username,
-                          style:  TextStyle(
-                              color:Theme.of(context).colorScheme.black,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.black,
                               fontSize: 18,
                               fontWeight: FontWeight.w700))
                     ],
@@ -90,6 +91,7 @@ class ReadLetterView extends StatelessWidget {
               ),
             ),
             verticalSpaceLarge,
+            bottomPadding(context),
           ],
         ),
       ),

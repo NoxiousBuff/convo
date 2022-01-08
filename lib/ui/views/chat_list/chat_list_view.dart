@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/app/app.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';

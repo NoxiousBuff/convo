@@ -45,13 +45,13 @@ class _ExplorViewState extends State<ExplorView>
                 width: 100,
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                    color: Colors.indigo.shade300.withAlpha(30),
+                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(30),
                     borderRadius: BorderRadius.circular(16)),
               ),
               verticalSpaceSmall,
               Expanded(
                 child: Container(
-                  color: Colors.indigo.shade200.withAlpha(30),
+                  color: Theme.of(context).colorScheme.lightGrey,
                 ),
               ),
               verticalSpaceSmall,
@@ -60,7 +60,7 @@ class _ExplorViewState extends State<ExplorView>
                 width: 200,
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                    color: Colors.indigo.shade300.withAlpha(30),
+                    color: Theme.of(context).colorScheme.lightGrey.withAlpha(30),
                     borderRadius: BorderRadius.circular(16)),
               ),
               verticalSpaceSmall,

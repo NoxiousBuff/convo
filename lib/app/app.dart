@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/locator.dart';
 import 'package:hint/app/routes.dart';
@@ -12,6 +13,9 @@ import 'package:hint/ui/views/discover/discover_viewmodel.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:hint/ui/views/onboarding/onboarding_view.dart';
+
+final CupertinoTabController mainViewTabController =
+    CupertinoTabController(initialIndex: 0);
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -44,6 +48,7 @@ class _MyAppState extends State<MyApp> {
       log('listening to the notification via actionStream');
       switch (receivedNotification.channelKey) {
         case NotificationChannelKeys.discoverChannel:
+          mainViewTabController.index = 2;
           break;
         default:
       }
