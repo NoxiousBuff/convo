@@ -20,7 +20,8 @@ Widget cwAccountButton(
       alignment: Alignment.center,
       decoration: isPrimaryFocus
           ? BoxDecoration(
-              color: Theme.of(context).colorScheme.blue, borderRadius: BorderRadius.circular(14.2))
+              color: Theme.of(context).colorScheme.blue,
+              borderRadius: BorderRadius.circular(14.2))
           : BoxDecoration(
               borderRadius: BorderRadius.circular(14.2),
               border: Border.all(color: Theme.of(context).colorScheme.darkGrey),
@@ -42,8 +43,8 @@ Widget cwAccountButton(
   );
 }
 
-Widget cwAccountIconButton(
-    BuildContext context,{ Icon? icon, void Function()? onTap}) {
+Widget cwAccountIconButton(BuildContext context,
+    {Icon? icon, void Function()? onTap}) {
   return InkWell(
     onTap: onTap,
     borderRadius: BorderRadius.circular(14.2),
@@ -53,7 +54,15 @@ Widget cwAccountIconButton(
         alignment: Alignment.center,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.2),
-            border: Border.all(color: Theme.of(context).colorScheme.mediumBlack)),
-        child: icon ?? Icon(FeatherIcons.send, color: Theme.of(context).colorScheme.black,)),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.isDarkTheme
+                      ? Theme.of(context).colorScheme.lightGrey
+                      : Theme.of(context).colorScheme.darkGrey,
+            )),
+        child: icon ??
+            Icon(
+              FeatherIcons.send,
+              color: Theme.of(context).colorScheme.black,
+            )),
   );
 }

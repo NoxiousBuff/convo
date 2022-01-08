@@ -108,6 +108,7 @@ class DulePersonDialog extends StatelessWidget {
               Navigator.pop(context);
               chatService.startDuleConversation(context, fireUser);
             },
+            fontSize: 18
           ),
         ),
         horizontalSpaceSmall,

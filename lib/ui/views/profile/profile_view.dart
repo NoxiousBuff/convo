@@ -70,6 +70,7 @@ class ProfileView extends StatelessWidget {
                         onTap: () {
                           chatService.startDuleConversation(context, fireUser);
                         },
+                        fontSize: 18,
                       ),
                     ),
                     horizontalSpaceSmall,

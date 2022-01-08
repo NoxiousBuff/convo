@@ -96,7 +96,7 @@ class SearchView extends StatelessWidget {
     ));
   }
 
-  Widget buildInitialContent(SearchViewModel model) {
+  Widget buildInitialContent(BuildContext context, SearchViewModel model) {
     bool isSearchListEmpty = Hive.box(HiveApi.recentSearchesHiveBox).isEmpty;
     return CustomScrollView(
       slivers: [
@@ -108,8 +108,11 @@ class SearchView extends StatelessWidget {
               children: [
                 Text(
                   isSearchListEmpty ? 'No Recent Searches' : 'Recent Searches',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 20),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    color: Theme.of(context).colorScheme.mediumBlack,
+                  ),
                 )
               ],
             ),
@@ -157,7 +160,7 @@ class SearchView extends StatelessWidget {
           future: model.usernameSearchFuture,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return buildInitialContent(model);
+              return buildInitialContent(context, model);
             }
             final searchResults = snapshot.data!.docs;
             return CustomScrollView(
@@ -195,7 +198,7 @@ class SearchView extends StatelessWidget {
                           child: Text(
                             'Type More to Get Better Results',
                             style: TextStyle(
-                            color: Theme.of(context).colorScheme.black),
+                                color: Theme.of(context).colorScheme.black),
                           ),
                         ),
                       )
