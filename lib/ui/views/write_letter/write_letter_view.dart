@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
@@ -6,6 +5,7 @@ import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/alert_dialog.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/profile/profile_view.dart';
@@ -77,14 +77,12 @@ class WriteLetterView extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ClipRRect(
+                          userProfilePhoto(
+                            context,
+                            fireUser.photoUrl,
+                            height: 28,
+                            width: 28,
                             borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              imageUrl: fireUser.photoUrl,
-                              height: 28,
-                              width: 28,
-                              fit: BoxFit.cover,
-                            ),
                           ),
                           horizontalSpaceRegular,
                           Text(fireUser.username,
@@ -124,10 +122,11 @@ class WriteLetterView extends StatelessWidget {
               CWAuthProceedButton(
                   buttonTitle: 'Send It',
                   isActive: model.isActive,
-                  isLoading: model.isBusy, onTap: () {
-                model.sendLetter(context, fireUser);
-                Navigator.pop(context);
-              }),
+                  isLoading: model.isBusy,
+                  onTap: () {
+                    model.sendLetter(context, fireUser);
+                    Navigator.pop(context);
+                  }),
               verticalSpaceLarge,
               bottomPadding(context),
             ],

@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/letter_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:stacked/stacked.dart';
 
@@ -48,15 +48,13 @@ class ReadLetterView extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: CachedNetworkImage(
-                          imageUrl: letter.photoUrl,
-                          height: 28,
-                          width: 28,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      userProfilePhoto(
+                            context,
+                            letter.photoUrl,
+                            height: 28,
+                            width: 28,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                       horizontalSpaceRegular,
                       Text(letter.username,
                           style: TextStyle(

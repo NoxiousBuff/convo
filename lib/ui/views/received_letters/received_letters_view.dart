@@ -39,7 +39,7 @@ class ReceivedLettersView extends StatelessWidget {
             final data = model.data;
             if (data != null) {
               final docs = data.docs;
-              return docs.isNotEmpty
+              return !docs.isNotEmpty
                   ? CustomScrollView(
                       scrollBehavior: const CupertinoScrollBehavior(),
                       slivers: [
@@ -110,10 +110,9 @@ class ReceivedLettersView extends StatelessWidget {
                     )
                   : emptyState(context,
                       heading: 'A little bit \ntoo clean.',
-                      description: 'Nobody remembers you, that\'s sad.');
+                      description: 'Ask your friends to drop\nletters for you to read later.');
             } else {
-              return const Text(
-                  'Something bad happened on our side. We will be in connect with you after sometime. Thank you for your patience.');
+              return emptyState(context, emoji: '🙏', heading: 'That\'s not supposed\nto happen.', description: 'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
             }
           },
         ),

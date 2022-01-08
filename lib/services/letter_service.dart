@@ -19,7 +19,7 @@ class LetterService {
       .doc(hiveApi.getUserData(FireUserField.id))
       .collection(receivedLettersFirestoreKey);
 
-  final CollectionReference _sentLettersCollection = FirebaseFirestore.instance
+  final CollectionReference sentLettersCollection = FirebaseFirestore.instance
       .collection(lettersFirestoreKey)
       .doc(hiveApi.getUserData(FireUserField.id))
       .collection(sentLettersFirestoreKey);
@@ -50,7 +50,7 @@ class LetterService {
       log.e('Error catched in sending the letter : $e');
       if (onError != null) onError();
     });
-    _sentLettersCollection.add({
+    sentLettersCollection.add({
       LetterFields.idTo: fireUser.id,
       LetterFields.idFrom: idFrom,
       LetterFields.photoUrl: fireUser.photoUrl,
@@ -74,7 +74,7 @@ class LetterService {
   }
 
   Stream<QuerySnapshot> getSentLetters() {
-    return _sentLettersCollection
+    return sentLettersCollection
         .orderBy(LetterFields.timestamp, descending: true)
         .snapshots();
   }

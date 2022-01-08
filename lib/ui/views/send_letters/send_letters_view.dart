@@ -111,10 +111,9 @@ class SendLettersView extends StatelessWidget {
                       emoji: '🙄',
                       heading: 'No letters, hmm\nReally ??',
                       description:
-                          'You haven\'t sent ant letters. \nWe think you need to socialize more.');
+                          'You haven\'t sent any letters. \nWe think you need to socialize more.');
             } else {
-              return const Text(
-                  'Something bad happened on our side. We will be in connect with you after sometime. Thank you for your patience.');
+              return emptyState(context, emoji: '🙏', heading: 'That\'s not supposed\nto happen.', description: 'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
             }
           },
         ),
