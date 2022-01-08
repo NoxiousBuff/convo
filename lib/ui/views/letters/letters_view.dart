@@ -40,20 +40,22 @@ class _LettersViewState extends State<LettersView>
             navService.materialPageRoute(context, const LetterInfoView());
           },
           icon: const Icon(FeatherIcons.info),
-          color:Theme.of(context).colorScheme.mediumBlack,
+          color: Theme.of(context).colorScheme.mediumBlack,
         ),
         horizontalSpaceSmall,
       ],
       elevation: 0.0,
-      title:  Text(
+      title: Text(
         'Letters',
         style: TextStyle(
-            fontWeight: FontWeight.w700, color:Theme.of(context).colorScheme.black, fontSize: 18),
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.black,
+            fontSize: 18),
       ),
       backgroundColor: Theme.of(context).colorScheme.lightGrey,
       leadingWidth: 56.0,
       leading: IconButton(
-        color:Theme.of(context).colorScheme.mediumBlack,
+        color: Theme.of(context).colorScheme.mediumBlack,
         icon: const Icon(FeatherIcons.arrowLeft),
         onPressed: () {
           mainViewPageController.animateToPage(0,
@@ -62,8 +64,8 @@ class _LettersViewState extends State<LettersView>
         },
       ),
       bottom: TabBar(
-        labelColor:Theme.of(context).colorScheme.black,
-        indicatorColor:Theme.of(context).colorScheme.mediumBlack,
+        labelColor: Theme.of(context).colorScheme.black,
+        indicatorColor: Theme.of(context).colorScheme.mediumBlack,
         controller: lettersTab,
         labelPadding: const EdgeInsets.symmetric(vertical: 16),
         labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -78,30 +80,31 @@ class _LettersViewState extends State<LettersView>
 
   TabBarView _buildTabBarView(BuildContext context) {
     return TabBarView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: lettersTab,
-              children: const [ReceivedLettersView(), SendLettersView()],
-            );
+      physics: const NeverScrollableScrollPhysics(),
+      controller: lettersTab,
+      children: const [ReceivedLettersView(), SendLettersView()],
+    );
   }
 
   Widget _buildAnimatedFAB(BuildContext context) {
     return OpenContainer(
-              closedElevation: 0,
-              openElevation: 0,
-              closedColor: Colors.transparent,
-              closedBuilder: (context, onPressed) {
-                return FloatingActionButton(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  elevation: 2,
-                  onPressed: onPressed,
-                  backgroundColor: Theme.of(context).colorScheme.blue,
-                  child: const Icon(FeatherIcons.edit),
-                );
-              },
-              openBuilder: (context, onPressed) {
-                return const SearchToWriteLetterView();
-              },
-            );
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: Colors.transparent,
+      closedBuilder: (context, onPressed) {
+        return FloatingActionButton(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 2,
+          onPressed: onPressed,
+          backgroundColor: Theme.of(context).colorScheme.blue,
+          child: const Icon(FeatherIcons.edit),
+        );
+      },
+      openBuilder: (context, onPressed) {
+        return const SearchToWriteLetterView();
+      },
+    );
   }
 
   @override
