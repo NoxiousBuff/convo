@@ -169,7 +169,7 @@ Widget receiverMessageBubble(
         if (data != null) {
           final json = data.snapshot.value;
           final DuleModel duleModel = DuleModel.fromJson(json);
-          bool isInChatRoom = model.conversationId == duleModel.roomUid;
+          bool isInChatRoom = model.conversationId == duleModel.roomUid && duleModel.online;
           Widget switcherChild;
           switch (isInChatRoom) {
             case true:
