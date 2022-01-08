@@ -39,7 +39,7 @@ class ReceivedLettersView extends StatelessWidget {
             final data = model.data;
             if (data != null) {
               final docs = data.docs;
-              return !docs.isNotEmpty
+              return docs.isNotEmpty
                   ? CustomScrollView(
                       scrollBehavior: const CupertinoScrollBehavior(),
                       slivers: [
