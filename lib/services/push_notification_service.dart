@@ -25,73 +25,98 @@ class PushNotificationService {
     id = DateTime.now().microsecondsSinceEpoch.remainder(100000);
     String localTimeZone =
         await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-            id: id,
-            channelKey: NotificationChannelKeys.discoverChannel,
-            title: '${Emojis.smile_partying_face} A very happy morning!!',
-            body:
-                'Today\'s Top Picks have been changed. Interesting conversations are waiting for you, don\'t be lazy. ',
-            notificationLayout: NotificationLayout.BigText,
-            autoDismissible: true),
-        schedule: NotificationCalendar(
-          hour: 9,
-          minute: 0,
-          second: 0,
-          millisecond: 0,
-          repeats: true,
-          timeZone: localTimeZone,
-        ));
-    await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-            id: id,
-            channelKey: NotificationChannelKeys.discoverChannel,
-            title: 'Day has been ended...huh!!',
-            body:
-                'Your discover is going to change tomorrow..Check out any people you might wanna talk.',
-            notificationLayout: NotificationLayout.BigText,
-            autoDismissible: true),
-        schedule: NotificationCalendar(
-          hour: 21,
-          minute: 0,
-          second: 0,
-          millisecond: 0,
-          repeats: true,
-          timeZone: localTimeZone,
-        ));
+    final hasDiscoverNotificationScheduled = hiveApi.getFromHive(
+      HiveApi.appSettingsBoxName,
+      AppSettingKeys.hasDiscoverNotificationScheduled,
+      defaultValue: false,
+    );
+    if (hasDiscoverNotificationScheduled) {
+      await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: id,
+              channelKey: NotificationChannelKeys.discoverChannel,
+              title: '${Emojis.smile_partying_face} A very happy morning!!',
+              body:
+                  'Today\'s Top Picks have been changed. Interesting conversations are waiting for you, don\'t be lazy. ',
+              notificationLayout: NotificationLayout.BigText,
+              autoDismissible: true),
+          schedule: NotificationCalendar(
+            hour: 9,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+            repeats: true,
+            timeZone: localTimeZone,
+          ));
+      await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: id,
+              channelKey: NotificationChannelKeys.discoverChannel,
+              title: 'Day has been ended...huh!!',
+              body:
+                  'Your discover is going to change tomorrow..Check out any people you might wanna talk.',
+              notificationLayout: NotificationLayout.BigText,
+              autoDismissible: true),
+          schedule: NotificationCalendar(
+            hour: 21,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+            repeats: true,
+            timeZone: localTimeZone,
+          ));
+      hiveApi.saveAndReplace(
+        HiveApi.appSettingsBoxName,
+        AppSettingKeys.hasDiscoverNotificationScheduled,
+        true,
+      );
+    }
   }
 
   createScheduledSecurityNotifications() async {
     id = DateTime.now().microsecondsSinceEpoch.remainder(100000);
     String localTimeZone =
         await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-            id: 123456789,
-            channelKey: NotificationChannelKeys.securityChannel,
-            title: 'Making convo safer.',
-            body: 'Don\'t worry we got it. Good to go. More secure than ever.',
-            notificationLayout: NotificationLayout.BigText,
-            autoDismissible: true),
-        actionButtons: [
-          NotificationActionButton(
-              key: 'DISMISS',
-              label: 'Okay',
-              autoDismissible: true,
-              showInCompactView: false,
-              buttonType: ActionButtonType.DisabledAction,
-              color: const Color.fromRGBO(0, 132, 255, 1))
-        ],
-        // schedule: NotificationInterval(interval: 60, timeZone: localTimeZone, repeats: true),
-        schedule: NotificationCalendar(
-          weekday: 7,
-          hour: 4,
-          minute: 29,
-          second: 0,
-          millisecond: 0,
-          repeats: true,
-          timeZone: localTimeZone,
-        ));
+    final hasSecurityNotificationAllowed = hiveApi.getFromHive(
+      HiveApi.appSettingsBoxName,
+      AppSettingKeys.hasSecurityNotificationAllowed,
+      defaultValue: false,
+    );
+    if (hasSecurityNotificationAllowed) {
+      await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: 123456789,
+              channelKey: NotificationChannelKeys.securityChannel,
+              title: 'Making convo safer.',
+              body:
+                  'Don\'t worry we got it. Good to go. More secure than ever.',
+              notificationLayout: NotificationLayout.BigText,
+              autoDismissible: true),
+          actionButtons: [
+            NotificationActionButton(
+                key: 'DISMISS',
+                label: 'Okay',
+                autoDismissible: true,
+                showInCompactView: false,
+                buttonType: ActionButtonType.DisabledAction,
+                color: const Color.fromRGBO(0, 132, 255, 1))
+          ],
+          // schedule: NotificationInterval(interval: 60, timeZone: localTimeZone, repeats: true),
+          schedule: NotificationCalendar(
+            weekday: 7,
+            hour: 4,
+            minute: 29,
+            second: 0,
+            millisecond: 0,
+            repeats: true,
+            timeZone: localTimeZone,
+          ));
+      hiveApi.saveAndReplace(
+        HiveApi.appSettingsBoxName,
+        AppSettingKeys.hasSecurityNotificationAllowed,
+        true,
+      );
+    }
   }
 
   initialiseScheduledNotifications() async {
