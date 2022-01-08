@@ -150,12 +150,14 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
         ],
       ),
       title: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             widget.fireUser.displayName,
             style: Theme.of(context).textTheme.bodyText1!.copyWith(
                 fontSize: 18, color: Theme.of(context).colorScheme.black),
+            overflow: TextOverflow.ellipsis,
           ),
           data != null
               ? DuleModel.fromJson(data.snapshot.value).online

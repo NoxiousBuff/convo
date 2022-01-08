@@ -200,7 +200,7 @@ Widget receiverMessageBubble(
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.black, fontSize: 24),
                   decoration: InputDecoration(
-                    hintText: 'Message Received',
+                    hintText: 'Let\'s Chat',
                     hintStyle: TextStyle(
                         color: Theme.of(context).colorScheme.mediumBlack,
                         fontSize: 24),

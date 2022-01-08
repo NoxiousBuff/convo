@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -200,72 +201,55 @@ Widget senderMessageBubble(
   int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: deepPurple);
   return Expanded(
     flex: model.duleFlexFactor,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: AnimatedContainer(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(0),
-        duration: const Duration(milliseconds: 200),
-        width: MediaQuery.of(context).size.width * 80,
-        decoration: BoxDecoration(
-            color: Color(senderBubbleCode),
-            borderRadius: BorderRadius.circular(32)),
-        // child: data != null
-        //     ? DuleModel.fromJson(data.snapshot.value).roomUid ==
-        //             model.conversationId
-        //         ? senderMessageContent(
-        //             context,
-        //             model: model,
-        //             heartsController: heartsController,
-        //             confettiController: confettiController,
-        //             balloonsController: balloonsController,
-        //           )
-        //         : TextButton.icon(
-        //             style: TextButton.styleFrom(
-        //               shape: RoundedRectangleBorder(
-        //                   borderRadius: BorderRadius.circular(12)),
-        //             ),
-        //             onPressed: () => navService.materialPageRoute(
-        //               context,
-        //               WriteLetterView(fireUser: fireUser),
-        //             ),
-        //             icon: Icon(FeatherIcons.send,
-        //                 color: Theme.of(context).colorScheme.mediumBlack),
-        //             label: Text(
-        //               'Send a letter',
-        //               style: TextStyle(
-        //                   color: Theme.of(context).colorScheme.mediumBlack,
-        //                   fontSize: 24,
-        //                   decoration: TextDecoration.underline),
-        //             ),
-        //           )
-        //     : TextButton.icon(
-        //         style: TextButton.styleFrom(
-        //           shape: RoundedRectangleBorder(
-        //               borderRadius: BorderRadius.circular(12)),
-        //         ),
-        //         onPressed: () => navService.materialPageRoute(
-        //           context,
-        //           WriteLetterView(fireUser: fireUser),
-        //         ),
-        //         icon: Icon(FeatherIcons.send,
-        //             color: Theme.of(context).colorScheme.mediumBlack),
-        //         label: Text(
-        //           'Send a letter',
-        //           style: TextStyle(
-        //               fontSize: 24,
-        //               decoration: TextDecoration.underline,
-        //               color: Theme.of(context).colorScheme.mediumBlack),
-        //         ),
-        //       ),
-        child: senderMessageContent(
-          context,
-          model: model,
-          heartsController: heartsController,
-          confettiController: confettiController,
-          balloonsController: balloonsController,
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: AnimatedContainer(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(0),
+            duration: const Duration(milliseconds: 200),
+            width: MediaQuery.of(context).size.width * 80,
+            decoration: BoxDecoration(
+                color: Color(senderBubbleCode),
+                borderRadius: BorderRadius.circular(32)),
+            child: senderMessageContent(
+              context,
+              model: model,
+              heartsController: heartsController,
+              confettiController: confettiController,
+              balloonsController: balloonsController,
+            ),
+          ),
         ),
-      ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Tooltip(
+            message: 'Your conversations are end to end encypted.',
+            textStyle: TextStyle(
+              color: Theme.of(context).colorScheme.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+            triggerMode: TooltipTriggerMode.tap,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.lightGrey,
+              borderRadius: BorderRadius.circular(14.2)
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            showDuration: const Duration(seconds: 2),
+            preferBelow: false,
+            child: const Padding(
+              padding: EdgeInsets.only(right: 30, bottom: 10),
+              child: Icon(
+                CupertinoIcons.lock,
+                color: Colors.white38,
+              ),
+            ),
+          ),
+        ),
+      ],
     ),
   );
 }
