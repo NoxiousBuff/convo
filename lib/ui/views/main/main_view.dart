@@ -8,7 +8,7 @@ import 'package:hint/pods/page_controller_pod.dart';
 import 'package:hint/ui/views/account/account_view/account_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_view.dart';
 import 'package:hint/ui/views/discover/discover_view.dart';
-import 'package:hint/ui/views/explor/explor_view.dart';
+import 'package:hint/ui/views/explore/explore_view.dart';
 
 final PageController mainViewPageController =
     PageController(keepPage: true, initialPage: 0);
@@ -59,7 +59,7 @@ class MainView extends StatelessWidget {
               case 0:
                 return const ChatListView();
               case 1:
-                return  const ExplorView();
+                return  const ExploreView();
               case 2:
                 return const DiscoverView();
               case 3:

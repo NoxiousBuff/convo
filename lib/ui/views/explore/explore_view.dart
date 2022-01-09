@@ -1,4 +1,4 @@
-import 'explor_viewmodel.dart';
+import 'explore_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,17 +10,18 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/ui/views/explore/widgets/explore_web_view.dart';
 
-class ExplorView extends StatefulWidget {
-  const ExplorView({Key? key}) : super(key: key);
+class ExploreView extends StatefulWidget {
+  const ExploreView({Key? key}) : super(key: key);
 
   static const String id = '/ExplorVie';
 
   @override
-  State<ExplorView> createState() => _ExplorViewState();
+  State<ExploreView> createState() => _ExploreViewState();
 }
 
-class _ExplorViewState extends State<ExplorView>
+class _ExploreViewState extends State<ExploreView>
     with AutomaticKeepAliveClientMixin {
   PageController pageController = PageController(viewportFraction: 0.6);
 
@@ -174,7 +175,7 @@ class _ExplorViewState extends State<ExplorView>
     );
   }
 
-  Widget loadingWidget(ExplorViewModel model, int index) {
+  Widget loadingWidget(ExploreViewModel model, int index) {
     return index == model.fetchedImages.length - 1
         ? model.isBusy
             ? Column(
@@ -229,8 +230,8 @@ class _ExplorViewState extends State<ExplorView>
       connectivityBuilder: (context, connectivity, child) {
         bool connected = connectivity != ConnectivityResult.none;
 
-        return ViewModelBuilder<ExplorViewModel>.reactive(
-          viewModelBuilder: () => ExplorViewModel(),
+        return ViewModelBuilder<ExploreViewModel>.reactive(
+          viewModelBuilder: () => ExploreViewModel(),
           onModelReady: (model) => connected ? model.fetchImages() : null,
           builder: (context, model, child) {
             final fetchedList =
@@ -319,8 +320,37 @@ class _ExplorViewState extends State<ExplorView>
                               color: color.scaffoldColor,
                               child: Column(
                                 children: [
+                                  if (index == 0)
+                                    GestureDetector(
+                                      onTap: () => navService.materialPageRoute(
+                                          context,
+                                          const ExploreWebView(
+                                              pixabayPhotoUrl:
+                                                  'https://pixabay.com')),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              'From Pixabay ♥',
+                                              
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .mediumBlack,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  if (index == 0) verticalSpaceSmall,
                                   const Divider(height: 0),
                                   ListTile(
+                                    
                                     title: Text(
                                       title,
                                       style: TextStyle(

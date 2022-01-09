@@ -26,8 +26,8 @@ List<PixabayImageModel> parsePhotos(String responseBody) {
   return pixabayHits;
 }
 
-class ExplorViewModel extends BaseViewModel {
-  final log = getLogger('ExplorViewModel');
+class ExploreViewModel extends BaseViewModel {
+  final log = getLogger('ExploreViewModel');
   static const _key = pixaBayApiKey; // PixabayApiKey
 
   final List<PixabayImageModel> _fetchedImages = [];

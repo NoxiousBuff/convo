@@ -52,6 +52,7 @@ dependencies:
   flutter_feather_icons: ^2.0.0+1
   cached_network_image: ^3.2.0
   video_thumbnail: ^0.4.3
+  webview_flutter: ^3.0.0
 
   #functional
   hive: ^2.0.4
