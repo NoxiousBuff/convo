@@ -12,8 +12,6 @@ import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
 import 'package:hint/ui/views/invites/invites_view.dart';
-import 'package:hint/ui/views/settings/chats_customization/chat_customization_viewmodel.dart';
-import 'package:hint/ui/views/settings/chats_customization/widgets/change_bubble_color.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -77,29 +75,6 @@ class ChatListView extends StatelessWidget {
                           ),
                         );
                 }),
-            Material(
-              color: Colors.transparent,
-              child: IconButton(
-                color: Theme.of(context).colorScheme.black,
-                icon: const Icon(FeatherIcons.paperclip),
-                onPressed: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(32),
-                        topLeft: Radius.circular(32),
-                      ),
-                    ),
-                    context: context,
-                    builder: (context) {
-                      return ChangebubbleColor(
-                          model: ChatsCustomizationViewModel());
-                    },
-                  );
-                },
-              ),
-            ),
             Material(
               color: Colors.transparent,
               child: IconButton(
