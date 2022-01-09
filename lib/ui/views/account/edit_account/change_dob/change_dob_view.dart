@@ -80,7 +80,7 @@ class ChangeDobView extends StatelessWidget {
                       context,
                       model.isDobNull
                           ? 'Select Your Date of Birth'
-                          : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the support@dule.org.'),
+                          : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the support@theconvo.in'),
                   verticalSpaceLarge,
                   model.isDobNull
                       ? SizedBox(
