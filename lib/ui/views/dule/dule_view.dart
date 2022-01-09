@@ -46,7 +46,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   static const duration = Duration(seconds: 4);
   static const String hiveBox = HiveApi.appSettingsBoxName;
   static const String sKey = AppSettingKeys.senderBubbleColor;
-  static const int lightBlue = MaterialColorsCode.lightBlue200;
+  static const int lightBlue = MaterialColorsCode.systemblueSender;
   int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: lightBlue);
 
   @override

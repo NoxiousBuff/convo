@@ -6,27 +6,35 @@ class ChatsCustomizationViewModel extends BaseViewModel {
   final log = getLogger('ChatsCustomizationViewModel');
 
   final senderBubbleColors = [
-    MaterialColorsCode.blue300,
-    MaterialColorsCode.green500,
-    MaterialColorsCode.orange700,
-    MaterialColorsCode.purple500,
-    MaterialColorsCode.yellow600,
-    MaterialColorsCode.indigo500,
-    MaterialColorsCode.teal500,
-    MaterialColorsCode.red800,
-    MaterialColorsCode.cyan500,
+    MaterialColorsCode.royalBlueSender,
+    MaterialColorsCode.hotPinkSender,
+    MaterialColorsCode.forestGreenSender,
+    MaterialColorsCode.classicBlueSender,
+
+    MaterialColorsCode.redSender,
+    MaterialColorsCode.orangeSender,
+    MaterialColorsCode.cyanSender,
+    MaterialColorsCode.pinkSender,
+    MaterialColorsCode.greenSender,
+    MaterialColorsCode.systemblueSender,
+    MaterialColorsCode.indigoSender,
+    MaterialColorsCode.tealSender,
   ];
 
   final receiverBubbleColors = [
-    MaterialColorsCode.lightBlue200,
-    MaterialColorsCode.green300,
-    MaterialColorsCode.orange400,
-    MaterialColorsCode.purple400,
-    MaterialColorsCode.yellowA200,
-    MaterialColorsCode.indigo400,
-    MaterialColorsCode.teal300,
-    MaterialColorsCode.red600,
-    MaterialColorsCode.cyan200,
+    MaterialColorsCode.paleYellowReceiver,
+    MaterialColorsCode.hotCyanReceiver,
+    MaterialColorsCode.butterReceiver,
+    MaterialColorsCode.classicPinkReceiver,
+
+    MaterialColorsCode.redReceiver,
+    MaterialColorsCode.orangeReceiver,
+    MaterialColorsCode.cyanReceiver,
+    MaterialColorsCode.pinkReceiver,
+    MaterialColorsCode.greenReceiver,
+    MaterialColorsCode.systemBlueReceiver,
+    MaterialColorsCode.indigoReceiver,
+    MaterialColorsCode.tealReceiver,
   ];
 
 }

@@ -135,10 +135,10 @@ Widget receiverMessageBubble(
   required FireUser fireUser,
   required DuleViewModel model,
 }) {
-  const int lightDeepPurple = MaterialColorsCode.deepPurple400;
+  const int defaultReceiverBubbleColor = MaterialColorsCode.systemBlueReceiver;
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String rKey = AppSettingKeys.receiverBubbleColor;
-  int rColorCode = Hive.box(hiveBox).get(rKey, defaultValue: lightDeepPurple);
+  int rColorCode = Hive.box(hiveBox).get(rKey, defaultValue: defaultReceiverBubbleColor);
   return StreamBuilder<DatabaseEvent>(
     stream: model.stream,
     builder: (context, snapshot) {
@@ -155,7 +155,7 @@ Widget receiverMessageBubble(
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             decoration: BoxDecoration(
-                color: Color(rColorCode),
+                color: Color.alphaBlend(Color(rColorCode), Colors.white),
                 borderRadius: BorderRadius.circular(32)),
             child: const AnimatedSwitcher(
               duration: Duration(milliseconds: 300),
@@ -197,25 +197,25 @@ Widget receiverMessageBubble(
                     model.updatTextFieldWidth();
                     model.updateOtherField(duleModel.msgTxt);
                   },
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.black, fontSize: 24),
-                  decoration: InputDecoration(
+                  style: const TextStyle(
+                      color: Colors.black, fontSize: 24),
+                  decoration: const InputDecoration(
                     hintText: 'Let\'s Chat',
                     hintStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.mediumBlack,
+                        color: Colors.black54,
                         fontSize: 24),
                     border:
-                        const OutlineInputBorder(borderSide: BorderSide.none),
+                         OutlineInputBorder(borderSide: BorderSide.none),
                   ),
                 ),
               );
               break;
             case false:
               {
-                switcherChild = Text(
+                switcherChild = const Text(
                   'User is Busy',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.mediumBlack,
+                      color: Colors.black54,
                       fontSize: 24),
                 );
               }
@@ -243,7 +243,7 @@ Widget receiverMessageBubble(
             ),
           );
         } else {
-          return const Text('Data is null now');
+          return const Text('Something bad happened.');
         }
       }
     },

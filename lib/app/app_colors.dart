@@ -147,26 +147,41 @@
 // }
 
 class MaterialColorsCode {
-  static const red800 = 0xffC62828; //Red
-  static const red600 = 0xffE53935; // Light Red
-  static const blue300 = 0xff64B5F6; // Blue
-  static const lightBlue200 = 0xff81D4FA; //Light Blue
-  static const pink400 = 0xffEC407A; //Pink
-  static const pink200 = 0xffF48FB1; //Light Pink
-  static const purple500 = 0xff9C27B0; //Purple
-  static const purple400 = 0xffAB47BC; // Light Purple
-  static const deepPurple500 = 0xff673AB7; //Deep purple
-  static const deepPurple400 = 0xff7E57C2; //Light Purple
-  static const indigo500 = 0xff3F51B5; //Indigo
-  static const indigo400 = 0xff5C6BC0; //Light Indigo
-  static const cyan500 = 0xff00BCD4; //Cyan
-  static const cyan200 = 0xff80DEEA; //Light Cyan
-  static const teal500 = 0xff009688; //Teal
-  static const teal300 = 0xff4DB6AC; //Light Teal
-  static const green500 = 0xff4CAF50; //Green
-  static const green300 = 0xff81C784; //Green Light
-  static const orange700 = 0xffF57C00; //Orange
-  static const orange400 = 0xffFFA726; //Light Orange
-  static const yellow600 = 0xffFDD835; //Yellow
-  static const yellowA200 = 0xffFFFF00; //Yellow Light
+
+  
+  static const royalBlueSender = 0xff234e70;
+  static const paleYellowReceiver = 0xfffaf8bf;
+
+  static const classicBlueSender = 0xff2F3C7E;
+  static  const classicPinkReceiver = 0xffFBEAEB;
+
+  static const hotPinkSender = 0xffFF69B4; //Purple
+  static const hotCyanReceiver = 0xff00FFFF; 
+  
+  static const forestGreenSender = 0xff3A6B35; //Purple
+  static const butterReceiver = 0xffFFFFD2;// Light Purple
+
+  static const redSender = 0xffff2d3d; //Red
+  static const redReceiver = 0xffffe1e2; // Light Red
+
+  static const pinkSender = 0xffff61a9;
+  static const pinkReceiver = 0xfffec6e0;
+
+  static const cyanSender = 0xff00c9d5; //Cyan
+  static const cyanReceiver = 0xffB7F2F3; //Light Cyan
+
+  static const orangeSender = 0xffee4e34; //Orange
+  static const orangeReceiver = 0xffFCEDDA; //Light Orange
+
+  static const systemblueSender = 0xff0184FF; // Blue
+  static const systemBlueReceiver = 0xffF6F5FF; //Light Blue
+
+  static const indigoSender = 0xff3F51B5; //Indigo
+  static const indigoReceiver = 0xffB9C0E6; //Light Indigo
+
+  static const tealSender = 0xff009688; //Teal
+  static const tealReceiver = 0xffB3E0DB; //Light Teal
+
+  static const greenSender = 0xff4CAF50; //Green
+  static const greenReceiver = 0xffD8EED9; //Green Light  
 }

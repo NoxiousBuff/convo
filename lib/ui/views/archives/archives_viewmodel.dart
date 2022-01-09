@@ -13,7 +13,12 @@ import 'package:stacked/stacked.dart';
 class ArchiveViewModel extends BaseViewModel {
   Future<void> showTileOptions(FireUser fireUser, context) async {
     return showModalBottomSheet(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(32),
+          topLeft: Radius.circular(32),
+        ),
+      ),
       context: context,
       builder: (context) {
         return Padding(

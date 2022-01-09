@@ -197,8 +197,8 @@ Widget senderMessageBubble(
 }) {
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String sKey = AppSettingKeys.senderBubbleColor;
-  const int deepPurple = MaterialColorsCode.deepPurple500;
-  int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: deepPurple);
+  const int defaultSenderBubbleColor = MaterialColorsCode.systemblueSender;
+  int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: defaultSenderBubbleColor);
   return Expanded(
     flex: model.duleFlexFactor,
     child: Stack(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/constants/app_strings.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/settings/chats_customization/chat_customization_viewmodel.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -31,9 +30,9 @@ class ChangebubbleColor extends StatelessWidget {
               valueListenable: hiveApi.hiveStream(boxName),
               builder: (context, box, child) {
                 var senderBubbleColorCode =
-                    box.get(sKey, defaultValue: MaterialColorsCode.blue300);
+                    box.get(sKey, defaultValue: MaterialColorsCode.systemblueSender);
                 var receiverBubbleColorCode = box.get(rKey,
-                    defaultValue: MaterialColorsCode.lightBlue200);
+                    defaultValue: MaterialColorsCode.systemBlueReceiver);
                 return Column(
                   children: [
                     Expanded(
@@ -42,13 +41,11 @@ class ChangebubbleColor extends StatelessWidget {
                           color: Color(receiverBubbleColorCode),
                           borderRadius: borderRadius,
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
-                            'Receiver Bubble',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .copyWith(color: Theme.of(context).colorScheme.white),
+                            'Friend\'s Bubble',
+                            style: TextStyle(
+                      color: Colors.black, fontSize: 24),
                           ),
                         ),
                       ),
@@ -60,13 +57,11 @@ class ChangebubbleColor extends StatelessWidget {
                           color: Color(senderBubbleColorCode),
                           borderRadius: borderRadius,
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
-                            'Sender Bubble',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .copyWith(color: Theme.of(context).colorScheme.white),
+                            'Your Bubble',
+                            style: TextStyle(
+                      color: Colors.white, fontSize: 24,),
                           ),
                         ),
                       ),
@@ -83,7 +78,7 @@ class ChangebubbleColor extends StatelessWidget {
             child: Center(
               child: Wrap(
                 children: List.generate(
-                  9,
+                  model.senderBubbleColors.length,
                   (i) => GestureDetector(
                     onTap: () async {
                       const box = HiveApi.appSettingsBoxName;

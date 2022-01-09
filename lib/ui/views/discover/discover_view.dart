@@ -157,40 +157,6 @@ class DiscoverView extends StatelessWidget {
                 ),
               ),
               sliverVerticalSpaceRegular,
-              // FutureBuilder<QuerySnapshot>(
-              //   future: model.peopleSuggestionsFuture,
-              //   builder: (context, snapshot) {
-              //     if (!snapshot.hasData) {
-              //       return SliverList(
-              //           delegate: SliverChildBuilderDelegate(
-              //               (context, i) => loadingUserListItem(context,
-              //                   showInterestChips: true),
-              //               childCount: 3));
-              //     }
-              //     final searchResults = snapshot.data!.docs;
-              //     return searchResults.isNotEmpty
-              //         ? SliverList(
-              //             delegate: SliverChildBuilderDelegate((context, i) {
-              //             FireUser localFireUser =
-              //                 FireUser.fromFirestore(snapshot.data!.docs[i]);
-              //             return dulePerson(context, model, localFireUser);
-              //           }, childCount: searchResults.length))
-              //         : SliverToBoxAdapter(
-              //             child: Padding(
-              //               padding: const EdgeInsets.all(15.0),
-              //               child: buildEmptyListUi(
-              //                 context,
-              //                 title: 'More interest\n More friends',
-              //                 buttonTitle: 'Add interests',
-              //                 color: Theme.of(context)
-              //                     .colorScheme
-              //                     .yellowAccent
-              //                     .withAlpha(80),
-              //               ),
-              //             ),
-              //           );
-              //   },
-              // ),
               FirestoreQueryBuilder(
                 pageSize: 5,
                 query: model.peopleSuggestionsFuture,
@@ -215,7 +181,7 @@ class DiscoverView extends StatelessWidget {
                               emoji: '🙌',
                               heading: 'What the..\nempty place !!',
                               description:
-                                  'You\'re unique, we give you that\nBut add more interest to find people you\'d wanna talk.',
+                                  'There aren\'t many people that match with you\nBut add more interest to find people you\'d wanna talk.',
                               proceedButton: CWAuthProceedButton(
                                   buttonTitle: 'Add Interests',
                                   onTap: () => navService.materialPageRoute(
