@@ -40,7 +40,7 @@ class HiveApi {
     final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
     if(Platform.isAndroid) {
       final build = await _deviceInfoPlugin.androidInfo;
-      final deviceVersion = build.version.release;
+      final deviceVersion = build.version.sdkInt;
       save(deviceInfoHiveBox, 'version', deviceVersion);
     }
   }

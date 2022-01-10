@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
     final deviceVersion =
         hiveApi.getFromHive(HiveApi.deviceInfoHiveBox, 'version');
     final intDeviceVersion = int.parse(deviceVersion);
-    if (intDeviceVersion >= 10) {
+    if (intDeviceVersion >= 29) {
       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
           systemNavigationBarColor: Colors.transparent,
           statusBarColor: Colors.transparent));
