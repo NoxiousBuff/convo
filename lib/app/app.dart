@@ -28,10 +28,9 @@ class _MyAppState extends State<MyApp> {
   final discoverViewModel = locator<DiscoverViewModel>();
 
   void systemUiModeChanger() {
-    final deviceVersion =
-        hiveApi.getFromHive(HiveApi.deviceInfoHiveBox, 'version');
-    final intDeviceVersion = int.parse(deviceVersion);
-    if (intDeviceVersion >= 29) {
+    final int deviceVersion =
+        hiveApi.getFromHive(HiveApi.deviceInfoHiveBox, 'version') as int;
+    if (deviceVersion >= 29) {
       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
           systemNavigationBarColor: Colors.transparent,
           statusBarColor: Colors.transparent));
