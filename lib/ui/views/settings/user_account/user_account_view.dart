@@ -76,11 +76,14 @@ class _AccountState extends State<UserAccountView> {
                           ],
                         ),
                         verticalSpaceRegular,
-                        cwEADetailsTile(context, 'Delete My User Account',
-                            showTrailingIcon: false,
-                            titleColor: Colors.red,
-                            subtitle:
-                                'If you want to delete your account, please email us at support@theconvo.in'),
+                        cwEADetailsTile(
+                          context,
+                          'Delete My User Account',
+                          showTrailingIcon: false,
+                          titleColor: Colors.red,
+                          subtitle:
+                              'If you want to delete your account, please email us at support@theconvo.in',
+                        ),
                       ],
                     ),
                   ),
