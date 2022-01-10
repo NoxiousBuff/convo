@@ -52,7 +52,7 @@ class InvitesView extends StatelessWidget {
                               verticalSpaceRegular,
                               cwEADescriptionTitle(
                                 context,
-                                'Invites your friends and family\n\nYour contacts data will not be uploaded on our server.\nEvrything will be locally on your phone.',
+                                'Invites your friends and family\n\nYour contacts data will not be uploaded on our server.\nEverything will be locally on your phone.',
                                 textAlign: TextAlign.center,
                               )
                             ],
