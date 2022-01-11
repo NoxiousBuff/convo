@@ -110,6 +110,8 @@ class DiscoverInterestView extends StatelessWidget {
                         );
                 },
               ),
+              sliverVerticalSpaceLarge,
+              bottomPadding(context),
             ],
           ),
         ),

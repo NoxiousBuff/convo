@@ -31,7 +31,7 @@ class NotificationView extends StatelessWidget {
           title: 'Notifications',
           onPressed: () => Navigator.pop(context),
         ),
-        body: !model.isNoticationAllowed
+        body: model.isNoticationAllowed
             ? ListView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
