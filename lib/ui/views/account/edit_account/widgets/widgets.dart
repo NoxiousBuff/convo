@@ -60,6 +60,7 @@ Widget cwEADetailsTile(
   bool isLoading = false,
   EdgeInsets? padding,
   Color? color,
+  IconData icon = FeatherIcons.chevronRight,
 }) {
   return InkWell(
     onTap: onTap,
@@ -113,7 +114,7 @@ Widget cwEADetailsTile(
                   )
                 : showTrailingIcon
                     ?  Icon(
-                        FeatherIcons.chevronRight,
+                        icon,
                         color: Theme.of(context).colorScheme.mediumBlack,
                         size: 28,
                       )
@@ -124,32 +125,6 @@ Widget cwEADetailsTile(
     ),
   );
 }
-
-// Widget cwEAHeading(String title,
-//     {MainAxisSize mainAxisSize = MainAxisSize.max,
-//     TextAlign textAlign = TextAlign.start,
-//     Color? color,
-//     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start}) {
-//   return Padding(
-//     padding: const EdgeInsets.symmetric(vertical: 12),
-//     child: Row(
-//       mainAxisSize: mainAxisSize,
-//       mainAxisAlignment: mainAxisAlignment,
-//       children: [
-//         Flexible(
-//           flex: 1,
-//           child: Text(
-//             title,
-//             textAlign: textAlign,
-//             textWidthBasis: TextWidthBasis.parent,
-//             style: TextStyle(
-//                 color: color ?? Theme.of(context).colorScheme.black, fontWeight: FontWeight.w700, fontSize: 32),
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
 
 class CWEAHeading extends StatelessWidget {
   const CWEAHeading( this.title, { Key? key , this.mainAxisSize = MainAxisSize.max, this.color, this.textAlign = TextAlign.start, this.mainAxisAlignment = MainAxisAlignment.start }) : super(key: key);

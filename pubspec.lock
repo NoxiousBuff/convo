@@ -330,20 +330,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.7"
-  file_sizes:
-    dependency: "direct main"
-    description:
-      name: file_sizes
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.6"
-  filesize:
-    dependency: "direct main"
-    description:
-      name: filesize
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.1"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -1210,12 +1196,12 @@ packages:
     source: hosted
     version: "1.0.0+1"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.17"
+    version: "6.0.18"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1300,13 +1286,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
-  video_thumbnail:
-    dependency: "direct main"
-    description:
-      name: video_thumbnail
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.3"
   watcher:
     dependency: transitive
     description:

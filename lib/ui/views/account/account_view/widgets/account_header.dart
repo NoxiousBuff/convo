@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
 
-Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName, String relationShipStatus, List<dynamic> hashtags) {
+Widget cwAccountHeader(BuildContext context, String? photoUrl,
+    String displayName, String? relationShipStatus, List<dynamic>? hashtags) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -11,15 +12,14 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: CachedNetworkImage(
-              imageUrl: photoUrl,
+          if (photoUrl != null)
+            userProfilePhoto(
+              context,
+              photoUrl,
               height: 84,
               width: 84,
-              fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(30),
             ),
-          ),
           horizontalSpaceRegular,
           Expanded(
             child: Column(
@@ -34,7 +34,9 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
                       Text(
                         displayName,
                         style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.black),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.black),
                       ),
                       horizontalSpaceTiny,
                       Container(
@@ -42,31 +44,35 @@ Widget cwAccountHeader(BuildContext context, String photoUrl, String displayName
                             horizontal: 8, vertical: 4.0),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Theme.of(context).colorScheme.lightBlack)),
+                            border: Border.all(
+                                color:
+                                    Theme.of(context).colorScheme.lightBlack)),
                         child: Text(
-                          relationShipStatus,
-                          style:  TextStyle(
-                              color: Theme.of(context).colorScheme.black, fontWeight: FontWeight.w600),
+                          relationShipStatus ?? 'Prefer Not To Say',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.black,
+                              fontWeight: FontWeight.w600),
                         ),
                       )
                     ],
                   ),
                 ),
-                Wrap(
-                  spacing: 8,
-                  direction: Axis.horizontal,
-                  children: List.generate(
-                    hashtags.length,
-                    (index) => Text(
-                      hashtags[index],
-                      style:  TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.mediumBlack,
+                if (hashtags != null)
+                  Wrap(
+                    spacing: 8,
+                    direction: Axis.horizontal,
+                    children: List.generate(
+                      hashtags.length,
+                      (index) => Text(
+                        hashtags[index],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.mediumBlack,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           )

@@ -1,11 +1,18 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/app/locator.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/views/auth/register/phone/phone_auth_view.dart';
+import 'package:hint/ui/views/auth/register/displayname/displayname_auth_view.dart';
 import 'package:stacked/stacked.dart';
+import 'package:http/http.dart' as http;
 
 class CredentialAuthViewModel extends BaseViewModel {
   final log = getLogger('CredentialAuthViewModel');
@@ -22,6 +29,14 @@ class CredentialAuthViewModel extends BaseViewModel {
   bool hasLowercase = false;
   bool hasSpecialCharacters = false;
   bool hasMinLength = false;
+
+  final firestoreApi = locator<FirestoreApi>();
+
+  String _countryName = '';
+  String get countryName => _countryName;
+
+  String _countryCode = '';
+  String get countryCode => _countryCode;
 
   void updateEmailEmpty() {
     emailEmpty = emailTech.text.isEmpty;
@@ -96,6 +111,8 @@ class CredentialAuthViewModel extends BaseViewModel {
     required String password,
   }) async {
     setBusy(true);
+    hiveApi.saveAndReplace(
+        HiveApi.appSettingsBoxName, FireUserField.email, emailTech.text);
     await authService.signUp(
         email: email,
         password: password,
@@ -116,9 +133,40 @@ class CredentialAuthViewModel extends BaseViewModel {
               title:
                   'Something wrong happened. Please check your internet connection.');
         });
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      await createUserInFirebase(context);
+    } else {
+      log.e('Firebase user is null');
+    }
     setBusy(false);
-    if(FirebaseAuth.instance.currentUser != null) {
-      navService.cupertinoPageRoute(context, const PhoneAuthView());
+    if (FirebaseAuth.instance.currentUser != null) {
+      navService.cupertinoPageRoute(context, const DisplayNameAuthView());
+    }
+  }
+
+  Future<void> createUserInFirebase(BuildContext context) async {
+    firestoreApi
+        .createUserInFirebase(
+      user: FirebaseAuth.instance.currentUser!,
+    )
+        .then((value) async {
+      await databaseService.addUserData(FirebaseAuth.instance.currentUser!.uid);
+    });
+  }
+
+  Future<void> lookUpGeopoint(BuildContext context) async {
+    final response =
+        await http.get(Uri.parse('https://api.ipregistry.co?key=tryout'));
+    if (response.statusCode == 200) {
+      _countryName =
+          jsonDecode(response.body)['location']['country']['name'].toString();
+      _countryCode = jsonDecode(response.body)['location']['country']
+              ['calling_code']
+          .toString();
+      notifyListeners();
+    } else {
+      customSnackbars.infoSnackbar(context, title: 'Turn On Your Internet');
     }
   }
 

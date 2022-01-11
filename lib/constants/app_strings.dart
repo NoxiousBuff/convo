@@ -86,6 +86,7 @@ class AppSettingKeys {
   static const String isSecurityAllowed = 'isSecurityAllowed';
   static const String hasDiscoverNotificationScheduled = 'hasDiscoverNotificationScheduled';
   static const String hasSecurityNotificationAllowed = 'hasSecurityNotificationAllowed';
+  static const String hasCompletedAuthentication = 'hasCompletedAuthentication';
 }
 
 class AppThemes {
@@ -107,3 +108,5 @@ class NotificationChannelGroupKeys {
   static const String securityChannelGroup = 'security_channel_group';
   static const String discoverChannelGroup = 'discover_channel_group';
 }
+
+class DefaultUserAccountValues {}

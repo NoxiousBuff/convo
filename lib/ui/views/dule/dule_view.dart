@@ -145,7 +145,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
             onTap: () => navService.materialPageRoute(
                 context, ProfileView(fireUser: widget.fireUser)),
             child: userProfilePhoto(context, widget.fireUser.photoUrl,
-                height: 50, width: 50),
+                height: 40, width: 40, borderRadius: BorderRadius.circular(16)),
           ),
         ],
       ),

@@ -5,6 +5,7 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/pods/verify_email_pod.dart';
 import 'package:hint/services/auth_service.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 
@@ -24,6 +25,11 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
         .collection(recentFirestoreKey)
         .orderBy(RecentUserField.timestamp, descending: true)
         .snapshots();
+  }
+
+  void invitePeople() {
+    Share.share(
+        'We can chat realtime on Convo. It\'s super immersive. Let\'s do it. Click on the link to the get the app. https://theconvo.in');
   }
 
   @override

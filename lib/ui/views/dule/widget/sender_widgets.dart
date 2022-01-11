@@ -26,6 +26,7 @@ Widget senderMediaWidget(
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           constraints: const BoxConstraints(maxHeight: 35, maxWidth: 35),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
           child: ExtendedImage.file(
             File(model.sendingMediaPath!),
             clipBehavior: Clip.antiAlias,
@@ -198,7 +199,8 @@ Widget senderMessageBubble(
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String sKey = AppSettingKeys.senderBubbleColor;
   const int defaultSenderBubbleColor = MaterialColorsCode.systemblueSender;
-  int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: defaultSenderBubbleColor);
+  int senderBubbleCode =
+      Hive.box(hiveBox).get(sKey, defaultValue: defaultSenderBubbleColor);
   return Expanded(
     flex: model.duleFlexFactor,
     child: Stack(
@@ -234,9 +236,8 @@ Widget senderMessageBubble(
             ),
             triggerMode: TooltipTriggerMode.tap,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.lightGrey,
-              borderRadius: BorderRadius.circular(14.2)
-            ),
+                color: Theme.of(context).colorScheme.lightGrey,
+                borderRadius: BorderRadius.circular(14.2)),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             showDuration: const Duration(seconds: 2),
             preferBelow: false,

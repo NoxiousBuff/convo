@@ -57,7 +57,7 @@ class ChangeBioView extends StatelessWidget {
                   children: [
                     cwEADetailsTile(context, 'Your Current Bio'),
                     Text(
-                      box.get(FireUserField.bio),
+                      box.get(FireUserField.bio, defaultValue: 'It is currently empty.'),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,

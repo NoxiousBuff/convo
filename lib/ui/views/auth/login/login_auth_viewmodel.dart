@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
+import 'package:hint/services/push_notification_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/views/home/home_view.dart';
 import 'package:stacked/stacked.dart';
@@ -44,7 +47,9 @@ class LoginAuthViewModel extends BaseViewModel {
         email: email,
         password: password,
         onComplete: () {
-          
+        hiveApi.saveAndReplace(HiveApi.appSettingsBoxName, AppSettingKeys.hasCompletedAuthentication, true); 
+        pushNotificationService.createScheduledDiscoverNotifications();
+        pushNotificationService.createScheduledSecurityNotifications(); 
         Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(builder: (context) =>  const HomeView()),

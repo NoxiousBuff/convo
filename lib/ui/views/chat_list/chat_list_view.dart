@@ -11,7 +11,6 @@ import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/invites/invites_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +29,8 @@ import 'widgets/show_tile_options.dart';
 class ChatListView extends StatelessWidget {
   const ChatListView({Key? key}) : super(key: key);
 
-  CupertinoSliverNavigationBar _buildAppBar(BuildContext context) =>
+  CupertinoSliverNavigationBar _buildAppBar(
+          BuildContext context, ChatListViewModel model) =>
       CupertinoSliverNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         automaticallyImplyLeading: false,
@@ -52,7 +52,7 @@ class ChatListView extends StatelessWidget {
                 color: Theme.of(context).colorScheme.black,
                 icon: const Icon(FeatherIcons.userPlus),
                 onPressed: () {
-                  navService.materialPageRoute(context, const InvitesView());
+                  model.invitePeople();
                 },
               ),
             ),
@@ -257,7 +257,7 @@ class ChatListView extends StatelessWidget {
           body: CustomScrollView(
             scrollBehavior: const CupertinoScrollBehavior(),
             slivers: [
-              _buildAppBar(context),
+              _buildAppBar(context, model),
               sliverVerticalSpaceRegular,
               _buildPinnedList(context, model),
               _buildChatList(context, model),

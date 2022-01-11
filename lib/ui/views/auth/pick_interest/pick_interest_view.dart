@@ -10,43 +10,32 @@ import 'package:hint/ui/views/auth/auth_widgets.dart';
 class PickInterestsView extends StatelessWidget {
   const PickInterestsView({
     Key? key,
-    required this.countryCode,
-    required this.displayName,
-    required this.phoneNumber,
-    required this.username,
   }) : super(key: key);
 
   static const String id = '/PickInterestsView';
-
-  final String displayName;
-  final String countryCode;
-  final String phoneNumber;
-  final String username;
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<PickInterestsViewModel>.reactive(
       viewModelBuilder: () => PickInterestsViewModel(),
-      onModelReady: (model) {
-        model.lookUpGeopoint(context);
-      },
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'Pick few things you like'),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              verticalSpaceRegular,
-              cwAuthHeadingTitle(context, title: 'What\'re your \nhobbies..?'),
-              verticalSpaceSmall,
-              cwAuthDescription(context,
-                  title: 'Choose at least ten interests'),
-              verticalSpaceSmall,
+              
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
                   children: [
+                    verticalSpaceRegular,
+                cwAuthHeadingTitle(context, title: 'What\'re your \nhobbies..?'),
+                verticalSpaceSmall,
+                cwAuthDescription(context,
+                  title: 'Choose at least ten interests'),
+                verticalSpaceSmall,
                     cwAuthInterestTopicPicker(
                       context, 
                       'Most Popular',
@@ -202,26 +191,7 @@ class PickInterestsView extends StatelessWidget {
                 isLoading: model.isBusy,
                 isActive: model.hasUserPickedTenInterests,
                 onTap: () async {
-                  model.createUserInFirebase(
-                    context,
-                    country: model.countryName,
-                    phoneNumber: phoneNumber,
-                    displayName: displayName,
-                    countryPhoneCode: countryCode,
-                    username: username,
-                  );
-
-                  model.userClickedButtonChanger();
-                  if (model.userClickedButton > 3) {
-                    model.createUserInFirebase(
-                      context,
-                      country: model.countryName,
-                      phoneNumber: phoneNumber,
-                      displayName: displayName,
-                      countryPhoneCode: countryCode,
-                      username: username,
-                    );
-                  }
+                  model.updateUserSelectedInterests(context);
                 },
               ),
               verticalSpaceLarge,

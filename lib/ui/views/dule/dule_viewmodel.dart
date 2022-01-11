@@ -180,7 +180,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
 
   /// upload task functionality
   Future<String> _uploadFunction({
-    Function(Object)? onError,
+    Function? onError,
     void Function()? onDone,
     required UploadTask task,
     required String fileType,
@@ -189,7 +189,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
     Future<TaskSnapshot> Function()? onTimeout,
   }) async {
     task.timeout(const Duration(seconds: 10), onTimeout: onTimeout);
-    task.snapshotEvents.listen(onData, onError: onError, onDone: onDone, cancelOnError: true);
+    task.snapshotEvents
+        .listen(onData, onError: onError, onDone: onDone, cancelOnError: true);
     await task;
     String downloadURL = await storage.ref(firebasePath).getDownloadURL();
     await updateUserDataWithKey(DatabaseMessageField.url, downloadURL);
@@ -266,7 +267,15 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         log.i('Task state: ${snapshot.state}');
         final progress = snapshot.bytesTransferred / snapshot.totalBytes;
         log.wtf(progress);
-        customSnackbars.errorSnackbar(context, title: 'Failed to upload file');
+      },
+      onError: (error) {
+        _changeSenderMediaPath(null);
+        _changeSenderMediaType(null);
+        setBusyForObject(_isGalleryUploading, false);
+        if (task.snapshot.state == TaskState.running) task.cancel();
+        task.cancel();
+        const String errorTitle = 'Failed to upload file';
+        customSnackbars.errorSnackbar(context, title: errorTitle);
       },
     );
     setBusy(false);
@@ -370,7 +379,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       onTimeout: () {
         _changeSenderMediaPath(null);
         _changeSenderMediaType(null);
-        if(task.snapshot.state == TaskState.running) task.cancel();
+        if (task.snapshot.state == TaskState.running) task.cancel();
         setBusyForObject(_isGalleryUploading, false);
         return task;
       },
@@ -386,7 +395,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
         _changeSenderMediaPath(null);
         _changeSenderMediaType(null);
         setBusyForObject(_isGalleryUploading, false);
-        if(task.snapshot.state == TaskState.running) task.cancel(); task.cancel();
+        if (task.snapshot.state == TaskState.running) task.cancel();
+        task.cancel();
         const String errorTitle = 'Failed to upload file';
         customSnackbars.errorSnackbar(context, title: errorTitle);
       },

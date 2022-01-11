@@ -31,7 +31,7 @@ class NotificationView extends StatelessWidget {
           title: 'Notifications',
           onPressed: () => Navigator.pop(context),
         ),
-        body: model.isNoticationAllowed
+        body: !model.isNoticationAllowed
             ? ListView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -291,29 +291,14 @@ class NotificationView extends StatelessWidget {
                   verticalSpaceMedium,
                   const Divider(height: 0),
                   verticalSpaceMedium,
-                  InkWell(
-                    borderRadius: BorderRadius.circular(20),
+                  cwEADetailsTile(
+                    context,
+                    'Allow Notifications',
                     onTap: () {
                       AwesomeNotifications().showNotificationConfigPage();
                     },
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: cwEADetailsTile(
-                            context,
-                            'Allow Notifications',
-                            subtitle: 'Tap to open settings page',
-                            showTrailingIcon: false,
-                          ),
-                        ),
-                        horizontalSpaceRegular,
-                        Icon(
-                          FeatherIcons.arrowUpRight,
-                          size: 32,
-                          color: Theme.of(context).colorScheme.black,
-                        )
-                      ],
-                    ),
+                    subtitle: 'Tap to open settings page',
+                    icon: FeatherIcons.externalLink,
                   ),
                 ],
               ),

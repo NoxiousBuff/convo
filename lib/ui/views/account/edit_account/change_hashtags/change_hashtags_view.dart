@@ -31,19 +31,21 @@ class ChangeHashtagsView extends StatelessWidget {
         body: ValueListenableBuilder<Box>(
           valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
           builder: (context, box, child) {
-            List<dynamic> hashList = box.get(FireUserField.hashTags);
+            List<dynamic> hashList = box.get(
+              FireUserField.hashTags,
+              defaultValue: ['#friendly', '#new', '#available'],
+            );
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView(
                 children: [
                   cwEADetailsTile(context, 'Your HashTags'),
-                   Text('Add upto 3 hashtags to describe yourself.',
+                  Text('Add upto 3 hashtags to describe yourself.',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                         color: Theme.of(context).colorScheme.mediumBlack,
                       )),
-
                   verticalSpaceRegular,
                   ListView.builder(
                       shrinkWrap: true,
@@ -53,10 +55,12 @@ class ChangeHashtagsView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(hashList[i],
-                                  style:  TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
-                                    color: Theme.of(context).colorScheme.mediumBlack,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .mediumBlack,
                                   )),
                               IconButton(
                                   onPressed: () {
@@ -101,16 +105,17 @@ class ChangeHashtagsView extends StatelessWidget {
                   CWAuthProceedButton(
                       buttonTitle: 'Add',
                       isActive: model.isActive,
-                      isLoading: model.isBusy, onTap: () {
-                    if (hashList.length < 3) {
-                      model.addToList('#${model.hashTagTech.text}');
-                      model.updateUserProperty(
-                          context, FireUserField.hashTags, model.updatedList);
-                    } else {
-                      customSnackbars.infoSnackbar(context,
-                          title: 'You can only add uptp 3 hashtags.');
-                    }
-                  }),
+                      isLoading: model.isBusy,
+                      onTap: () {
+                        if (hashList.length < 3) {
+                          model.addToList('#${model.hashTagTech.text}');
+                          model.updateUserProperty(context,
+                              FireUserField.hashTags, model.updatedList);
+                        } else {
+                          customSnackbars.infoSnackbar(context,
+                              title: 'You can only add uptp 3 hashtags.');
+                        }
+                      }),
                   verticalSpaceLarge,
                 ],
               ),

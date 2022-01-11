@@ -116,7 +116,7 @@ Widget dulePerson(
                                       color: Theme.of(context).colorScheme.greenAccent
                                           .withAlpha(100)),
                                   child: Text(
-                                    commonInterests.elementAt(2).toString(),
+                                    commonInterests.elementAt(1).toString(),
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.green,
                                         fontWeight: FontWeight.w700),
@@ -134,7 +134,7 @@ Widget dulePerson(
                                       color: Theme.of(context).colorScheme.yellowAccent
                                           .withAlpha(80)),
                                   child: Text(
-                                    commonInterests.elementAt(3).toString(),
+                                    commonInterests.elementAt(2).toString(),
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.yellow,
                                         fontWeight: FontWeight.w700),
@@ -152,7 +152,7 @@ Widget dulePerson(
                                       color: Theme.of(context).colorScheme.purpleAccent
                                           .withAlpha(100)),
                                   child: Text(
-                                    commonInterests.elementAt(4).toString(),
+                                    commonInterests.elementAt(3).toString(),
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.purple,
                                         fontWeight: FontWeight.w700),
@@ -170,7 +170,7 @@ Widget dulePerson(
                                       color: Theme.of(context).colorScheme.redAccent
                                           .withAlpha(100)),
                                   child: Text(
-                                    commonInterests.elementAt(5).toString(),
+                                    commonInterests.elementAt(4).toString(),
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.red,
                                         fontWeight: FontWeight.w700),
@@ -188,7 +188,7 @@ Widget dulePerson(
                                       color: Theme.of(context).colorScheme.lightGrey
                                           .withAlpha(100)),
                                   child: Text(
-                                    commonInterests.elementAt(6).toString(),
+                                    commonInterests.elementAt(5).toString(),
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.mediumBlack,
                                         fontWeight: FontWeight.w700),

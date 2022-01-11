@@ -24,7 +24,7 @@ class AuthService {
 
   static User? liveUser = FirebaseAuth.instance.currentUser;
 
-  signUp({
+  Future<void> signUp({
     required String email,
     required String password,
     required Function onComplete,
@@ -60,7 +60,7 @@ class AuthService {
     }
   }
 
-  logIn({
+  Future<void> logIn({
     required String email,
     required String password,
     required Function onComplete,

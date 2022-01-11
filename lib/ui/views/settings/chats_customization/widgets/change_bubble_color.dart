@@ -124,6 +124,7 @@ class ChangebubbleColor extends StatelessWidget {
                               color: Color(model.receiverBubbleColors[i]),
                             ),
                           ),
+
                         ],
                       ),
                     ),
@@ -132,6 +133,7 @@ class ChangebubbleColor extends StatelessWidget {
               ),
             ),
           ),
+          verticalSpaceMedium,
         ],
       ),
     );

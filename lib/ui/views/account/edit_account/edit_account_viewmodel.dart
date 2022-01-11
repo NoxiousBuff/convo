@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:filesize/filesize.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/locator.dart';
@@ -9,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:stacked/stacked.dart';
-import 'package:hint/api/storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
@@ -97,31 +95,6 @@ class EditAccountViewModel extends BaseViewModel {
     }
   }
 
-  Future<String?> uploadFile(String filePath, BuildContext context) async {
-    setBusy(true);
-    String path = 'ProfilePhotos/';
-    final size = File(filePath).readAsBytesSync().lengthInBytes;
-    final kbSize = size / 1024;
-    final fileSize = kbSize / 1024;
-    final _size = filesize(size);
-    log.wtf(_size);
-    if (fileSize.toInt() > 8) {
-      customSnackbars.infoSnackbar(context,
-          title: 'Your file size is greater than 8 MB');
-      return null;
-    } else {
-      customSnackbars.infoSnackbar(context, title: 'File is uploading.......');
-      final downloadUrl = await storageApi.uploadFile(filePath, path, onError: () {
-        customSnackbars.errorSnackbar(context, title: 'Something went wrong');
-      });
-      // final response = await http.get(Uri.parse(downloadUrl!));
-      String key = FireUserField.photoUrl;
-      await Hive.box(_hiveBox).put(key, downloadUrl);
-      // log.wtf(response.bodyBytes);
-      setBusy(false);
-      return downloadUrl;
-    }
-  }
 
   Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value,{bool useSetBusy = true}) async {
     if(useSetBusy) setBusy(true);

@@ -16,7 +16,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/dule/widget/display_receiver_media.dart';
 
-
 class AppBarMediaVisibility extends StatelessWidget {
   const AppBarMediaVisibility(this.fireUser, this.stream, {Key? key})
       : super(key: key);
@@ -138,7 +137,8 @@ Widget receiverMessageBubble(
   const int defaultReceiverBubbleColor = MaterialColorsCode.systemBlueReceiver;
   const String hiveBox = HiveApi.appSettingsBoxName;
   const String rKey = AppSettingKeys.receiverBubbleColor;
-  int rColorCode = Hive.box(hiveBox).get(rKey, defaultValue: defaultReceiverBubbleColor);
+  int rColorCode =
+      Hive.box(hiveBox).get(rKey, defaultValue: defaultReceiverBubbleColor);
   return StreamBuilder<DatabaseEvent>(
     stream: model.stream,
     builder: (context, snapshot) {
@@ -169,61 +169,65 @@ Widget receiverMessageBubble(
         if (data != null) {
           final json = data.snapshot.value;
           final DuleModel duleModel = DuleModel.fromJson(json);
-          bool isInChatRoom = model.conversationId == duleModel.roomUid && duleModel.online;
+          bool isInChatRoom =
+              model.conversationId == duleModel.roomUid;
           Widget switcherChild;
-          switch (isInChatRoom) {
-            case true:
-              model.updateOtherField(duleModel.msgTxt);
-              switcherChild = AnimatedSwitcher(
-                duration: const Duration(milliseconds: 10),
-                child: TextFormField(
-                  key: UniqueKey(),
-                  expands: true,
-                  minLines: null,
-                  maxLines: null,
-                  readOnly: true,
-                  maxLength: 160,
-                  cursorHeight: 28,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  buildCounter: (_,
-                      {required currentLength, maxLength, required isFocused}) {
-                    return const SizedBox.shrink();
-                  },
-                  controller: model.otherTech,
-                  cursorColor: Theme.of(context).colorScheme.blue,
-                  textAlign: TextAlign.center,
-                  cursorRadius: const Radius.circular(100),
-                  onChanged: (value) {
-                    model.updatTextFieldWidth();
-                    model.updateOtherField(duleModel.msgTxt);
-                  },
-                  style: const TextStyle(
-                      color: Colors.black, fontSize: 24),
-                  decoration: const InputDecoration(
-                    hintText: 'Let\'s Chat',
-                    hintStyle: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 24),
-                    border:
-                         OutlineInputBorder(borderSide: BorderSide.none),
+          if (duleModel.online) {
+            switch (isInChatRoom) {
+              case true:
+                model.updateOtherField(duleModel.msgTxt);
+                switcherChild = AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 10),
+                  child: TextFormField(
+                    key: UniqueKey(),
+                    expands: true,
+                    minLines: null,
+                    maxLines: null,
+                    readOnly: true,
+                    maxLength: 160,
+                    cursorHeight: 28,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    buildCounter: (_,
+                        {required currentLength,
+                        maxLength,
+                        required isFocused}) {
+                      return const SizedBox.shrink();
+                    },
+                    controller: model.otherTech,
+                    cursorColor: Theme.of(context).colorScheme.blue,
+                    textAlign: TextAlign.center,
+                    cursorRadius: const Radius.circular(100),
+                    onChanged: (value) {
+                      model.updatTextFieldWidth();
+                      model.updateOtherField(duleModel.msgTxt);
+                    },
+                    style: const TextStyle(color: Colors.black, fontSize: 24),
+                    decoration: const InputDecoration(
+                      hintText: 'Let\'s Chat',
+                      hintStyle: TextStyle(color: Colors.black54, fontSize: 24),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                    ),
                   ),
-                ),
-              );
-              break;
-            case false:
-              {
-                switcherChild = const Text(
-                  'User is Busy',
-                  style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 24),
                 );
-              }
-              break;
-            default:
-              {
-                switcherChild = const Text('This is default');
-              }
+                break;
+              case false:
+                {
+                  switcherChild = const Text(
+                    'User is Busy',
+                    style: TextStyle(color: Colors.black54, fontSize: 24),
+                  );
+                }
+                break;
+              default:
+                {
+                  switcherChild = const Text('This is default');
+                }
+            }
+          } else {
+            switcherChild = const Text(
+              'Offline',
+              style: TextStyle(color: Colors.black54, fontSize: 24),
+            );
           }
           return Expanded(
             flex: model.otherFlexFactor,

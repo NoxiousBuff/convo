@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
@@ -56,10 +57,15 @@ class AccountView extends StatelessWidget {
                     verticalSpaceRegular,
                     cwAccountHeader(
                       context,
-                      box.get(FireUserField.photoUrl),
-                      box.get(FireUserField.displayName),
-                      box.get(FireUserField.romanticStatus),
-                      box.get(FireUserField.hashTags),
+                      box.get(FireUserField.photoUrl,
+                          defaultValue: FirestoreApi.kDefaultPhotoUrl),
+                      box.get(
+                        FireUserField.displayName,
+                      ),
+                      box.get(FireUserField.romanticStatus,
+                          defaultValue: 'Prefer Not To Say'),
+                      box.get(FireUserField.hashTags,
+                          defaultValue: ['#friendly', '#new', '#available']),
                     ),
                     verticalSpaceLarge,
                     Row(

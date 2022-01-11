@@ -26,8 +26,8 @@ class ForgotPasswordAuthView extends StatelessWidget {
             key: model.forgotPasswordFormKey,
             child: Stack(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                ListView(
+                  physics: const BouncingScrollPhysics(),
                   children: [
                     verticalSpaceRegular,
                     cwAuthHeadingTitle(context, title: 'Enter your \nemail'),

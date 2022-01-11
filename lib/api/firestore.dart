@@ -66,33 +66,27 @@ class FirestoreApi {
   }
 
   Future<void> saveUserDataInHive(String key, dynamic userData) async {
-    await hiveApi.save(HiveApi.userDataHiveBox, key, userData);
+    await hiveApi.saveAndReplace(HiveApi.userDataHiveBox, key, userData);
   }
 
   Future<void> createUserInFirebase({
     Function? onError,
     required User user,
-    required String country,
-    required String displayName,
-    required String username,
-    required String phoneNumber,
-    required List<String> interests,
-    required String countryPhoneCode,
+    
   }) async {
     try {
       await subsCollection.doc(user.uid).set({
         FireUserField.bio: 'Hey I am using dule',
-        FireUserField.country: country,
-        FireUserField.countryPhoneCode: countryPhoneCode,
+        FireUserField.country: '',
+        FireUserField.countryPhoneCode: '',
         FireUserField.email: user.email,
         FireUserField.hashTags: ['#Dule User'],
         FireUserField.id: user.uid,
-        FireUserField.interests: interests,
-        FireUserField.phone: phoneNumber,
+        FireUserField.interests: [],
+        FireUserField.phone: '',
         FireUserField.photoUrl: kDefaultPhotoUrl,
-        FireUserField.displayName: displayName,
         FireUserField.userCreated: Timestamp.now(),
-        FireUserField.username: username,
+        FireUserField.username: '',
         FireUserField.blocked: [],
         FireUserField.blockedBy: [],
         FireUserField.romanticStatus: 'Prefer Not To Say',
@@ -101,21 +95,21 @@ class FirestoreApi {
         FireUserField.tokens: FieldValue.arrayUnion([]),
       });
       saveUserDataInHive(FireUserField.bio, 'Hey I am using dule');
-      saveUserDataInHive(FireUserField.country, country);
-      saveUserDataInHive(FireUserField.countryPhoneCode, countryPhoneCode);
+      saveUserDataInHive(FireUserField.country, '');
+      saveUserDataInHive(FireUserField.countryPhoneCode, '');
       saveUserDataInHive(FireUserField.email, user.email);
       saveUserDataInHive(
-          FireUserField.hashTags, ['#duleuser', '#new', '#available']);
+          FireUserField.hashTags, ['#friendly', '#new', '#available']);
       saveUserDataInHive(FireUserField.id, user.uid);
-      saveUserDataInHive(FireUserField.interests, interests);
-      saveUserDataInHive(FireUserField.phone, phoneNumber);
+      saveUserDataInHive(FireUserField.interests, []);
+      saveUserDataInHive(FireUserField.phone, '');
       saveUserDataInHive(
         FireUserField.photoUrl,
         kDefaultPhotoUrl,
       );
       saveUserDataInHive(
         FireUserField.displayName,
-        displayName,
+        '',
       );
       saveUserDataInHive(
         FireUserField.userCreated,
@@ -123,7 +117,7 @@ class FirestoreApi {
       );
       saveUserDataInHive(
         FireUserField.username,
-        username,
+        '',
       );
       saveUserDataInHive(
         FireUserField.blocked,
@@ -172,7 +166,7 @@ class FirestoreApi {
     final currentUser = _auth.currentUser!;
     await subsCollection
         .doc(currentUser.uid)
-        .update({'userName': userName})
+        .update({FireUserField.username: userName})
         .then((value) => log.i(
             'Username : $userName has been successfully changed in firestore.'))
         .onError((error, stackTrace) {
@@ -185,7 +179,7 @@ class FirestoreApi {
     final currentUser = _auth.currentUser!;
     await subsCollection
         .doc(currentUser.uid)
-        .update({'displayName': displayName})
+        .update({FireUserField.displayName: displayName})
         .then((value) => log.i(
             'User display name : $displayName has been successfully changed in firestore.'))
         .onError((error, stackTrace) {
@@ -216,7 +210,8 @@ class FirestoreApi {
         FireUserField.tokens: FieldValue.arrayUnion([token]),
       }).then((value) {
         log.wtf('$token has been saved');
-        hiveApi.save(HiveApi.appSettingsBoxName, AppSettingKeys.isTokenSaved, true);
+        hiveApi.save(
+            HiveApi.appSettingsBoxName, AppSettingKeys.isTokenSaved, true);
       });
     }
   }

@@ -36,9 +36,6 @@ Future<void> main() async {
     /// intialising awesome notifications
     intialiseAwesomeNotifications();
 
-    ///initiasingScheduledNotifications
-    pushNotificationService.initialiseScheduledNotifications();
-
     /// seting locator for dependency injection
     setupLocator();
 

@@ -4,7 +4,7 @@ import 'dart:math' as math;
 
 
 Widget userProfilePhoto(BuildContext context, String imageUrl,
-    {double height = 56, double width = 56, BorderRadius? borderRadius}) {
+    {double height = 48, double width = 48, BorderRadius? borderRadius}) {
   return SizedBox(
     width: width,
     height: height,

@@ -28,12 +28,12 @@ class PushNotificationService {
     final hasDiscoverNotificationScheduled = hiveApi.getFromHive(
       HiveApi.appSettingsBoxName,
       AppSettingKeys.hasDiscoverNotificationScheduled,
-      defaultValue: false,
+      defaultValue: true,
     );
     if (hasDiscoverNotificationScheduled) {
       await AwesomeNotifications().createNotification(
           content: NotificationContent(
-              id: id,
+              id: 1234,
               channelKey: NotificationChannelKeys.discoverChannel,
               title: '${Emojis.smile_partying_face} A very happy morning!!',
               body:
@@ -50,7 +50,7 @@ class PushNotificationService {
           ));
       await AwesomeNotifications().createNotification(
           content: NotificationContent(
-              id: id,
+              id: 12345,
               channelKey: NotificationChannelKeys.discoverChannel,
               title: 'Day has been ended...huh!!',
               body:
@@ -65,6 +65,7 @@ class PushNotificationService {
             repeats: true,
             timeZone: localTimeZone,
           ));
+      log.e('Discover Notfications are scheduled');
       hiveApi.saveAndReplace(
         HiveApi.appSettingsBoxName,
         AppSettingKeys.hasDiscoverNotificationScheduled,
@@ -80,16 +81,16 @@ class PushNotificationService {
     final hasSecurityNotificationAllowed = hiveApi.getFromHive(
       HiveApi.appSettingsBoxName,
       AppSettingKeys.hasSecurityNotificationAllowed,
-      defaultValue: false,
+      defaultValue: true,
     );
     if (hasSecurityNotificationAllowed) {
-      await AwesomeNotifications().createNotification(
+      AwesomeNotifications().createNotification(
           content: NotificationContent(
               id: 123456789,
               channelKey: NotificationChannelKeys.securityChannel,
               title: 'Making convo safer.',
               body:
-                  'Don\'t worry we got it. Good to go. More secure than ever.',
+                  'We are running a weekly security check. Nothing to worry about. You can remove these notifications by going into Open App > Settings > Notifications > Turn Off  Security notfications.',
               notificationLayout: NotificationLayout.BigText,
               autoDismissible: true),
           actionButtons: [
@@ -104,25 +105,21 @@ class PushNotificationService {
           // schedule: NotificationInterval(interval: 60, timeZone: localTimeZone, repeats: true),
           schedule: NotificationCalendar(
             weekday: 7,
-            hour: 4,
+            hour: 16,
             minute: 29,
             second: 0,
             millisecond: 0,
             repeats: true,
             timeZone: localTimeZone,
           ));
-      hiveApi.saveAndReplace(
-        HiveApi.appSettingsBoxName,
-        AppSettingKeys.hasSecurityNotificationAllowed,
-        true,
-      );
+      log.e('Security Notfications are scheduled');
     }
   }
 
-  initialiseScheduledNotifications() async {
-    createScheduledDiscoverNotifications();
-    createScheduledSecurityNotifications();
-  }
+  // initialiseScheduledNotifications() async {
+  //   createScheduledDiscoverNotifications();
+  //   createScheduledSecurityNotifications();
+  // }
 
   onForegroundMessage() async {
     await _fcm.getToken();

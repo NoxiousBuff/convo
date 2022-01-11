@@ -6,13 +6,11 @@ import 'package:hint/app/locator.dart';
 import 'package:hint/app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/ui/views/discover/discover_viewmodel.dart';
-import 'package:hint/ui/views/home/home_view.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:hint/ui/views/onboarding/onboarding_view.dart';
+import 'package:hint/ui/views/startup/startup_view.dart';
 
 final CupertinoTabController mainViewTabController =
     CupertinoTabController(initialIndex: 0);
@@ -88,9 +86,7 @@ class _MyAppState extends State<MyApp> {
           home: OfflineBuilder(
             child: const Text(''),
             connectivityBuilder: (context, connection, child) {
-              return FirebaseAuth.instance.currentUser != null
-                  ? const HomeView()
-                  : OnBoardingView();
+              return const StartUpView();
             },
           ),
           routes: appRoutes,

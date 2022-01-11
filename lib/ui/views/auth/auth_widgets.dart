@@ -266,13 +266,13 @@ class CWAuthInterestChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isSelected = userSelectedInterests.contains(label);
+    bool isSelected = model.userSelectedInterests.contains(label);
     return GestureDetector(
       onTap: () {
         if (!isSelected) {
-          userSelectedInterests.add(label);
+          model.userSelectedInterests.add(label);
         } else {
-          userSelectedInterests.remove(label);
+          model.userSelectedInterests.remove(label);
         }
         model.changeInterestLength();
         model.notifyListeners();
