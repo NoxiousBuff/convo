@@ -111,7 +111,7 @@ class DiscoverInterestView extends StatelessWidget {
                 },
               ),
               sliverVerticalSpaceLarge,
-              bottomPadding(context),
+              SliverToBoxAdapter(child: bottomPadding(context)),
             ],
           ),
         ),
