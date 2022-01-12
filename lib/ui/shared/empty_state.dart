@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
@@ -11,6 +12,7 @@ Widget emptyState(
   double upperGap = 0.0,
   double lowerGap = 0.0,
   CWAuthProceedButton? proceedButton,
+  Widget? secondaryButton,
   EdgeInsets? proceedButtonPadding,
 }) {
   return Column(
@@ -36,7 +38,7 @@ Widget emptyState(
         padding: proceedButtonPadding ?? const EdgeInsets.symmetric(horizontal: 20),
         child: proceedButton,
       ),
-      
+      secondaryButton ?? shrinkBox,
       SizedBox(height: lowerGap),
     ],
   );

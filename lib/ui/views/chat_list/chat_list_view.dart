@@ -232,10 +232,12 @@ class ChatListView extends StatelessWidget {
                               'It\'s pretty quiet in here\ndon\'t you think?',
                           description: 'Find friends to begin a\nconversation.',
                           proceedButton: CWAuthProceedButton(
-                              buttonTitle: 'Discover Friends',
-                              onTap: () {
-                                mainViewTabController.index = 2;
-                              })),
+                            buttonTitle: 'Invite Friends Over',
+                            onTap: () => model.invitePeople(),
+                          ),
+                          secondaryButton: TextButton(
+                              onPressed: () => mainViewTabController.index = 2,
+                              child: const Text('Or Discover Friends'))),
                     );
             } else {
               return const SliverToBoxAdapter(
