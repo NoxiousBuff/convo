@@ -38,6 +38,7 @@ class ChangeHashtagsView extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView(
+                physics: const BouncingScrollPhysics(),
                 children: [
                   cwEADetailsTile(context, 'Your HashTags'),
                   Text('Add upto 3 hashtags to describe yourself.',

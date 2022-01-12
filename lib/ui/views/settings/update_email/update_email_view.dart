@@ -38,6 +38,7 @@ class UpdateEmailView extends StatelessWidget {
                       child: Form(
                         key: model.updateEmailFormKey,
                         child: ListView(
+                          physics: const BouncingScrollPhysics(),
                           children: [
                             cwEADetailsTile(context, 'Your Current Email'),
                             Text(

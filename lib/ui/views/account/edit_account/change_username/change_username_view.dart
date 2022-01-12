@@ -58,6 +58,7 @@ class ChangeUserNameView extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ListView(
+                  physics: const BouncingScrollPhysics(),
                   children: [
                     cwEADetailsTile(context, 'Your Current UserName'),
                     Text(

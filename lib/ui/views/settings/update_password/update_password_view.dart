@@ -31,6 +31,7 @@ class UpdatePasswordView extends StatelessWidget {
                   child: Form(
                     key: model.resetPasswordFormKey,
                     child: ListView(
+                      physics: const BouncingScrollPhysics(),
                       children: [
                         verticalSpaceLarge,
                         cwEADetailsTile(context, 'Want to update password ??',

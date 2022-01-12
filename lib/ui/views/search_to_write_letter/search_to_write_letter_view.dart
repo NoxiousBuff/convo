@@ -50,6 +50,7 @@ class SearchToWriteLetterView extends StatelessWidget {
             builder: (context, box, child) {
               final recentSearchList = box.values.toList();
               return ListView.builder(
+                physics: const BouncingScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, i) {
                     final recentSearch = recentSearchList[i];
@@ -127,6 +128,7 @@ class SearchToWriteLetterView extends StatelessWidget {
           final searchResults = snapshot.data!.docs;
           return snapshot.data != null && searchResults.isNotEmpty
               ? ListView.builder(
+                physics: const BouncingScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     var fireUser = FireUser.fromFirestore(searchResults[index]);

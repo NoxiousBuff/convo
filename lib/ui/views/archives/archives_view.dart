@@ -34,6 +34,7 @@ class _ArchiveViewState extends State<ArchiveView> {
 
                 return archivedUsersList.isNotEmpty
                     ? ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, i) {
                           final userUid = archivedUsersList[i];
                           return UserListItem(userUid: userUid, onLongPress: (fireUser) {

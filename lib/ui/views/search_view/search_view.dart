@@ -1,6 +1,8 @@
 import 'package:hint/api/hive.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/empty_state.dart';
+import 'package:hint/ui/views/profile/profile_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hint/services/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/shared/user_item.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -128,7 +129,7 @@ class SearchView extends StatelessWidget {
               final recentSearch = recentSearchList[i];
               return Row(
                 children: [
-                  Expanded(child: UserListItem(userUid: recentSearch)),
+                  Expanded(child: UserListItem(userUid: recentSearch, onTap: (fireUser) => navService.cupertinoPageRoute(context, ProfileView(fireUser: fireUser)))),
                   IconButton(
                     onPressed: () {
                       model.deleteFromRecentSearches(recentSearch);
@@ -177,9 +178,8 @@ class SearchView extends StatelessWidget {
                               fireUser: fireUser,
                               title: fireUser.username,
                               subtitle: fireUser.displayName,
-                              onTap: () async {
-                                chatService.startDuleConversation(
-                                    context, fireUser);
+                              onTap: () {
+                                navService.cupertinoPageRoute(context, ProfileView(fireUser: fireUser));
                                 model.addToRecentSearches(fireUser.id);
                               },
                             );

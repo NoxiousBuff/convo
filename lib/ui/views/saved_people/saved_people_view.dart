@@ -29,6 +29,7 @@ class SavedPeopleView extends StatelessWidget {
             final savedPeopleList = box.values.toList();
             return savedPeopleList.isNotEmpty
                 ? ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.all(0),
                     itemCount: savedPeopleList.length,
                     itemBuilder: (context, i) {
