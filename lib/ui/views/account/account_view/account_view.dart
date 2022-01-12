@@ -82,7 +82,7 @@ class AccountView extends StatelessWidget {
                       ],
                     ),
                     verticalSpaceLarge,
-                    cwAccountBio(context, box.get(FireUserField.bio)),
+                    cwAccountBio(context, box.get(FireUserField.bio, defaultValue: ''), ifMine: true),
                     verticalSpaceLarge,
                     cwAccountInterests(
                         context, box.get(FireUserField.interests)),

@@ -3,8 +3,8 @@ import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/views/account/edit_account/change_bio/change_bio_view.dart';
 
-Widget cwAccountBio(BuildContext context, String? bio) {
-  return bio != null ? Text(
+Widget cwAccountBio(BuildContext context, String bio, {bool ifMine = false}) {
+  return ifMine ? bio != '' ? Text(
     bio,
     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.black),
   ) : InkWell(
@@ -15,5 +15,8 @@ Widget cwAccountBio(BuildContext context, String? bio) {
       'Add Your bio',
       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.black),
     ),
+  ) : Text(
+    bio,
+    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.black),
   );
 }
