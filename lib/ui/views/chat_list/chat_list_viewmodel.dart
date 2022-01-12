@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hint/api/hive.dart';
 import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
@@ -28,8 +29,10 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
   }
 
   void invitePeople() {
+    String username =
+        hiveApi.getUserData(FireUserField.username, defaultValue: '');
     Share.share(
-        'We can chat realtime on Convo. It\'s super immersive. Let\'s do it. Click on the link to the get the app. https://theconvo.in');
+        'I am on Convo as @$username. We can chat realtime and it\'s super immersive. Install the app to connect with me. https://theconvo.in');
   }
 
   @override
