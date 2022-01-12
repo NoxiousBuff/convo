@@ -19,7 +19,7 @@ class PickInterestsView extends StatelessWidget {
       viewModelBuilder: () => PickInterestsViewModel(),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
-        appBar: cwAuthAppBar(context, title: 'Pick few things you like'),
+        appBar: cwAuthAppBar(context, title: 'Pick few things you like', onPressed: () => Navigator.pop(context),),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(

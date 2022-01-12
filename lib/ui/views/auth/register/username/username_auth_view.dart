@@ -26,7 +26,7 @@ class UserNameAuthView extends StatelessWidget {
       viewModelBuilder: () => UserNameAuthViewModel(),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
-        appBar: cwAuthAppBar(context, title: 'Find a username',onPressed: ()=> Navigator.pop(context)),
+        appBar: cwAuthAppBar(context, title: 'Find a username', onPressed: ()=> Navigator.pop(context)),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Form(

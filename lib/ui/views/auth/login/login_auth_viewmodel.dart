@@ -40,22 +40,22 @@ class LoginAuthViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> login(BuildContext context, String email, String password) async {
+  Future<void> login(
+      BuildContext context, String email, String password) async {
     setBusy(true);
     focusNode.unfocus();
     await authService.logIn(
         email: email,
         password: password,
         onComplete: () {
-        hiveApi.saveAndReplace(HiveApi.appSettingsBoxName, AppSettingKeys.hasCompletedAuthentication, true); 
-        pushNotificationService.createScheduledDiscoverNotifications();
-        pushNotificationService.createScheduledSecurityNotifications(); 
-        Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (context) =>  const HomeView()),
-        (route) => false);
-          // return customSnackbars.successSnackbar(context,
-          //     title: 'You have been successfully logged in.');
+          hiveApi.saveAndReplace(HiveApi.appSettingsBoxName,
+              AppSettingKeys.hasCompletedAuthentication, true);
+          pushNotificationService.createScheduledDiscoverNotifications();
+          pushNotificationService.createScheduledSecurityNotifications();
+          Navigator.pushAndRemoveUntil(
+              context,
+              CupertinoPageRoute(builder: (context) => const HomeView()),
+              (route) => false);
         },
         noAccountExists: () {
           return customSnackbars.errorSnackbar(context,
@@ -66,7 +66,8 @@ class LoginAuthViewModel extends BaseViewModel {
               title: 'Email Provided is invalid. Please check again.');
         },
         wrongPassword: () {
-          return customSnackbars.errorSnackbar(context, title: 'Wrong Password');
+          return customSnackbars.errorSnackbar(context,
+              title: 'Wrong Password');
         },
         onError: () {
           return customSnackbars.errorSnackbar(context,

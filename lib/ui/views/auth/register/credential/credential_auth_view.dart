@@ -22,7 +22,7 @@ class CredentialAuthView extends StatelessWidget {
       onModelReady: (model) => model.lookUpGeopoint(context),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
-        appBar: cwAuthAppBar(context, title: 'SignUp'),
+        appBar: cwAuthAppBar(context, title: 'SignUp', onPressed: () => Navigator.pop(context),),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Form(

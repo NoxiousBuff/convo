@@ -137,18 +137,18 @@ class EditAccountView extends StatelessWidget {
                   cwEADetailsTile(context, 'Display Name',
                       subtitle: box.get(FireUserField.displayName,
                           defaultValue: 'Select Your gender'), onTap: () {
-                    navService.cupertinoPageRoute(
+                    navService.materialPageRoute(
                         context, const ChangeDisplayNameView());
                   }),
                   cwEADetailsTile(context, 'UserName',
                       subtitle: box.get(FireUserField.username,
                           defaultValue: 'Select Your gender'), onTap: () {
-                    navService.cupertinoPageRoute(
+                    navService.materialPageRoute(
                         context, const ChangeUserNameView());
                   }),
                   cwEADetailsTile(context, 'Bio', subtitle: 'Update Your Bio',
                       onTap: () {
-                    navService.cupertinoPageRoute(
+                    navService.materialPageRoute(
                         context, const ChangeBioView());
                   }),
                   const Divider(),
@@ -177,19 +177,19 @@ class EditAccountView extends StatelessWidget {
                           subtitle: !isDobNull
                               ? model.formattedBirthDate
                               : 'Pick Your DOB', onTap: () {
-                        navService.cupertinoPageRoute(
+                        navService.materialPageRoute(
                             context, const ChangeDobView());
                       });
                     },
                   ),
                   cwEADetailsTile(context, 'Hashtags',
                       subtitle: 'Find Your HashTags', onTap: () {
-                    navService.cupertinoPageRoute(
+                    navService.materialPageRoute(
                         context, const ChangeHashtagsView());
                   }),
                   cwEADetailsTile(context, 'Interests',
                       subtitle: 'Choose Your Interest', onTap: () {
-                    navService.cupertinoPageRoute(
+                    navService.materialPageRoute(
                         context, const ChangeInterestView());
                   }),
                   const Divider(),

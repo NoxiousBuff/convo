@@ -86,7 +86,7 @@ class ChangeDobView extends StatelessWidget {
                                 ? 'Select Your Date of Birth'
                                 : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the'),
                       ),
-                      InkWell(
+                      model.isDobNull ? shrinkBox : InkWell(
                         onTap: () => model.openEmailClientForChangeDOB(context),
                         child: Text(
                           'support@theconvo.in',
