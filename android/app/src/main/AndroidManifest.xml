@@ -25,9 +25,11 @@
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
-            android:showWhenLocked="true"
+            android:showWhenLocked="false"
             android:turnScreenOn="true"
             android:exported="true">
+            <!-- change the android:showWhenLocked to false to prevent the app -->
+            <!-- to be shown while the phone is locked -->
             <!-- android:screenOrientation added for portrait orientation -->
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
