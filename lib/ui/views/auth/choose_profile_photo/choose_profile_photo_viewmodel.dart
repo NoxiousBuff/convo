@@ -18,6 +18,10 @@ import 'package:hint/app/app_logger.dart';
 class ChooseProfilePhotoViewModel extends BaseViewModel {
   final log = getLogger('ChooseProfilePhotoViewModel');
 
+  final bool shouldNavigateToHomeView;
+
+  ChooseProfilePhotoViewModel(this.shouldNavigateToHomeView);
+
   final firestoreApi = locator<FirestoreApi>();
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -97,11 +101,11 @@ class ChooseProfilePhotoViewModel extends BaseViewModel {
         .then((instance) {
       hiveApi.updateUserData(propertyName, value);
       customSnackbars.successSnackbar(context,
-          title: 'Succeesfully Saved !!');
-      Navigator.pushAndRemoveUntil(
+          title: 'Profile Photo Updated');
+      shouldNavigateToHomeView ? Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const HomeView()),
-            (route) => false);
+            (route) => false) : Navigator.pop(context);
     });
     if(useSetBusy) setBusy(false);
   }

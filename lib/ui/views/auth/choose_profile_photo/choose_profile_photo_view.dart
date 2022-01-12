@@ -8,9 +8,10 @@ import 'package:stacked/stacked.dart';
 import 'choose_profile_photo_viewmodel.dart';
 
 class ChooseProfilePhotoView extends StatelessWidget {
-  const ChooseProfilePhotoView({Key? key}) : super(key: key);
+  const ChooseProfilePhotoView({Key? key, this.shouldNavigateToHomeView = true}) : super(key: key);
 
   static const String id = '/ChooseProfilePhotoView';
+  final bool shouldNavigateToHomeView;
 
   Widget userProfileImageSelector(
     BuildContext context,
@@ -33,7 +34,7 @@ class ChooseProfilePhotoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChooseProfilePhotoViewModel>.reactive(
-      viewModelBuilder: () => ChooseProfilePhotoViewModel(),
+      viewModelBuilder: () => ChooseProfilePhotoViewModel(shouldNavigateToHomeView),
       builder: (context, model, child) => Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,

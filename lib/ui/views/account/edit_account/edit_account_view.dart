@@ -11,6 +11,7 @@ import 'package:hint/ui/views/account/edit_account/widgets/change_gender_modal.d
 import 'package:hint/ui/views/account/edit_account/widgets/change_relationship_status_model.dart';
 import 'package:hint/ui/views/account/edit_account/widgets/widgets.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/auth/choose_profile_photo/choose_profile_photo_view.dart';
 import 'package:hive/hive.dart';
 import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
@@ -74,7 +75,14 @@ class EditAccountView extends StatelessWidget {
                                 ],
                               ),
                               cwEADetailsTile(context, 'New Profile Photo',
-                                  onTap: () => model.pickImage(context)),
+                                  // onTap: () => model.pickImage(context),
+                                  onTap: () {
+                                Navigator.pop(context);
+                                navService.materialPageRoute(
+                                    context,
+                                    const ChooseProfilePhotoView(
+                                        shouldNavigateToHomeView: false));
+                              }),
                               cwEADetailsTile(
                                 context,
                                 'Cancel',
