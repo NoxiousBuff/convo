@@ -77,8 +77,7 @@ class WriteLetterView extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          userProfilePhoto(
-                            context,
+                          UserProfilePhoto(
                             fireUser.photoUrl,
                             height: 28,
                             width: 28,

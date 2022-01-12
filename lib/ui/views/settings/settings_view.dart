@@ -109,7 +109,7 @@ class SettingsView extends StatelessWidget {
             },  icon: FeatherIcons.externalLink ),
             cwEADetailsTile(context, 'Send Suggestions',
                 subtitle: 'Report any bug and feature you would want to see.', onTap: () {
-              model.openEmailClient();
+              model.openEmailClient(context);
             }, icon: FeatherIcons.externalLink ),
           ],
         ),

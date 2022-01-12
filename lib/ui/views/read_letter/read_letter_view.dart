@@ -48,8 +48,7 @@ class ReadLetterView extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      userProfilePhoto(
-                            context,
+                      UserProfilePhoto(
                             letter.photoUrl,
                             height: 28,
                             width: 28,

@@ -2,23 +2,66 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+class UserProfilePhoto extends StatelessWidget {
+  const UserProfilePhoto(
+    this.imageUrl, {
+    Key? key,
+    this.height = 48,
+    this.width = 48,
+    this.borderRadius,
+  }) : super(key: key);
 
-Widget userProfilePhoto(BuildContext context, String imageUrl,
-    {double height = 48, double width = 48, BorderRadius? borderRadius}) {
-  return SizedBox(
-    width: width,
-    height: height,
-    child: ClipRRect(
-      borderRadius: borderRadius ?? BorderRadius.circular(20),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => const Smiley(),
-        errorWidget: (context, url, error) => const Smiley(),
-        // imageBuilder: (context, imageProvider) => const Smiley(),
+  final String imageUrl;
+  final double height;
+  final double width;
+  final BorderRadius? borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ClipRRect(
+        borderRadius: borderRadius ?? BorderRadius.circular(20),
+        child: _photoDecider(imageUrl),
       ),
-    ),
-  );
+    );
+  }
+}
+
+Widget _photoDecider(String imageUrl) {
+  switch (imageUrl) {
+    case 'assets/default1.png':
+      return Image.asset(
+        'assets/default1.png',
+        fit: BoxFit.cover,
+      );
+    case 'assets/default2.png':
+      return Image.asset(
+        'assets/default2.png',
+        fit: BoxFit.cover,
+      );
+    case 'assets/default3.png':
+      return Image.asset(
+        'assets/default3.png',
+        fit: BoxFit.cover,
+      );
+    case 'assets/default4.png':
+      return Image.asset(
+        'assets/default4.png',
+        fit: BoxFit.cover,
+      );
+    default:
+      {
+        return CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const Smiley(),
+          errorWidget: (context, url, error) => const Smiley(),
+          // imageBuilder: (context, imageProvider) => const Smiley(),
+        );
+      }
+  }
 }
 
 class Smiley extends StatelessWidget {

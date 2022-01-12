@@ -35,7 +35,7 @@ class DiscoverView extends StatelessWidget {
         style: TextStyle(
             fontWeight: FontWeight.w700,
             color: Theme.of(context).colorScheme.black,
-            fontSize: 32),
+            fontSize: 28),
       ),
       actions: [
         IconButton(
@@ -103,7 +103,6 @@ class DiscoverView extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         body: RefreshIndicator(
           key: model.discoverRefreshKey,
-          strokeWidth: 1,
           onRefresh: () async {
             model.onRefresh();
           },

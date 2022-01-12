@@ -38,7 +38,7 @@ class UserItem extends StatelessWidget {
         ),
       ),
       trailing: trailing ?? const SizedBox.shrink(),
-      leading: userProfilePhoto(context, fireUser.photoUrl),
+      leading: UserProfilePhoto( fireUser.photoUrl),
       title: Padding(
         padding: const EdgeInsets.only(bottom: 5.0),
         child: Text(

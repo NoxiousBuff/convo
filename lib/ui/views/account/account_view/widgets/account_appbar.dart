@@ -18,7 +18,7 @@ AppBar cwAccountAppBar(BuildContext context, String title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style:  TextStyle(
-              fontSize: 32,
+              fontSize: 28,
               color: Theme.of(context).colorScheme.black,
               fontWeight: FontWeight.w700,
             ),

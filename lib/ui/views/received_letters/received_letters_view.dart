@@ -84,8 +84,7 @@ class ReceivedLettersView extends StatelessWidget {
                                               .colorScheme
                                               .mediumBlack),
                                     ),
-                                    leading: userProfilePhoto(
-                                      context,
+                                    leading: UserProfilePhoto(
                                       letter.photoUrl,
                                       width: 40,
                                       height: 40,

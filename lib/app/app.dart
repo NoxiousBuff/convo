@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/pods/settings_pod.dart';
 import 'package:hint/ui/views/discover/discover_viewmodel.dart';
-import 'package:flutter_offline/flutter_offline.dart';
 import 'package:hint/ui/views/startup/startup_view.dart';
 
 final CupertinoTabController mainViewTabController =
@@ -83,12 +82,7 @@ class _MyAppState extends State<MyApp> {
               ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white),
           darkTheme: ThemeData.dark()
               .copyWith(scaffoldBackgroundColor: const Color(0xff121212)),
-          home: OfflineBuilder(
-            child: const Text(''),
-            connectivityBuilder: (context, connection, child) {
-              return const StartUpView();
-            },
-          ),
+          home: const StartUpView(),
           routes: appRoutes,
         );
       },

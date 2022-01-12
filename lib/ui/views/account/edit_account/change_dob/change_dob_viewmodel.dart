@@ -8,6 +8,7 @@ import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChangeDobViewModel extends BaseViewModel {
   final log = getLogger('ChangeDobViewModel');
@@ -72,6 +73,12 @@ final firestoreApi = locator<FirestoreApi>();
     });
     setBusy(false);
     Navigator.of(context, rootNavigator: false).pop();
+  }
+
+  Future<void> openEmailClientForChangeDOB(BuildContext context) async {
+    String username = hiveApi.getUserData(FireUserField.username, defaultValue: '');
+    final url = 'mailto:support@theconvo.in?subject=Change%20my%20birth%20date&body=Add%20your%20content%20here%0A%0A%0A%0AThanks,%0A$username';
+    if (! await launch(url)) customSnackbars.errorSnackbar(context, title: 'Error in opening email client.');
   }
 
 }

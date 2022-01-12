@@ -39,7 +39,7 @@ class _ExploreWebViewState extends State<ExploreWebView> {
               width: 0,
               color: CupertinoColors.inactiveGray,
             )),
-        backgroundColor: Theme.of(context).colorScheme.lightGrey,
+        backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         middle: Text(widget.pixabayPhotoUrl, style: TextStyle(color: Theme.of(context).colorScheme.mediumBlack, fontWeight: FontWeight.w400,),),
       ),
       body: Column(

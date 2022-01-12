@@ -137,8 +137,7 @@ class ChatListView extends StatelessWidget {
                                 context, fireUser),
                             child: Column(
                               children: [
-                                userProfilePhoto(
-                                  context,
+                                UserProfilePhoto(
                                   fireUser.photoUrl,
                                   height: screenWidthPercentage(context,
                                       percentage: 0.25),

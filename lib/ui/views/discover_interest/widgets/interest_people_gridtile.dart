@@ -44,8 +44,7 @@ Widget interestedPeopleGridTile(BuildContext context, FireUser fireUser) {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            userProfilePhoto(
-              context,
+            UserProfilePhoto(
               fireUser.photoUrl,
               height: screenWidthPercentage(context, percentage: 0.2),
               width: screenWidthPercentage(context, percentage: 0.2),

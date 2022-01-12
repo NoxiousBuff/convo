@@ -53,16 +53,16 @@ class ForgotPasswordAuthView extends StatelessWidget {
                       autofocus: true,
                       autofillHints: const [AutofillHints.email],
                       style:  TextStyle(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).colorScheme.black),
                       showCursor: true,
                       cursorColor: Theme.of(context).colorScheme.blue,
-                      cursorHeight: 32,
+                      cursorHeight: 28,
                       decoration: const InputDecoration(
                         hintText: 'Email Address',
                         hintStyle: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.w700),
+                            fontSize: 24, fontWeight: FontWeight.w700),
                         contentPadding: EdgeInsets.all(0),
                         border: OutlineInputBorder(
                             borderSide: BorderSide.none, gapPadding: 0.0),

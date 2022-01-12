@@ -37,57 +37,6 @@ AppBar cwAuthAppBar(BuildContext context,
   );
 }
 
-// Widget cwAuthProceedButton(BuildContext context,
-//     {required String buttonTitle,
-//     void Function()? onTap,
-//     bool isLoading = false,
-//     bool isActive = true}) {
-//   return GestureDetector(
-//     onTap: isActive
-//         ? isLoading
-//             ? null
-//             : onTap
-//         : null,
-//     child: Material(
-//       elevation: 8,
-//       borderRadius: BorderRadius.circular(16),
-//       shadowColor: isActive
-//           ? Theme.of(context).colorScheme.blue.withAlpha(100)
-//           : Colors.transparent,
-//       child: Container(
-//         height: 48,
-//         width: screenWidth(context),
-//         alignment: Alignment.center,
-//         child: isLoading
-//             ? SizedBox(
-//                 height: 17,
-//                 width: 17,
-//                 child: CircularProgressIndicator(
-//                   strokeWidth: 1.5,
-//                   valueColor: AlwaysStoppedAnimation<Color>(
-//                       Theme.of(context).colorScheme.white),
-//                 ),
-//               )
-//             : Text(
-//                 buttonTitle,
-//                 style: TextStyle(
-//                   fontSize: 18,
-//                   fontWeight: FontWeight.w700,
-//                   color: isActive
-//                       ? Theme.of(context).colorScheme.white
-//                       : Theme.of(context).colorScheme.mediumBlack,
-//                 ),
-//               ),
-//         decoration: BoxDecoration(
-//             color: isActive
-//                 ? Theme.of(context).colorScheme.blue
-//                 : Theme.of(context).colorScheme.lightGrey,
-//             borderRadius: BorderRadius.circular(16)),
-//       ),
-//     ),
-//   );
-// }
-
 class CWAuthProceedButton extends StatelessWidget {
   const CWAuthProceedButton({
     Key? key,
@@ -173,7 +122,7 @@ Widget cwAuthHeadingTitle(BuildContext context, {required String title}) {
   return Text(
     title,
     textAlign: TextAlign.start,
-    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w700),
+    style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w700),
   );
 }
 

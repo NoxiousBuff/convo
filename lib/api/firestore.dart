@@ -76,11 +76,11 @@ class FirestoreApi {
   }) async {
     try {
       await subsCollection.doc(user.uid).set({
-        FireUserField.bio: 'Hey I am using dule',
+        FireUserField.bio: '',
         FireUserField.country: '',
         FireUserField.countryPhoneCode: '',
         FireUserField.email: user.email,
-        FireUserField.hashTags: ['#Dule User'],
+        FireUserField.hashTags: ['#friendly', '#new', '#available'],
         FireUserField.id: user.uid,
         FireUserField.interests: [],
         FireUserField.phone: '',
@@ -94,7 +94,7 @@ class FirestoreApi {
         FireUserField.dob: null,
         FireUserField.tokens: FieldValue.arrayUnion([]),
       });
-      saveUserDataInHive(FireUserField.bio, 'Hey I am using dule');
+      saveUserDataInHive(FireUserField.bio, '');
       saveUserDataInHive(FireUserField.country, '');
       saveUserDataInHive(FireUserField.countryPhoneCode, '');
       saveUserDataInHive(FireUserField.email, user.email);

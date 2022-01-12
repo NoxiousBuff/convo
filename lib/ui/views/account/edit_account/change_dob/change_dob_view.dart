@@ -76,11 +76,29 @@ class ChangeDobView extends StatelessWidget {
                   verticalSpaceRegular,
                   const Divider(),
                   verticalSpaceRegular,
-                  cwEADescriptionTitle(
-                      context,
-                      model.isDobNull
-                          ? 'Select Your Date of Birth'
-                          : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the support@theconvo.in'),
+                  Wrap(
+                  
+                    children: [
+                      Flexible(
+                        child: cwEADescriptionTitle(
+                            context,
+                            model.isDobNull
+                                ? 'Select Your Date of Birth'
+                                : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the'),
+                      ),
+                      InkWell(
+                        onTap: () => model.openEmailClientForChangeDOB(context),
+                        child: Text(
+                          'support@theconvo.in',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.blue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                   verticalSpaceLarge,
                   model.isDobNull
                       ? SizedBox(

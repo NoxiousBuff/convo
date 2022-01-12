@@ -13,8 +13,7 @@ Widget cwAccountHeader(BuildContext context, String? photoUrl,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (photoUrl != null)
-            userProfilePhoto(
-              context,
+            UserProfilePhoto(
               photoUrl,
               height: 84,
               width: 84,

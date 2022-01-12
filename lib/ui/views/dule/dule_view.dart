@@ -144,7 +144,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           InkWell(
             onTap: () => navService.materialPageRoute(
                 context, ProfileView(fireUser: widget.fireUser)),
-            child: userProfilePhoto(context, widget.fireUser.photoUrl,
+            child: UserProfilePhoto( widget.fireUser.photoUrl,
                 height: 40, width: 40, borderRadius: BorderRadius.circular(16)),
           ),
         ],

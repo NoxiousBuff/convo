@@ -83,6 +83,8 @@ class _AccountState extends State<UserAccountView> {
                           titleColor: Colors.red,
                           subtitle:
                               'If you want to delete your account, please email us at support@theconvo.in',
+                          onTap: () =>
+                              model.openEmailClienForAccountdDeletion(context),
                         ),
                       ],
                     ),

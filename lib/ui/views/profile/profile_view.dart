@@ -1,4 +1,3 @@
-import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
@@ -15,8 +14,6 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-
 import 'profile_viewmodel.dart';
 
 class ProfileView extends StatelessWidget {
@@ -35,19 +32,7 @@ class ProfileView extends StatelessWidget {
         builder: (context, model, child) {
           return Scaffold(
             backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
-            appBar: cwAccountAppBar(
-              context,
-              fireUser.username,
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(FeatherIcons.moreVertical),
-                  color:Theme.of(context).colorScheme.black,
-                  iconSize: 24,
-                ),
-                horizontalSpaceSmall
-              ],
-            ),
+            appBar: cwAccountAppBar(context, fireUser.username),
             body: ListView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -57,7 +42,7 @@ class ProfileView extends StatelessWidget {
                   context,
                   fireUser.photoUrl,
                   fireUser.displayName,
-                  FireUserField.romanticStatus,
+                  fireUser.romanticStatus,
                   fireUser.hashTags,
                 ),
                 verticalSpaceLarge,

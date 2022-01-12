@@ -89,40 +89,13 @@ class EditAccountView extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   children: [
-                        //     model.isBusy
-                        //         ? const SizedBox(
-                        //             height: 104,
-                        //             width: 104,
-                        //             child: CupertinoActivityIndicator())
-                        //         : userProfilePhoto(
-                        //             context,
-                        //             profileKey,
-                        //             height: 104,
-                        //             width: 104,
-                        //             borderRadius: BorderRadius.circular(38),
-                        //           ),
-                        //   ],
-                        // ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Stack(
                               alignment: Alignment.center,
                               children: [
-                                // ClipRRect(
-                                //   borderRadius: BorderRadius.circular(38),
-                                //   child: CachedNetworkImage(
-                                //     imageUrl: profileKey,
-                                //     height: 104,
-                                //     width: 104,
-                                //     fit: BoxFit.cover,
-                                //   ),
-                                // ),
-                                userProfilePhoto(
-                                  context,
+                                UserProfilePhoto(
                                   profileKey,
                                   height: 104,
                                   width: 104,

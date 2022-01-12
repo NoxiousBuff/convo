@@ -6,7 +6,7 @@ import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 import 'package:hint/services/push_notification_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/views/home/home_view.dart';
+import 'package:hint/ui/views/auth/choose_profile_photo/choose_profile_photo_view.dart';
 import 'package:hint/ui/views/welcome/welcome_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
@@ -45,7 +45,7 @@ class PickInterestsViewModel extends BaseViewModel {
         log.wtf('User Selected Interest : $userSelectedInterests');
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
+            MaterialPageRoute(builder: (context) => const ChooseProfilePhotoView()),
             (route) => false);
       }).onError((error, stackTrace) {
         setBusy(false);
