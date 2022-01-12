@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/letter_model.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
@@ -31,9 +32,7 @@ class SendLettersView extends StatelessWidget {
                   'Something bad happened. Please Try again later.');
             }
             if (!model.dataReady) {
-              return const CircularProgressIndicator.adaptive(
-                strokeWidth: 2,
-              );
+              return const Center(child: CircularProgress());
             }
             final data = model.data;
             if (data != null) {
@@ -112,7 +111,11 @@ class SendLettersView extends StatelessWidget {
                       description:
                           'You haven\'t sent any letters. \nWe think you need to socialize more.');
             } else {
-              return emptyState(context, emoji: '🙏', heading: 'That\'s not supposed\nto happen.', description: 'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
+              return emptyState(context,
+                  emoji: '🙏',
+                  heading: 'That\'s not supposed\nto happen.',
+                  description:
+                      'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
             }
           },
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/letter_model.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
@@ -31,10 +32,7 @@ class ReceivedLettersView extends StatelessWidget {
                   'Something bad happened. Please Try again later.');
             }
             if (!model.dataReady) {
-              return const Center(
-                  child: CircularProgressIndicator.adaptive(
-                strokeWidth: 2,
-              ));
+              return const Center(child: CircularProgress());
             }
             final data = model.data;
             if (data != null) {
@@ -109,9 +107,14 @@ class ReceivedLettersView extends StatelessWidget {
                     )
                   : emptyState(context,
                       heading: 'A little bit \ntoo clean.',
-                      description: 'Ask your friends to drop\nletters for you to read later.');
+                      description:
+                          'Ask your friends to drop\nletters for you to read later.');
             } else {
-              return emptyState(context, emoji: '🙏', heading: 'That\'s not supposed\nto happen.', description: 'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
+              return emptyState(context,
+                  emoji: '🙏',
+                  heading: 'That\'s not supposed\nto happen.',
+                  description:
+                      'Something bad happened on our side.\nWe will be in connect with you after sometime.\nThank you for your patience.');
             }
           },
         ),
