@@ -56,6 +56,7 @@ class ChangeDobView extends StatelessWidget {
             valueListenable: hiveApi.hiveStream(HiveApi.userDataHiveBox),
             builder: (context, box, child) {
               return ListView(
+                physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
                   cwEADetailsTile(
@@ -76,27 +77,22 @@ class ChangeDobView extends StatelessWidget {
                   verticalSpaceRegular,
                   const Divider(),
                   verticalSpaceRegular,
-                  Wrap(
-                  
+                  verticalSpaceRegular,
+                  Row(
                     children: [
-                      Flexible(
+                      Expanded(
                         child: cwEADescriptionTitle(
                             context,
                             model.isDobNull
                                 ? 'Select Your Date of Birth'
-                                : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the'),
+                                : 'You have already set your date of birth. You cannot change it now. For any queries about this, write us at the support@dule.org.'),
                       ),
-                      model.isDobNull ? shrinkBox : InkWell(
-                        onTap: () => model.openEmailClientForChangeDOB(context),
-                        child: Text(
-                          'support@theconvo.in',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).colorScheme.blue,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
+                      model.isDobNull
+                          ? shrinkBox : IconButton(
+                              onPressed: () =>
+                                  model.openEmailClientForChangeDOB(context),
+                              icon: const Icon(FeatherIcons.externalLink))
+                          ,
                     ],
                   ),
                   verticalSpaceLarge,
@@ -124,10 +120,10 @@ class ChangeDobView extends StatelessWidget {
                             ),
                           ),
                         )
-                      : const SizedBox.shrink(),
+                      :  shrinkBox,
                   model.isDobNull
                       ? verticalSpaceSmall
-                      : const SizedBox.shrink(),
+                      :  shrinkBox,
                   model.isDobNull
                       ? CWAuthProceedButton(
                           buttonTitle: 'Save',
@@ -165,7 +161,7 @@ class ChangeDobView extends StatelessWidget {
                           isLoading: model.isBusy,
                           isActive: model.isEdited,
                         )
-                      : const SizedBox.shrink(),
+                      :  shrinkBox,
                 ],
               );
             },
