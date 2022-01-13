@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/hive.dart';
@@ -31,8 +32,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-  DatabaseReference _databaseReference() =>
-      FirebaseDatabase.instance.ref('dules/$uid/${DatabaseMessageField.online}');
+  final _ref = FirebaseDatabase.instance
+      .ref('dules/${AuthService.liveUser!.uid}/${DatabaseMessageField.online}');
 
   Future<void> savingUserToken() async {
     final _token = await _fcm.getToken();
@@ -46,67 +47,70 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     });
   }
 
+  void goOffline() async {
+    FirebaseDatabase.instance.goOffline().then((value) {
+      OnDisconnect onDisconnect = _ref.onDisconnect();
+      onDisconnect
+          .set(false)
+          .then((value) => log.wtf('Finally gone offline'))
+          .catchError((e) => log.e('Getting Error:$e'));
+    });
+  }
+
+  void goOnline() async {
+    FirebaseDatabase.instance.goOnline().then((value) {
+      _ref.set(true).then((value) => log.wtf('User is online now!!'));
+    }).catchError((e) {
+      log.e('goOnlineError:$e');
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     savingUserToken();
-    final ref = _databaseReference();
-    ref.set(true);
+    goOnline();
     WidgetsBinding.instance!.addObserver(this);
-  }
-
-  Future<void> goOffline() async {
-    try {
-      await FirebaseDatabase.instance
-          .goOffline()
-          .whenComplete(() => log.wtf('Database Go Offline'));
-      DatabaseReference ref = _databaseReference();
-      OnDisconnect onDisconnect = ref.onDisconnect();
-      onDisconnect.set(false);
-    } catch (e) {
-      log.e('goOffline Error:$e');
-    }
-  }
-
-  Future<void> goOnline() async {
-    try {
-      await FirebaseDatabase.instance
-          .goOnline()
-          .whenComplete(() => log.wtf('Database Go Online'));
-      DatabaseReference ref = _databaseReference();
-      ref.set(true);
-    } catch (e) {
-      log.e('go online Error:$e');
-    }
   }
 
   @override
   didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      log.v('App Is In Foreground');
+
       goOnline();
     } else {
+      log.v('App Is In Background');
+
       goOffline();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (BuildContext context, ref, Widget? child) {
-        final pageControllerProvider = ref.watch(pageControllerPod);
-        return PageView(
-          controller: mainViewPageController,
-          scrollBehavior: const MaterialScrollBehavior(
-              androidOverscrollIndicator: AndroidOverscrollIndicator.stretch),
-          physics: pageControllerProvider.currentIndex != 0
-              ? const NeverScrollableScrollPhysics()
-              : const ClampingScrollPhysics(),
-          children: const [
-            MainView(),
-            LettersView(),
-          ],
-        );
-      },
-    );
+    return OfflineBuilder(
+        child: const Text('data'),
+        connectivityBuilder: (context, connection, child) {
+          bool connected = connection != ConnectivityResult.none;
+          connected ? goOnline() : goOffline();
+          return Consumer(
+            builder: (BuildContext context, ref, Widget? child) {
+              final pageControllerProvider = ref.watch(pageControllerPod);
+              return PageView(
+                controller: mainViewPageController,
+                scrollBehavior: const MaterialScrollBehavior(
+                    androidOverscrollIndicator:
+                        AndroidOverscrollIndicator.stretch),
+                physics: pageControllerProvider.currentIndex != 0
+                    ? const NeverScrollableScrollPhysics()
+                    : const ClampingScrollPhysics(),
+                children: const [
+                  MainView(),
+                  LettersView(),
+                ],
+              );
+            },
+          );
+        });
   }
 }
