@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
@@ -12,7 +11,6 @@ import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/views/auth/register/displayname/displayname_auth_view.dart';
 import 'package:stacked/stacked.dart';
-import 'package:http/http.dart' as http;
 
 class CredentialAuthViewModel extends BaseViewModel {
   final log = getLogger('CredentialAuthViewModel');
@@ -32,11 +30,11 @@ class CredentialAuthViewModel extends BaseViewModel {
 
   final firestoreApi = locator<FirestoreApi>();
 
-  String _countryName = '';
-  String get countryName => _countryName;
+  // String _countryName = '';
+  // String get countryName => _countryName;
 
-  String _countryCode = '';
-  String get countryCode => _countryCode;
+  // String _countryCode = '';
+  // String get countryCode => _countryCode;
 
   void updateEmailEmpty() {
     emailEmpty = emailTech.text.isEmpty;
@@ -155,20 +153,20 @@ class CredentialAuthViewModel extends BaseViewModel {
     });
   }
 
-  Future<void> lookUpGeopoint(BuildContext context) async {
-    final response =
-        await http.get(Uri.parse('https://api.ipregistry.co?key=tryout'));
-    if (response.statusCode == 200) {
-      _countryName =
-          jsonDecode(response.body)['location']['country']['name'].toString();
-      _countryCode = jsonDecode(response.body)['location']['country']
-              ['calling_code']
-          .toString();
-      notifyListeners();
-    } else {
-      customSnackbars.infoSnackbar(context, title: 'Turn On Your Internet');
-    }
-  }
+  // Future<void> lookUpGeopoint(BuildContext context) async {
+  //   final response =
+  //       await http.get(Uri.parse('https://api.ipregistry.co?key=tryout'));
+  //   if (response.statusCode == 200) {
+  //     _countryName =
+  //         jsonDecode(response.body)['location']['country']['name'].toString();
+  //     _countryCode = jsonDecode(response.body)['location']['country']
+  //             ['calling_code']
+  //         .toString();
+  //     notifyListeners();
+  //   } else {
+  //     customSnackbars.infoSnackbar(context, title: 'Turn On Your Internet');
+  //   }
+  // }
 
   @override
   void dispose() {

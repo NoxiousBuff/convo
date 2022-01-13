@@ -19,7 +19,6 @@ class CredentialAuthView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<CredentialAuthViewModel>.reactive(
       viewModelBuilder: () => CredentialAuthViewModel(),
-      onModelReady: (model) => model.lookUpGeopoint(context),
       builder: (context, model, child) => Scaffold(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         appBar: cwAuthAppBar(context, title: 'SignUp', onPressed: () => Navigator.pop(context),),
