@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -10,6 +12,7 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/pixabay_image_model.dart';
 import 'package:hint/models/pixabay_api_response.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 List<PixabayImageModel> parsePhotos(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<String, dynamic>();
@@ -31,6 +34,7 @@ class ExploreViewModel extends BaseViewModel {
   static const _key = pixaBayApiKey; // PixabayApiKey
 
   final List<PixabayImageModel> _fetchedImages = [];
+
   List<PixabayImageModel> get fetchedImages => _fetchedImages;
 
   static const hiveKey = FireUserField.interests;
@@ -123,5 +127,9 @@ class ExploreViewModel extends BaseViewModel {
     } else {
       throw Exception('Failed to load album');
     }
+  }
+
+  void launchURLInBrowser(BuildContext context, String url) async {
+    if (! await launch(url)) customSnackbars.errorSnackbar(context, title: 'Error in opening url "https://pixabay.com".');
   }
 }

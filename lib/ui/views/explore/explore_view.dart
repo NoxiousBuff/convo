@@ -10,7 +10,6 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/search_view/search_view.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/ui/views/explore/widgets/explore_web_view.dart';
 
 class ExploreView extends StatefulWidget {
   const ExploreView({Key? key}) : super(key: key);
@@ -322,11 +321,7 @@ class _ExploreViewState extends State<ExploreView>
                                 children: [
                                   if (index == 0)
                                     GestureDetector(
-                                      onTap: () => navService.materialPageRoute(
-                                          context,
-                                          const ExploreWebView(
-                                              pixabayPhotoUrl:
-                                                  'https://pixabay.com')),
+                                      onTap: () => model.launchURLInBrowser(context, 'https://pixabay.com'),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15),
