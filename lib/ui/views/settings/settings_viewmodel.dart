@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
+import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:share_plus/share_plus.dart';
@@ -10,11 +11,13 @@ import 'package:url_launcher/url_launcher.dart';
 class SettingsViewModel extends BaseViewModel {
   final log = getLogger('SettingsViewModel');
 
+  
+
   void invitePeople() {
     String username =
         hiveApi.getUserData(FireUserField.username, defaultValue: '');
     Share.share(
-        'I am on Convo as @$username. We can chat realtime and it\'s super immersive. Install the app to connect with me. https://theconvo.in');
+        'I am on Convo as @$username. We can chat realtime and it\'s super immersive. Install the app to connect with me. \n$appPLayStoreUrl');
   }
 
   Future<void> openEmailClient(BuildContext context) async {

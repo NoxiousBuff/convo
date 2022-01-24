@@ -2,7 +2,8 @@
 
 
 /// name of the [app]
-const String appName = 'Dule';
+const String appName = 'Convo';
+const String appPLayStoreUrl = 'https://play.google.com/store/apps/details?id=com.noxiousbuff.hint';
 
 
 ///cloud firestore keys

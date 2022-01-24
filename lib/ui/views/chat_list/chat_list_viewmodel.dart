@@ -32,7 +32,7 @@ class ChatListViewModel extends StreamViewModel<QuerySnapshot> {
     String username =
         hiveApi.getUserData(FireUserField.username, defaultValue: '');
     Share.share(
-        'I am on Convo as @$username. We can chat realtime and it\'s super immersive. Install the app to connect with me. https://theconvo.in');
+        'I am on Convo as @$username. We can chat realtime and it\'s super immersive. Install the app to connect with me. \n$appPLayStoreUrl');
   }
 
   @override

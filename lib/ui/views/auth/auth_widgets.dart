@@ -105,12 +105,17 @@ Widget cwAuthCheckingTile(BuildContext context,
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Checkbox(
-        activeColor: Theme.of(context).colorScheme.blueAccent.withAlpha(50),
-        checkColor: Theme.of(context).colorScheme.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        value: value,
-        onChanged: (value) {},
+      SizedBox(
+        height: 24.0,
+        width: 24.0,
+        child: Checkbox(
+          activeColor: Theme.of(context).colorScheme.blueAccent.withAlpha(50),
+          checkColor: Theme.of(context).colorScheme.blue,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          value: value,
+          onChanged: (value) {},
+        ),
       ),
       horizontalDefaultMessageSpace,
       Text(title),
