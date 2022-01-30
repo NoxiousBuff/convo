@@ -64,7 +64,7 @@ Future<void> showTileOptions(FireUser fireUser, context, bool pinned) async {
                       .bodyText2!
                       .copyWith(fontSize: 18)),
             ),
-            ListTile(
+            pinned ? shrinkBox : ListTile(
               onTap: () {
                 chatService.addToArchive(fireUser.id);
                 hiveApi.addToArchivedUsers(fireUser.id);
@@ -101,7 +101,7 @@ Future<void> showTileOptions(FireUser fireUser, context, bool pinned) async {
                       .bodyText2!
                       .copyWith(fontSize: 18)),
             ),
-            pinned ? ListTile(
+            pinned ? shrinkBox : ListTile(
               onTap: () {
                 Navigator.pop(context);
                 showDialog(
@@ -131,7 +131,7 @@ Future<void> showTileOptions(FireUser fireUser, context, bool pinned) async {
                       .textTheme
                       .bodyText2!
                       .copyWith(fontSize: 18)),
-            ) : shrinkBox,
+            ),
             verticalSpaceMedium,
             bottomPadding(context),
           ],
