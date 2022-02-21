@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/app/app_logger.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/constants/message_string.dart';
 import 'package:extended_image/extended_image.dart';

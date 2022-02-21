@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 
 //todo active message colour was Color.fromRGBO(100,132,255,1) and inactive colour was Colors.grey.shade700

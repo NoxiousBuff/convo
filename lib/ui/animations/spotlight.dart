@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_background/animated_background.dart';

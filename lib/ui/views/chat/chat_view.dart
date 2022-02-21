@@ -3,7 +3,6 @@ import 'chat_messages.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/models/user_model.dart';

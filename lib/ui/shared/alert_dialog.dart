@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 
 class BasicDialogContent extends StatelessWidget {

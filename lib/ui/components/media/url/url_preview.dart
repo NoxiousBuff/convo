@@ -1,5 +1,4 @@
 import 'package:hint/api/hive_helper.dart';
-import 'package:hive/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';

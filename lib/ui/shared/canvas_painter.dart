@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/widgets.dart' hide Image;
 
 /// A very simple widget that supports drawing using touch.
 class Painter extends StatefulWidget {

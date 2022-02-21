@@ -1,6 +1,5 @@
 import 'chat_bubble_type.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 class ChatBubbleClipper extends CustomClipper<Path> {
   final BubbleType? type;

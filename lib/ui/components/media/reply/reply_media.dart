@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_colors.dart';
 import 'package:hint/api/hive_helper.dart';
 import 'package:hint/models/user_model.dart';

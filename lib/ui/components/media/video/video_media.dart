@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:hint/api/hive_helper.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_widget.dart';
 import 'package:hint/app/app_colors.dart';
