@@ -110,3 +110,21 @@ class NotificationChannelGroupKeys {
 }
 
 class DefaultUserAccountValues {}
+
+class DocumentField {
+  static const String isRead = 'isRead';
+  static const String isReply = 'isReply';
+  static const String message = 'message';
+  static const String messageUid = 'messageUid';
+  static const String replyMessage = 'replyMessage';
+  static const String senderUid = 'senderUid';
+  static const String timestamp = 'timestamp';
+  static const String type = 'type';
+}
+
+class MessageField {
+  static const String messageText = 'messageText';
+  static const String mediaUrl = 'mediaUrl';
+  static const String mediaList = 'mediaList';
+  static const String mediaType = 'mediaType';
+}

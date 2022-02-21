@@ -160,6 +160,7 @@ class FirestoreApi {
     } else {
       log.wtf('User cannot be empty. Please fill it correctly.');
     }
+    return null;
   }
 
   Future<void> changeUserName(String userName) async {

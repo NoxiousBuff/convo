@@ -15,6 +15,7 @@ const String subsFirestoreKey = 'subs';
 const String lettersFirestoreKey = 'letters';
 const String receivedLettersFirestoreKey = 'receivedLetters';
 const String sentLettersFirestoreKey = 'sentLetters';
+const String conversationFirestorekey = 'conversations';
 
 
 /// realtime database keys

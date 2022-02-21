@@ -8,7 +8,9 @@ import 'package:hint/constants/app_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/views/chat/chat_view.dart';
 import 'package:hint/ui/views/dule/dule_view.dart';
+import 'package:uuid/uuid.dart';
 
 import 'database_service.dart';
 import 'nav_service.dart';
@@ -29,18 +31,35 @@ class ChatService {
   static final CollectionReference subsCollection =
       _firestore.collection(subsFirestoreKey);
 
+  static final CollectionReference _conversationCollection =
+      _firestore.collection(conversationFirestorekey);
+
   Future<void> updateRoomId(FireUser fireUser) async {
-    String value = chatService.getConversationId(fireUser.id, liveUserUid);
+    String conversationId = getConversationId(fireUser.id, liveUserUid);
+    Map<String, dynamic> chatRoomMap = {
+      'chatRoomId': conversationId,
+      'nearMe': false,
+      'liveUserUid': liveUserUid,
+      'receiverUid': fireUser.id,
+    };
+
+    createChatRoom(conversationId, chatRoomMap);
     await databaseService.updateUserDataWithKey(
-        DatabaseMessageField.roomUid, value);
+        DatabaseMessageField.roomUid, conversationId);
   }
 
   startDuleConversation(
     BuildContext context,
     FireUser fireUser,
   ) {
-    navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
+    // navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
+    String conversationId = getConversationId(fireUser.id, liveUserUid);
+    navService.cupertinoPageRoute(context, ChatView(fireUser: fireUser, conversationId: conversationId));
     updateRoomId(fireUser);
+  }
+
+  createChatRoom(String chatRoomId, chatRoomMap) {
+    _conversationCollection.doc(chatRoomId).set(chatRoomMap);
   }
 
   getConversationId(String a, String b) {
@@ -51,6 +70,39 @@ class ChatService {
       // ignore: unnecessary_string_escapes
       return '$a\_$b';
     }
+  }
+
+  addNewMessage({
+    required String receiverUid,
+    required String type,
+    bool isReply = false,
+    bool isRead = false,
+    String? messageText,
+    String? mediaUrl,
+    List<String?>? mediaType,
+    List<String?>? mediaList,
+  }) {
+    String conversationId = getConversationId(receiverUid, liveUserUid);
+    String messageUid = const Uuid().v1();
+    final Map messageMap = {};
+    final Map replyMessageMap = {};
+    if (messageText != null) messageMap[MessageField.messageText] = messageText;
+    if (mediaUrl != null) messageMap[MessageField.mediaUrl] = mediaUrl;
+    if (mediaList != null) messageMap[MessageField.mediaList] = mediaList;
+    if (mediaType != null) messageMap[MessageField.mediaType] = mediaType;
+    _conversationCollection
+        .doc(conversationId)
+        .collection(chatsFirestoreKey)
+        .add({
+      DocumentField.isRead: isRead,
+      DocumentField.isReply: isReply,
+      DocumentField.message: messageMap,
+      DocumentField.messageUid: messageUid,
+      DocumentField.replyMessage: replyMessageMap,
+      DocumentField.senderUid: liveUserUid,
+      DocumentField.timestamp: Timestamp.now(),
+      DocumentField.type: type,
+    });
   }
 
   /// Archive the user

@@ -11,6 +11,7 @@ import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/chat/chat_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,7 @@ class ChatListView extends StatelessWidget {
               color: Colors.transparent,
               child: IconButton(
                 color: Theme.of(context).colorScheme.black,
+                iconSize: 24,
                 icon: const Icon(FeatherIcons.userPlus),
                 onPressed: () {
                   model.invitePeople();
@@ -67,6 +69,7 @@ class ChatListView extends StatelessWidget {
                           color: Colors.transparent,
                           child: IconButton(
                             color: Theme.of(context).colorScheme.black,
+                            iconSize: 24,
                             icon: const Icon(FeatherIcons.folder),
                             onPressed: () {
                               navService.cupertinoPageRoute(
@@ -80,6 +83,7 @@ class ChatListView extends StatelessWidget {
               child: IconButton(
                 color: Theme.of(context).colorScheme.black,
                 icon: const Icon(FeatherIcons.send),
+                iconSize: 24,
                 onPressed: () {
                   mainViewPageController.animateToPage(
                     1,
@@ -208,6 +212,10 @@ class ChatListView extends StatelessWidget {
                                 ? archived || pinned
                                     ? const SizedBox.shrink()
                                     : UserListItem(
+                                        onTap: (fireUser) {
+                                          chatService.startDuleConversation(context, fireUser);
+                                          
+                                        },
                                         // contentPadding: const EdgeInsets.all(0),
                                         userUid: userUid,
                                         onLongPress: (fireUser) {
