@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/views/chat/chat_view.dart';
-import 'package:hint/ui/views/dule/dule_view.dart';
 import 'package:uuid/uuid.dart';
 
 import 'database_service.dart';

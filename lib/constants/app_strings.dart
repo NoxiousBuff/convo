@@ -1,14 +1,14 @@
 /// This is the class that keep track of all the fields used in the app
 
 class MediaType {
-  static const String url = 'URL';
-  static const String text = 'text';
-  static const String meme = 'meme';
-  static const String image = 'image';
-  static const String video = 'video';
-  static const String emoji = 'emoji';
-  static const String canvasImage = 'canvasImage';
-  static const String pixaBayImage = 'pixaBayImage';
+  static const String url = 'Url';
+  static const String text = 'Text';
+  static const String image = 'Image';
+  static const String video = 'Video';
+  //static const String meme = 'meme';
+  //static const String emoji = 'emoji';
+  //static const String canvasImage = 'canvasImage';
+  //static const String pixaBayImage = 'pixaBayImage';
 }
 
 class FireUserField {
@@ -84,8 +84,10 @@ class AppSettingKeys {
   static const String isLetterAllowed = 'isLetterAllowed';
   static const String isDiscoverAllowed = 'isDiscoverAllowed';
   static const String isSecurityAllowed = 'isSecurityAllowed';
-  static const String hasDiscoverNotificationScheduled = 'hasDiscoverNotificationScheduled';
-  static const String hasSecurityNotificationAllowed = 'hasSecurityNotificationAllowed';
+  static const String hasDiscoverNotificationScheduled =
+      'hasDiscoverNotificationScheduled';
+  static const String hasSecurityNotificationAllowed =
+      'hasSecurityNotificationAllowed';
   static const String hasCompletedAuthentication = 'hasCompletedAuthentication';
 }
 

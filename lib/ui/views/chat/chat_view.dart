@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,9 +13,10 @@ import 'package:hint/services/nav_service.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:hint/ui/views/chat/message_bubble/message_bubble_view.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:stacked/stacked.dart';
-
+import 'package:gmo_media_picker/media_picker.dart';
 import 'chat_viewmodel.dart';
 
 class ChatView extends StatelessWidget {
@@ -32,41 +34,43 @@ class ChatView extends StatelessWidget {
     return ViewModelBuilder<ChatViewModel>.reactive(
       viewModelBuilder: () =>
           ChatViewModel(fireUser: fireUser, conversationId: conversationId),
-      builder: (context, model, child) => Scaffold(
-        appBar: AppBar(
-          leading: Icon(FeatherIcons.arrowLeft,
-              color: Theme.of(context).colorScheme.mediumBlack),
-          titleSpacing: 0.0,
-          elevation: 0.0,
-          backgroundColor: Theme.of(context).colorScheme.lightGrey,
-          title: Row(
-            children: [
-              UserProfilePhoto(
-                fireUser.photoUrl,
-                height: 36,
-                width: 36,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              horizontalSpaceSmall,
-              Text(
-                fireUser.displayName,
-                style: TextStyle(color: Theme.of(context).colorScheme.black),
-              ),
-            ],
+      builder: (context, model, child) {
+        return Scaffold(
+          appBar: AppBar(
+            leading: Icon(FeatherIcons.arrowLeft,
+                color: Theme.of(context).colorScheme.mediumBlack),
+            titleSpacing: 0.0,
+            elevation: 0.0,
+            backgroundColor: Theme.of(context).colorScheme.lightGrey,
+            title: Row(
+              children: [
+                UserProfilePhoto(
+                  fireUser.photoUrl,
+                  height: 36,
+                  width: 36,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                horizontalSpaceSmall,
+                Text(
+                  fireUser.displayName,
+                  style: TextStyle(color: Theme.of(context).colorScheme.black),
+                ),
+              ],
+            ),
           ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            children: [
-              chatList(context, model),
-              chatTextField(context, model),
-              _buildBottomOptions(context, model),
-              bottomPadding(context),
-            ],
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              children: [
+                chatList(context, model),
+                chatTextField(context, model),
+                _buildBottomOptions(context, model),
+                bottomPadding(context),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -129,7 +133,16 @@ class ChatView extends StatelessWidget {
           iconSize: 32,
         ),
         IconButton(
-          onPressed: () => {},
+          onPressed: () => GmoMediaPicker.picker(
+            context,
+            isMulti: true,
+            mulCallback: (List<AssetEntity> assets) async {
+              await Future.wait(assets.map((asset) async {
+                final file = await asset.file;
+                await model.uploadFile(file!.path, asset);
+              }));
+            },
+          ),
           icon: const Icon(FeatherIcons.image),
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
@@ -207,87 +220,59 @@ class ChatView extends StatelessWidget {
 
   chatList(BuildContext context, ChatViewModel model) {
     return Expanded(
-        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: model.getUserchat,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text('There is some error. Please try again later.'),
-          );
-        }
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CupertinoActivityIndicator(),
-          );
-        }
-        final messages = snapshot.data!.docs;
-        return CustomScrollView(
-          scrollBehavior: const CupertinoScrollBehavior(),
-          reverse: true,
-          slivers: [
-            recieverMsgBubble(context, model),
-            messages.isEmpty
-                ? model.messageText.isNotEmpty
-                    ? const SliverToBoxAdapter(child: shrinkBox)
-                    : SliverToBoxAdapter(
-                        child: emptyState(
-                          context,
-                          heading: 'No messages here',
-                          emoji: '🙌',
-                          description: 'Break the norm and\nstart the convo',
-                        ),
-                      )
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final message = Message.fromFirestore(messages[index]);
-                        bool fromReceiver = message.senderUid == fireUser.id;
-                        return Row(
-                          mainAxisAlignment: fromReceiver
-                              ? MainAxisAlignment.start
-                              : MainAxisAlignment.end,
-                          children: [
-                            Flexible(
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 2),
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.85,
-                                    minWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.1),
-                                // alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                    color: fromReceiver
-                                        ? Theme.of(context).colorScheme.grey
-                                        : Theme.of(context).colorScheme.blue,
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Text(
-                                  message.message[MessageField.messageText],
-                                  style: TextStyle(
-                                    color: fromReceiver
-                                        ? Theme.of(context).colorScheme.black
-                                        : Theme.of(context).colorScheme.white,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      childCount: messages.length,
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: model.getUserchat,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text('There is some error. Please try again later.'),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CupertinoActivityIndicator(),
+            );
+          }
+          final messages = snapshot.data!.docs;
+          return CustomScrollView(
+            scrollBehavior: const CupertinoScrollBehavior(),
+            reverse: true,
+            slivers: [
+              recieverMsgBubble(context, model),
+              messages.isEmpty
+                  ? model.messageText.isNotEmpty
+                      ? const SliverToBoxAdapter(child: shrinkBox)
+                      : SliverToBoxAdapter(
+                          child: emptyState(
+                            context,
+                            heading: 'No messages here',
+                            emoji: '🙌',
+                            description: 'Break the norm and\nstart the convo',
+                          ),
+                        )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final message =
+                              Message.fromFirestore(messages[index]);
+                          bool fromReceiver = message.senderUid == fireUser.id;
+                          return Align(
+                            alignment: fromReceiver
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
+                            child: MessageBubble(
+                                message: message, fromReceiver: fromReceiver),
+                          );
+                        },
+                        childCount: messages.length,
+                      ),
                     ),
-                  ),
-            sliverVerticalSpaceLarge,
-          ],
-        );
-      },
-    ));
+              sliverVerticalSpaceLarge,
+            ],
+          );
+        },
+      ),
+    );
   }
 
   chatTextField(BuildContext context, ChatViewModel model) {
@@ -316,9 +301,12 @@ class ChatView extends StatelessWidget {
                           : Theme.of(context).colorScheme.lightGrey,
                       borderRadius: BorderRadius.circular(32)),
                   child: CupertinoTextField.borderless(
-                    suffix: GestureDetector(child:  const Icon(FeatherIcons.send), onTap: () {
-                      model.addMessage();
-                    },),
+                    suffix: GestureDetector(
+                      child: const Icon(FeatherIcons.send),
+                      onTap: () {
+                        model.addMessage();
+                      },
+                    ),
                     suffixMode: OverlayVisibilityMode.editing,
                     controller: model.messageTech,
                     style: TextStyle(

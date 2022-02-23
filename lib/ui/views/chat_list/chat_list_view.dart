@@ -11,7 +11,7 @@ import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/chat/chat_view.dart';
+import 'package:hint/ui/views/reels_testing/reels_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -37,10 +37,14 @@ class ChatListView extends StatelessWidget {
         automaticallyImplyLeading: false,
         leading: Material(
           color: Colors.transparent,
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: Image.asset('assets/appicon_mdpi_gradient.png'),
+          child: InkWell(
+            onTap: () =>
+                navService.materialPageRoute(context, const ReelsView()),
+            child: SizedBox(
+              height: 30,
+              width: 30,
+              child: Image.asset('assets/appicon_mdpi_gradient.png'),
+            ),
           ),
         ),
         trailing: Row(
@@ -213,8 +217,8 @@ class ChatListView extends StatelessWidget {
                                     ? const SizedBox.shrink()
                                     : UserListItem(
                                         onTap: (fireUser) {
-                                          chatService.startDuleConversation(context, fireUser);
-                                          
+                                          chatService.startDuleConversation(
+                                              context, fireUser);
                                         },
                                         // contentPadding: const EdgeInsets.all(0),
                                         userUid: userUid,

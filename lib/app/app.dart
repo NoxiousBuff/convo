@@ -78,11 +78,11 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           title: 'Convo',
           themeMode: settingsPod.appTheme,
-          theme: ThemeData.light().copyWith(
-              scaffoldBackgroundColor: Colors.white, useMaterial3: true),
+          theme:
+              ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white),
           darkTheme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: const Color(0xff121212),
-              useMaterial3: true),
+            scaffoldBackgroundColor: const Color(0xff121212),
+          ),
           home: const StartUpView(),
           routes: appRoutes,
         );
