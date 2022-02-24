@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +18,24 @@ import 'package:stacked/stacked.dart';
 import 'package:gmo_media_picker/media_picker.dart';
 import 'chat_viewmodel.dart';
 
+// FlutterUploader _uploader = FlutterUploader();
+
+// void backgroundHandler() {
+//   // Needed so that plugin communication works.
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   // This uploader instance works within the isolate only.
+//   FlutterUploader uploader = FlutterUploader();
+
+//   // You have now access to:
+//   uploader.progress.listen((progress) {
+//     // upload progress
+//   });
+//   uploader.result.listen((result) {
+//     // upload results
+//   });
+// }
+
 class ChatView extends StatelessWidget {
   const ChatView(
       {Key? key, required this.fireUser, required this.conversationId})
@@ -37,8 +54,11 @@ class ChatView extends StatelessWidget {
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
-            leading: Icon(FeatherIcons.arrowLeft,
-                color: Theme.of(context).colorScheme.mediumBlack),
+            leading: InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Icon(FeatherIcons.arrowLeft,
+                  color: Theme.of(context).colorScheme.mediumBlack),
+            ),
             titleSpacing: 0.0,
             elevation: 0.0,
             backgroundColor: Theme.of(context).colorScheme.lightGrey,
@@ -139,8 +159,27 @@ class ChatView extends StatelessWidget {
             mulCallback: (List<AssetEntity> assets) async {
               await Future.wait(assets.map((asset) async {
                 final file = await asset.file;
-                await model.uploadFile(file!.path, asset);
+                String firebasePath = model.filenameGenrator(asset);
+                int index = assets.indexOf(asset);
+                double fileSize = file!.lengthSync().toDouble();
+
+                model.log.w('Index:$index');
+                model.log.w('FileSize:$fileSize');
+                
+                model.updateTotalFileSize(fileSize);
+                model.log.wtf('TotalFileSize:${model.totalSize}');
+                return model.uploadFile(file.path, firebasePath);
               }));
+              // final files = await Future.wait(assets.map((asset) async {
+              //   final file = await asset.file;
+              //   return file!;
+              // }));
+              // model.flutterUploader(files);
+              // _uploader.progress.listen((progress) {
+              //   final _progress = progress.progress;
+              //   final taskId = progress.taskId;
+              //   getLogger('ChatView|$taskId').w(_progress);
+              // });
             },
           ),
           icon: const Icon(FeatherIcons.image),
@@ -218,6 +257,38 @@ class ChatView extends StatelessWidget {
     ));
   }
 
+  Widget uploadingFileIndicator(BuildContext context, ChatViewModel model) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            width: screenWidthPercentage(context, percentage: 0.6),
+            color: Theme.of(context).colorScheme.darkGrey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  model.fileTitle,
+                  style: TextStyle(
+                      fontSize: 18, color: Theme.of(context).colorScheme.black),
+                ),
+                LinearProgressIndicator(
+                  value: model.fileProgress,
+                  valueColor: AlwaysStoppedAnimation(
+                      Theme.of(context).colorScheme.blue),
+                )
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   chatList(BuildContext context, ChatViewModel model) {
     return Expanded(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -238,6 +309,7 @@ class ChatView extends StatelessWidget {
             scrollBehavior: const CupertinoScrollBehavior(),
             reverse: true,
             slivers: [
+              SliverToBoxAdapter(child: uploadingFileIndicator(context, model)),
               recieverMsgBubble(context, model),
               messages.isEmpty
                   ? model.messageText.isNotEmpty

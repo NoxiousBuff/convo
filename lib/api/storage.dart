@@ -36,10 +36,16 @@ class StorageApi {
         .ref(firestorePath)
         .putFile(File(filePath));
     try {
+      task.snapshotEvents.listen((snapshot) {
+        final progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+        log.v(progress);
+      });
+
       // Storage tasks function as a Delegating Future so we can await them.
-      firebase_storage.TaskSnapshot snapshot = await task;
-      log.wtf(snapshot.bytesTransferred / snapshot.totalBytes);
+      //firebase_storage.TaskSnapshot snapshot = await task;
+      //log.wtf(snapshot.bytesTransferred / snapshot.totalBytes);
       //print('Uploaded ${snapshot.bytesTransferred} bytes.');
+
     } on firebase_core.FirebaseException catch (e) {
       // The final snapshot is also available on the task via `.snapshot`,
       // this can include 2 additional states, `TaskState.error` & `TaskState.canceled`
