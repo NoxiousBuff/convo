@@ -57,6 +57,7 @@ dependencies:
 
   #functional
   hive: ^2.0.4
+  dio: ^4.0.4
   logger: ^1.0.0
   device_info: ^2.0.2
   hive_flutter: ^1.0.0

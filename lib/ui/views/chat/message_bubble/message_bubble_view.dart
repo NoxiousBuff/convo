@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hint/ui/views/chat/chat_media/image_media.dart';
 import 'package:hint/ui/views/chat/chat_media/text_media.dart';
 import 'package:intl/intl.dart';
 
@@ -34,7 +35,10 @@ class MessageBubble extends StatelessWidget {
       switch (message.type) {
         case MediaType.text:
           return TextMedia(fromReceiver: fromReceiver, message: message);
-
+        case MediaType.image:
+          return ImageMedia(
+              imageURL: message.message[MessageField.mediaUrl],
+              messageUid: message.messageUid);
         default:
           return shrinkBox;
       }

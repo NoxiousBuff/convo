@@ -7,11 +7,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 final hiveApi = HiveApi();
 
 class HiveApi {
-
-  ///// abstraction of logger for providing logs in 
+  ///// abstraction of logger for providing logs in
   /// the console for this particular class
   final log = getLogger('HiveApi');
-
 
   static const String userContacts = 'userContacts';
   static const String appSettingsBoxName = 'appSettings';
@@ -22,7 +20,7 @@ class HiveApi {
   static const String pinnedUsersHiveBox = 'pinnedUsers';
   static const String archivedUsersHiveBox = 'archiveUsers';
   static const String deviceInfoHiveBox = 'deviceInfo';
-
+  static const String imagesMediaHiveBox = 'imagesMediaHiveBox';
 
   Future<void> initialiseHive() async {
     await Hive.openBox(deviceInfoHiveBox);
@@ -34,11 +32,12 @@ class HiveApi {
     await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(savedPeopleHiveBox);
     await Hive.openBox(recentSearchesHiveBox);
+    await Hive.openBox(imagesMediaHiveBox);
   }
 
   Future<void> saveDeviceInfoInHive() async {
     final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-    if(Platform.isAndroid) {
+    if (Platform.isAndroid) {
       final build = await _deviceInfoPlugin.androidInfo;
       final deviceVersion = build.version.sdkInt;
       save(deviceInfoHiveBox, 'version', deviceVersion);
@@ -49,10 +48,7 @@ class HiveApi {
     return Hive.box(hiveBoxName).listenable();
   }
 
-  dynamic getFromHive(
-    String hiveBoxName,
-    String key, {dynamic defaultValue}
-  ) {
+  dynamic getFromHive(String hiveBoxName, String key, {dynamic defaultValue}) {
     try {
       return Hive.box(hiveBoxName).get(key, defaultValue: defaultValue);
     } catch (e) {
@@ -67,8 +63,7 @@ class HiveApi {
     log.wtf('Succesfully Replace In Hive');
   }
 
-  Future<void> save(
-      String hiveBoxName, dynamic key, dynamic value) async {
+  Future<void> save(String hiveBoxName, dynamic key, dynamic value) async {
     try {
       bool doesBoxExist = await Hive.boxExists(hiveBoxName);
       bool isBoxOpen = Hive.isBoxOpen(hiveBoxName);
@@ -106,7 +101,7 @@ class HiveApi {
             'The value for the key in hiveBox:$hiveBoxName has not been deleted. Error : $error'));
   }
 
-  dynamic getUserData(String key,{ dynamic defaultValue}) {
+  dynamic getUserData(String key, {dynamic defaultValue}) {
     try {
       return Hive.box(userDataHiveBox).get(key, defaultValue: defaultValue);
     } catch (e) {

@@ -1,10 +1,10 @@
 /// This is the class that keep track of all the fields used in the app
 
 class MediaType {
-  static const String url = 'Url';
-  static const String text = 'Text';
-  static const String image = 'Image';
-  static const String video = 'Video';
+  static const String url = 'url';
+  static const String text = 'text';
+  static const String image = 'image';
+  static const String video = 'video';
   //static const String meme = 'meme';
   //static const String emoji = 'emoji';
   //static const String canvasImage = 'canvasImage';

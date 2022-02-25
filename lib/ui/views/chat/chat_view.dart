@@ -157,29 +157,8 @@ class ChatView extends StatelessWidget {
             context,
             isMulti: true,
             mulCallback: (List<AssetEntity> assets) async {
-              await Future.wait(assets.map((asset) async {
-                final file = await asset.file;
-                String firebasePath = model.filenameGenrator(asset);
-                int index = assets.indexOf(asset);
-                double fileSize = file!.lengthSync().toDouble();
-
-                model.log.w('Index:$index');
-                model.log.w('FileSize:$fileSize');
-                
-                model.updateTotalFileSize(fileSize);
-                model.log.wtf('TotalFileSize:${model.totalSize}');
-                return model.uploadFile(file.path, firebasePath);
-              }));
-              // final files = await Future.wait(assets.map((asset) async {
-              //   final file = await asset.file;
-              //   return file!;
-              // }));
-              // model.flutterUploader(files);
-              // _uploader.progress.listen((progress) {
-              //   final _progress = progress.progress;
-              //   final taskId = progress.taskId;
-              //   getLogger('ChatView|$taskId').w(_progress);
-              // });
+              await Future.wait(
+                  assets.map((asset) => model.uploadAndAddToDatabase(asset)));
             },
           ),
           icon: const Icon(FeatherIcons.image),

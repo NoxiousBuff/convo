@@ -36,16 +36,20 @@ class ChatViewModel extends BaseViewModel {
   String _uploadingFileTitle = '';
   String get fileTitle => _uploadingFileTitle;
 
-  double _totalSize = 0.0;
-  double get totalSize => _totalSize;
-
-  double _uploadedSize = 0.0;
-  double get uploadedSize => _uploadedSize;
+  // ignore: prefer_final_fields
+  List<String> _selectedMediaList = [];
+  List<String> get selectedMediaList => _selectedMediaList;
 
   void changeTitle(String title) {
     _uploadingFileTitle = title;
     notifyListeners();
   }
+
+  /// add into media list
+  void addToMediaList(String url) => _selectedMediaList.add(url);
+
+  /// clear the media list
+  void clearTheList() => _selectedMediaList.clear();
 
   /// Reset the current progress of file after uploading
   void updateProgress(double? value) {
@@ -53,19 +57,9 @@ class ChatViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  /// Total Size Of the selected medias
-  void updateTotalFileSize(double size) {
-    _totalSize = (_totalSize + size).toDouble();
-    notifyListeners();
-  }
-
-  void updateUploadedSize(double size) {
-    _uploadedSize = _uploadedSize + _uploadingFileProgress!;
-    notifyListeners();
-  }
-
   /// upload media into firebase storage and get progress
-  Future<String> uploadFile(String filePath, String firestorePath) async {
+  Future<String> uploadFile(
+      String filePath, String firestorePath, String mediaType) async {
     firebase_storage.UploadTask task = firebase_storage.FirebaseStorage.instance
         .ref(firestorePath)
         .putFile(File(filePath));
@@ -92,17 +86,16 @@ class ChatViewModel extends BaseViewModel {
       if (e.code == 'permission-denied') {
         log.e('User does not have permission to upload to this reference.');
       }
-      // ...
-
     }
     await task;
     String downloadURL = await _storage.ref(firestorePath).getDownloadURL();
-    updateProgress(null);
+    addMediaMessage(mediaType, downloadURL);
     return downloadURL;
   }
 
-  /// Genrate File Name For Firebase Storage Bucket
-  String filenameGenrator(AssetEntity asset) {
+  /// Genrate File Name For Firebase Storage Bucket 
+  /// and upload to firebase storage and add to firestore
+  Future<String> uploadAndAddToDatabase(AssetEntity asset) async {
     final now = DateTime.now();
     final year = now.year;
     final month = now.month;
@@ -124,7 +117,9 @@ class ChatViewModel extends BaseViewModel {
     log.v('MimeType:$mimeType | FileExtension:$fileExtension');
     log.v('FirebaseStoragePath:$storagePath');
 
-    return firebasePath;
+    File? file = await asset.file;
+
+    return uploadFile(file!.path, firebasePath, mimeType);
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> get getUserchat =>
@@ -155,8 +150,15 @@ class ChatViewModel extends BaseViewModel {
     messageTech.clear();
     updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
     chatService.addNewMessage(
-        receiverUid: fireUser.id, type: 'Text', messageText: _messageText);
+        receiverUid: fireUser.id,
+        type: MediaType.text,
+        messageText: _messageText);
     updateMessageText('');
+  }
+
+  void addMediaMessage(String mediaType, String mediaUrl) {
+    chatService.addNewMessage(
+        receiverUid: fireUser.id, type: mediaType, mediaUrl: mediaUrl);
   }
 
   final TextEditingController messageTech = TextEditingController();
