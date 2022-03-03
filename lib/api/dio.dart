@@ -14,7 +14,7 @@ class DioApi {
         .download(mediaUrl, savePath, deleteOnError: true,
             onReceiveProgress: (downloaded, total) {
           final progress = ((downloaded / total) * 100).toInt();
-          print('Downloading Media Progress $progress');
+          log.wtf('Downloading Media Progress $progress');
         })
         .then((value) => getLogger('DioApi').i(
             'The file with mediaUrl : $mediaUrl has been successfully downloaded at savePath : $savePath.'))

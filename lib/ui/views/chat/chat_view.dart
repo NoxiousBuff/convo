@@ -9,6 +9,7 @@ import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
@@ -36,7 +37,7 @@ import 'chat_viewmodel.dart';
 //   });
 // }
 
-class ChatView extends StatelessWidget {
+class ChatView extends StatefulWidget {
   const ChatView(
       {Key? key, required this.fireUser, required this.conversationId})
       : super(key: key);
@@ -47,10 +48,15 @@ class ChatView extends StatelessWidget {
   final String conversationId;
 
   @override
+  State<ChatView> createState() => _ChatViewState();
+}
+
+class _ChatViewState extends State<ChatView> {
+  @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatViewModel>.reactive(
-      viewModelBuilder: () =>
-          ChatViewModel(fireUser: fireUser, conversationId: conversationId),
+      viewModelBuilder: () => ChatViewModel(
+          fireUser: widget.fireUser, conversationId: widget.conversationId),
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -65,14 +71,14 @@ class ChatView extends StatelessWidget {
             title: Row(
               children: [
                 UserProfilePhoto(
-                  fireUser.photoUrl,
+                  widget.fireUser.photoUrl,
                   height: 36,
                   width: 36,
                   borderRadius: BorderRadius.circular(15),
                 ),
                 horizontalSpaceSmall,
                 Text(
-                  fireUser.displayName,
+                  widget.fireUser.displayName,
                   style: TextStyle(color: Theme.of(context).colorScheme.black),
                 ),
               ],
@@ -157,8 +163,24 @@ class ChatView extends StatelessWidget {
             context,
             isMulti: true,
             mulCallback: (List<AssetEntity> assets) async {
-              await Future.wait(
-                  assets.map((asset) => model.uploadAndAddToDatabase(asset)));
+              if (await model.pickedMediaLength(assets) < 8) {
+                await Future.wait(
+                    assets.map((asset) => model.uploadAndAddToDatabase(asset)));
+              } else {
+                customSnackbars.infoSnackbar(context, title: 'Maximum size must be less than 8 MB');
+              }
+
+              //final mediaList = model.selectedMediaList;
+              // await Future.wait(
+              //   mediaList.map(
+              //     (media) {
+              //       return model
+              //           .addMediaMessage(media['MediaType'], media['URL'])
+              //           .then((value) =>
+              //               model.log.wtf('successfully added to firestore'));
+              //     },
+              //   ),
+              // );
             },
           ),
           icon: const Icon(FeatherIcons.image),
@@ -167,7 +189,7 @@ class ChatView extends StatelessWidget {
         ),
         IconButton(
           onPressed: () => navService.materialPageRoute(
-              context, WriteLetterView(fireUser: fireUser)),
+              context, WriteLetterView(fireUser: widget.fireUser)),
           icon: const Icon(FeatherIcons.send),
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
@@ -186,54 +208,56 @@ class ChatView extends StatelessWidget {
 
   recieverMsgBubble(BuildContext contex, ChatViewModel model) {
     return SliverToBoxAdapter(
-        child: StreamBuilder<DatabaseEvent>(
-      stream: model.realtimeDBDocument,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return shrinkBox;
-        }
-        if (!snapshot.hasData) {
-          return shrinkBox;
-        } else {
-          final data = snapshot.data;
+      child: StreamBuilder<DatabaseEvent>(
+        stream: model.realtimeDBDocument,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return shrinkBox;
+          }
+          if (!snapshot.hasData) {
+            return shrinkBox;
+          } else {
+            final data = snapshot.data;
 
-          if (data != null) {
-            final json = data.snapshot.value;
-            final DuleModel duleModel = DuleModel.fromJson(json);
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                duleModel.msgTxt.isEmpty
-                    ? shrinkBox
-                    : Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.yellowAccent,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Text(
-                            duleModel.msgTxt,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.black,
-                              fontSize: 18,
+            if (data != null) {
+              final json = data.snapshot.value;
+              final DuleModel duleModel = DuleModel.fromJson(json);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  duleModel.msgTxt.isEmpty
+                      ? shrinkBox
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).colorScheme.yellowAccent,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Text(
+                              duleModel.msgTxt,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.black,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                SizedBox(
-                  width: screenWidthPercentage(context, percentage: 0.1),
-                ),
-              ],
-            );
-          } else {
-            return shrinkBox;
+                  SizedBox(
+                    width: screenWidthPercentage(context, percentage: 0.1),
+                  ),
+                ],
+              );
+            } else {
+              return shrinkBox;
+            }
           }
-        }
-      },
-    ));
+        },
+      ),
+    );
   }
 
   Widget uploadingFileIndicator(BuildContext context, ChatViewModel model) {
@@ -288,7 +312,7 @@ class ChatView extends StatelessWidget {
             scrollBehavior: const CupertinoScrollBehavior(),
             reverse: true,
             slivers: [
-              SliverToBoxAdapter(child: uploadingFileIndicator(context, model)),
+              // SliverToBoxAdapter(child: uploadingFileIndicator(context, model)),
               recieverMsgBubble(context, model),
               messages.isEmpty
                   ? model.messageText.isNotEmpty
@@ -306,7 +330,8 @@ class ChatView extends StatelessWidget {
                         (context, index) {
                           final message =
                               Message.fromFirestore(messages[index]);
-                          bool fromReceiver = message.senderUid == fireUser.id;
+                          bool fromReceiver =
+                              message.senderUid == widget.fireUser.id;
                           return Align(
                             alignment: fromReceiver
                                 ? Alignment.centerLeft

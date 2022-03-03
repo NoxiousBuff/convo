@@ -130,3 +130,8 @@ class MessageField {
   static const String mediaList = 'mediaList';
   static const String mediaType = 'mediaType';
 }
+
+class VideoThumbnailField {
+  static const videoThumbnailPath = 'videoThumbnailPath';
+  static const localVideoPath = 'localVideoPath';
+}

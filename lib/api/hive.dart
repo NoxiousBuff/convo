@@ -20,7 +20,7 @@ class HiveApi {
   static const String pinnedUsersHiveBox = 'pinnedUsers';
   static const String archivedUsersHiveBox = 'archiveUsers';
   static const String deviceInfoHiveBox = 'deviceInfo';
-  static const String imagesMediaHiveBox = 'imagesMediaHiveBox';
+  static const String mediaHiveBox = 'mediaHiveBox';
 
   Future<void> initialiseHive() async {
     await Hive.openBox(deviceInfoHiveBox);
@@ -32,7 +32,7 @@ class HiveApi {
     await Hive.openBox(recentChatsHiveBox);
     await Hive.openBox(savedPeopleHiveBox);
     await Hive.openBox(recentSearchesHiveBox);
-    await Hive.openBox(imagesMediaHiveBox);
+    await Hive.openBox(mediaHiveBox);
   }
 
   Future<void> saveDeviceInfoInHive() async {

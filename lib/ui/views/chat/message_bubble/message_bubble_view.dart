@@ -4,6 +4,7 @@ import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/views/chat/chat_media/image_media.dart';
 import 'package:hint/ui/views/chat/chat_media/text_media.dart';
+import 'package:hint/ui/views/chat/chat_media/videothumbnail_widget.dart';
 import 'package:intl/intl.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -39,6 +40,12 @@ class MessageBubble extends StatelessWidget {
           return ImageMedia(
               imageURL: message.message[MessageField.mediaUrl],
               messageUid: message.messageUid);
+        case MediaType.video:
+          {
+            return VideoThumbnailWidget(
+                imageURL: message.message[MessageField.mediaUrl],
+                messageUid: message.messageUid);
+          }
         default:
           return shrinkBox;
       }

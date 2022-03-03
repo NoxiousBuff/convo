@@ -53,7 +53,8 @@ class ChatService {
   ) {
     // navService.cupertinoPageRoute(context, DuleView(fireUser: fireUser));
     String conversationId = getConversationId(fireUser.id, liveUserUid);
-    navService.cupertinoPageRoute(context, ChatView(fireUser: fireUser, conversationId: conversationId));
+    navService.cupertinoPageRoute(
+        context, ChatView(fireUser: fireUser, conversationId: conversationId));
     updateRoomId(fireUser);
   }
 
@@ -71,7 +72,7 @@ class ChatService {
     }
   }
 
-  addNewMessage({
+  Future<String> addNewMessage({
     required String receiverUid,
     required String type,
     bool isReply = false,
@@ -80,7 +81,7 @@ class ChatService {
     String? mediaUrl,
     List<String?>? mediaType,
     List<String?>? mediaList,
-  }) {
+  }) async {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String messageUid = const Uuid().v1();
     final Map messageMap = {};
@@ -89,7 +90,7 @@ class ChatService {
     if (mediaUrl != null) messageMap[MessageField.mediaUrl] = mediaUrl;
     if (mediaList != null) messageMap[MessageField.mediaList] = mediaList;
     if (mediaType != null) messageMap[MessageField.mediaType] = mediaType;
-    _conversationCollection
+    await _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
         .add({
@@ -102,6 +103,45 @@ class ChatService {
       DocumentField.timestamp: Timestamp.now(),
       DocumentField.type: type,
     });
+    return messageUid;
+    //  _conversationCollection
+    //     .doc(conversationId)
+    //     .collection(chatsFirestoreKey)
+    //     .add({
+    //   DocumentField.isRead: isRead,
+    //   DocumentField.isReply: isReply,
+    //   DocumentField.message: messageMap,
+    //   DocumentField.messageUid: messageUid,
+    //   DocumentField.replyMessage: replyMessageMap,
+    //   DocumentField.senderUid: liveUserUid,
+    //   DocumentField.timestamp: Timestamp.now(),
+    //   DocumentField.type: type,
+    // }).whenComplete(() {
+    //   final now = DateTime.now();
+    //   final year = now.year;
+    //   final month = now.month;
+    //   final day = now.day;
+    //   String uploadingDate = '$year$month$day';
+    //   String uploadingTime =
+    //       '${now.second}${now.millisecond}${now.microsecond}';
+
+    //   final extension = type == MediaType.image ? 'jpeg' : 'mp4';
+
+    //   String mediaName = type == MediaType.image
+    //       ? 'IMG-$uploadingDate-$uploadingTime'
+    //       : 'VID-$uploadingDate-$uploadingTime';
+
+    //   String folderPath = type == MediaType.image
+    //       ? 'Media/Convo Images/Send'
+    //       : 'Media/Convo Videos/Send';
+
+    //   // BackgroundDownloader().saveMediaAtPath(
+    //   //     mediaURL: mediaUrl!,
+    //   //     mediaName: mediaName,
+    //   //     extension: extension,
+    //   //     folderPath: folderPath,
+    //   //     messageUid: messageUid);
+    // });
   }
 
   /// Archive the user

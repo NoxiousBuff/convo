@@ -58,22 +58,21 @@ dependencies:
   #functional
   hive: ^2.0.4
   dio: ^4.0.4
+  get_it: ^7.2.0
   logger: ^1.0.0
+  share_plus: ^3.0.4
   device_info: ^2.0.2
   hive_flutter: ^1.0.0
   pixabay_picker: ^1.0.6
   image_picker: ^0.8.4+3
   flutter_offline: ^2.0.0
   string_validator: ^0.3.0
-  contacts_service: ^0.6.1
   permission_handler: ^8.3.0
-  extended_image: ^6.0.1
-  get_it: ^7.2.0
-  insta_public_api: ^0.1.2
-  share_plus: ^3.0.4
-  awesome_notifications: ^0.6.19
   path_provider: ^2.0.8
   url_launcher: ^6.0.18
+  extended_image: ^6.0.1
+  video_compress_ds: ^3.1.6
+  awesome_notifications: ^0.6.19
 
 dev_dependencies:
   flutter_test:

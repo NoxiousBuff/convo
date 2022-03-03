@@ -1,20 +1,26 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gmo_media_picker/media_picker.dart';
+import 'package:hint/api/hive.dart';
+import 'package:hint/api/path_finder.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/services/chat_service.dart';
 import 'package:hint/services/database_service.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+import 'dart:math' as math;
+import 'package:video_compress_ds/video_compress_ds.dart';
 
 class ChatViewModel extends BaseViewModel {
   ChatViewModel({required this.conversationId, required this.fireUser});
@@ -37,8 +43,8 @@ class ChatViewModel extends BaseViewModel {
   String get fileTitle => _uploadingFileTitle;
 
   // ignore: prefer_final_fields
-  List<String> _selectedMediaList = [];
-  List<String> get selectedMediaList => _selectedMediaList;
+  List<Map> _selectedMediaList = [];
+  List<Map> get selectedMediaList => _selectedMediaList;
 
   void changeTitle(String title) {
     _uploadingFileTitle = title;
@@ -46,7 +52,18 @@ class ChatViewModel extends BaseViewModel {
   }
 
   /// add into media list
-  void addToMediaList(String url) => _selectedMediaList.add(url);
+  void addToMediaList(
+      {required String url,
+      required String mediaType,
+      required String mediaName}) {
+    Map<String, dynamic> map = <String, dynamic>{
+      'URL': url,
+      'MediaType': mediaType,
+      'MediaName': mediaName,
+    };
+    log.wtf('addedMedia: $map');
+    _selectedMediaList.add(map);
+  }
 
   /// clear the media list
   void clearTheList() => _selectedMediaList.clear();
@@ -57,9 +74,99 @@ class ChatViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  /// Genrate fileName which will locally saved
+  String localNameGenerator(String mimeType) {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month;
+    final day = now.day;
+    String uploadingDate = '$year$month$day';
+    String uploadingTime = '${now.second}${now.millisecond}${now.microsecond}';
+
+    String mediaName = mimeType == MediaType.image
+        ? 'IMG-$uploadingDate-$uploadingTime'
+        : 'VID-$uploadingDate-$uploadingTime';
+
+    return mediaName;
+  }
+
+  /// Get the selected media List length picked from gallery
+  Future<int> pickedMediaLength(List<AssetEntity> assets) async {
+    final files = await Future.wait(assets.map((e) => e.file));
+
+    final sizes = files.map((e) => e!.lengthSync()).toList();
+
+    /// Size in bytes
+    final sum = sizes.reduce((a, b) => a + b);
+
+    /// Size in kb
+    var sizeinKB = sum / 1024;
+
+    var sizeInMB = sizeinKB / 1024;
+
+    log.wtf('PickedImage Size in MB:$sizeInMB');
+
+    return sizeInMB.toInt();
+  }
+
+  /// compress the picked image
+  Future<File> compressImage(File imageFile) async {
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+    int rand = math.Random().nextInt(10000);
+
+    img.Image? image = img.decodeImage(imageFile.readAsBytesSync());
+    // choose the size here, it will maintain aspect ratio
+    img.Image smallerImage =
+        img.copyResize(image!, height: image.height, width: image.width);
+
+    var compressedImage = File('$path/img_$rand.jpeg')
+      ..writeAsBytesSync(img.encodeJpg(smallerImage, quality: 40));
+
+    var sizeinKB = compressedImage.lengthSync() / 1024;
+
+    var sizeInMB = sizeinKB / 1024;
+
+    log.wtf('CompressedImage Size in MB:$sizeInMB');
+    return compressedImage;
+  }
+
+  /// Compress the video
+  Future<File?> compressVideo(File file) async {
+    final originalLength = file.lengthSync();
+    double sizeInKB = originalLength / 1024;
+    double sizeInMB = sizeInKB / 1024;
+    log.wtf('PickedVideo Size in MB:$sizeInMB');
+    MediaInfo? mediaInfo = await VideoCompress.compressVideo(
+      file.path,
+      quality: VideoQuality.MediumQuality,
+      deleteOrigin: false, // It's false by default
+    );
+    log.wtf('CompressedVideo Size in MB:${mediaInfo!.filesize}');
+    return mediaInfo.file;
+  }
+
+  /// Genrate thumbnail for video and save it locally
+  Future<File> videoThumnailGenerator(File file) async {
+    final thumbnailFile =
+        await VideoCompress.getFileThumbnail(file.path, quality: 40);
+
+    final mediaName = localNameGenerator(MediaType.image);
+
+    pathFinder.saveInLocalPath(thumbnailFile,
+        mediaName: mediaName,
+        folderPath: 'Media/Thumbnails',
+        extension: 'jpeg');
+    return thumbnailFile;
+  }
+
   /// upload media into firebase storage and get progress
-  Future<String> uploadFile(
-      String filePath, String firestorePath, String mediaType) async {
+  Future<String> uploadFile({
+    required String filePath,
+    required String mediaType,
+    required String extension,
+    required String firestorePath,
+  }) async {
     firebase_storage.UploadTask task = firebase_storage.FirebaseStorage.instance
         .ref(firestorePath)
         .putFile(File(filePath));
@@ -72,12 +179,6 @@ class ChatViewModel extends BaseViewModel {
           updateProgress(progress);
         },
       );
-
-      // Storage tasks function as a Delegating Future so we can await them.
-      //firebase_storage.TaskSnapshot snapshot = await task;
-      //log.wtf(snapshot.bytesTransferred / snapshot.totalBytes);
-      //print('Uploaded ${snapshot.bytesTransferred} bytes.');
-
     } on firebase_core.FirebaseException catch (e) {
       // The final snapshot is also available on the task via `.snapshot`,
       // this can include 2 additional states, `TaskState.error` & `TaskState.canceled`
@@ -89,11 +190,62 @@ class ChatViewModel extends BaseViewModel {
     }
     await task;
     String downloadURL = await _storage.ref(firestorePath).getDownloadURL();
-    addMediaMessage(mediaType, downloadURL);
+
+    final messageUid = await chatService
+        .addNewMessage(
+            receiverUid: fireUser.id, type: mediaType, mediaUrl: downloadURL)
+        .whenComplete(() => log.w('Message added to firestore successfully'));
+
+    final mediaName = localNameGenerator(mediaType);
+
+    log.wtf('MediaType:$mediaType');
+
+    switch (mediaType) {
+      case MediaType.image:
+        {
+          String folderPath = mediaType == MediaType.image
+              ? 'Media/Convo Images/Send'
+              : 'Media/Convo Videos/Send';
+
+          final savedFile = await pathFinder.saveInLocalPath(File(filePath),
+              mediaName: mediaName,
+              folderPath: folderPath,
+              extension: extension);
+
+          Hive.box(HiveApi.mediaHiveBox)
+              .put(messageUid, savedFile.path)
+              .whenComplete(() =>
+                  log.wtf('Media Path is saved in hive ${savedFile.path}'));
+        }
+
+        break;
+      case MediaType.video:
+        {
+          final thumbnail = await videoThumnailGenerator(File(filePath));
+          String folderPath = mediaType == MediaType.image
+              ? 'Media/Convo Images/Send'
+              : 'Media/Convo Videos/Send';
+
+          final savedFile = await pathFinder.saveInLocalPath(File(filePath),
+              mediaName: mediaName,
+              folderPath: folderPath,
+              extension: extension);
+          Map<String, dynamic> map = {
+            VideoThumbnailField.localVideoPath: savedFile.path,
+            VideoThumbnailField.videoThumbnailPath: thumbnail.path
+          };
+
+          Hive.box(HiveApi.mediaHiveBox).put(messageUid, map).whenComplete(
+              () => log.wtf('Media Path is saved in hive ${savedFile.path}'));
+        }
+        break;
+      default:
+    }
+
     return downloadURL;
   }
 
-  /// Genrate File Name For Firebase Storage Bucket 
+  /// Genrate File Name For Firebase Storage Bucket
   /// and upload to firebase storage and add to firestore
   Future<String> uploadAndAddToDatabase(AssetEntity asset) async {
     final now = DateTime.now();
@@ -106,7 +258,7 @@ class ChatViewModel extends BaseViewModel {
     final mimeType = asset.mimeType!.split("/").first;
     final fileExtension = asset.mimeType!.split("/").last;
 
-    String storagePath = mimeType == 'image'
+    String storagePath = mimeType == MediaType.image
         ? 'IMG-$uploadingDate-$uploadingTime.$fileExtension'
         : 'VID-$uploadingDate-$uploadingTime.$fileExtension';
 
@@ -118,8 +270,35 @@ class ChatViewModel extends BaseViewModel {
     log.v('FirebaseStoragePath:$storagePath');
 
     File? file = await asset.file;
+    switch (mimeType) {
+      case MediaType.image:
+        {
+          final compressedImage = await compressImage(file!);
+          return uploadFile(
+              filePath: compressedImage.path,
+              mediaType: mimeType,
+              extension: fileExtension,
+              firestorePath: firebasePath);
+        }
 
-    return uploadFile(file!.path, firebasePath, mimeType);
+      case MediaType.video:
+        {
+          return uploadFile(
+              mediaType: mimeType,
+              filePath: file!.path,
+              extension: fileExtension,
+              firestorePath: firebasePath);
+        }
+
+      default:
+        {
+          return uploadFile(
+              filePath: file!.path,
+              mediaType: mimeType,
+              extension: fileExtension,
+              firestorePath: firebasePath);
+        }
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> get getUserchat =>
@@ -146,6 +325,7 @@ class ChatViewModel extends BaseViewModel {
       .child(fireUser.id)
       .onValue;
 
+  /// Add text message to firestore
   addMessage() {
     messageTech.clear();
     updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
@@ -156,10 +336,10 @@ class ChatViewModel extends BaseViewModel {
     updateMessageText('');
   }
 
-  void addMediaMessage(String mediaType, String mediaUrl) {
-    chatService.addNewMessage(
-        receiverUid: fireUser.id, type: mediaType, mediaUrl: mediaUrl);
-  }
+  /// Add Media Message To Firestore
+  // Future addMediaMessage(String mediaType, String mediaUrl) =>
+  //     chatService.addNewMessage(
+  //         receiverUid: fireUser.id, type: mediaType, mediaUrl: mediaUrl);
 
   final TextEditingController messageTech = TextEditingController();
 
