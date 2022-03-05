@@ -8,7 +8,7 @@ class Message {
   final bool isReply;
   final LinkedHashMap<String, dynamic> message;
   final String messageUid;
-  final LinkedHashMap<String, dynamic>? replyMessage;
+  final LinkedHashMap<String, dynamic> replyMessage;
   final String senderUid;
   final Timestamp timestamp;
   final String type;
@@ -18,7 +18,7 @@ class Message {
     required this.isReply,
     required this.message,
     required this.messageUid,
-    this.replyMessage,
+    required this.replyMessage,
     required this.senderUid,
     required this.timestamp,
     required this.type,

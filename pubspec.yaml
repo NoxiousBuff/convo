@@ -43,6 +43,7 @@ dependencies:
   timeago: ^3.1.0
 
   # ui
+  swipe_to: ^1.0.2
   animations: ^2.0.2
   pinput: ^1.2.1
   video_player: ^2.1.4
@@ -54,6 +55,7 @@ dependencies:
   swipe_deck: ^1.1.0
   gmo_media_picker: ^0.0.4
   flutter_parsed_text: ^2.2.1
+  custom_rounded_rectangle_border: ^0.2.0-nullsafety.0
 
   #functional
   hive: ^2.0.4

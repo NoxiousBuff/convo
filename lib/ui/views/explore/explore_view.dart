@@ -167,7 +167,9 @@ class _ExploreViewState extends State<ExploreView>
                 );
               }
             default:
-              {}
+              {
+                return null;
+              }
           }
         },
       ),
@@ -321,7 +323,8 @@ class _ExploreViewState extends State<ExploreView>
                                 children: [
                                   if (index == 0)
                                     GestureDetector(
-                                      onTap: () => model.launchURLInBrowser(context, 'https://pixabay.com'),
+                                      onTap: () => model.launchURLInBrowser(
+                                          context, 'https://pixabay.com'),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15),
@@ -329,7 +332,6 @@ class _ExploreViewState extends State<ExploreView>
                                           children: [
                                             Text(
                                               'From Pixabay ♥',
-                                              
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Theme.of(context)
@@ -345,7 +347,6 @@ class _ExploreViewState extends State<ExploreView>
                                   if (index == 0) verticalSpaceSmall,
                                   const Divider(height: 0),
                                   ListTile(
-                                    
                                     title: Text(
                                       title,
                                       style: TextStyle(

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:gmo_media_picker/media_picker.dart';
 import 'package:hint/api/hive.dart';
 import 'package:hint/api/path_finder.dart';
+import 'package:hint/api/replymessage_value.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/models/user_model.dart';
@@ -42,31 +44,40 @@ class ChatViewModel extends BaseViewModel {
   String _uploadingFileTitle = '';
   String get fileTitle => _uploadingFileTitle;
 
+  bool _isReply = false;
+  bool get isReply => _isReply;
+
   // ignore: prefer_final_fields
-  List<Map> _selectedMediaList = [];
-  List<Map> get selectedMediaList => _selectedMediaList;
+  // List<Map> _selectedMediaList = [];
+  // List<Map> get selectedMediaList => _selectedMediaList;
 
   void changeTitle(String title) {
     _uploadingFileTitle = title;
     notifyListeners();
   }
 
-  /// add into media list
-  void addToMediaList(
-      {required String url,
-      required String mediaType,
-      required String mediaName}) {
-    Map<String, dynamic> map = <String, dynamic>{
-      'URL': url,
-      'MediaType': mediaType,
-      'MediaName': mediaName,
-    };
-    log.wtf('addedMedia: $map');
-    _selectedMediaList.add(map);
+  /// CHange the value of isReply bool
+  void isReplyValue(bool value) {
+    _isReply = value;
+    notifyListeners();
   }
 
+  /// add into media list
+  // void addToMediaList(
+  //     {required String url,
+  //     required String mediaType,
+  //     required String mediaName}) {
+  //   Map<String, dynamic> map = <String, dynamic>{
+  //     'URL': url,
+  //     'MediaType': mediaType,
+  //     'MediaName': mediaName,
+  //   };
+  //   log.wtf('addedMedia: $map');
+  //   _selectedMediaList.add(map);
+  // }
+
   /// clear the media list
-  void clearTheList() => _selectedMediaList.clear();
+  //void clearTheList() => _selectedMediaList.clear();
 
   /// Reset the current progress of file after uploading
   void updateProgress(double? value) {
@@ -215,7 +226,7 @@ class ChatViewModel extends BaseViewModel {
           Hive.box(HiveApi.mediaHiveBox)
               .put(messageUid, savedFile.path)
               .whenComplete(() =>
-                  log.wtf('Media Path is saved in hive ${savedFile.path}'));
+                  log.wtf('Image Path is saved in hive ${savedFile.path}'));
         }
 
         break;
@@ -236,7 +247,7 @@ class ChatViewModel extends BaseViewModel {
           };
 
           Hive.box(HiveApi.mediaHiveBox).put(messageUid, map).whenComplete(
-              () => log.wtf('Media Path is saved in hive ${savedFile.path}'));
+              () => log.wtf('Video Map Saved | Video Path ${savedFile.path}'));
         }
         break;
       default:
@@ -327,12 +338,24 @@ class ChatViewModel extends BaseViewModel {
 
   /// Add text message to firestore
   addMessage() {
+    bool reply = locator.get<GetReplyMessageValue>().isReply;
     messageTech.clear();
     updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
-    chatService.addNewMessage(
-        receiverUid: fireUser.id,
-        type: MediaType.text,
-        messageText: _messageText);
+    reply == false
+        ? chatService.addNewMessage(
+            receiverUid: fireUser.id,
+            type: MediaType.text,
+            messageText: _messageText)
+        : chatService.addNewMessage(
+            isReply: true,
+            type: MediaType.text,
+            receiverUid: fireUser.id,
+            messageText: _messageText,
+            swipeMsgUid: locator.get<GetReplyMessageValue>().messageUid,
+            swipeMsgText: locator.get<GetReplyMessageValue>().messageText,
+            swipeMediaURL: locator.get<GetReplyMessageValue>().messageURL,
+            swipeMsgType: locator.get<GetReplyMessageValue>().messageType,
+          );
     updateMessageText('');
   }
 

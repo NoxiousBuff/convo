@@ -79,17 +79,27 @@ class ChatService {
     bool isRead = false,
     String? messageText,
     String? mediaUrl,
-    List<String?>? mediaType,
-    List<String?>? mediaList,
+    String? swipeMsgUid,
+    String? swipeMsgType,
+    String? swipeMsgText,
+    String? swipeMediaURL,
   }) async {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String messageUid = const Uuid().v1();
     final Map messageMap = {};
-    final Map replyMessageMap = {};
-    if (messageText != null) messageMap[MessageField.messageText] = messageText;
-    if (mediaUrl != null) messageMap[MessageField.mediaUrl] = mediaUrl;
-    if (mediaList != null) messageMap[MessageField.mediaList] = mediaList;
-    if (mediaType != null) messageMap[MessageField.mediaType] = mediaType;
+    final Map replyMsgMap = {};
+    const fMessageText = MessageField.messageText;
+    const fMediaURL = MessageField.mediaUrl;
+
+    /// MessageMap Fields
+    if (messageText != null) messageMap[fMessageText] = messageText;
+    if (mediaUrl != null) messageMap[fMediaURL] = mediaUrl;
+
+    /// ReplyMessage Fields
+    if (swipeMsgText != null) replyMsgMap[fMessageText] = swipeMsgText;
+    if (swipeMsgType != null) replyMsgMap[DocumentField.type] = swipeMsgType;
+    if (swipeMediaURL != null) replyMsgMap[fMediaURL] = swipeMediaURL;
+    if (swipeMsgUid != null) replyMsgMap[DocumentField.messageUid] = swipeMsgUid;
     await _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
@@ -98,7 +108,7 @@ class ChatService {
       DocumentField.isReply: isReply,
       DocumentField.message: messageMap,
       DocumentField.messageUid: messageUid,
-      DocumentField.replyMessage: replyMessageMap,
+      DocumentField.replyMessage: replyMsgMap,
       DocumentField.senderUid: liveUserUid,
       DocumentField.timestamp: Timestamp.now(),
       DocumentField.type: type,

@@ -83,8 +83,9 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
 
   /// Thumbnail Widget of video
   Widget videoThumbnail() {
-    Map<String, dynamic> map =
+    final hive =
         Hive.box(widget.hiveBoxName).get(widget.messageUid);
+    final map = Map<String, dynamic>.from(hive);
     final path = VideoThumbnailModel.fromJson(map).videoThumbnailPath;
     return GestureDetector(
       onTap: widget.onTap,

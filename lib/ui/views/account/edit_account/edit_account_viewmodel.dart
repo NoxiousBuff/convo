@@ -10,7 +10,6 @@ import 'package:jiffy/jiffy.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 
 class EditAccountViewModel extends BaseViewModel {
@@ -56,30 +55,30 @@ class EditAccountViewModel extends BaseViewModel {
     await updateUserProperty(context, FireUserField.photoUrl, downloadURL);
   }
 
-  Future<File?> pickImage(BuildContext context) async {
-    final selectedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 40);
+  // Future<File?> pickImage(BuildContext context) async {
+  //   final selectedImage = await ImagePicker()
+  //       .pickImage(source: ImageSource.gallery, imageQuality: 40);
 
-    if (selectedImage != null) {
-      const title = 'Your file size is greater than 8 MB';
-      final fileSizeInBytes = File(selectedImage.path).lengthSync();
-      // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
-      double fileSizeInKB = fileSizeInBytes / 1024;
-      // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
-      double fileSizeInMB = fileSizeInKB / 1024;
-      log.wtf('File Size: $fileSizeInMB MB');
-      if (fileSizeInMB > 8.0) {
-        customSnackbars.errorSnackbar(context, title: title);
-      } else {
-        String path = File(selectedImage.path).path;
-        Navigator.pop(context);
-        await uploadProfileImage(File(path), context);
-      }
-      return File(selectedImage.path);
-    } else {
-      log.wtf('pickImage | Image not clicked');
-    }
-  }
+  //   if (selectedImage != null) {
+  //     const title = 'Your file size is greater than 8 MB';
+  //     final fileSizeInBytes = File(selectedImage.path).lengthSync();
+  //     // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+  //     double fileSizeInKB = fileSizeInBytes / 1024;
+  //     // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+  //     double fileSizeInMB = fileSizeInKB / 1024;
+  //     log.wtf('File Size: $fileSizeInMB MB');
+  //     if (fileSizeInMB > 8.0) {
+  //       customSnackbars.errorSnackbar(context, title: title);
+  //     } else {
+  //       String path = File(selectedImage.path).path;
+  //       Navigator.pop(context);
+  //       await uploadProfileImage(File(path), context);
+  //     }
+  //     return File(selectedImage.path);
+  //   } else {
+  //     log.wtf('pickImage | Image not clicked');
+  //   }
+  // }
 
   String _formattedBirthDate = '';
   String get formattedBirthDate => _formattedBirthDate;

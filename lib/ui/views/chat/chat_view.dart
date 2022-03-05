@@ -3,6 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/api/replymessage_value.dart';
+import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/models/dule_model.dart';
@@ -18,24 +21,6 @@ import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:stacked/stacked.dart';
 import 'package:gmo_media_picker/media_picker.dart';
 import 'chat_viewmodel.dart';
-
-// FlutterUploader _uploader = FlutterUploader();
-
-// void backgroundHandler() {
-//   // Needed so that plugin communication works.
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   // This uploader instance works within the isolate only.
-//   FlutterUploader uploader = FlutterUploader();
-
-//   // You have now access to:
-//   uploader.progress.listen((progress) {
-//     // upload progress
-//   });
-//   uploader.result.listen((result) {
-//     // upload results
-//   });
-// }
 
 class ChatView extends StatefulWidget {
   const ChatView(
@@ -84,16 +69,13 @@ class _ChatViewState extends State<ChatView> {
               ],
             ),
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              children: [
-                chatList(context, model),
-                chatTextField(context, model),
-                _buildBottomOptions(context, model),
-                bottomPadding(context),
-              ],
-            ),
+          body: Column(
+            children: [
+              chatList(context, model),
+              chatTextField(context, model),
+              _buildBottomOptions(context, model),
+              bottomPadding(context),
+            ],
           ),
         );
       },
@@ -167,7 +149,8 @@ class _ChatViewState extends State<ChatView> {
                 await Future.wait(
                     assets.map((asset) => model.uploadAndAddToDatabase(asset)));
               } else {
-                customSnackbars.infoSnackbar(context, title: 'Maximum size must be less than 8 MB');
+                customSnackbars.infoSnackbar(context,
+                    title: 'Maximum size must be less than 8 MB');
               }
 
               //final mediaList = model.selectedMediaList;
@@ -292,7 +275,45 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
-  chatList(BuildContext context, ChatViewModel model) {
+  Widget replyMessageTile() {
+    final color = Theme.of(context).colorScheme.black.withOpacity(0.5);
+    bool sendedByMe = locator.get<GetReplyMessageValue>().senderUid ==
+        FirestoreApi().getCurrentUser!.uid;
+    return Visibility(
+      visible: locator.get<GetReplyMessageValue>().isReply,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        width: screenWidth(context),
+        color: color,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                locator.get<GetReplyMessageValue>().isReplyValChanger(false);
+                locator.get<GetReplyMessageValue>().clearReplyMsg();
+              },
+              child: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.white,
+                maxRadius: 10,
+                child: const Center(
+                  child: Icon(
+                    FeatherIcons.x,
+                    size: 12,
+                  ),
+                ),
+              ),
+            ),
+            horizontalSpaceRegular,
+            Text(
+                'Replying to ${sendedByMe ? 'yourself' : widget.fireUser.username}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget chatList(BuildContext context, ChatViewModel model) {
     return Expanded(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: model.getUserchat,
@@ -313,6 +334,7 @@ class _ChatViewState extends State<ChatView> {
             reverse: true,
             slivers: [
               // SliverToBoxAdapter(child: uploadingFileIndicator(context, model)),
+              SliverToBoxAdapter(child: replyMessageTile()),
               recieverMsgBubble(context, model),
               messages.isEmpty
                   ? model.messageText.isNotEmpty
@@ -351,7 +373,7 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
-  chatTextField(BuildContext context, ChatViewModel model) {
+  Widget chatTextField(BuildContext context, ChatViewModel model) {
     return Column(
       children: [
         Padding(

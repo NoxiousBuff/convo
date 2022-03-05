@@ -52,6 +52,7 @@ class ChooseProfilePhotoViewModel extends BaseViewModel {
       return File(selectedImage.path);
     } else {
       log.wtf('pickImage | Image not clicked');
+      return null;
     }
   }
 
@@ -90,8 +91,10 @@ class ChooseProfilePhotoViewModel extends BaseViewModel {
     await updateUserProperty(context, FireUserField.photoUrl, downloadURL);
   }
 
-  Future<void> updateUserProperty(BuildContext context, String propertyName, dynamic value, {bool useSetBusy = true}) async {
-    if(useSetBusy) setBusy(true);
+  Future<void> updateUserProperty(
+      BuildContext context, String propertyName, dynamic value,
+      {bool useSetBusy = true}) async {
+    if (useSetBusy) setBusy(true);
     await firestoreApi
         .updateUser(
       uid: AuthService.liveUser!.uid,
@@ -100,14 +103,14 @@ class ChooseProfilePhotoViewModel extends BaseViewModel {
     )
         .then((instance) {
       hiveApi.updateUserData(propertyName, value);
-      customSnackbars.successSnackbar(context,
-          title: 'Profile Photo Updated');
-      shouldNavigateToHomeView ? Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-            (route) => false) : Navigator.pop(context);
+      customSnackbars.successSnackbar(context, title: 'Profile Photo Updated');
+      shouldNavigateToHomeView
+          ? Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeView()),
+              (route) => false)
+          : Navigator.pop(context);
     });
-    if(useSetBusy) setBusy(false);
+    if (useSetBusy) setBusy(false);
   }
-
 }

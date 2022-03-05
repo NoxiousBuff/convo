@@ -232,6 +232,7 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       return File(selectedImage.path);
     } else {
       log.wtf('pickImage | Image not clicked');
+      return null;
     }
   }
 
@@ -296,11 +297,13 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
       if (fileSize > 8) {
         customSnackbars.errorSnackbar(context,
             title: 'Maximum size of upload is 8 MB.');
+        return null;
       } else {
         return file;
       }
     } else {
       log.wtf('pickVideo | Video was not recorded');
+      return null;
     }
   }
 

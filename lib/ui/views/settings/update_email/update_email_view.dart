@@ -65,6 +65,8 @@ class UpdateEmailView extends StatelessWidget {
                                     return customSnackbars.errorSnackbar(
                                         context,
                                         title: 'Provide a valid email address');
+                                  } else {
+                                    return null;
                                   }
                                 }),
                             verticalSpaceSmall,
