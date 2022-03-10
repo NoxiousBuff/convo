@@ -1,34 +1,35 @@
-import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/api/background_downloader.dart';
-import 'package:hint/api/dio.dart';
-import 'package:hint/api/hive.dart';
-import 'package:hint/api/path.dart';
-import 'package:hint/app/app_logger.dart';
-import 'package:hint/models/video_thumbnail.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
 import 'dart:io';
+import 'download_button.dart';
+import 'package:hint/api/hive.dart';
+import 'package:flutter/material.dart';
+import 'package:filesize/filesize.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/path_finder.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/models/message_model.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/models/video_thumbnail.dart';
+import 'package:hint/ui/shared/alert_dialog.dart';
+import 'package:hint/api/background_downloader.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
+import 'package:video_compress_ds/video_compress_ds.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class VideoThumbnail extends StatefulWidget {
   //make sure that the hive box is already opened
-  final String mediaUrl;
-  final String? imageName;
+  // final String mediaUrl;
   final String hiveBoxName;
   final String folderPath;
   final VoidCallback? onTap;
-  final String messageUid;
+  //final String messageUid;
+  final Message message;
   const VideoThumbnail({
     Key? key,
-    required this.mediaUrl,
     required this.hiveBoxName,
     required this.folderPath,
-    this.imageName,
     this.onTap,
-    required this.messageUid,
+    required this.message,
   }) : super(key: key);
 
   @override
@@ -36,14 +37,31 @@ class VideoThumbnail extends StatefulWidget {
 }
 
 class _VideoThumbnailState extends State<VideoThumbnail> {
-  bool hiveContainsPath = false;
-
-  /// API
-  DioApi dioApi = DioApi();
-  PathHelper pathHelper = PathHelper();
+  /// The current user Uid OR user unique ID
+  String currentUserUid = FirestoreApi().getCurrentUser!.uid;
 
   final log = getLogger('VideoThumbnail');
 
+  @override
+  void initState() {
+    bool containPath =
+        Hive.box(widget.hiveBoxName).containsKey(widget.message.messageUid);
+
+    if (widget.message.senderUid != currentUserUid) {
+      if (!containPath) generalWorker();
+    }
+    super.initState();
+  }
+
+  /// Generate the thumbnail od received video and return the file
+  Future<File> thumbnailGenerate(String videoPath) async {
+    var thumbnail =
+        await VideoCompress.getFileThumbnail(videoPath, quality: 50);
+
+    return File(thumbnail.path);
+  }
+
+  /// This will download the thumbnail image and save it locally in hive database
   void generalWorker() async {
     final now = DateTime.now();
     final year = now.year;
@@ -52,47 +70,86 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
     String uploadingDate = '$year$month$day';
     String uploadingTime = '${now.second}${now.millisecond}${now.microsecond}';
     String imageName = 'CON-$uploadingDate-IMG-$uploadingTime';
-    await backDownloader.saveMediaAtPath(
+    final thumbnailFile =
+        await thumbnailGenerate(widget.message.message[MessageField.mediaUrl]);
+
+    /// Download the received video and save it convo application folder
+    await BackgroundDownloader().saveMediaAtPath(
       extension: 'mp4',
       mediaName: imageName,
-      mediaURL: widget.mediaUrl,
-      messageUid: widget.messageUid,
       folderPath: widget.folderPath,
+      messageUid: widget.message.messageUid,
+      mediaURL: widget.message.message[MessageField.mediaUrl],
     );
-  }
 
-  Widget downloadButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Text(
-            "Download",
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          horizontalSpaceTiny,
-          Icon(FeatherIcons.arrowDown, color: Colors.white)
-        ],
-      ),
+    /// Save the thumbnail locally in convo application folder and
+    /// store the path of thumbnail in hive database
+    pathFinder.saveInLocalPath(
+      thumbnailFile,
+      extension: 'jpeg',
+      mediaName: imageName,
+      folderPath: 'Media/Thumbnails',
     );
   }
 
   /// Thumbnail Widget of video
-  Widget videoThumbnail() {
-    final hive =
-        Hive.box(widget.hiveBoxName).get(widget.messageUid);
+  Widget videoThumbnail(Box<dynamic> box) {
+    Message _message = widget.message;
+
+    ///  get hiveBox details
+    final hive = box.get(_message.messageUid);
+
+    /// convert it into a Map<String,dynamic>
     final map = Map<String, dynamic>.from(hive);
+
+    /// And get the path of video thumbnail
     final path = VideoThumbnailModel.fromJson(map).videoThumbnailPath;
+
+    /// check wether I send this mesage OR receive
+    bool iSend = _message.senderUid == currentUserUid;
+
+    /// Size in bytes of video
+    int size = _message.message[MessageField.size];
+
+    const String description = 'Sorry, this media file appears to be missing';
     return GestureDetector(
       onTap: widget.onTap,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Image.file(File(path)),
+          Image.file(
+            File(path),
+            errorBuilder: (context, object, StackTrace? stackTrace) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  BlurHash(hash: _message.message[MessageField.blurHash]),
+                  iSend
+                      ? DownloadButton(
+                          buttonTitle: 'Download',
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) {
+                              return DuleAlertDialog(
+                                title: 'Missing Media',
+                                description: description,
+                                icon: FeatherIcons.info,
+                                primaryButtonText: 'OK',
+                                primaryOnPressed: () => Navigator.pop(context),
+                              );
+                            },
+                          ),
+                        )
+                      : DownloadButton(
+                          onTap: () => generalWorker(),
+                          buttonTitle: filesize(size),
+                        ),
+                ],
+              );
+            },
+          ),
+          //TODO: This circle avatar appears if there is an error to open filePath
+          //TODO: Can't find a solution now , if there is an error in errorBuilder of image then this circle avatar must be disappears
           CircleAvatar(
             maxRadius: 30,
             backgroundColor: Colors.black.withOpacity(0.8),
@@ -115,57 +172,54 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
     return ValueListenableBuilder<Box>(
       valueListenable: Hive.box(HiveApi.mediaHiveBox).listenable(),
       builder: (context, box, child) {
-        return box.containsKey(widget.messageUid)
-            ? videoThumbnail()
+        Message _message = widget.message;
+
+        /// This is the hash of blurhash
+        String hash = _message.message[MessageField.blurHash];
+
+        bool iSend = _message.senderUid == currentUserUid;
+        return box.containsKey(widget.message.messageUid)
+            ? videoThumbnail(box)
             : GestureDetector(
                 onTap: widget.onTap,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    CachedNetworkImage(
-                      placeholder: (context, string) {
-                        if (string.isEmpty) {
-                          const Text('Error Occurred');
-                        }
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                      fit: BoxFit.fitWidth,
-                      imageUrl: widget.mediaUrl,
-                    ),
-                    BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: const Text(' '),
-                    ),
-
-                    CircleAvatar(
-                      maxRadius: 30,
-                      backgroundColor: Colors.black.withOpacity(0.8),
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 4),
-                        child: Icon(
-                          FeatherIcons.play,
-                          size: 25,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    // Column(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   mainAxisSize: MainAxisSize.min,
-                    //   children: [
-                    //     downloadButton(),
-                    //     const Padding(
-                    //       padding:
-                    //           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    //       child: Text(
-                    //         'Sorry, this media file appears to be missing',
-                    //         style: TextStyle(color: Colors.white),
-                    //         textAlign: TextAlign.center,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // )
+                    iSend
+                        ? Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              BlurHash(hash: hash),
+                              DownloadButton(
+                                buttonTitle: 'Download',
+                                onTap: () => showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return DuleAlertDialog(
+                                      title: 'Missing Media',
+                                      description:
+                                          'Sorry, this media file appears to be missing',
+                                      icon: FeatherIcons.info,
+                                      primaryButtonText: 'OK',
+                                      primaryOnPressed: () =>
+                                          Navigator.pop(context),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+                        : Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              BlurHash(hash: hash),
+                              DownloadButton(
+                                buttonTitle:
+                                    _message.message[MessageField.size],
+                                onTap: () => generalWorker(),
+                              ),
+                            ],
+                          ),
                   ],
                 ),
               );

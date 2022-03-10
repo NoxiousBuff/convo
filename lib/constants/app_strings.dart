@@ -5,6 +5,7 @@ class MediaType {
   static const String text = 'text';
   static const String image = 'image';
   static const String video = 'video';
+  static const String document = 'document';
   //static const String meme = 'meme';
   //static const String emoji = 'emoji';
   //static const String canvasImage = 'canvasImage';
@@ -122,16 +123,30 @@ class DocumentField {
   static const String senderUid = 'senderUid';
   static const String timestamp = 'timestamp';
   static const String type = 'type';
+  static const String reactions = 'reactions';
 }
 
 class MessageField {
-  static const String messageText = 'messageText';
+  static const String size = 'size';
   static const String mediaUrl = 'mediaUrl';
+  static const String blurHash = 'blurHash';
   static const String mediaList = 'mediaList';
   static const String mediaType = 'mediaType';
+  static const String messageText = 'messageText';
+  static const String documentTitle = 'documentTitle';
+  static const String reactedUsersID = 'reactedUsersID';
 }
 
 class VideoThumbnailField {
   static const videoThumbnailPath = 'videoThumbnailPath';
   static const localVideoPath = 'localVideoPath';
+}
+
+class ReactionsField {
+  static const String wow = 'wow';
+  static const String sad = 'sad';
+  static const String haha = 'haha';
+  static const String like = 'like';
+  static const String love = 'love';
+  static const String angry = 'angry';
 }

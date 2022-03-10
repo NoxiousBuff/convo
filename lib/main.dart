@@ -39,7 +39,6 @@ Future<void> main() async {
     /// seting locator for dependency injection
     setupLocator();
 
-
     /// saving device info in hive for android edge to edge screen configurations
     await hiveApi.saveDeviceInfoInHive();
 

@@ -22,6 +22,7 @@ class PathFinder {
     return false;
   }
 
+  /// This will return the created path of a file
   Future<String> getLocalPath({
     required String mediaName,
     required String folderPath,
@@ -62,6 +63,47 @@ class PathFinder {
     return savePath;
   }
 
+  /// This the path of saved directory
+  /// saved Directory Path means
+  /// The directory OR folder in which you want to saved the file
+  Future<String> getSavedDirecotyPath(String folderPath) async {
+    Directory? directory;
+
+    if (Platform.isAndroid) {
+      if (await _requestPermission(Permission.storage)) {
+        directory = (await getExternalStorageDirectory());
+        String newPath = "";
+        List<String> paths = directory!.path.split("/");
+        for (int x = 1; x < paths.length; x++) {
+          String folder = paths[x];
+          if (folder != "Android") {
+            newPath += "/" + folder;
+          } else {
+            break;
+          }
+        }
+        String backPath = '/Convo' '/$folderPath';
+        log.wtf('Back Path of the Folder : $backPath');
+        newPath = newPath + backPath;
+        directory = Directory(newPath);
+        log.wtf('Path of the newly created directory : ${directory.path}');
+      } else {}
+    } else {
+      if (await _requestPermission(Permission.photos)) {
+        directory = await getApplicationDocumentsDirectory();
+      } else {}
+    }
+
+    String savePath = directory!.path;
+    log.i('Save Path: $savePath');
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return savePath;
+  }
+
+  /// This function will save a copy of your given file in that path you choosed or make
+  /// e.g: /storage/emulated/0/Convo/Media/Convo Images/your filename
   Future<File> saveInLocalPath(File mediaFile,
       {required String mediaName,
       required String folderPath,

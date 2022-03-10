@@ -6,7 +6,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-final backDownloader = BackgroundDownloader();
 
 class BackgroundDownloader {
   final log = getLogger('BackgroundDownloader');

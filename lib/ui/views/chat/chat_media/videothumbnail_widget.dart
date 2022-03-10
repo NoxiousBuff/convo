@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/video_thumbnail.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 
+/// Display OR save the thumbnail of each sended or recived video
 class VideoThumbnailWidget extends StatelessWidget {
-  final String imageURL;
-  final String messageUid;
+  final Message message;
+
   const VideoThumbnailWidget({
     Key? key,
-    required this.imageURL,
-    required this.messageUid,
+    required this.message,
   }) : super(key: key);
 
   @override
@@ -25,10 +26,14 @@ class VideoThumbnailWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(8)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4),
+
+        /// video Thumbnail is a widget of display video thumbnail
+        /// This widget also save OR download the thumbnail of received video
         child: VideoThumbnail(
-          mediaUrl: imageURL,
-          folderPath: 'Convo/Media/Thumbnails',
-          messageUid: messageUid,
+          message: message,
+
+          /// Folder Path OR Name where the downloaded thumbnail of video saved
+          folderPath: 'Media/Thumbnails',
           hiveBoxName: HiveApi.mediaHiveBox,
         ),
       ),

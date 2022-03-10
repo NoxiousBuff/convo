@@ -29,6 +29,9 @@ class FirestoreApi {
   ///getter tp get the current user
   User? get getCurrentUser => _auth.currentUser;
 
+  /// Get current user uid
+  String get currentUserId => getCurrentUser!.uid;
+
   ///method to updateUser in [Firebase]
   Future<void> updateUser(
       {required String uid,
@@ -72,7 +75,6 @@ class FirestoreApi {
   Future<void> createUserInFirebase({
     Function? onError,
     required User user,
-    
   }) async {
     try {
       await subsCollection.doc(user.uid).set({

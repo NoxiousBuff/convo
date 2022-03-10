@@ -1,26 +1,28 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
+import 'chat_viewmodel.dart';
+import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hint/api/firestore.dart';
-import 'package:hint/api/replymessage_value.dart';
 import 'package:hint/app/locator.dart';
-import 'package:hint/constants/app_strings.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hint/api/firestore.dart';
+import 'package:hint/models/user_model.dart';
 import 'package:hint/models/dule_model.dart';
 import 'package:hint/models/message_model.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/nav_service.dart';
-import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/shared/user_profile_photo.dart';
-import 'package:hint/ui/views/chat/message_bubble/message_bubble_view.dart';
-import 'package:hint/ui/views/write_letter/write_letter_view.dart';
-import 'package:stacked/stacked.dart';
+import 'package:hint/services/nav_service.dart';
+import 'package:hint/constants/app_strings.dart';
+import 'package:hint/ui/shared/empty_state.dart';
+import 'package:hint/api/replymessage_value.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:gmo_media_picker/media_picker.dart';
-import 'chat_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/shared/custom_snackbars.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/ui/views/write_letter/write_letter_view.dart';
+import 'package:hint/ui/views/chat/message_bubble/message_bubble_view.dart';
+import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView(
@@ -53,27 +55,72 @@ class _ChatViewState extends State<ChatView> {
             titleSpacing: 0.0,
             elevation: 0.0,
             backgroundColor: Theme.of(context).colorScheme.lightGrey,
-            title: Row(
-              children: [
-                UserProfilePhoto(
-                  widget.fireUser.photoUrl,
-                  height: 36,
-                  width: 36,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                horizontalSpaceSmall,
-                Text(
-                  widget.fireUser.displayName,
-                  style: TextStyle(color: Theme.of(context).colorScheme.black),
-                ),
-              ],
+
+            /// This will display the username unique name of each user
+            title: InkWell(
+              onTap: () => navService.materialPageRoute(
+                  context, const UserAccountView()),
+              child: Row(
+                children: [
+                  /// This display the profile photo of user
+                  UserProfilePhoto(
+                    widget.fireUser.photoUrl,
+                    height: 36,
+                    width: 36,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  horizontalSpaceSmall,
+
+                  /// This will display the current Display name of a user
+                  Text(
+                    widget.fireUser.displayName,
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.black),
+                  ),
+                ],
+              ),
             ),
+            actions: [
+              /// A model bottom sheet appear after pressing this icon
+              /// which contain some options regarding the chat room
+              /// like clear the chat and report the chat and more
+              IconButton(
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Column(
+                      children: [
+                        verticalSpaceRegular,
+
+                        /// This will clear all the conversation in a chat room
+                        chatOptions(Icons.delete_forever, 'Clear Chat'),
+
+                        /// This will report to convo about a user
+                        chatOptions(Icons.report, 'Report')
+                      ],
+                    );
+                  },
+                ),
+                icon: Icon(
+                  FeatherIcons.info,
+                  color: Theme.of(context).colorScheme.mediumBlack,
+                ),
+              ),
+            ],
           ),
           body: Column(
             children: [
+              /// This is the list of chat messages which user send or recived
               chatList(context, model),
+
+              /// This is textfield of the chat screen
+              /// With the help of this textfield user send text message
               chatTextField(context, model),
+
+              /// These are the bottom options for any chatroom  like pick images , videos and docs play animation and many nore
               _buildBottomOptions(context, model),
+
+              /// This bottom padding to keep textfield above from the hardware keybottons in the android device
               bottomPadding(context),
             ],
           ),
@@ -82,6 +129,25 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  /// This widget hepls to display chat options
+  Widget chatOptions(IconData? icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20),
+          horizontalSpaceSmall,
+          Text(
+            text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// These options are for messaging like send media
+  /// run effects send hand drawing art and ohter stuff like that
   Widget _buildBottomOptions(BuildContext context, ChatViewModel model) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -94,6 +160,8 @@ class _ChatViewState extends State<ChatView> {
           iconSize: 32,
         ),
         IconButton(
+          /// This will show the options for playing animation like
+          /// confetti balloons and other
           onPressed: () => showModalBottomSheet(
             elevation: 0,
             backgroundColor: Colors.transparent,
@@ -105,22 +173,22 @@ class _ChatViewState extends State<ChatView> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     horizontalSpaceRegular,
+
+                    /// This will play confetti animation
                     InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Navigator.pop(context),
                         child: const Chip(label: Text('Confetti'))),
                     horizontalSpaceRegular,
+
+                    /// This will play hearts animation
                     InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Navigator.pop(context),
                         child: const Chip(label: Text('Hearts'))),
                     horizontalSpaceRegular,
+
+                    /// This will play balloons animation
                     InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
+                      onTap: () => Navigator.pop(context),
                       child: const Chip(
                         label: Text('Balloons'),
                       ),
@@ -134,41 +202,72 @@ class _ChatViewState extends State<ChatView> {
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
         ),
+
+        /// Click and send image from your device camera
         IconButton(
           onPressed: () {},
           icon: const Icon(FeatherIcons.camera),
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
         ),
+
+        /// This Icon is used for pickin media like images and videos and send it
         IconButton(
           onPressed: () => GmoMediaPicker.picker(
             context,
             isMulti: true,
             mulCallback: (List<AssetEntity> assets) async {
+              /// Pick the media from device
+              /// like images and videos
               if (await model.pickedMediaLength(assets) < 8) {
+                /// This will upload all media in firebase storage
+                /// and added the information into firestore
                 await Future.wait(
                     assets.map((asset) => model.uploadAndAddToDatabase(asset)));
               } else {
+                /// This snackbar will appear if the of selected files are greater than 8 MB
+                /// because maximum uploading file size is 8 MB
+                /// and this will one file or more than one but max Size is 8 MB
                 customSnackbars.infoSnackbar(context,
                     title: 'Maximum size must be less than 8 MB');
               }
-
-              //final mediaList = model.selectedMediaList;
-              // await Future.wait(
-              //   mediaList.map(
-              //     (media) {
-              //       return model
-              //           .addMediaMessage(media['MediaType'], media['URL'])
-              //           .then((value) =>
-              //               model.log.wtf('successfully added to firestore'));
-              //     },
-              //   ),
-              // );
             },
           ),
           icon: const Icon(FeatherIcons.image),
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
+        ),
+
+        /// This icon will display the picking the docs from device
+        /// User can send any documents to another user
+        IconButton(
+          iconSize: 32,
+          icon: const Icon(FeatherIcons.folder),
+          color: Theme.of(context).colorScheme.darkGrey,
+          onPressed: () async {
+            /// This will pick all document from the device
+            /// user can pick any document like
+            /// pdf, png, mp4 etc.
+            final result = await model.documentsPicker(context);
+            if (result != null) {
+              /// This will convert the picked documents list into a
+              /// list of file
+              final files = result.files
+                  .map((platformFile) => File(platformFile.path!))
+                  .toList();
+              if (await model.pickedDocumentsLength(files) < 8) {
+                /// This will upload all documents in firebase storage
+                /// and added the information into firestore
+                Future.wait(result.files.map((file) => model.uploadDocs(file)));
+              } else {
+                /// This snackbar will appear if the of selected documents are greater than 8 MB
+                /// because maximum uploading documents size is 8 MB
+                /// and this will one document or more than one but max Size is 8 MB
+                customSnackbars.infoSnackbar(context,
+                    title: 'Maximum size must be less than 8 MB');
+              }
+            }
+          },
         ),
         IconButton(
           onPressed: () => navService.materialPageRoute(
@@ -189,6 +288,11 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  /// This is the message bubble of those message
+  /// which was received by current user OR will receive
+  /// These message are appears on the left side of the screen
+  /// With different color compare with sended message
+  /// These message are received by current user
   recieverMsgBubble(BuildContext contex, ChatViewModel model) {
     return SliverToBoxAdapter(
       child: StreamBuilder<DatabaseEvent>(
@@ -243,6 +347,9 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  /// This will appears when user send any media
+  /// This shows the uploading progress of files which user uploading into database
+  /// This is a stream so, all progress will display in realtime OR live
   Widget uploadingFileIndicator(BuildContext context, ChatViewModel model) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -275,6 +382,7 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  /// This tile will appear above on the textfield when isReply is true
   Widget replyMessageTile() {
     final color = Theme.of(context).colorScheme.black.withOpacity(0.5);
     bool sendedByMe = locator.get<GetReplyMessageValue>().senderUid ==
@@ -288,6 +396,7 @@ class _ChatViewState extends State<ChatView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            /// isReply will false after pressing this
             InkWell(
               onTap: () {
                 locator.get<GetReplyMessageValue>().isReplyValChanger(false);
@@ -313,6 +422,8 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  /// This is the list of all messages in a conversation of two user
+  ///  OR in a chat room
   Widget chatList(BuildContext context, ChatViewModel model) {
     return Expanded(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -358,8 +469,10 @@ class _ChatViewState extends State<ChatView> {
                             alignment: fromReceiver
                                 ? Alignment.centerLeft
                                 : Alignment.centerRight,
-                            child: MessageBubble(
-                                message: message, fromReceiver: fromReceiver),
+                            child: MessageBubbleView(
+                                message: message,
+                                fromReceiver: fromReceiver,
+                                fireUserId: widget.fireUser.id),
                           );
                         },
                         childCount: messages.length,

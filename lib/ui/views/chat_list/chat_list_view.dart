@@ -11,6 +11,7 @@ import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:hint/ui/views/flutter_downloader/downloader_view.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
@@ -34,12 +35,16 @@ class ChatListView extends StatelessWidget {
       CupertinoSliverNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.scaffoldColor,
         automaticallyImplyLeading: false,
-        leading: Material(
-          color: Colors.transparent,
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: Image.asset('assets/appicon_mdpi_gradient.png'),
+        leading: InkWell(
+          onTap: () =>
+              navService.materialPageRoute(context, const DownloaderView()),
+          child: Material(
+            color: Colors.transparent,
+            child: SizedBox(
+              height: 30,
+              width: 30,
+              child: Image.asset('assets/appicon_mdpi_gradient.png'),
+            ),
           ),
         ),
         trailing: Row(

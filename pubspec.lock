@@ -57,6 +57,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.19"
+  blurhash:
+    dependency: "direct main"
+    description:
+      name: blurhash
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
+  blurhash_dart:
+    dependency: transitive
+    description:
+      name: blurhash_dart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
+  blurhash_web:
+    dependency: transitive
+    description:
+      name: blurhash_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -336,7 +357,14 @@ packages:
       name: file_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.2.7"
+    version: "4.5.0"
+  filesize:
+    dependency: "direct main"
+    description:
+      name: filesize
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -476,12 +504,12 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_blurhash:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_blurhash
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0"
+    version: "0.6.4"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -489,6 +517,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  flutter_downloader:
+    dependency: "direct main"
+    description:
+      name: flutter_downloader
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.7.2"
   flutter_facebook_auth:
     dependency: transitive
     description:
@@ -792,7 +827,7 @@ packages:
     source: hosted
     version: "1.7.0"
   mime:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mime
       url: "https://pub.dartlang.org"
@@ -1397,7 +1432,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.1"
+    version: "2.4.1"
   xdg_directories:
     dependency: transitive
     description:

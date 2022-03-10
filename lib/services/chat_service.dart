@@ -62,7 +62,7 @@ class ChatService {
     _conversationCollection.doc(chatRoomId).set(chatRoomMap);
   }
 
-  getConversationId(String a, String b) {
+  String getConversationId(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
       // ignore: unnecessary_string_escapes
       return '$b\_$a';
@@ -72,20 +72,57 @@ class ChatService {
     }
   }
 
+  /// Delete a chat message from a conversation room
+  Future deleteChatMsg(String fireUserUid, String messageUid) async {
+    String currentUserUid = FirestoreApi().getCurrentUser!.uid;
+    String conversationID = getConversationId(fireUserUid, currentUserUid);
+    return _conversationCollection
+        .doc(conversationID)
+        .collection(chatsFirestoreKey)
+        .doc(messageUid)
+        .delete()
+        .then((value) => log.wtf("Message Deleted"))
+        .catchError((error) => log.e("Failed to delete message: $error"));
+  }
+
+  /// update message in firestore database
+  Future updateMessage(
+      {required String fireUserUid,
+      required String messageUid,
+      required String fieldName,
+      required dynamic fielValue}) async {
+    String currentUserUid = FirestoreApi().getCurrentUser!.uid;
+    String conversationID = getConversationId(fireUserUid, currentUserUid);
+
+    return _conversationCollection
+        .doc(conversationID)
+        .collection(chatsFirestoreKey)
+        .doc(messageUid)
+        .update({fieldName: fielValue})
+        .then((value) => log.wtf("Message Updated"))
+        .catchError((error) => log.e("Failed to update message: $error"));
+  }
+
+  /// Add a new message in firestore database
   Future<String> addNewMessage({
     required String receiverUid,
     required String type,
     bool isReply = false,
     bool isRead = false,
+    int? fileSize,
+    String? blurHash,
     String? messageText,
+    String? documentTitle,
     String? mediaUrl,
     String? swipeMsgUid,
     String? swipeMsgType,
     String? swipeMsgText,
     String? swipeMediaURL,
+    String? swipeDocTitle,
   }) async {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String messageUid = const Uuid().v1();
+    final Map reactions = {};
     final Map messageMap = {};
     final Map replyMsgMap = {};
     const fMessageText = MessageField.messageText;
@@ -94,16 +131,27 @@ class ChatService {
     /// MessageMap Fields
     if (messageText != null) messageMap[fMessageText] = messageText;
     if (mediaUrl != null) messageMap[fMediaURL] = mediaUrl;
+    if (blurHash != null) messageMap[MessageField.blurHash] = blurHash;
+    if (fileSize != null) messageMap[MessageField.size] = fileSize;
+    if (documentTitle != null) {
+      messageMap[MessageField.documentTitle] = documentTitle;
+    }
 
     /// ReplyMessage Fields
     if (swipeMsgText != null) replyMsgMap[fMessageText] = swipeMsgText;
     if (swipeMsgType != null) replyMsgMap[DocumentField.type] = swipeMsgType;
     if (swipeMediaURL != null) replyMsgMap[fMediaURL] = swipeMediaURL;
-    if (swipeMsgUid != null) replyMsgMap[DocumentField.messageUid] = swipeMsgUid;
+    if (swipeDocTitle != null) {
+      replyMsgMap[MessageField.documentTitle] = swipeDocTitle;
+    }
+    if (swipeMsgUid != null) {
+      replyMsgMap[DocumentField.messageUid] = swipeMsgUid;
+    }
     await _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)
-        .add({
+        .doc(messageUid)
+        .set({
       DocumentField.isRead: isRead,
       DocumentField.isReply: isReply,
       DocumentField.message: messageMap,
@@ -112,6 +160,7 @@ class ChatService {
       DocumentField.senderUid: liveUserUid,
       DocumentField.timestamp: Timestamp.now(),
       DocumentField.type: type,
+      DocumentField.reactions: reactions,
     });
     return messageUid;
     //  _conversationCollection

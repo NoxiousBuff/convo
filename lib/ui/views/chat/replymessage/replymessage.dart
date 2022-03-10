@@ -12,6 +12,8 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:custom_rounded_rectangle_border/custom_rounded_rectangle_border.dart';
 
+/// This class is for displaying reply message
+/// reply message are those message which is used to reply for a specific message
 class ReplyMessage extends StatelessWidget {
   final String senderUid;
   final LinkedHashMap<String, dynamic> replyMessage;
@@ -21,11 +23,18 @@ class ReplyMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // This is the color of reply stick which connect
+    //The repled message to normal message
     Color replyStickColor = Theme.of(context).colorScheme.black;
+
+    /// This widget decide the type of message
+    /// After decide the type od message this will display the that message
+    /// which is replied
     Widget replyMessageWidget() {
       switch (replyMessage[DocumentField.type]) {
         case MediaType.text:
           {
+            /// This will widget is for text message type
             return Text(
               replyMessage[MessageField.messageText],
               overflow: TextOverflow.ellipsis,
@@ -33,24 +42,41 @@ class ReplyMessage extends StatelessWidget {
               style: const TextStyle(fontSize: 12),
             );
           }
-        case MediaType.url:
+        case MediaType.document:
           {
-            return Text(
-              replyMessage[MessageField.messageText],
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
-              style: const TextStyle(fontSize: 12),
+            /// This will display documents in reply message
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey,
+                      border: Border.all(color: Colors.grey)),
+                  child: const Icon(FeatherIcons.fileText,
+                      size: 16, color: Colors.white),
+                ),
+                horizontalSpaceTiny,
+                Text(
+                  replyMessage[MessageField.documentTitle],
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             );
           }
         case MediaType.image:
           {
+            /// This will display image message type for replying
             final imageLocalPath = Hive.box(HiveApi.mediaHiveBox)
                 .get(replyMessage[DocumentField.messageUid]);
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 imageLocalPath == null
-                    ? const Icon(FeatherIcons.image, size: 10)
+                    ? const Icon(FeatherIcons.image, size: 20)
                     : SizedBox(
                         height: 20,
                         width: 20,
@@ -63,6 +89,7 @@ class ReplyMessage extends StatelessWidget {
           }
         case MediaType.video:
           {
+            /// This displays the video
             final map = Hive.box(HiveApi.mediaHiveBox)
                 .get(replyMessage[DocumentField.messageUid]);
             var videoThumbnailPath =
@@ -71,7 +98,15 @@ class ReplyMessage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 map == null
-                    ? const Icon(FeatherIcons.image, size: 10)
+                    ? Container(
+                        height: 20,
+                        width: 20,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(4)),
+                        child: const Center(
+                            child: Icon(FeatherIcons.video, size: 10)))
                     : Stack(
                         alignment: Alignment.center,
                         children: [
@@ -105,9 +140,13 @@ class ReplyMessage extends StatelessWidget {
     }
 
     if (senderUid == FirestoreApi().getCurrentUser!.uid) {
+      /// This conditions decides wether reply message will appears
+      /// in right side of the screen OR left side
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          /// This is reply message widget which display
+          /// the reply message
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -120,7 +159,10 @@ class ReplyMessage extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              verticalSpaceRegular,
+              verticalSpaceMedium,
+
+              /// This is the reply stick which connects
+              /// The replied message to normal message
               Container(
                 height: 20,
                 width: 20,
@@ -147,7 +189,10 @@ class ReplyMessage extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              verticalSpaceRegular,
+              verticalSpaceMedium,
+
+              /// This is the reply stick which connects
+              /// The replied message to normal message
               Container(
                 height: 20,
                 width: 20,
@@ -163,6 +208,9 @@ class ReplyMessage extends StatelessWidget {
               ),
             ],
           ),
+
+          /// This is reply message widget which display
+          /// the reply message
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

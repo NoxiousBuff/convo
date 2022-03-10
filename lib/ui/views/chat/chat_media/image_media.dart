@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/ui/shared/convo_image/convo_image.dart';
+import 'package:flutter/material.dart';
+import 'package:hint/models/message_model.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/shared/convo_image/convo_image.dart';
 
 class ImageMedia extends StatelessWidget {
-  final String imageURL;
-  final String messageUid;
+  final Message message;
   const ImageMedia({
     Key? key,
-    required this.imageURL,
-    required this.messageUid,
+    required this.message,
   }) : super(key: key);
 
   @override
@@ -26,9 +25,8 @@ class ImageMedia extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: ConvoImage(
-          mediaUrl: imageURL,
-          folderPath: 'Convo/Media/Convo Images',
-          messageUid: messageUid,
+          message: message,
+          folderPath: 'Media/Convo Images',
           hiveBoxName: HiveApi.mediaHiveBox,
         ),
       ),

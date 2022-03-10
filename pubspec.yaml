@@ -17,63 +17,68 @@ dependencies:
   flutter_riverpod: ^1.0.2
 
   # intro_animation
-  animated_text_kit: ^4.2.1
   spring: ^2.0.2
+  animated_text_kit: ^4.2.1
   smooth_page_indicator: ^1.0.0+2
 
   # firebase
   firebase_core: ^1.7.0
   firebase_auth: ^3.1.3
+  flutterfire_ui: ^0.3.0
   cloud_firestore: ^3.1.5
+  cloud_functions: ^3.2.4
   firebase_storage: ^10.0.5
   firebase_database: ^9.0.4
   firebase_messaging: ^11.2.4
   firebase_crashlytics: ^2.4.4
-  cloud_functions: ^3.2.4
-  flutterfire_ui: ^0.3.0
 
   #resources
+  mime: ^1.0.1
   uuid: ^3.0.4
+  jiffy: ^4.1.0
   intl: ^0.17.0
   lottie: ^1.0.1
-  file_picker: ^4.1.5
+  timeago: ^3.1.0
+  filesize: ^2.0.1
+  file_picker: ^4.5.0  
   country_picker: ^2.0.8
   email_validator: ^2.0.1
-  jiffy: ^4.1.0
-  timeago: ^3.1.0
 
   # ui
-  swipe_to: ^1.0.2
-  animations: ^2.0.2
   pinput: ^1.2.1
-  video_player: ^2.1.4
   confetti: ^0.6.0
-  flutter_markdown: ^0.6.9
-  flutter_feather_icons: ^2.0.0+1
-  cached_network_image: ^3.2.0
-  webview_flutter: ^3.0.0
+  swipe_to: ^1.0.2
+  blurhash: ^1.0.0
+  animations: ^2.0.2
   swipe_deck: ^1.1.0
+  video_player: ^2.1.4
+  webview_flutter: ^3.0.0
+  flutter_markdown: ^0.6.9
   gmo_media_picker: ^0.0.4
+  flutter_blurhash: ^0.6.4
   flutter_parsed_text: ^2.2.1
+  cached_network_image: ^3.2.0
+  flutter_feather_icons: ^2.0.0+1
   custom_rounded_rectangle_border: ^0.2.0-nullsafety.0
 
   #functional
-  hive: ^2.0.4
   dio: ^4.0.4
+  hive: ^2.0.4
   get_it: ^7.2.0
   logger: ^1.0.0
   share_plus: ^3.0.4
   device_info: ^2.0.2
   hive_flutter: ^1.0.0
-  pixabay_picker: ^1.0.6
-  image_picker: ^0.8.4+3
-  flutter_offline: ^2.0.0
-  string_validator: ^0.3.0
-  permission_handler: ^8.3.0
   path_provider: ^2.0.8
   url_launcher: ^6.0.18
+  image_picker: ^0.8.4+3
+  pixabay_picker: ^1.0.6
   extended_image: ^6.0.1
+  flutter_offline: ^2.0.0
+  string_validator: ^0.3.0
   video_compress_ds: ^3.1.6
+  flutter_downloader: ^1.7.2
+  permission_handler: ^8.3.0
   awesome_notifications: ^0.6.19
 
 dev_dependencies:
@@ -97,3 +102,5 @@ flutter:
 
   assets:
     - assets/
+    - images/
+  

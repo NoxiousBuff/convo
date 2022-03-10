@@ -21,6 +21,9 @@ class GetReplyMessageValue extends ChangeNotifier {
   String? _senderUid;
   String? get senderUid => _senderUid;
 
+  String? _documentTitle;
+  String? get documentTitle => _documentTitle;
+
   /// change the value of isReply bool
   void isReplyValChanger(bool val) {
     _isReply = val;
@@ -35,18 +38,21 @@ class GetReplyMessageValue extends ChangeNotifier {
     required String swipedMsgsenderUid,
     String? swipedMsgText,
     String? swipedMediaURL,
+    String? swipedDocumentTitle,
   }) {
     _messageUid = swipedMsgUid;
     _messageType = swipedMsgType;
     _messageText = swipedMsgText;
     _mediaURL = swipedMediaURL;
     _senderUid = swipedMsgsenderUid;
+    _documentTitle = swipedDocumentTitle;
     notifyListeners();
     log('GetReplyMessageValue => swipedMsgUid:$_messageUid');
     log('GetReplyMessageValue => swipedMsgType:$_messageType');
     log('GetReplyMessageValue => swipedMsgText:$_messageText');
     log('GetReplyMessageValue => swipedMediaURL:$_mediaURL');
     log('GetReplyMessageValue => swipedMsgsenderUid:$_senderUid');
+    log('GetReplyMessageValue => swipedDocumentTitle:$_documentTitle');
   }
 
   void clearReplyMsg() {
