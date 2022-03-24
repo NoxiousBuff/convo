@@ -1,3 +1,5 @@
+import 'package:hint/ui/views/chat/chat_media/text_media.dart';
+
 import 'chat_viewmodel.dart';
 import 'widgets/chat_options.dart';
 import 'package:lottie/lottie.dart';
@@ -132,164 +134,164 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
           fireUser: widget.fireUser, conversationId: widget.conversationId),
       builder: (context, model, child) {
         return StreamBuilder<DatabaseEvent>(
-            stream: model.realtimeDBDocument,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Text('There is something wrong');
+          stream: model.realtimeDBDocument,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text('There is something wrong');
+            }
+
+            if (!snapshot.hasData) const CupertinoActivityIndicator();
+            final data = snapshot.data;
+            if (data != null) {
+              final receiverData = data.snapshot.value;
+              final receiverUser = DuleModel.fromJson(receiverData);
+              switch (receiverUser.aniType) {
+                case AnimationType.confetti:
+                  {
+                    confettiCntlr.forward();
+                  }
+                  break;
+                case AnimationType.balloons:
+                  {
+                    balloonCntlr.forward();
+                  }
+                  break;
+                case AnimationType.hearts:
+                  {
+                    heartCntlr.forward();
+                  }
+                  break;
+
+                case AnimationType.dollar:
+                  {
+                    dollarCntlr.forward();
+                  }
+                  break;
+                case AnimationType.fuckOff:
+                  {
+                    fuckCntlr.forward();
+                  }
+                  break;
+
+                default:
+                  {}
               }
+            }
 
-              if (!snapshot.hasData) const CupertinoActivityIndicator();
-              final data = snapshot.data;
-              if (data != null) {
-                final receiverData = data.snapshot.value;
-                final receiverUser = DuleModel.fromJson(receiverData);
-                switch (receiverUser.aniType) {
-                  case AnimationType.confetti:
-                    {
-                      confettiCntlr.forward();
-                    }
-                    break;
-                  case AnimationType.balloons:
-                    {
-                      balloonCntlr.forward();
-                    }
-                    break;
-                  case AnimationType.hearts:
-                    {
-                      heartCntlr.forward();
-                    }
-                    break;
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Scaffold(
+                  appBar: AppBar(
+                    leading: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(FeatherIcons.arrowLeft,
+                          color: Theme.of(context).colorScheme.mediumBlack),
+                    ),
+                    titleSpacing: 0.0,
+                    elevation: 0.0,
+                    backgroundColor: Theme.of(context).colorScheme.lightGrey,
 
-                  case AnimationType.dollar:
-                    {
-                      dollarCntlr.forward();
-                    }
-                    break;
-                  case AnimationType.fuckOff:
-                    {
-                      fuckCntlr.forward();
-                    }
-                    break;
+                    /// This will display the username unique name of each user
+                    title: InkWell(
+                      onTap: () => navService.materialPageRoute(
+                          context, const UserAccountView()),
+                      child: Row(
+                        children: [
+                          /// This display the profile photo of user
+                          UserProfilePhoto(
+                            widget.fireUser.photoUrl,
+                            height: 36,
+                            width: 36,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          horizontalSpaceSmall,
 
-                  default:
-                    {}
-                }
-              }
-
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  Scaffold(
-                    appBar: AppBar(
-                      leading: InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(FeatherIcons.arrowLeft,
-                            color: Theme.of(context).colorScheme.mediumBlack),
+                          /// This will display the current Display name of a user
+                          Text(
+                            widget.fireUser.displayName,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.black),
+                          ),
+                        ],
                       ),
-                      titleSpacing: 0.0,
-                      elevation: 0.0,
-                      backgroundColor: Theme.of(context).colorScheme.lightGrey,
+                    ),
+                    actions: [
+                      /// A model bottom sheet appear after pressing this icon
+                      /// which contain some options regarding the chat room
+                      /// like clear the chat and report the chat and more
+                      IconButton(
+                        onPressed: () => showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Column(
+                              children: const [
+                                verticalSpaceRegular,
 
-                      /// This will display the username unique name of each user
-                      title: InkWell(
-                        onTap: () => navService.materialPageRoute(
-                            context, const UserAccountView()),
-                        child: Row(
-                          children: [
-                            /// This display the profile photo of user
-                            UserProfilePhoto(
-                              widget.fireUser.photoUrl,
-                              height: 36,
-                              width: 36,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            horizontalSpaceSmall,
+                                /// This will clear all the conversation in a chat room
+                                ChatOptions(
+                                    icon: FeatherIcons.delete, label: 'Delete'),
 
-                            /// This will display the current Display name of a user
-                            Text(
-                              widget.fireUser.displayName,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.black),
-                            ),
-                          ],
+                                /// This will report to convo about a user
+                                ChatOptions(
+                                    icon: Icons.report, label: 'Report'),
+                                verticalSpaceRegular,
+                              ],
+                            );
+                          },
+                        ),
+                        icon: Icon(
+                          FeatherIcons.info,
+                          color: Theme.of(context).colorScheme.mediumBlack,
                         ),
                       ),
-                      actions: [
-                        /// A model bottom sheet appear after pressing this icon
-                        /// which contain some options regarding the chat room
-                        /// like clear the chat and report the chat and more
-                        IconButton(
-                          onPressed: () => showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return Column(
-                                children: const [
-                                  verticalSpaceRegular,
-
-                                  /// This will clear all the conversation in a chat room
-                                  ChatOptions(
-                                      icon: FeatherIcons.delete,
-                                      label: 'Delete'),
-
-                                  /// This will report to convo about a user
-                                  ChatOptions(
-                                      icon: Icons.report, label: 'Report'),
-                                  verticalSpaceRegular,
-                                ],
-                              );
-                            },
-                          ),
-                          icon: Icon(
-                            FeatherIcons.info,
-                            color: Theme.of(context).colorScheme.mediumBlack,
-                          ),
-                        ),
-                      ],
-                    ),
-                    body: Column(
-                      children: [
-                        /// This is the list of chat messages which user send or recived
-                        chatList(context, model),
-
-                        /// This is textfield of the chat screen
-                        /// With the help of this textfield user send text message
-                        textField(context, model),
-
-                        /// These are the bottom options for any chatroom  like pick images , videos and docs play animation and many nore
-                        _buildBottomOptions(context, model),
-
-                        /// This bottom padding to keep textfield above from the hardware keybottons in the android device
-                        bottomPadding(context),
-                      ],
-                    ),
+                    ],
                   ),
-                  heartCntlr.isAnimating
-                      ? LottieBuilder.asset('json/heart.json',
-                          controller: heartCntlr)
-                      : shrinkBox,
-                  fuckCntlr.isAnimating
-                      ? LottieBuilder.asset('json/fuck_off.json',
-                          controller: fuckCntlr)
-                      : shrinkBox,
-                  confettiCntlr.isAnimating
-                      ? LottieBuilder.asset(
-                          'json/confetti.json',
-                          fit: BoxFit.cover,
-                          controller: confettiCntlr,
-                          height: screenHeight(context),
-                        )
-                      : shrinkBox,
-                  dollarCntlr.isAnimating
-                      ? LottieBuilder.asset('json/dollar_rain.json',
-                          controller: dollarCntlr)
-                      : shrinkBox,
-                  balloonCntlr.isAnimating
-                      ? LottieBuilder.asset('json/balloons.json',
-                          controller: balloonCntlr)
-                      : shrinkBox,
-                ],
-              );
-            });
+                  body: Column(
+                    children: [
+                      /// This is the list of chat messages which user send or recived
+                      chatList(context, model),
+
+                      /// This is textfield of the chat screen
+                      /// With the help of this textfield user send text message
+                      textField(context, model),
+
+                      /// These are the bottom options for any chatroom  like pick images , videos and docs play animation and many nore
+                      _buildBottomOptions(context, model),
+
+                      /// This bottom padding to keep textfield above from the hardware keybottons in the android device
+                      bottomPadding(context),
+                    ],
+                  ),
+                ),
+                heartCntlr.isAnimating
+                    ? LottieBuilder.asset('json/heart.json',
+                        controller: heartCntlr)
+                    : shrinkBox,
+                fuckCntlr.isAnimating
+                    ? LottieBuilder.asset('json/fuck_off.json',
+                        controller: fuckCntlr)
+                    : shrinkBox,
+                confettiCntlr.isAnimating
+                    ? LottieBuilder.asset(
+                        'json/confetti.json',
+                        fit: BoxFit.cover,
+                        controller: confettiCntlr,
+                        height: screenHeight(context),
+                      )
+                    : shrinkBox,
+                dollarCntlr.isAnimating
+                    ? LottieBuilder.asset('json/dollar_rain.json',
+                        controller: dollarCntlr)
+                    : shrinkBox,
+                balloonCntlr.isAnimating
+                    ? LottieBuilder.asset('json/balloons.json',
+                        controller: balloonCntlr)
+                    : shrinkBox,
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -531,36 +533,65 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
 
             if (data != null) {
               final json = data.snapshot.value;
+              const padding =
+                  EdgeInsets.symmetric(horizontal: 14, vertical: 10);
               final DuleModel duleModel = DuleModel.fromJson(json);
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  duleModel.msgTxt.isEmpty
-                      ? shrinkBox
-                      : Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).colorScheme.yellowAccent,
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Text(
-                              duleModel.msgTxt,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.black,
-                                fontSize: 18,
+              var maxWidth = screenWidthPercentage(context, percentage: 0.8);
+              return duleModel.msgTxt.isEmpty
+                  ? shrinkBox
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: padding,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.grey,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              constraints: BoxConstraints(maxWidth: maxWidth),
+                              child: Text(
+                                duleModel.msgTxt,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.white,
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                  SizedBox(
-                    width: screenWidthPercentage(context, percentage: 0.1),
-                  ),
-                ],
-              );
+                          )
+                        ],
+                      ),
+                    );
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.start,
+              //   children: [
+              //     duleModel.msgTxt.isEmpty
+              //         ? shrinkBox
+              //         : Padding(
+              //             padding: const EdgeInsets.all(8.0),
+              //             child: Container(
+              //               alignment: Alignment.center,
+              //               padding: const EdgeInsets.symmetric(
+              //                   horizontal: 16, vertical: 12),
+              //               decoration: BoxDecoration(
+              //                   color:
+              //                       Theme.of(context).colorScheme.yellowAccent,
+              //                   borderRadius: BorderRadius.circular(20)),
+              //               child: Text(
+              //                 duleModel.msgTxt,
+              //                 style: TextStyle(
+              //                   color: Theme.of(context).colorScheme.black,
+              //                   fontSize: 18,
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //     SizedBox(
+              //       width: screenWidthPercentage(context, percentage: 0.1),
+              //     ),
+              //   ],
+              // );
             } else {
               return shrinkBox;
             }
