@@ -1,12 +1,13 @@
+import 'dart:io';
 import 'dart:ui';
 import 'dart:isolate';
 import 'package:hint/api/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/path_finder.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 class TestClass {
@@ -136,11 +137,23 @@ class _DownloaderViewState extends State<DownloaderView> {
   Future<String?> download() async {
     String fileName = _localNameGenerator(MediaType.video);
 
-    var savedDir = await pathFinder.getSavedDirecotyPath('Media/Convo Videos');
+    var savedDir = await pathHelper.getSavedDirecotyPath('Media/Convo Videos');
     final downloaderMap = await PathHelper().flutterDownloader(
         url: url, savedDir: savedDir, fileNameWithExtension: '$fileName.mp4');
 
     return downloaderMap[MediaHiveBoxField.taskID];
+  }
+
+  Future _createDirectory() async {
+    final directory = await getExternalStorageDirectory();
+    final path = directory!.path;
+    final _directory = Directory('$path/Jai Shree Ram');
+    if (!await _directory.exists()) {
+      _directory.create(recursive: true);
+    }
+    //  await Directory('$path/CapturedImages').create(recursive: true);
+    //print("The directory $directory is created");
+    log.w('created directory: $_directory');
   }
 
   @override
@@ -165,31 +178,7 @@ class _DownloaderViewState extends State<DownloaderView> {
           verticalSpaceMedium,
           CupertinoButton.filled(
             child: const Text('Generate Thumbnail'),
-            onPressed: () async {
-              //String folderPath = 'Media/Thumbnails';
-              //String encodedURL = Uri.encodeFull(url);
-              try {
-                // var path = await pathHelper.getSavedDirecotyPath(folderPath);
-                // final name = pathHelper.localNameGenerator(MediaType.image);
-                // final fileName = await VideoThumbnail.thumbnailData(
-                //   quality: 75,
-                //   video: encodedURL,
-                //   //thumbnailPath: '$path/$name.jpeg',
-                // );
-                // log.wtf('filename:$fileName');
-                // var file =
-                //     await VideoCompress.getFileThumbnail(url, quality: 50);
-                // log.wtf('thumbnailPath:$file');
-                // await pathHelper
-                //     .saveInLocalPath(file,
-                //         extension: 'jpeg',
-                //         mediaName: 'MediaName',
-                //         folderPath: 'Media/Thumbnails')
-                //     .whenComplete(() => log.wtf('Thumbnail Saved Succesfully'));
-              } on Exception catch (e) {
-                log.e('Thumbnail Generate Error:$e');
-              }
-            },
+            onPressed: () => _createDirectory(),
           ),
           Text('${_downloadingProgress / 100}'),
           IconButton(

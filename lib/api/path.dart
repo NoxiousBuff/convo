@@ -177,21 +177,22 @@ class PathHelper {
     if (Platform.isAndroid) {
       if (await _requestPermission(Permission.storage)) {
         directory = (await getExternalStorageDirectory());
-        String newPath = "";
-        List<String> paths = directory!.path.split("/");
-        for (int x = 1; x < paths.length; x++) {
-          String folder = paths[x];
-          if (folder != "Android") {
-            newPath += "/" + folder;
-          } else {
-            break;
-          }
-        }
-        String backPath = '/Convo' '/$folderPath';
-        log.wtf('Back Path of the Folder : $backPath');
-        newPath = newPath + backPath;
-        directory = Directory(newPath);
-        log.wtf('Path of the newly created directory : ${directory.path}');
+        String directoryPath = directory!.path;
+        // List<String> paths = directory!.path.split("/");
+        // for (int x = 1; x < paths.length; x++) {
+        //   String folder = paths[x];
+        //   if (folder != "Android") {
+        //     newPath += "/" + folder;
+        //   } else {
+        //     break;
+        //   }
+        // }
+        // String backPath = '/$folderPath';
+        //newPath = newPath + backPath;
+        final path = '$directoryPath/$folderPath';
+        directory = Directory(path);
+        log.wtf('Android Folder Path Of Convo: $directory');
+        log.wtf('Path of the newly created directory : $path');
       } else {}
     } else {
       if (await _requestPermission(Permission.photos)) {
@@ -216,21 +217,27 @@ class PathHelper {
     if (Platform.isAndroid) {
       if (await _requestPermission(Permission.storage)) {
         directory = (await getExternalStorageDirectory());
-        String newPath = "";
-        List<String> paths = directory!.path.split("/");
-        for (int x = 1; x < paths.length; x++) {
-          String folder = paths[x];
-          if (folder != "Android") {
-            newPath += "/" + folder;
-          } else {
-            break;
-          }
-        }
-        String backPath = '/Convo' '/$folderPath';
-        log.wtf('Back Path of the Folder : $backPath');
-        newPath = newPath + backPath;
-        directory = Directory(newPath);
-        log.wtf('Path of the newly created directory : ${directory.path}');
+        String directoryPath = directory!.path;
+
+        // String newPath = "";
+        // List<String> paths = directory!.path.split("/");
+        // for (int x = 1; x < paths.length; x++) {
+        //   String folder = paths[x];
+        //   if (folder != "Android") {
+        //     newPath += "/" + folder;
+        //   } else {
+        //     break;
+        //   }
+        // }
+        // String backPath = '/Convo' '/$folderPath';
+        // log.wtf('Back Path of the Folder : $backPath');
+        // newPath = newPath + backPath;
+        // directory = Directory(newPath);
+        // log.wtf('Path of the newly created directory : ${directory.path}');
+        final path = '$directoryPath/$folderPath';
+        directory = Directory(path);
+        log.wtf('Android Folder Path Of Convo: $directory');
+        log.wtf('Path of the newly created directory : $path');
       } else {}
     } else {
       if (await _requestPermission(Permission.photos)) {

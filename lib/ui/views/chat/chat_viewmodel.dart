@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:hint/api/path.dart';
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
 import 'package:stacked/stacked.dart';
@@ -9,7 +10,6 @@ import 'package:blurhash/blurhash.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image/image.dart' as img;
 import 'package:hint/app/app_logger.dart';
-import 'package:hint/api/path_finder.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:file_picker/file_picker.dart';
@@ -35,6 +35,9 @@ class ChatViewModel extends BaseViewModel {
   /// Unique Id of a conversation
   /// without this id nobody can enter or get the conversation
   String conversationId;
+
+  /// calling path helper
+  PathHelper pathHelper = PathHelper();
 
   /// calling database API class
   final databaseService = DatabaseService();
@@ -177,7 +180,7 @@ class ChatViewModel extends BaseViewModel {
 
     final mediaName = _localNameGenerator(MediaType.image);
 
-    pathFinder.saveInLocalPath(thumbnailFile,
+    pathHelper.saveInLocalPath(thumbnailFile,
         mediaName: mediaName,
         folderPath: 'Media/Thumbnails',
         extension: 'jpeg');
@@ -321,7 +324,7 @@ class ChatViewModel extends BaseViewModel {
 
     /// This will save the copy of selected file in the convo app
     /// local directory or folder
-    final savedFile = await pathFinder.saveInLocalPath(File(filePath),
+    final savedFile = await pathHelper.saveInLocalPath(File(filePath),
         mediaName: mediaName, folderPath: folder, extension: extension);
 
     /// Add the message in firestore and
