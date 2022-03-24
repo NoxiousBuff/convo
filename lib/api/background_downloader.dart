@@ -6,30 +6,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class BackgroundDownloader {
   final log = getLogger('BackgroundDownloader');
 
   Directory? globalDirectory;
   DioApi dioApi = DioApi();
-  // Future<void> _requestDownload(
-  //     {required String url,
-  //     required String fileName,
-  //     required String localPath}) async {
-  //   // final dir =
-  //   //     await getApplicationDocumentsDirectory(); //From path_provider package
-  //   // var _localPath = dir.path + _name;
-  //   // final savedDir = Directory(_localPath);
-  //   //await savedDir.create(recursive: true).then((value) async {});
-  //   String? _taskid = await FlutterDownloader.enqueue(
-  //     url: url,
-  //     fileName: fileName,
-  //     savedDir: localPath,
-  //     showNotification: true,
-  //     openFileFromNotification: false,
-  //   );
-  //   log.wtf('TaskID:$_taskid');
-  // }
 
   Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {

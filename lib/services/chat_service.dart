@@ -27,6 +27,8 @@ class ChatService {
 
   static final String liveUserUid = _auth.currentUser!.uid;
 
+  final databaseService = DatabaseService();
+
   static final CollectionReference subsCollection =
       _firestore.collection(subsFirestoreKey);
 
@@ -111,6 +113,7 @@ class ChatService {
     bool isRead = false,
     int? fileSize,
     String? blurHash,
+    String? localPath,
     String? messageText,
     String? documentTitle,
     String? mediaUrl,
@@ -119,6 +122,7 @@ class ChatService {
     String? swipeMsgText,
     String? swipeMediaURL,
     String? swipeDocTitle,
+    String? senderThumbnail,
   }) async {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String messageUid = const Uuid().v1();
@@ -133,6 +137,10 @@ class ChatService {
     if (mediaUrl != null) messageMap[fMediaURL] = mediaUrl;
     if (blurHash != null) messageMap[MessageField.blurHash] = blurHash;
     if (fileSize != null) messageMap[MessageField.size] = fileSize;
+    if (localPath != null) messageMap[MessageField.senderLocalPath] = localPath;
+    if (senderThumbnail != null) {
+      messageMap[MessageField.senderThumbnail] = senderThumbnail;
+    }
     if (documentTitle != null) {
       messageMap[MessageField.documentTitle] = documentTitle;
     }

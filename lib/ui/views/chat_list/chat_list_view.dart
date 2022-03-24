@@ -1,29 +1,29 @@
 import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hint/api/hive.dart';
 import 'package:hint/app/app.dart';
-import 'package:hint/constants/app_keys.dart';
-import 'package:hint/extensions/custom_color_scheme.dart';
-import 'package:hint/models/user_model.dart';
-import 'package:hint/services/chat_service.dart';
-import 'package:hint/ui/shared/circular_progress.dart';
-import 'package:hint/ui/shared/empty_state.dart';
-import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/ui/shared/user_profile_photo.dart';
-import 'package:hint/ui/views/auth/auth_widgets.dart';
-import 'package:hint/ui/views/flutter_downloader/downloader_view.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hint/api/hive.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hint/extensions/query.dart';
+import 'package:hint/models/user_model.dart';
+import 'package:hint/constants/app_keys.dart';
+import 'package:hint/ui/shared/ui_helpers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/services/nav_service.dart';
+import 'package:hint/services/chat_service.dart';
+import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/main/main_view.dart';
+import 'package:hint/ui/views/auth/auth_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
+import 'package:hint/ui/shared/user_profile_photo.dart';
+import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/archives/archives_view.dart';
 import 'package:hint/ui/views/chat_list/chat_list_viewmodel.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat_list/widgets/user_list_item.dart';
-import 'package:hint/extensions/query.dart';
+import 'package:hint/ui/views/flutter_downloader/downloader_view.dart';
 
 import 'widgets/show_tile_options.dart';
 
@@ -100,6 +100,8 @@ class ChatListView extends StatelessWidget {
           ],
         ),
         stretch: true,
+       
+        // *  Title of the app
         largeTitle: Text(
           'Convo',
           style: TextStyle(

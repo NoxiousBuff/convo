@@ -1,4 +1,6 @@
 import 'chat_viewmodel.dart';
+import 'widgets/chat_options.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/locator.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/models/dule_model.dart';
+import 'package:ezanimation/ezanimation.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/services/nav_service.dart';
@@ -14,13 +17,17 @@ import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/api/replymessage_value.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:gmo_media_picker/media_picker.dart';
+import 'package:hint/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
 import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
+import 'package:hint/ui/views/chat/widgets/chat_textfield.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hint/ui/views/chat/widgets/replymessage_tile.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
+import 'package:hint/ui/views/chat/widgets/chat_animation_options.dart';
 import 'package:hint/ui/views/chat/message_bubble/message_bubble_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 
@@ -38,111 +45,252 @@ class ChatView extends StatefulWidget {
   State<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<ChatView> {
+class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
+  /// Duration of each animation in chat room
+  static const duration = Duration(seconds: 4);
+
+  /// calling database API calss
+  final databaseService = DatabaseService();
+
+  /// calling the replyMessage locator
+  final replyMsgLocator = locator.get<GetReplyMessageValue>();
+
+  /// animation controllers
+  late AnimationController fuckCntlr;
+  late AnimationController heartCntlr;
+  late AnimationController dollarCntlr;
+  late AnimationController balloonCntlr;
+  late AnimationController confettiCntlr;
+
+  final ezAnimation = EzAnimation(0.0, 200.0, const Duration(seconds: 4));
+
+  Animation<double> balloonSize(AnimationController balloonCntlr) {
+    Animation<double> _balloonSize = Tween<double>(begin: 0, end: 500)
+        .animate(CurvedAnimation(parent: balloonCntlr, curve: Curves.linear));
+    return _balloonSize;
+  }
+
+  Animation<Offset> balloonPosition(AnimationController balloonCntlr) {
+    final _position = Tween<Offset>(
+            begin: const Offset(0, 0), end: const Offset(1, 1))
+        .animate(CurvedAnimation(parent: balloonCntlr, curve: Curves.linear));
+    return _position;
+  }
+
+  @override
+  void initState() {
+    databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+
+    databaseService.updateUserDataWithKey(
+        DatabaseMessageField.roomUid, widget.conversationId);
+
+    /// initialise the heart controller
+    heartCntlr = AnimationController(vsync: this, duration: duration);
+
+    /// initialise the balloon controller
+    balloonCntlr = AnimationController(vsync: this, duration: duration);
+
+    /// initialise the fuck controller
+    fuckCntlr = AnimationController(vsync: this, duration: duration);
+
+    /// initialise the confetti controller
+    confettiCntlr = AnimationController(vsync: this, duration: duration);
+
+    /// initialise the dollar controller
+    dollarCntlr = AnimationController(vsync: this, duration: duration);
+
+    fuckCntlr.addListener(() => setState(() {}));
+    heartCntlr.addListener(() => setState(() {}));
+    dollarCntlr.addListener(() => setState(() {}));
+    balloonCntlr.addListener(() => setState(() {}));
+    confettiCntlr.addListener(() => setState(() {}));
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    fuckCntlr.removeListener(() {});
+    heartCntlr.removeListener(() {});
+    dollarCntlr.removeListener(() {});
+    balloonCntlr.removeListener(() {});
+    confettiCntlr.removeListener(() {});
+
+    fuckCntlr.dispose();
+    heartCntlr.dispose();
+    dollarCntlr.dispose();
+    balloonCntlr.dispose();
+    confettiCntlr.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChatViewModel>.reactive(
       viewModelBuilder: () => ChatViewModel(
           fireUser: widget.fireUser, conversationId: widget.conversationId),
       builder: (context, model, child) {
-        return Scaffold(
-          appBar: AppBar(
-            leading: InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Icon(FeatherIcons.arrowLeft,
-                  color: Theme.of(context).colorScheme.mediumBlack),
-            ),
-            titleSpacing: 0.0,
-            elevation: 0.0,
-            backgroundColor: Theme.of(context).colorScheme.lightGrey,
+        return StreamBuilder<DatabaseEvent>(
+            stream: model.realtimeDBDocument,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Text('There is something wrong');
+              }
 
-            /// This will display the username unique name of each user
-            title: InkWell(
-              onTap: () => navService.materialPageRoute(
-                  context, const UserAccountView()),
-              child: Row(
+              if (!snapshot.hasData) const CupertinoActivityIndicator();
+              final data = snapshot.data;
+              if (data != null) {
+                final receiverData = data.snapshot.value;
+                final receiverUser = DuleModel.fromJson(receiverData);
+                switch (receiverUser.aniType) {
+                  case AnimationType.confetti:
+                    {
+                      confettiCntlr.forward();
+                    }
+                    break;
+                  case AnimationType.balloons:
+                    {
+                      balloonCntlr.forward();
+                    }
+                    break;
+                  case AnimationType.hearts:
+                    {
+                      heartCntlr.forward();
+                    }
+                    break;
+
+                  case AnimationType.dollar:
+                    {
+                      dollarCntlr.forward();
+                    }
+                    break;
+                  case AnimationType.fuckOff:
+                    {
+                      fuckCntlr.forward();
+                    }
+                    break;
+
+                  default:
+                    {}
+                }
+              }
+
+              return Stack(
+                alignment: Alignment.center,
                 children: [
-                  /// This display the profile photo of user
-                  UserProfilePhoto(
-                    widget.fireUser.photoUrl,
-                    height: 36,
-                    width: 36,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  horizontalSpaceSmall,
+                  Scaffold(
+                    appBar: AppBar(
+                      leading: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(FeatherIcons.arrowLeft,
+                            color: Theme.of(context).colorScheme.mediumBlack),
+                      ),
+                      titleSpacing: 0.0,
+                      elevation: 0.0,
+                      backgroundColor: Theme.of(context).colorScheme.lightGrey,
 
-                  /// This will display the current Display name of a user
-                  Text(
-                    widget.fireUser.displayName,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.black),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              /// A model bottom sheet appear after pressing this icon
-              /// which contain some options regarding the chat room
-              /// like clear the chat and report the chat and more
-              IconButton(
-                onPressed: () => showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return Column(
-                      children: [
-                        verticalSpaceRegular,
+                      /// This will display the username unique name of each user
+                      title: InkWell(
+                        onTap: () => navService.materialPageRoute(
+                            context, const UserAccountView()),
+                        child: Row(
+                          children: [
+                            /// This display the profile photo of user
+                            UserProfilePhoto(
+                              widget.fireUser.photoUrl,
+                              height: 36,
+                              width: 36,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            horizontalSpaceSmall,
 
-                        /// This will clear all the conversation in a chat room
-                        chatOptions(Icons.delete_forever, 'Clear Chat'),
+                            /// This will display the current Display name of a user
+                            Text(
+                              widget.fireUser.displayName,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        /// A model bottom sheet appear after pressing this icon
+                        /// which contain some options regarding the chat room
+                        /// like clear the chat and report the chat and more
+                        IconButton(
+                          onPressed: () => showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                children: const [
+                                  verticalSpaceRegular,
 
-                        /// This will report to convo about a user
-                        chatOptions(Icons.report, 'Report')
+                                  /// This will clear all the conversation in a chat room
+                                  ChatOptions(
+                                      icon: FeatherIcons.delete,
+                                      label: 'Delete'),
+
+                                  /// This will report to convo about a user
+                                  ChatOptions(
+                                      icon: Icons.report, label: 'Report'),
+                                  verticalSpaceRegular,
+                                ],
+                              );
+                            },
+                          ),
+                          icon: Icon(
+                            FeatherIcons.info,
+                            color: Theme.of(context).colorScheme.mediumBlack,
+                          ),
+                        ),
                       ],
-                    );
-                  },
-                ),
-                icon: Icon(
-                  FeatherIcons.info,
-                  color: Theme.of(context).colorScheme.mediumBlack,
-                ),
-              ),
-            ],
-          ),
-          body: Column(
-            children: [
-              /// This is the list of chat messages which user send or recived
-              chatList(context, model),
+                    ),
+                    body: Column(
+                      children: [
+                        /// This is the list of chat messages which user send or recived
+                        chatList(context, model),
 
-              /// This is textfield of the chat screen
-              /// With the help of this textfield user send text message
-              chatTextField(context, model),
+                        /// This is textfield of the chat screen
+                        /// With the help of this textfield user send text message
+                        textField(context, model),
 
-              /// These are the bottom options for any chatroom  like pick images , videos and docs play animation and many nore
-              _buildBottomOptions(context, model),
+                        /// These are the bottom options for any chatroom  like pick images , videos and docs play animation and many nore
+                        _buildBottomOptions(context, model),
 
-              /// This bottom padding to keep textfield above from the hardware keybottons in the android device
-              bottomPadding(context),
-            ],
-          ),
-        );
+                        /// This bottom padding to keep textfield above from the hardware keybottons in the android device
+                        bottomPadding(context),
+                      ],
+                    ),
+                  ),
+                  heartCntlr.isAnimating
+                      ? LottieBuilder.asset('json/heart.json',
+                          controller: heartCntlr)
+                      : shrinkBox,
+                  fuckCntlr.isAnimating
+                      ? LottieBuilder.asset('json/fuck_off.json',
+                          controller: fuckCntlr)
+                      : shrinkBox,
+                  confettiCntlr.isAnimating
+                      ? LottieBuilder.asset(
+                          'json/confetti.json',
+                          fit: BoxFit.cover,
+                          controller: confettiCntlr,
+                          height: screenHeight(context),
+                        )
+                      : shrinkBox,
+                  dollarCntlr.isAnimating
+                      ? LottieBuilder.asset('json/dollar_rain.json',
+                          controller: dollarCntlr)
+                      : shrinkBox,
+                  balloonCntlr.isAnimating
+                      ? LottieBuilder.asset('json/balloons.json',
+                          controller: balloonCntlr)
+                      : shrinkBox,
+                ],
+              );
+            });
       },
-    );
-  }
-
-  /// This widget hepls to display chat options
-  Widget chatOptions(IconData? icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20),
-          horizontalSpaceSmall,
-          Text(
-            text,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
     );
   }
 
@@ -276,9 +424,84 @@ class _ChatViewState extends State<ChatView> {
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
         ),
+
+        /// display the screen animations option
+        /// for playing for e.g confetti, balloons, heart, coins etc
+        IconButton(
+          onPressed: () => showModalBottomSheet(
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (_) {
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                height: screenHeightPercentage(context, percentage: 0.1),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    horizontalSpaceSmall,
+                    AnimationOptionChip(
+                        label: 'Confetti',
+                        onTap: () {
+                          model.updateAnimation(
+                              context: context,
+                              controller: confettiCntlr,
+                              animationType: AnimationType.confetti);
+                        }),
+                    horizontalSpaceSmall,
+                    AnimationOptionChip(
+                        label: 'Balloons',
+                        onTap: () {
+                          model.updateAnimation(
+                              context: context,
+                              controller: balloonCntlr,
+                              animationType: AnimationType.balloons);
+                        }),
+                    horizontalSpaceSmall,
+                    AnimationOptionChip(
+                      label: 'Hearts',
+                      onTap: () {
+                        model.updateAnimation(
+                            context: context,
+                            controller: heartCntlr,
+                            animationType: AnimationType.hearts);
+                      },
+                    ),
+                    horizontalSpaceSmall,
+                    AnimationOptionChip(
+                        label: 'Fuck Off',
+                        onTap: () {
+                          model.updateAnimation(
+                              context: context,
+                              controller: fuckCntlr,
+                              animationType: AnimationType.fuckOff);
+                        }),
+                    horizontalSpaceSmall,
+                    AnimationOptionChip(
+                        label: 'Dollars',
+                        onTap: () {
+                          model.updateAnimation(
+                              context: context,
+                              controller: dollarCntlr,
+                              animationType: AnimationType.dollar);
+                        }),
+                    horizontalSpaceSmall,
+                  ],
+                ),
+              );
+            },
+          ),
+          icon: const Icon(FeatherIcons.edit2),
+          color: Theme.of(context).colorScheme.darkGrey,
+          iconSize: 32,
+        ),
         const Spacer(),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            model.addMessage();
+            model.messageTech.clear();
+            model.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+          },
           icon: const Icon((FeatherIcons.refreshCcw)),
           color: Theme.of(context).colorScheme.red,
           iconSize: 32,
@@ -382,49 +605,11 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
-  /// This tile will appear above on the textfield when isReply is true
-  Widget replyMessageTile() {
-    final color = Theme.of(context).colorScheme.black.withOpacity(0.5);
-    bool sendedByMe = locator.get<GetReplyMessageValue>().senderUid ==
-        FirestoreApi().getCurrentUser!.uid;
-    return Visibility(
-      visible: locator.get<GetReplyMessageValue>().isReply,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-        width: screenWidth(context),
-        color: color,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            /// isReply will false after pressing this
-            InkWell(
-              onTap: () {
-                locator.get<GetReplyMessageValue>().isReplyValChanger(false);
-                locator.get<GetReplyMessageValue>().clearReplyMsg();
-              },
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.white,
-                maxRadius: 10,
-                child: const Center(
-                  child: Icon(
-                    FeatherIcons.x,
-                    size: 12,
-                  ),
-                ),
-              ),
-            ),
-            horizontalSpaceRegular,
-            Text(
-                'Replying to ${sendedByMe ? 'yourself' : widget.fireUser.username}'),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// This is the list of all messages in a conversation of two user
   ///  OR in a chat room
   Widget chatList(BuildContext context, ChatViewModel model) {
+    bool sendedByMe =
+        replyMsgLocator.senderUid == FirestoreApi().getCurrentUser!.uid;
     return Expanded(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: model.getUserchat,
@@ -444,8 +629,13 @@ class _ChatViewState extends State<ChatView> {
             scrollBehavior: const CupertinoScrollBehavior(),
             reverse: true,
             slivers: [
-              // SliverToBoxAdapter(child: uploadingFileIndicator(context, model)),
-              SliverToBoxAdapter(child: replyMessageTile()),
+              SliverToBoxAdapter(
+                /// This tile will appear above on the textfield when isReply is true
+                child: ReplyMessageTile(
+                  sendedByMe: sendedByMe,
+                  fireUserName: widget.fireUser.username,
+                ),
+              ),
               recieverMsgBubble(context, model),
               messages.isEmpty
                   ? model.messageText.isNotEmpty
@@ -486,6 +676,28 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
+  Widget textField(BuildContext context, ChatViewModel model) {
+    return ChatTextField(
+      child: CupertinoTextField.borderless(
+        controller: model.messageTech,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.black,
+          fontSize: 18,
+        ),
+        placeholder: 'Messages sent as you type',
+        textInputAction: TextInputAction.newline,
+        minLines: 1,
+        maxLines: 6,
+        maxLength: 160,
+        onChanged: (value) {
+          model.updateMessageText(value);
+          model.updateUserDataWithKey(DatabaseMessageField.msgTxt, value);
+        },
+      ),
+    );
+  }
+
+  /// creating an ios style textfield for typing messages
   Widget chatTextField(BuildContext context, ChatViewModel model) {
     return Column(
       children: [
@@ -514,15 +726,14 @@ class _ChatViewState extends State<ChatView> {
                   child: CupertinoTextField.borderless(
                     suffix: GestureDetector(
                       child: const Icon(FeatherIcons.send),
-                      onTap: () {
-                        model.addMessage();
-                      },
+                      onTap: () => model.addMessage(),
                     ),
                     suffixMode: OverlayVisibilityMode.editing,
                     controller: model.messageTech,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.black,
-                        fontSize: 18),
+                      color: Theme.of(context).colorScheme.black,
+                      fontSize: 18,
+                    ),
                     placeholder: 'Messages sent as you type',
                     textInputAction: TextInputAction.newline,
                     minLines: 1,

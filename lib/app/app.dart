@@ -1,15 +1,15 @@
 import 'dart:developer';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:hint/api/hive.dart';
-import 'package:hint/app/locator.dart';
 import 'package:hint/app/routes.dart';
+import 'package:hint/app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hint/constants/app_strings.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hint/pods/settings_pod.dart';
-import 'package:hint/ui/views/discover/discover_viewmodel.dart';
+import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/views/startup/startup_view.dart';
+import 'package:hint/ui/views/discover/discover_viewmodel.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 final CupertinoTabController mainViewTabController =
     CupertinoTabController(initialIndex: 0);
@@ -60,11 +60,6 @@ class _MyAppState extends State<MyApp> {
         default:
       }
     });
-    // AwesomeNotifications()
-    //     .createdStream
-    //     .listen((ReceivedNotification receivedNotification) {
-
-    // });
   }
 
   @override

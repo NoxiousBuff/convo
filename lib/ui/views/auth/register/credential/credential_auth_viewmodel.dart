@@ -18,6 +18,7 @@ class CredentialAuthViewModel extends BaseViewModel {
   bool passwordEmpty = false;
   bool isPasswordShown = false;
   bool fieldNotEmpty = false;
+  final databaseService = DatabaseService();
   final credentialFormKey = GlobalKey<FormState>();
   TextEditingController emailTech = TextEditingController();
   TextEditingController passwordTech = TextEditingController();

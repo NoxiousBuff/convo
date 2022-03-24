@@ -26,6 +26,8 @@ class DuleViewModel extends StreamViewModel<DatabaseEvent> {
   final FireUser fireUser;
   final log = getLogger('DuleViewModel');
 
+  final databaseService = DatabaseService();
+
   /// Type of sending media to other user
   String? _sendingMediaType = '';
   String? get sendingMediaType => _sendingMediaType;

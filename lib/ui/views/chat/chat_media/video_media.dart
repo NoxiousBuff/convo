@@ -1,14 +1,14 @@
 import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/models/message_model.dart';
-import 'package:hint/ui/shared/video_thumbnail.dart';
+import 'package:hint/ui/shared/video_media/video_thumbnail.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 
 /// Display OR save the thumbnail of each sended or recived video
-class VideoThumbnailWidget extends StatelessWidget {
+class VideoMedia extends StatelessWidget {
   final Message message;
 
-  const VideoThumbnailWidget({
+  const VideoMedia({
     Key? key,
     required this.message,
   }) : super(key: key);
@@ -29,11 +29,11 @@ class VideoThumbnailWidget extends StatelessWidget {
 
         /// video Thumbnail is a widget of display video thumbnail
         /// This widget also save OR download the thumbnail of received video
-        child: VideoThumbnail(
+        child: VideoThumbnailView(
           message: message,
 
           /// Folder Path OR Name where the downloaded thumbnail of video saved
-          folderPath: 'Media/Thumbnails',
+          folderPath: 'Media/Convo Videos',
           hiveBoxName: HiveApi.mediaHiveBox,
         ),
       ),

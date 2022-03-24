@@ -48,6 +48,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
   static const String sKey = AppSettingKeys.senderBubbleColor;
   static const int lightBlue = MaterialColorsCode.systemblueSender;
   int senderBubbleCode = Hive.box(hiveBox).get(sKey, defaultValue: lightBlue);
+  final databaseService = DatabaseService();
 
   @override
   void initState() {
@@ -61,7 +62,6 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
     heartsController.addListener(() => setState(() {}));
     confettiController.addListener(() => setState(() {}));
     balloonsController.addListener(() => setState(() {}));
-
 
     super.initState();
   }
@@ -144,7 +144,7 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
           InkWell(
             onTap: () => navService.materialPageRoute(
                 context, ProfileView(fireUser: widget.fireUser)),
-            child: UserProfilePhoto( widget.fireUser.photoUrl,
+            child: UserProfilePhoto(widget.fireUser.photoUrl,
                 height: 40, width: 40, borderRadius: BorderRadius.circular(16)),
           ),
         ],
@@ -173,18 +173,18 @@ class _DuleViewState extends State<DuleView> with TickerProviderStateMixin {
       ),
       actions: [
         data != null
-            ? AppBarMediaVisibility(
-                widget.fireUser, stream)
+            ? AppBarMediaVisibility(widget.fireUser, stream)
             : shrinkBox,
         IconButton(
           onPressed: () {
             pushNotificationService.sendZap(
-                  widget.fireUser.id,
-                  whenComplete: () => customSnackbars.successSnackbar(context,
-                      title: 'He has been notified.'),
-                  onError: () => customSnackbars.errorSnackbar(context,
-                      title: 'There was some error in notifying. Please check your internet connection.'),
-                );
+              widget.fireUser.id,
+              whenComplete: () => customSnackbars.successSnackbar(context,
+                  title: 'He has been notified.'),
+              onError: () => customSnackbars.errorSnackbar(context,
+                  title:
+                      'There was some error in notifying. Please check your internet connection.'),
+            );
           },
           icon: const Icon(FeatherIcons.zap),
           color: Theme.of(context).colorScheme.black,

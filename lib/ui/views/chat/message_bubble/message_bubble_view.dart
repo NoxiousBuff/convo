@@ -19,7 +19,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat/chat_media/document_media.dart';
 import 'package:hint/ui/views/chat/replymessage/replymessage.dart';
 import 'package:hint/ui/views/message_forwarder/forward_view.dart';
-import 'package:hint/ui/views/chat/chat_media/videothumbnail_widget.dart';
+import 'package:hint/ui/views/chat/chat_media/video_media.dart';
 import 'package:hint/ui/views/chat/message_bubble/messagebubble_view.dart';
 
 /// This the widget of message bubble
@@ -147,12 +147,14 @@ class _MessageBubbleViewState extends State<MessageBubbleView> {
         case MediaType.video:
 
           /// This widget is responsible for displaing video message
-          return VideoThumbnailWidget(message: widget.message);
+          return VideoMedia(message: widget.message);
         case MediaType.document:
 
           /// This widget is responsible for displaing documents
           return DocumentMedia(
-              message: widget.message, fromReceiver: widget.fromReceiver);
+              message: widget.message,
+              fromReceiver: widget.fromReceiver,
+              folderPath: 'Media/Convo Documents');
 
         default:
 

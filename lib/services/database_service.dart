@@ -5,7 +5,6 @@ import 'package:hint/app/locator.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/services/auth_service.dart';
 
-final databaseService = DatabaseService();
 
 class DatabaseService {
 

@@ -2,7 +2,6 @@
 import 'package:dio/dio.dart';
 import 'package:hint/app/app_logger.dart';
 
-final DioApi dioApi = DioApi();
 
 class DioApi {
   static final Dio dio = Dio();

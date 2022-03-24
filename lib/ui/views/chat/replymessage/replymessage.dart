@@ -5,8 +5,8 @@ import 'package:hint/api/firestore.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/constants/app_strings.dart';
-import 'package:hint/models/video_thumbnail.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:hint/models/media_display_model.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -93,7 +93,7 @@ class ReplyMessage extends StatelessWidget {
             final map = Hive.box(HiveApi.mediaHiveBox)
                 .get(replyMessage[DocumentField.messageUid]);
             var videoThumbnailPath =
-                VideoThumbnailModel.fromJson(Map.from(map)).videoThumbnailPath;
+                MediaDisplayModel.fromJson(Map.from(map)).thumbnailPath;
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -156,27 +156,19 @@ class ReplyMessage extends StatelessWidget {
               child: replyMessageWidget(),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              verticalSpaceMedium,
-
-              /// This is the reply stick which connects
-              /// The replied message to normal message
-              Container(
-                height: 20,
-                width: 20,
-                decoration: ShapeDecoration(
-                  shape: CustomRoundedRectangleBorder(
-                    borderRadius:
-                        const BorderRadius.only(topRight: Radius.circular(5)),
-                    topSide: BorderSide(color: replyStickColor),
-                    rightSide: BorderSide(color: replyStickColor),
-                    topRightCornerSide: BorderSide(color: replyStickColor),
-                  ),
-                ),
+          Container(
+            height: 20,
+            width: 10,
+            margin: const EdgeInsets.only(top: 20),
+            decoration: ShapeDecoration(
+              shape: CustomRoundedRectangleBorder(
+                borderRadius:
+                    const BorderRadius.only(topRight: Radius.circular(5)),
+                topSide: BorderSide(color: replyStickColor),
+                rightSide: BorderSide(color: replyStickColor),
+                topRightCornerSide: BorderSide(color: replyStickColor),
               ),
-            ],
+            ),
           ),
           horizontalSpaceSmall,
         ],
@@ -186,27 +178,20 @@ class ReplyMessage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           horizontalSpaceSmall,
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              verticalSpaceMedium,
-
-              /// This is the reply stick which connects
-              /// The replied message to normal message
-              Container(
-                height: 20,
-                width: 20,
-                decoration: ShapeDecoration(
-                  shape: CustomRoundedRectangleBorder(
-                    borderRadius:
-                        const BorderRadius.only(topLeft: Radius.circular(5)),
-                    topSide: BorderSide(color: replyStickColor),
-                    leftSide: BorderSide(color: replyStickColor),
-                    topLeftCornerSide: BorderSide(color: replyStickColor),
-                  ),
-                ),
+          Container(
+            height: 20,
+            width: 10,
+            margin: const EdgeInsets.only(top: 20),
+            decoration: ShapeDecoration(
+              shape: CustomRoundedRectangleBorder(
+                borderRadius:
+                    const BorderRadius.only(topLeft: Radius.circular(5)),
+                topSide: BorderSide(color: replyStickColor),
+                leftSide: BorderSide(color: replyStickColor),
+                topLeftCornerSide: BorderSide(color: replyStickColor),
               ),
-            ],
+            ),
+            child: verticalSpaceRegular,
           ),
 
           /// This is reply message widget which display
@@ -215,7 +200,7 @@ class ReplyMessage extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.grey,
+                  color: Theme.of(context).colorScheme.darkGrey,
                   borderRadius: BorderRadius.circular(30)),
               child: replyMessageWidget(),
             ),

@@ -10,6 +10,7 @@ class PathFinder {
 
   Directory? globalDirectory;
 
+  // * request for get permission of storage from user if Convo don't have 
   Future<bool> _requestPermission(Permission permission) async {
     if (await permission.isGranted) {
       return true;
@@ -23,7 +24,7 @@ class PathFinder {
   }
 
   /// This will return the created path of a file
-  Future<String> getLocalPath({
+  Future<String> _getLocalPath({
     required String mediaName,
     required String folderPath,
     required String extension,
@@ -108,7 +109,7 @@ class PathFinder {
       {required String mediaName,
       required String folderPath,
       required String extension}) async {
-    final path = await getLocalPath(
+    final path = await _getLocalPath(
         mediaName: mediaName, folderPath: folderPath, extension: extension);
     return mediaFile.copy(path);
   }

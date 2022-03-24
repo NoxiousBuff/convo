@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:isolate';
+import 'package:hint/api/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hint/app/app_logger.dart';
@@ -7,16 +8,6 @@ import 'package:hint/api/path_finder.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-
-const debug = true;
-
-// class DownloadCallbackClass {
-//   static void callback(String id, DownloadTaskStatus status, int progress) {
-//     final SendPort send =
-//         IsolateNameServer.lookupPortByName('downloader_send_port')!;
-//     send.send([id, status, progress]);
-//   }
-// }
 
 class TestClass {
   static void callback(String id, DownloadTaskStatus status, int progress) {
@@ -36,44 +27,34 @@ class DownloaderView extends StatefulWidget {
 class _DownloaderViewState extends State<DownloaderView> {
   String _taskId = '';
   int _downloadingProgress = 0;
-  List<Map> downloadsListMaps = [];
+  final pathHelper = PathHelper();
   final ReceivePort _port = ReceivePort();
   final log = getLogger('DownloaderView');
   DownloadTaskStatus _taskStatus = DownloadTaskStatus.enqueued;
+  String url =
+      'https://firebasestorage.googleapis.com/v0/b/hint-72d23.appspot.com/o/2.%20Microsoft%20Excel%20Startup%20Screen.mp4?alt=media&token=07860ee9-7d0b-4086-9ba0-1cf947326a57';
 
   @override
   void initState() {
-    flutterDownloaderInitialise();
-    super.initState();
-  }
-
-  void flutterDownloaderInitialise() async {
-    /// Initialise flutter downloader plugin
-    await FlutterDownloader.initialize(debug: true);
-
     FlutterDownloader.registerCallback(TestClass.callback);
+
+    super.initState();
   }
 
   @override
   void dispose() {
     /// Remove the isolate OR dispose the isolate
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    //IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
 
-  /// Get the task from flutter downloader to listen OR
+  /// Get the task from flutter downloader to listen and
   /// get the info of downloading file
   Future task(String taskID) async {
     List<DownloadTask>? getTasks = await FlutterDownloader.loadTasks();
 
     if (getTasks != null) {
       final _task = getTasks.firstWhere((task) => task.taskId == taskID);
-
-      // _map['id'] = _task.taskId;
-      // _map['status'] = _task.status;
-      // _map['progress'] = _task.progress;
-      // _map['filename'] = _task.filename;
-      // _map['savedDirectory'] = _task.savedDir;
 
       _taskId = _task.taskId;
       _taskStatus = _task.status;
@@ -105,7 +86,9 @@ class _DownloaderViewState extends State<DownloaderView> {
       }
       log.wtf('Progress:${progress / 100}');
       log.wtf(_taskStatus);
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -127,15 +110,7 @@ class _DownloaderViewState extends State<DownloaderView> {
                         : const Text('Download waiting');
   }
 
-  /// This is a callback for second thread to download the file
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port')!;
-    send.send([id, status, progress]);
-  }
-
-  /// Genrate fileName which will locally saved
+  /// Generate fileName which will locally saved
   String _localNameGenerator(String mimeType) {
     final now = DateTime.now();
     final year = now.year;
@@ -159,15 +134,13 @@ class _DownloaderViewState extends State<DownloaderView> {
 
   /// download a file in background usingg flutter downloader
   Future<String?> download() async {
-    const String url =
-        'https://firebasestorage.googleapis.com/v0/b/hint-72d23.appspot.com/o/2.%20Microsoft%20Excel%20Startup%20Screen.mp4?alt=media&token=07860ee9-7d0b-4086-9ba0-1cf947326a57';
-
     String fileName = _localNameGenerator(MediaType.video);
 
     var savedDir = await pathFinder.getSavedDirecotyPath('Media/Convo Videos');
-    final _taskID = await FlutterDownloader.enqueue(
-        url: url, savedDir: savedDir, fileName: '$fileName.mp4');
-    return _taskID;
+    final downloaderMap = await PathHelper().flutterDownloader(
+        url: url, savedDir: savedDir, fileNameWithExtension: '$fileName.mp4');
+
+    return downloaderMap[MediaHiveBoxField.taskID];
   }
 
   @override
@@ -189,39 +162,41 @@ class _DownloaderViewState extends State<DownloaderView> {
               }
             },
           ),
+          verticalSpaceMedium,
+          CupertinoButton.filled(
+            child: const Text('Generate Thumbnail'),
+            onPressed: () async {
+              //String folderPath = 'Media/Thumbnails';
+              //String encodedURL = Uri.encodeFull(url);
+              try {
+                // var path = await pathHelper.getSavedDirecotyPath(folderPath);
+                // final name = pathHelper.localNameGenerator(MediaType.image);
+                // final fileName = await VideoThumbnail.thumbnailData(
+                //   quality: 75,
+                //   video: encodedURL,
+                //   //thumbnailPath: '$path/$name.jpeg',
+                // );
+                // log.wtf('filename:$fileName');
+                // var file =
+                //     await VideoCompress.getFileThumbnail(url, quality: 50);
+                // log.wtf('thumbnailPath:$file');
+                // await pathHelper
+                //     .saveInLocalPath(file,
+                //         extension: 'jpeg',
+                //         mediaName: 'MediaName',
+                //         folderPath: 'Media/Thumbnails')
+                //     .whenComplete(() => log.wtf('Thumbnail Saved Succesfully'));
+              } on Exception catch (e) {
+                log.e('Thumbnail Generate Error:$e');
+              }
+            },
+          ),
           Text('${_downloadingProgress / 100}'),
           IconButton(
               onPressed: () => FlutterDownloader.cancel(taskId: _taskId),
               icon: const Icon(Icons.close)),
-
-          // Row(
-          //   children: [
-          //     Text('${_downloadingProgress / 100}'),
-          //     IconButton(
-          //         onPressed: () => FlutterDownloader.remove(taskId: taskId),
-          //         icon: icon)
-          //   ],
-          // ),
           verticalSpaceMedium,
           LinearProgressIndicator(value: _downloadingProgress / 100)
-          // SizedBox(
-          //   width: screenWidth(context),
-          //   height: screenHeightPercentage(context, percentage: 0.5),
-          //   child: ListView.builder(
-          //       itemCount: downloadsListMaps.length,
-          //       itemBuilder: (context, i) {
-          //         Map _map = downloadsListMaps[i];
-          //         String _filename = _map['filename'];
-          //         int _progress = _map['progress'];
-          //         return Column(
-          //           children: [
-          //             Text(_filename),
-          //             verticalSpaceRegular,
-          //             LinearProgressIndicator(value: _progress / 100),
-          //           ],
-          //         );
-          //       }),
-          // )
         ],
       ),
     );

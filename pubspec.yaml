@@ -40,7 +40,9 @@ dependencies:
   lottie: ^1.0.1
   timeago: ^3.1.0
   filesize: ^2.0.1
+  open_file: ^3.2.1
   file_picker: ^4.5.0  
+  ezanimation: ^0.6.0
   country_picker: ^2.0.8
   email_validator: ^2.0.1
 
@@ -75,6 +77,7 @@ dependencies:
   pixabay_picker: ^1.0.6
   extended_image: ^6.0.1
   flutter_offline: ^2.0.0
+  video_thumbnail: ^0.4.6
   string_validator: ^0.3.0
   video_compress_ds: ^3.1.6
   flutter_downloader: ^1.7.2
@@ -103,4 +106,5 @@ flutter:
   assets:
     - assets/
     - images/
+    - json/
   
