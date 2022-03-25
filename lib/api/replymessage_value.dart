@@ -1,6 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:hint/models/message_model.dart';
 
 // class GetReplyMessageValue extends ChangeNotifier {
 //   String? _messageUid;
@@ -67,17 +67,20 @@ import 'package:flutter/material.dart';
 abstract class GetReplyMessageValue extends ChangeNotifier {
   /// get the unique identity of a message [Uid]
   /// and the unique id of message we call messageuid
-  String? get messageUid;
+  //String get messageUid;
+
+  /// get the message value
+  Message get message;
 
   /// get the type of message
   /// e.g text, image, video, document
-  String? get messageType;
+  //String get messageType;
 
   /// get the text of the message if available
-  String? get messageText;
+  //String? get messageText;
 
   /// get the url of the media if available
-  String? get mediaURL;
+  //String? get mediaURL;
 
   /// get the value of isReply bool
   /// if user is replying to a specific message then
@@ -90,39 +93,42 @@ abstract class GetReplyMessageValue extends ChangeNotifier {
   String? get senderUid;
 
   /// get the title OR name of document
-  String? get documentTitle;
+  //String? get documentTitle;
 
   /// change the value of isReply bool
   void isReplyValChanger(bool val);
 
   /// get the data of swiped message
-  void getSwipedMsgValue({
-    required String swipedMsgUid,
-    required String swipedMsgType,
-    required String swipedMsgsenderUid,
-    String? swipedMsgText,
-    String? swipedMediaURL,
-    String? swipedDocumentTitle,
-  });
+  // void getSwipedMsgValue({
+  //   required String swipedMsgUid,
+  //   required String swipedMsgType,
+  //   required String swipedMsgsenderUid,
+  //   String? swipedMsgText,
+  //   String? swipedMediaURL,
+  //   String? swipedDocumentTitle,
+  // });
 
   /// clear the all value
   void clearReplyMsg();
+
+  /// get swiped Message all its value
+  void getSwipedMsg(Message msg);
 }
 
 class ReplyMessageImplimentation extends GetReplyMessageValue {
   ///  The unique identity of a message [Uid]
   /// and the unique id of message we call messageuid
-  String? _messageUid;
+  //String? _messageUid;
 
   /// The type of message
   /// e.g text, image, video, document
-  String? _messageType;
+  //String? _messageType;
 
   /// The text of the message if available
-  String? _messageText;
+  //String? _messageText;
 
   /// The Url of the media message if available
-  String? _mediaURL;
+  //String? _mediaURL;
 
   /// get the value of isReply bool
   /// if user is replying to a specific message then
@@ -135,41 +141,48 @@ class ReplyMessageImplimentation extends GetReplyMessageValue {
   String? _senderUid;
 
   /// The title OR name of document
-  String? _documentTitle;
+  //String? _documentTitle;
+
+  Message? _message;
 
   @override
   void clearReplyMsg() {
-    _messageUid = null;
-    _messageType = null;
-    _messageText = null;
-    _mediaURL = null;
-    _senderUid = null;
+    _message = null;
+    notifyListeners();
   }
 
-  @override
-  String? get documentTitle => _documentTitle;
+  // @override
+  // String? get documentTitle => _documentTitle;
+
+  // @override
+  // void getSwipedMsgValue({
+  //   required String swipedMsgUid,
+  //   required String swipedMsgType,
+  //   required String swipedMsgsenderUid,
+  //   String? swipedMsgText,
+  //   String? swipedMediaURL,
+  //   String? swipedDocumentTitle,
+  // }) {
+  //   _messageUid = swipedMsgUid;
+  //   _messageType = swipedMsgType;
+  //   _messageText = swipedMsgText;
+  //   _mediaURL = swipedMediaURL;
+  //   _senderUid = swipedMsgsenderUid;
+  //   _documentTitle = swipedDocumentTitle;
+  //   notifyListeners();
+  //   log('GetReplyMessageValue => swipedMsgUid:$_messageUid');
+  //   log('GetReplyMessageValue => swipedMsgType:$_messageType');
+  //   log('GetReplyMessageValue => swipedMsgText:$_messageText');
+  //   log('GetReplyMessageValue => swipedMediaURL:$_mediaURL');
+  //   log('GetReplyMessageValue => swipedMsgsenderUid:$_senderUid');
+  //   log('GetReplyMessageValue => swipedDocumentTitle:$_documentTitle');
+  // }
 
   @override
-  void getSwipedMsgValue(
-      {required String swipedMsgUid,
-      required String swipedMsgType,
-      required String swipedMsgsenderUid,
-      String? swipedMsgText,
-      String? swipedMediaURL,
-      String? swipedDocumentTitle}) {
-    _messageUid = swipedMsgUid;
-    _messageType = swipedMsgType;
-    _messageText = swipedMsgText;
-    _mediaURL = swipedMediaURL;
-    _senderUid = swipedMsgsenderUid;
-    _documentTitle = swipedDocumentTitle;
+  void getSwipedMsg(Message msg) {
+    _message = msg;
     notifyListeners();
-    log('GetReplyMessageValue => swipedMsgUid:$_messageUid');
-    log('GetReplyMessageValue => swipedMsgType:$_messageType');
-    log('GetReplyMessageValue => swipedMsgText:$_messageText');
-    log('GetReplyMessageValue => swipedMediaURL:$_mediaURL');
-    log('GetReplyMessageValue => swipedMsgsenderUid:$_senderUid');
-    log('GetReplyMessageValue => swipedDocumentTitle:$_documentTitle');
+    log('Message:$_message');
   }
 
   @override
@@ -182,18 +195,21 @@ class ReplyMessageImplimentation extends GetReplyMessageValue {
     log('GetReplyMessageValue => isReplyValue:$_isReply');
   }
 
-  @override
-  String? get messageText => _messageText;
+  // @override
+  // String? get messageText => _messageText;
+
+  // @override
+  // String get messageType => _messageType!;
+
+  // @override
+  // String? get mediaURL => _mediaURL;
+
+  // @override
+  // String get messageUid => _messageUid!;
+
+   @override
+   String? get senderUid => _senderUid;
 
   @override
-  String? get messageType => _messageType;
-
-  @override
-  String? get mediaURL => _mediaURL;
-
-  @override
-  String? get messageUid => _messageUid;
-
-  @override
-  String? get senderUid => _senderUid;
+  Message get message => _message!;
 }

@@ -130,6 +130,7 @@ class DocumentField {
   static const String reactions = 'reactions';
 }
 
+/// Strings of firestore message field
 class MessageField {
   static const String size = 'size';
   static const String mediaUrl = 'mediaUrl';
@@ -143,6 +144,18 @@ class MessageField {
   static const String senderThumbnail = 'senderThumbnail';
   static const String receiverThumbnail = 'receiverThumbnail';
   static const String receiverLocalPath = 'receiverLocalPath';
+}
+
+/// String of reply message field
+class RMField {
+  static const type = 'type';
+  static const hash = 'blurHash';
+  static const mediaURL = 'mediaUrl';
+  static const localPath = 'localPath';
+  static const messageUid = 'messageUid';
+  static const docTitle = 'documentTitle';
+  static const messageText = 'messageText';
+  static const thumbnailPath = 'thumbnailPath';
 }
 
 /// Media HiveBox Strings

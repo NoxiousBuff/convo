@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:hint/api/firestore.dart';
 import 'package:hint/api/path.dart';
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
@@ -36,8 +37,14 @@ class ChatViewModel extends BaseViewModel {
   /// without this id nobody can enter or get the conversation
   String conversationId;
 
+  /// calling current user uid from firestore api class
+  String currentUserId = FirestoreApi().currentUserId;
+
   /// calling path helper
   PathHelper pathHelper = PathHelper();
+
+  /// calling reply message locator
+  final _replyLocator = locator.get<GetReplyMessageValue>();
 
   /// calling database API class
   final databaseService = DatabaseService();
@@ -558,26 +565,79 @@ class ChatViewModel extends BaseViewModel {
 
   /// Add text message to firestore
   addMessage() {
-    bool reply = locator.get<GetReplyMessageValue>().isReply;
+    bool reply = _replyLocator.isReply;
     messageTech.clear();
     updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
-    reply == false
-        ? chatService.addNewMessage(
-            type: MediaType.text,
-            receiverUid: fireUser.id,
-            messageText: _messageText)
-        : chatService.addNewMessage(
-            isReply: true,
-            type: MediaType.text,
-            receiverUid: fireUser.id,
-            messageText: _messageText,
-            swipeMsgUid: locator.get<GetReplyMessageValue>().messageUid,
-            swipeMsgText: locator.get<GetReplyMessageValue>().messageText,
-            swipeMediaURL: locator.get<GetReplyMessageValue>().mediaURL,
-            swipeMsgType: locator.get<GetReplyMessageValue>().messageType,
-            swipeDocTitle: locator.get<GetReplyMessageValue>().documentTitle,
-          );
-    updateMessageText('');
+    if (!reply) {
+      return chatService.addNewMessage(
+        type: MediaType.text,
+        receiverUid: fireUser.id,
+        messageText: _messageText,
+      );
+    } else {
+      final _locatorMsg = _replyLocator.message;
+      final _message = _locatorMsg.message;
+      switch (_locatorMsg.type) {
+        case MediaType.text:
+          {
+            return chatService.addNewMessage(
+                isReply: true,
+                type: MediaType.text,
+                receiverUid: fireUser.id,
+                messageText: _messageText,
+                swipeMsgType: _locatorMsg.type,
+                swipeMsgUid: _locatorMsg.messageUid,
+                swipeMsgText: _message[MessageField.messageText]);
+          }
+
+        case MediaType.image:
+          {
+            return chatService.addNewMessage(
+              isReply: true,
+              type: MediaType.image,
+              receiverUid: fireUser.id,
+              messageText: _messageText,
+              swipeMsgType: _locatorMsg.type,
+              swipeMsgUid: _locatorMsg.messageUid,
+              swipeHash: _message[MessageField.blurHash],
+              swipeLocalPath: _locatorMsg.senderUid == currentUserId
+                  ? _message[MessageField.senderLocalPath]
+                  : _message[MessageField.receiverLocalPath],
+            );
+          }
+        case MediaType.video:
+          {
+            return chatService.addNewMessage(
+              isReply: true,
+              type: MediaType.video,
+              receiverUid: fireUser.id,
+              messageText: _messageText,
+              swipeMsgType: _locatorMsg.type,
+              swipeMsgUid: _locatorMsg.messageUid,
+              swipeHash: _message[MessageField.blurHash],
+              swipeLocalPath: _locatorMsg.senderUid == currentUserId
+                  ? _message[MessageField.senderThumbnail]
+                  : _message[MessageField.receiverThumbnail],
+            );
+          }
+        case MediaType.document:
+          {
+            return chatService.addNewMessage(
+              isReply: true,
+              type: MediaType.document,
+              receiverUid: fireUser.id,
+              messageText: _messageText,
+              swipeMsgType: _locatorMsg.type,
+              swipeMsgUid: _locatorMsg.messageUid,
+              swipeDocTitle: _message[MessageField.documentTitle],
+            );
+          }
+        default:
+          {
+            return '';
+          }
+      }
+    }
   }
 
   final TextEditingController messageTech = TextEditingController();

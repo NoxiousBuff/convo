@@ -117,12 +117,15 @@ class ChatService {
     String? messageText,
     String? documentTitle,
     String? mediaUrl,
+    String? swipeHash,
     String? swipeMsgUid,
     String? swipeMsgType,
     String? swipeMsgText,
     String? swipeMediaURL,
     String? swipeDocTitle,
     String? senderThumbnail,
+    String? swipeLocalPath,
+    String? swipeThumbnail,
   }) async {
     String conversationId = getConversationId(receiverUid, liveUserUid);
     String messageUid = const Uuid().v1();
@@ -146,15 +149,17 @@ class ChatService {
     }
 
     /// ReplyMessage Fields
-    if (swipeMsgText != null) replyMsgMap[fMessageText] = swipeMsgText;
-    if (swipeMsgType != null) replyMsgMap[DocumentField.type] = swipeMsgType;
-    if (swipeMediaURL != null) replyMsgMap[fMediaURL] = swipeMediaURL;
-    if (swipeDocTitle != null) {
-      replyMsgMap[MessageField.documentTitle] = swipeDocTitle;
+    if (swipeHash != null) replyMsgMap[RMField.hash] = swipeHash;
+    if (swipeMsgType != null) replyMsgMap[RMField.type] = swipeMsgType;
+    if (swipeMsgUid != null) replyMsgMap[RMField.messageUid] = swipeMsgUid;
+    if (swipeMediaURL != null) replyMsgMap[RMField.mediaURL] = swipeMediaURL;
+    if (swipeMsgText != null) replyMsgMap[RMField.messageText] = swipeMsgText;
+    if (swipeLocalPath != null) replyMsgMap[RMField.localPath] = swipeLocalPath;
+    if (swipeDocTitle != null) replyMsgMap[RMField.docTitle] = swipeDocTitle;
+    if (swipeThumbnail != null) {
+      replyMsgMap[RMField.thumbnailPath] = swipeThumbnail;
     }
-    if (swipeMsgUid != null) {
-      replyMsgMap[DocumentField.messageUid] = swipeMsgUid;
-    }
+
     await _conversationCollection
         .doc(conversationId)
         .collection(chatsFirestoreKey)

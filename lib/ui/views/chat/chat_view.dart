@@ -1,5 +1,3 @@
-import 'package:hint/ui/views/chat/chat_media/text_media.dart';
-
 import 'chat_viewmodel.dart';
 import 'widgets/chat_options.dart';
 import 'package:lottie/lottie.dart';
@@ -30,7 +28,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat/widgets/replymessage_tile.dart';
 import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:hint/ui/views/chat/widgets/chat_animation_options.dart';
-import 'package:hint/ui/views/chat/message_bubble/message_bubble_view.dart';
+import 'package:hint/ui/views/chat/message_bubble/messagebubble_view.dart';
 import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 
 class ChatView extends StatefulWidget {
@@ -56,6 +54,9 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
 
   /// calling the replyMessage locator
   final replyMsgLocator = locator.get<GetReplyMessageValue>();
+
+  /// get the current user uid from firestore api class
+  final currentUserID = FirestoreApi().currentUserId;
 
   /// animation controllers
   late AnimationController fuckCntlr;
@@ -107,6 +108,8 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
     balloonCntlr.addListener(() => setState(() {}));
     confettiCntlr.addListener(() => setState(() {}));
 
+    replyMsgLocator.addListener(() => setState(() {}));
+
     super.initState();
   }
 
@@ -123,6 +126,8 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
     dollarCntlr.dispose();
     balloonCntlr.dispose();
     confettiCntlr.dispose();
+
+    replyMsgLocator.removeListener(() => setState(() {}));
 
     super.dispose();
   }
@@ -503,6 +508,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
             model.addMessage();
             model.messageTech.clear();
             model.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+            replyMsgLocator.isReplyValChanger(false);
           },
           icon: const Icon((FeatherIcons.refreshCcw)),
           color: Theme.of(context).colorScheme.red,
@@ -563,35 +569,6 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
                         ],
                       ),
                     );
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.start,
-              //   children: [
-              //     duleModel.msgTxt.isEmpty
-              //         ? shrinkBox
-              //         : Padding(
-              //             padding: const EdgeInsets.all(8.0),
-              //             child: Container(
-              //               alignment: Alignment.center,
-              //               padding: const EdgeInsets.symmetric(
-              //                   horizontal: 16, vertical: 12),
-              //               decoration: BoxDecoration(
-              //                   color:
-              //                       Theme.of(context).colorScheme.yellowAccent,
-              //                   borderRadius: BorderRadius.circular(20)),
-              //               child: Text(
-              //                 duleModel.msgTxt,
-              //                 style: TextStyle(
-              //                   color: Theme.of(context).colorScheme.black,
-              //                   fontSize: 18,
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //     SizedBox(
-              //       width: screenWidthPercentage(context, percentage: 0.1),
-              //     ),
-              //   ],
-              // );
             } else {
               return shrinkBox;
             }
@@ -639,8 +616,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   /// This is the list of all messages in a conversation of two user
   ///  OR in a chat room
   Widget chatList(BuildContext context, ChatViewModel model) {
-    bool sendedByMe =
-        replyMsgLocator.senderUid == FirestoreApi().getCurrentUser!.uid;
+    final valueNotifier = ValueNotifier<bool>(replyMsgLocator.isReply);
     return Expanded(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: model.getUserchat,
@@ -651,9 +627,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
             );
           }
           if (!snapshot.hasData) {
-            return const Center(
-              child: CupertinoActivityIndicator(),
-            );
+            return const Center(child: CupertinoActivityIndicator());
           }
           final messages = snapshot.data!.docs;
           return CustomScrollView(
@@ -662,9 +636,16 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
             slivers: [
               SliverToBoxAdapter(
                 /// This tile will appear above on the textfield when isReply is true
-                child: ReplyMessageTile(
-                  sendedByMe: sendedByMe,
-                  fireUserName: widget.fireUser.username,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: valueNotifier,
+                  builder: (context, value, child) {
+                    return Visibility(
+                      visible: value,
+                      child: ReplyMessageTile(
+                        fireUserName: widget.fireUser.username,
+                      ),
+                    );
+                  },
                 ),
               ),
               recieverMsgBubble(context, model),

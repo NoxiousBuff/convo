@@ -136,7 +136,7 @@ class _ConvoImageState extends State<ConvoImage> {
     //bool iSend = _message.senderUid == currentUserUid;
 
     /// This is the hash of blurhash
-    String hash = _message.message[MessageField.blurHash];
+    final hash = _message.message[MessageField.blurHash];
 
     /// This is the LinkedHashMap<String, dynamic> of message from firestore
     final _messageMap = _message.message;

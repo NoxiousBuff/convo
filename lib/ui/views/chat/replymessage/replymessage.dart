@@ -1,12 +1,11 @@
 import 'dart:collection';
-import 'package:hint/api/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:hint/models/media_display_model.dart';
+import 'package:hint/ui/shared/circular_progress.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -31,12 +30,12 @@ class ReplyMessage extends StatelessWidget {
     /// After decide the type od message this will display the that message
     /// which is replied
     Widget replyMessageWidget() {
-      switch (replyMessage[DocumentField.type]) {
+      switch (replyMessage[RMField.type]) {
         case MediaType.text:
           {
             /// This will widget is for text message type
             return Text(
-              replyMessage[MessageField.messageText],
+              replyMessage[RMField.messageText],
               overflow: TextOverflow.ellipsis,
               softWrap: true,
               style: const TextStyle(fontSize: 12),
@@ -59,7 +58,7 @@ class ReplyMessage extends StatelessWidget {
                 ),
                 horizontalSpaceTiny,
                 Text(
-                  replyMessage[MessageField.documentTitle],
+                  replyMessage[RMField.docTitle],
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
                   style: const TextStyle(fontSize: 12),
@@ -70,18 +69,41 @@ class ReplyMessage extends StatelessWidget {
         case MediaType.image:
           {
             /// This will display image message type for replying
-            final imageLocalPath = Hive.box(HiveApi.mediaHiveBox)
-                .get(replyMessage[DocumentField.messageUid]);
+
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                imageLocalPath == null
-                    ? const Icon(FeatherIcons.image, size: 20)
-                    : SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: Image.file(File(imageLocalPath)),
-                      ),
+                SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: ExtendedImage.file(
+                    File(replyMessage[RMField.localPath]),
+                    loadStateChanged: (state) {
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.failed:
+                          {
+                            return const BlurHash(hash: RMField.hash);
+                          }
+                        case LoadState.loading:
+                          {
+                            return const CircularProgress();
+                          }
+                        case LoadState.completed:
+                          {
+                            return ExtendedRawImage(
+                              image: state.extendedImageInfo?.image,
+                              fit: BoxFit.cover,
+                            );
+                          }
+                        default:
+                          {
+                            return const Icon(FeatherIcons.image,
+                                size: 12, color: Colors.white);
+                          }
+                      }
+                    },
+                  ),
+                ),
                 horizontalSpaceTiny,
                 const Text('Image'),
               ],
@@ -89,44 +111,50 @@ class ReplyMessage extends StatelessWidget {
           }
         case MediaType.video:
           {
-            /// This displays the video
-            final map = Hive.box(HiveApi.mediaHiveBox)
-                .get(replyMessage[DocumentField.messageUid]);
-            var videoThumbnailPath =
-                MediaDisplayModel.fromJson(Map.from(map)).thumbnailPath;
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                map == null
-                    ? Container(
-                        height: 20,
-                        width: 20,
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(4)),
-                        child: const Center(
-                            child: Icon(FeatherIcons.video, size: 10)))
-                    : Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: Image.file(
-                              File(videoThumbnailPath),
-                              fit: BoxFit.cover,
-                              height: 20,
-                              width: 20,
-                            ),
-                          ),
-                          const Icon(
-                            FeatherIcons.play,
-                            size: 12,
-                            color: Colors.white,
-                          )
-                        ],
+                SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ExtendedImage.file(
+                        File(replyMessage[RMField.thumbnailPath]),
+                        loadStateChanged: (state) {
+                          switch (state.extendedImageLoadState) {
+                            case LoadState.failed:
+                              {
+                                return const BlurHash(hash: RMField.hash);
+                              }
+                            case LoadState.loading:
+                              {
+                                return const CircularProgress();
+                              }
+                            case LoadState.completed:
+                              {
+                                return ExtendedRawImage(
+                                  image: state.extendedImageInfo?.image,
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                            default:
+                              {
+                                return const Icon(FeatherIcons.video,
+                                    size: 12, color: Colors.white);
+                              }
+                          }
+                        },
                       ),
+                      const Icon(
+                        FeatherIcons.play,
+                        size: 12,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
+                ),
                 horizontalSpaceTiny,
                 const Text('Video'),
               ],
