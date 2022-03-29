@@ -1,16 +1,18 @@
 import 'dart:io';
 import 'dart:math' as math;
-import 'package:hint/api/firestore.dart';
-import 'package:hint/api/path.dart';
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
+import 'package:hint/api/path.dart';
 import 'package:stacked/stacked.dart';
 import 'package:hint/app/locator.dart';
 import 'package:flutter/material.dart';
+import 'package:filesize/filesize.dart';
 import 'package:blurhash/blurhash.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image/image.dart' as img;
+import 'package:hint/api/firestore.dart';
 import 'package:hint/app/app_logger.dart';
+import 'package:hint/api/uploads_api.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/constants/app_keys.dart';
 import 'package:file_picker/file_picker.dart';
@@ -45,6 +47,9 @@ class ChatViewModel extends BaseViewModel {
 
   /// calling reply message locator
   final _replyLocator = locator.get<GetReplyMessageValue>();
+
+  /// callling uploads api class locator
+  final _uploadLocator = locator.get<UploadsAPI>();
 
   /// calling database API class
   final databaseService = DatabaseService();
@@ -83,7 +88,7 @@ class ChatViewModel extends BaseViewModel {
   /// get a hash of blurhash
   Future<String> _blurHashString(File file) async {
     final bytes = await file.readAsBytes();
-    final hash = await BlurHash.encode(bytes, 4, 3);
+    final hash = await BlurHash.encode(bytes, 3, 4);
     log.wtf('blurHash:$hash');
     return hash;
   }
@@ -101,26 +106,26 @@ class ChatViewModel extends BaseViewModel {
   }
 
   /// Genrate fileName which will locally saved
-  String _localNameGenerator(String mimeType) {
-    final now = DateTime.now();
-    final year = now.year;
-    final month = now.month;
-    final day = now.day;
-    String uploadingDate = '$year$month$day';
-    String uploadingTime = '${now.second}${now.millisecond}${now.microsecond}';
+  // String _localNameGenerator(String mimeType) {
+  //   final now = DateTime.now();
+  //   final year = now.year;
+  //   final month = now.month;
+  //   final day = now.day;
+  //   String uploadingDate = '$year$month$day';
+  //   String uploadingTime = '${now.second}${now.millisecond}${now.microsecond}';
 
-    switch (mimeType) {
-      case MediaType.image:
-        return 'IMG-$uploadingDate-$uploadingTime';
+  //   switch (mimeType) {
+  //     case MediaType.image:
+  //       return 'IMG-$uploadingDate-$uploadingTime';
 
-      case MediaType.video:
-        return 'VID-$uploadingDate-$uploadingTime';
-      case MediaType.document:
-        return 'DOC-$uploadingDate-$uploadingTime';
-      default:
-        return 'DOC-$uploadingDate-$uploadingTime';
-    }
-  }
+  //     case MediaType.video:
+  //       return 'VID-$uploadingDate-$uploadingTime';
+  //     case MediaType.document:
+  //       return 'DOC-$uploadingDate-$uploadingTime';
+  //     default:
+  //       return 'DOC-$uploadingDate-$uploadingTime';
+  //   }
+  // }
 
   /// Get the selected media List length picked from gallery
   Future<int> pickedMediaLength(List<AssetEntity> assets) async {
@@ -136,8 +141,9 @@ class ChatViewModel extends BaseViewModel {
 
     var sizeInMB = sizeinKB / 1024;
 
-    log.wtf('PickedImage Size in MB:$sizeInMB');
+    _uploadLocator.getTotalByteData(sum);
 
+    log.wtf('PickedImage Size in MB:${filesize(sum)}');
     return sizeInMB.toInt();
   }
 
@@ -185,7 +191,7 @@ class ChatViewModel extends BaseViewModel {
     final thumbnailFile =
         await VideoCompress.getFileThumbnail(file.path, quality: 40);
 
-    final mediaName = _localNameGenerator(MediaType.image);
+    final mediaName = pathHelper.localNameGenerator(MediaType.image);
 
     pathHelper.saveInLocalPath(thumbnailFile,
         mediaName: mediaName,
@@ -195,95 +201,75 @@ class ChatViewModel extends BaseViewModel {
   }
 
   /// Add the message in firestore and return the messageUid of the added message
-  Future<String> _getMessageUid(String mediaType,
-      {String? hash,
-      int? fileSize,
-      String? localPath,
-      String? thumbnailPath,
-      required String downloadURL,
-      String? documentTitle}) async {
-    switch (mediaType) {
-      case MediaType.image:
-        {
-          // * Add message when type is image
-          // * we need blurhash for display raw data of video thumbnail
-          // * if image is not present offline of in firestore storage
-          // * OR is hive path is empty
-          final messageUid = await chatService
-              .addNewMessage(
-                  blurHash: hash,
-                  type: mediaType,
-                  fileSize: fileSize,
-                  localPath: localPath,
-                  mediaUrl: downloadURL,
-                  receiverUid: fireUser.id)
-              .whenComplete(() => log.w('Image Message added'));
-          return messageUid;
-        }
+  // Future<String> _getMessageUid(String mediaType,
+  //     {String? hash,
+  //     int? fileSize,
+  //     String? localPath,
+  //     String? thumbnailPath,
+  //     required String downloadURL,
+  //     String? documentTitle}) async {
+  //   switch (mediaType) {
+  //     case MediaType.image:
+  //       {
+  //         // * Add message when type is image
+  //         // * we need blurhash for display raw data of video thumbnail
+  //         // * if image is not present offline of in firestore storage
+  //         // * OR is hive path is empty
+  //         final messageUid = await chatService
+  //             .addNewMessage(
+  //                 blurHash: hash,
+  //                 type: mediaType,
+  //                 fileSize: fileSize,
+  //                 localPath: localPath,
+  //                 mediaUrl: downloadURL,
+  //                 receiverUid: fireUser.id)
+  //             .whenComplete(() => log.w('Image Message added'));
+  //         return messageUid;
+  //       }
 
-      case MediaType.video:
-        {
-          // * Add message when type is video
-          // * we need blurhash for display raw data of image
-          // * if image is not present offline of in firestore storage
-          // * OR is hive path is empty
-          final messageUid = await chatService
-              .addNewMessage(
-                  blurHash: hash,
-                  type: mediaType,
-                  fileSize: fileSize,
-                  localPath: localPath,
-                  mediaUrl: downloadURL,
-                  receiverUid: fireUser.id,
-                  senderThumbnail: thumbnailPath)
-              .whenComplete(() => log.w('Video Message added'));
-          return messageUid;
-        }
-      case MediaType.document:
-        {
-          // * Add message when type is document
-          final messageUid = await chatService
-              .addNewMessage(
-                  type: mediaType,
-                  mediaUrl: downloadURL,
-                  receiverUid: fireUser.id,
-                  documentTitle: documentTitle)
-              .whenComplete(() => log.w('Document Message added'));
-          return messageUid;
-        }
-      default:
-        {
-          // * This is the default case for adding message in firestore database
-          final messageUid = await chatService
-              .addNewMessage(
-                  type: mediaType,
-                  mediaUrl: downloadURL,
-                  receiverUid: fireUser.id)
-              .whenComplete(() => log.w('Document Message added'));
-          return messageUid;
-        }
-    }
-  }
-
-  /// This will decide the folder of the downloaded or saved media locally
-  String folderPathDecider(String mediaType) {
-    switch (mediaType) {
-      case MediaType.image:
-        {
-          return 'Media/Convo Images/Send';
-        }
-
-      case MediaType.video:
-        {
-          return 'Media/Convo Videos/Send';
-        }
-
-      default:
-        {
-          return 'Media/Convo Documents/Send';
-        }
-    }
-  }
+  //     case MediaType.video:
+  //       {
+  //         // * Add message when type is video
+  //         // * we need blurhash for display raw data of image
+  //         // * if image is not present offline of in firestore storage
+  //         // * OR is hive path is empty
+  //         final messageUid = await chatService
+  //             .addNewMessage(
+  //                 blurHash: hash,
+  //                 type: mediaType,
+  //                 fileSize: fileSize,
+  //                 localPath: localPath,
+  //                 mediaUrl: downloadURL,
+  //                 receiverUid: fireUser.id,
+  //                 senderThumbnail: thumbnailPath)
+  //             .whenComplete(() => log.w('Video Message added'));
+  //         return messageUid;
+  //       }
+  //     case MediaType.document:
+  //       {
+  //         // * Add message when type is document
+  //         final messageUid = await chatService
+  //             .addNewMessage(
+  //                 type: mediaType,
+  //                 mediaUrl: downloadURL,
+  //                 receiverUid: fireUser.id,
+  //                 documentTitle: documentTitle)
+  //             .whenComplete(() => log.w('Document Message added'));
+  //         return messageUid;
+  //       }
+  //     default:
+  //       {
+  //         // * This is the default case for adding message in firestore database
+  //         final messageUid = await chatService
+  //             .addNewMessage(
+  //                 type: mediaType,
+  //                 mediaUrl: downloadURL,
+  //                 receiverUid: fireUser.id)
+  //             .whenComplete(() => log.w('Document Message added'));
+  //         return messageUid;
+  //       }
+  //   }
+  // }
 
   /// upload media into firebase storage and get progress
   Future<String> _uploadFile({
@@ -295,17 +281,24 @@ class ChatViewModel extends BaseViewModel {
     required String extension,
     required String firestorePath,
   }) async {
+    int fileLength = File(filePath).lengthSync();
     firebase_storage.UploadTask task = firebase_storage.FirebaseStorage.instance
         .ref(firestorePath)
         .putFile(File(filePath));
     try {
       task.snapshotEvents.listen(
         (snapshot) {
-          var progress = snapshot.bytesTransferred / snapshot.totalBytes;
-          log.v((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          //var progress = snapshot.bytesTransferred / snapshot.totalBytes;
+          //log.v((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
 
           /// uploading progress of file
-          updateProgress(progress);
+          //updateProgress(progress);
+          _uploadLocator.getTransfferingBytes(snapshot.bytesTransferred);
+
+          // final totalProgress =
+          //     _uploadLocator.transferredByteData / _uploadLocator.totalByteData;
+
+          //log.wtf('TotalProgress:${totalProgress/100}');
         },
       );
     } on firebase_core.FirebaseException catch (e) {
@@ -318,6 +311,8 @@ class ChatViewModel extends BaseViewModel {
       }
     }
     await task;
+    _uploadLocator.getTransfferingBytes(0);
+    _uploadLocator.getTransfferedBytes(fileLength);
 
     /// This is the download Url of media
     ///  which was uploaded to the firestore storage
@@ -325,9 +320,10 @@ class ChatViewModel extends BaseViewModel {
 
     /// Generate the filename or medianame for locally downloaded file
     /// which will saved in convo application folder
-    String mediaName = _localNameGenerator(mediaType);
+    String mediaName = pathHelper.localNameGenerator(mediaType);
 
-    String folder = folderPathDecider(mediaType);
+    /// This will decide the folder of the downloaded or saved media locally
+    String folder = pathHelper.folderPathDecider(mediaType);
 
     /// This will save the copy of selected file in the convo app
     /// local directory or folder
@@ -336,38 +332,21 @@ class ChatViewModel extends BaseViewModel {
 
     /// Add the message in firestore and
     /// return the messageUid after adding message
-    await _getMessageUid(
-      mediaType,
+    await chatService.addMsgAndGetUid(
       hash: hash,
+      mediaType: mediaType,
       downloadURL: downloadURL,
+      receiverUid: fireUser.id,
       localPath: savedFile.path,
       documentTitle: documentTitle,
       thumbnailPath: thumbnail?.path,
       fileSize: File(filePath).lengthSync(),
     );
 
-    // if (thumbnail != null) {
-    //   final map = {
-    //     MediaHiveBoxField.taskID: null,
-    //     MediaHiveBoxField.thumbnailPath: thumbnail.path,
-    //     MediaHiveBoxField.localPath: savedFile.path,
-    //   };
-
-    //   /// This will save the path of saved file in hive local database
-    //   Hive.box(HiveApi.mediaHiveBox).put(messageUid, map).whenComplete(
-    //       () => log.wtf('Image Path is saved in hive ${savedFile.path}'));
-    // } else {
-    //   /// This will save the path of saved file in hive local database
-    //   Hive.box(HiveApi.mediaHiveBox)
-    //       .put(messageUid, savedFile.path)
-    //       .whenComplete(
-    //           () => log.wtf('Image Path is saved in hive ${savedFile.path}'));
-    // }
-
     return downloadURL;
   }
 
-  /// Genrate File Name For Firebase Storage Bucket
+  /// Generate File Name For Firebase Storage Bucket
   /// and upload to firebase storage and add to firestore
   Future<String> uploadAndAddToDatabase(AssetEntity asset) async {
     final now = DateTime.now();
@@ -397,11 +376,11 @@ class ChatViewModel extends BaseViewModel {
     switch (mimeType) {
       case MediaType.image:
         {
-          final compressedImage = await _compressImage(file!);
-          final hash = await _blurHashString(compressedImage);
+          //final compressedImage = await _compressImage(file!);
+          final hash = await _blurHashString(file!);
           return _uploadFile(
               hash: hash,
-              filePath: compressedImage.path,
+              filePath: file.path,
               mediaType: mimeType,
               extension: fileExtension,
               firestorePath: firebasePath);

@@ -176,44 +176,6 @@ class ChatService {
       DocumentField.reactions: reactions,
     });
     return messageUid;
-    //  _conversationCollection
-    //     .doc(conversationId)
-    //     .collection(chatsFirestoreKey)
-    //     .add({
-    //   DocumentField.isRead: isRead,
-    //   DocumentField.isReply: isReply,
-    //   DocumentField.message: messageMap,
-    //   DocumentField.messageUid: messageUid,
-    //   DocumentField.replyMessage: replyMessageMap,
-    //   DocumentField.senderUid: liveUserUid,
-    //   DocumentField.timestamp: Timestamp.now(),
-    //   DocumentField.type: type,
-    // }).whenComplete(() {
-    //   final now = DateTime.now();
-    //   final year = now.year;
-    //   final month = now.month;
-    //   final day = now.day;
-    //   String uploadingDate = '$year$month$day';
-    //   String uploadingTime =
-    //       '${now.second}${now.millisecond}${now.microsecond}';
-
-    //   final extension = type == MediaType.image ? 'jpeg' : 'mp4';
-
-    //   String mediaName = type == MediaType.image
-    //       ? 'IMG-$uploadingDate-$uploadingTime'
-    //       : 'VID-$uploadingDate-$uploadingTime';
-
-    //   String folderPath = type == MediaType.image
-    //       ? 'Media/Convo Images/Send'
-    //       : 'Media/Convo Videos/Send';
-
-    //   // BackgroundDownloader().saveMediaAtPath(
-    //   //     mediaURL: mediaUrl!,
-    //   //     mediaName: mediaName,
-    //   //     extension: extension,
-    //   //     folderPath: folderPath,
-    //   //     messageUid: messageUid);
-    // });
   }
 
   /// Archive the user
@@ -305,5 +267,79 @@ class ChatService {
   Future<void> addToRecentList(String receiverUid) async {
     _addToRecentListForSender(receiverUid);
     _addTORecentListForReceiver(receiverUid);
+  }
+
+  /// Add the message in firestore and return the messageUid of the added message
+  Future<String> addMsgAndGetUid({
+    String? hash,
+    int? fileSize,
+    String? localPath,
+    String? thumbnailPath,
+    String? documentTitle,
+    required String mediaType,
+    required String downloadURL,
+    required String receiverUid,
+  }) async {
+    switch (mediaType) {
+      case MediaType.image:
+        {
+          // * Add message when type is image
+          // * we need blurhash for display raw data of video thumbnail
+          // * if image is not present offline of in firestore storage
+          // * OR is hive path is empty
+          final messageUid = await chatService
+              .addNewMessage(
+                  blurHash: hash,
+                  type: mediaType,
+                  fileSize: fileSize,
+                  localPath: localPath,
+                  mediaUrl: downloadURL,
+                  receiverUid: receiverUid)
+              .whenComplete(() => log.w('Image Message added'));
+          return messageUid;
+        }
+
+      case MediaType.video:
+        {
+          // * Add message when type is video
+          // * we need blurhash for display raw data of image
+          // * if image is not present offline of in firestore storage
+          // * OR is hive path is empty
+          final messageUid = await chatService
+              .addNewMessage(
+                  blurHash: hash,
+                  type: mediaType,
+                  fileSize: fileSize,
+                  localPath: localPath,
+                  mediaUrl: downloadURL,
+                  receiverUid: receiverUid,
+                  senderThumbnail: thumbnailPath)
+              .whenComplete(() => log.w('Video Message added'));
+          return messageUid;
+        }
+      case MediaType.document:
+        {
+          // * Add message when type is document
+          final messageUid = await chatService
+              .addNewMessage(
+                  type: mediaType,
+                  mediaUrl: downloadURL,
+                  receiverUid: receiverUid,
+                  documentTitle: documentTitle)
+              .whenComplete(() => log.w('Document Message added'));
+          return messageUid;
+        }
+      default:
+        {
+          // * This is the default case for adding message in firestore database
+          final messageUid = await chatService
+              .addNewMessage(
+                  type: mediaType,
+                  mediaUrl: downloadURL,
+                  receiverUid: receiverUid)
+              .whenComplete(() => log.w('Document Message added'));
+          return messageUid;
+        }
+    }
   }
 }

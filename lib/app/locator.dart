@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hint/api/database.dart';
 import 'package:hint/api/firestore.dart';
 import 'package:hint/api/thumbnail_api.dart';
+import 'package:hint/api/uploads_api.dart';
 import 'package:hint/pods/verify_email_pod.dart';
 import 'package:hint/api/replymessage_value.dart';
 import 'package:hint/services/permission_service.dart';
@@ -20,6 +21,7 @@ void setupLocator() {
   locator.registerLazySingleton<DiscoverViewModel>(() => DiscoverViewModel());
   //locator.registerLazySingleton<ThumbnailAPI>(() => ThumbnailImplientation());
   locator.registerSingleton<ThumbnailAPI>(ThumbnailImplientation());
+  locator.registerSingleton<UploadsAPI>(UploadsAPIImplimentation());
   locator.registerSingleton<FlutterDownloaderAPI>(
       FlutterDownloaderImplimentation());
   locator.registerSingleton<GetReplyMessageValue>(ReplyMessageImplimentation());

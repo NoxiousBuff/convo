@@ -1,17 +1,19 @@
+
+import 'package:hint/ui/shared/scribble/scribble_view.dart';
+
 import 'chat_viewmodel.dart';
-import 'widgets/chat_options.dart';
 import 'package:lottie/lottie.dart';
 import 'package:stacked/stacked.dart';
 import 'package:flutter/material.dart';
 import 'package:hint/app/locator.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:scribble/scribble.dart';
 import 'package:hint/api/firestore.dart';
+import 'package:hint/api/uploads_api.dart';
 import 'package:hint/models/user_model.dart';
 import 'package:hint/models/dule_model.dart';
-import 'package:ezanimation/ezanimation.dart';
 import 'package:hint/models/message_model.dart';
 import 'package:hint/ui/shared/ui_helpers.dart';
-import 'package:hint/services/nav_service.dart';
 import 'package:hint/constants/app_strings.dart';
 import 'package:hint/ui/shared/empty_state.dart';
 import 'package:hint/api/replymessage_value.dart';
@@ -20,16 +22,14 @@ import 'package:gmo_media_picker/media_picker.dart';
 import 'package:hint/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hint/ui/shared/custom_snackbars.dart';
-import 'package:hint/ui/shared/user_profile_photo.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hint/extensions/custom_color_scheme.dart';
 import 'package:hint/ui/views/chat/widgets/chat_textfield.dart';
+import 'package:hint/ui/views/chat/widgets/chatview_title.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hint/ui/views/chat/widgets/replymessage_tile.dart';
-import 'package:hint/ui/views/write_letter/write_letter_view.dart';
 import 'package:hint/ui/views/chat/widgets/chat_animation_options.dart';
 import 'package:hint/ui/views/chat/message_bubble/messagebubble_view.dart';
-import 'package:hint/ui/views/settings/user_account/user_account_view.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView(
@@ -55,8 +55,14 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   /// calling the replyMessage locator
   final replyMsgLocator = locator.get<GetReplyMessageValue>();
 
+  /// callling uploads api class locator
+  final _uploadLocator = locator.get<UploadsAPI>();
+
   /// get the current user uid from firestore api class
   final currentUserID = FirestoreApi().currentUserId;
+
+  /// notifier for scribble
+  late ScribbleNotifier _scribbleNotifier;
 
   /// animation controllers
   late AnimationController fuckCntlr;
@@ -64,8 +70,6 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   late AnimationController dollarCntlr;
   late AnimationController balloonCntlr;
   late AnimationController confettiCntlr;
-
-  final ezAnimation = EzAnimation(0.0, 200.0, const Duration(seconds: 4));
 
   Animation<double> balloonSize(AnimationController balloonCntlr) {
     Animation<double> _balloonSize = Tween<double>(begin: 0, end: 500)
@@ -83,6 +87,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   @override
   void initState() {
     databaseService.updateUserDataWithKey(DatabaseMessageField.msgTxt, '');
+    databaseService.updateUserDataWithKey(DatabaseMessageField.aniType, '');
 
     databaseService.updateUserDataWithKey(
         DatabaseMessageField.roomUid, widget.conversationId);
@@ -102,14 +107,18 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
     /// initialise the dollar controller
     dollarCntlr = AnimationController(vsync: this, duration: duration);
 
+    _scribbleNotifier = ScribbleNotifier();
+
     fuckCntlr.addListener(() => setState(() {}));
     heartCntlr.addListener(() => setState(() {}));
     dollarCntlr.addListener(() => setState(() {}));
     balloonCntlr.addListener(() => setState(() {}));
     confettiCntlr.addListener(() => setState(() {}));
-
-    replyMsgLocator.addListener(() => setState(() {}));
-
+    _scribbleNotifier.addListener((state) {});
+    if (!mounted) {
+      replyMsgLocator.addListener(() => setState(() {}));
+      _uploadLocator.addListener(() => setState(() {}));
+    }
     super.initState();
   }
 
@@ -120,14 +129,15 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
     dollarCntlr.removeListener(() {});
     balloonCntlr.removeListener(() {});
     confettiCntlr.removeListener(() {});
+    replyMsgLocator.removeListener(() => setState(() {}));
+    _uploadLocator.removeListener(() => setState(() {}));
 
     fuckCntlr.dispose();
     heartCntlr.dispose();
     dollarCntlr.dispose();
     balloonCntlr.dispose();
     confettiCntlr.dispose();
-
-    replyMsgLocator.removeListener(() => setState(() {}));
+    _scribbleNotifier.dispose();
 
     super.dispose();
   }
@@ -198,53 +208,13 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
                     backgroundColor: Theme.of(context).colorScheme.lightGrey,
 
                     /// This will display the username unique name of each user
-                    title: InkWell(
-                      onTap: () => navService.materialPageRoute(
-                          context, const UserAccountView()),
-                      child: Row(
-                        children: [
-                          /// This display the profile photo of user
-                          UserProfilePhoto(
-                            widget.fireUser.photoUrl,
-                            height: 36,
-                            width: 36,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          horizontalSpaceSmall,
-
-                          /// This will display the current Display name of a user
-                          Text(
-                            widget.fireUser.displayName,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.black),
-                          ),
-                        ],
-                      ),
-                    ),
+                    title: ChatViewTitle(widget.fireUser),
                     actions: [
                       /// A model bottom sheet appear after pressing this icon
                       /// which contain some options regarding the chat room
                       /// like clear the chat and report the chat and more
                       IconButton(
-                        onPressed: () => showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Column(
-                              children: const [
-                                verticalSpaceRegular,
-
-                                /// This will clear all the conversation in a chat room
-                                ChatOptions(
-                                    icon: FeatherIcons.delete, label: 'Delete'),
-
-                                /// This will report to convo about a user
-                                ChatOptions(
-                                    icon: Icons.report, label: 'Report'),
-                                verticalSpaceRegular,
-                              ],
-                            );
-                          },
-                        ),
+                        onPressed: () {},
                         icon: Icon(
                           FeatherIcons.info,
                           color: Theme.of(context).colorScheme.mediumBlack,
@@ -379,6 +349,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
                 /// and added the information into firestore
                 await Future.wait(
                     assets.map((asset) => model.uploadAndAddToDatabase(asset)));
+                _uploadLocator.clearAllBytes();
               } else {
                 /// This snackbar will appear if the of selected files are greater than 8 MB
                 /// because maximum uploading file size is 8 MB
@@ -425,9 +396,17 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
           },
         ),
         IconButton(
-          onPressed: () => navService.materialPageRoute(
-              context, WriteLetterView(fireUser: widget.fireUser)),
-          icon: const Icon(FeatherIcons.send),
+          onPressed: () => showModalBottomSheet(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(32),
+                  topLeft: Radius.circular(32),
+                ),
+              ),
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (_) => ScribbleView(_scribbleNotifier,widget.fireUser)),
+          icon: const Icon(FeatherIcons.activity),
           color: Theme.of(context).colorScheme.darkGrey,
           iconSize: 32,
         ),
@@ -581,37 +560,37 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   /// This will appears when user send any media
   /// This shows the uploading progress of files which user uploading into database
   /// This is a stream so, all progress will display in realtime OR live
-  Widget uploadingFileIndicator(BuildContext context, ChatViewModel model) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Container(
-            width: screenWidthPercentage(context, percentage: 0.6),
-            color: Theme.of(context).colorScheme.darkGrey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  model.fileTitle,
-                  style: TextStyle(
-                      fontSize: 18, color: Theme.of(context).colorScheme.black),
-                ),
-                LinearProgressIndicator(
-                  value: model.fileProgress,
-                  valueColor: AlwaysStoppedAnimation(
-                      Theme.of(context).colorScheme.blue),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget uploadingFileIndicator(BuildContext context, ChatViewModel model) {
+  //   return Row(
+  //     mainAxisSize: MainAxisSize.min,
+  //     mainAxisAlignment: MainAxisAlignment.end,
+  //     children: [
+  //       ClipRRect(
+  //         borderRadius: BorderRadius.circular(4),
+  //         child: Container(
+  //           width: screenWidthPercentage(context, percentage: 0.6),
+  //           color: Theme.of(context).colorScheme.darkGrey,
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 model.fileTitle,
+  //                 style: TextStyle(
+  //                     fontSize: 18, color: Theme.of(context).colorScheme.black),
+  //               ),
+  //               LinearProgressIndicator(
+  //                 value: model.fileProgress,
+  //                 valueColor: AlwaysStoppedAnimation(
+  //                     Theme.of(context).colorScheme.blue),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   /// This is the list of all messages in a conversation of two user
   ///  OR in a chat room
@@ -710,58 +689,58 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   }
 
   /// creating an ios style textfield for typing messages
-  Widget chatTextField(BuildContext context, ChatViewModel model) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Container(
-                  constraints: BoxConstraints(
-                      maxWidth:
-                          screenWidthPercentage(context, percentage: 0.85),
-                      minWidth:
-                          screenWidthPercentage(context, percentage: 0.01)),
-                  alignment: Alignment.center,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  decoration: BoxDecoration(
-                      color: model.messageText.isNotEmpty
-                          ? Theme.of(context).colorScheme.blue
-                          : Theme.of(context).colorScheme.lightGrey,
-                      borderRadius: BorderRadius.circular(32)),
-                  child: CupertinoTextField.borderless(
-                    suffix: GestureDetector(
-                      child: const Icon(FeatherIcons.send),
-                      onTap: () => model.addMessage(),
-                    ),
-                    suffixMode: OverlayVisibilityMode.editing,
-                    controller: model.messageTech,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.black,
-                      fontSize: 18,
-                    ),
-                    placeholder: 'Messages sent as you type',
-                    textInputAction: TextInputAction.newline,
-                    minLines: 1,
-                    maxLines: 6,
-                    onChanged: (value) {
-                      model.updateMessageText(value);
-                      model.updateUserDataWithKey(
-                          DatabaseMessageField.msgTxt, value);
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget chatTextField(BuildContext context, ChatViewModel model) {
+  //   return Column(
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 10),
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.end,
+  //           mainAxisSize: MainAxisSize.max,
+  //           children: [
+  //             Padding(
+  //               padding: const EdgeInsets.symmetric(vertical: 8),
+  //               child: Container(
+  //                 constraints: BoxConstraints(
+  //                     maxWidth:
+  //                         screenWidthPercentage(context, percentage: 0.85),
+  //                     minWidth:
+  //                         screenWidthPercentage(context, percentage: 0.01)),
+  //                 alignment: Alignment.center,
+  //                 padding:
+  //                     const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+  //                 decoration: BoxDecoration(
+  //                     color: model.messageText.isNotEmpty
+  //                         ? Theme.of(context).colorScheme.blue
+  //                         : Theme.of(context).colorScheme.lightGrey,
+  //                     borderRadius: BorderRadius.circular(32)),
+  //                 child: CupertinoTextField.borderless(
+  //                   suffix: GestureDetector(
+  //                     child: const Icon(FeatherIcons.send),
+  //                     onTap: () => model.addMessage(),
+  //                   ),
+  //                   suffixMode: OverlayVisibilityMode.editing,
+  //                   controller: model.messageTech,
+  //                   style: TextStyle(
+  //                     color: Theme.of(context).colorScheme.black,
+  //                     fontSize: 18,
+  //                   ),
+  //                   placeholder: 'Messages sent as you type',
+  //                   textInputAction: TextInputAction.newline,
+  //                   minLines: 1,
+  //                   maxLines: 6,
+  //                   onChanged: (value) {
+  //                     model.updateMessageText(value);
+  //                     model.updateUserDataWithKey(
+  //                         DatabaseMessageField.msgTxt, value);
+  //                   },
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }

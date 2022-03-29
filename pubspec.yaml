@@ -42,15 +42,17 @@ dependencies:
   filesize: ^2.0.1
   open_file: ^3.2.1
   file_picker: ^4.5.0  
-  ezanimation: ^0.6.0
   country_picker: ^2.0.8
   email_validator: ^2.0.1
+  fast_color_picker: ^0.1.1
+  flutter_state_notifier: ^0.7.1
 
   # ui
   pinput: ^1.2.1
   confetti: ^0.6.0
   swipe_to: ^1.0.2
   blurhash: ^1.0.0
+  scribble: ^0.2.2
   animations: ^2.0.2
   swipe_deck: ^1.1.0
   video_player: ^2.1.4

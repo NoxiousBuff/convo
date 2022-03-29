@@ -32,6 +32,7 @@ class FirestoreApi {
   /// Get current user uid
   String get currentUserId => getCurrentUser!.uid;
 
+
   ///method to updateUser in [Firebase]
   Future<void> updateUser(
       {required String uid,

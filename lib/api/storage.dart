@@ -1,10 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:hint/app/app_logger.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
-
-final storageApi = StorageApi();
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class StorageApi {
   /// abstraction of logger for providing logs in
@@ -22,6 +21,20 @@ class StorageApi {
     File file = File(filePath);
     try {
       final uploaded = await _storage.ref(firestorePath).putFile(file);
+
+      return await uploaded.ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      log.e(e.message);
+      if (onError != null) onError();
+      return null;
+    }
+  }
+
+  /// method to upload a [BytesData] to the storage bucked to [firebase]
+  Future<String?> uploadByteData(Uint8List data, String firestorePath,
+      {Function? onError}) async {
+    try {
+      final uploaded = await _storage.ref(firestorePath).putData(data);
 
       return await uploaded.ref.getDownloadURL();
     } on FirebaseException catch (e) {
